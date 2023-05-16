@@ -1,20 +1,36 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { Dialog, Transition } from "@headlessui/react";
+import { ethers } from "ethers";
 import { FC, Fragment, useState } from "react";
 
 export interface Asset {
   image: string;
   symbol: string;
+  denom: string;
+  decimals: number;
 }
 
 interface Props {
   asset: Asset;
+  balances: Record<string, string>;
   assets: Asset[];
   onSelect: (asset: Asset) => void;
 }
 
-const AssetSelect: FC<Props> = ({ asset, assets, onSelect }) => {
+const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const sortedAssets = assets.sort((a, b) => {
+    const aBalance = balances[a.denom]
+      ? parseFloat(ethers.formatUnits(balances[a.denom], a.decimals))
+      : 0;
+    const bBalance = balances[b.denom]
+      ? parseFloat(ethers.formatUnits(balances[b.denom], b.decimals))
+      : 0;
+
+    return bBalance - aBalance;
+  });
 
   return (
     <Fragment>
@@ -88,7 +104,9 @@ const AssetSelect: FC<Props> = ({ asset, assets, onSelect }) => {
                     </Dialog.Title>
                   </div>
                   <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
-                    {assets.map((asset) => {
+                    {sortedAssets.map((asset) => {
+                      const balance = balances[asset.denom];
+
                       return (
                         <div key={asset.symbol}>
                           <button
@@ -99,11 +117,18 @@ const AssetSelect: FC<Props> = ({ asset, assets, onSelect }) => {
                             }}
                           >
                             <img
+                              alt={asset.symbol}
                               className="w-16 h-16"
                               src={`https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${asset.image}`}
-                              alt={asset.symbol}
                             />
-                            <p className="font-bold">{asset.symbol}</p>
+                            <p className="font-bold flex-1">{asset.symbol}</p>
+                            {balance && (
+                              <p className="text-sm text-white/40">
+                                {parseFloat(
+                                  ethers.formatUnits(balance, asset.decimals)
+                                ).toFixed(4)}
+                              </p>
+                            )}
                           </button>
                         </div>
                       );

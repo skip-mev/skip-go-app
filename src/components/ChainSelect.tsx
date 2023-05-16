@@ -83,7 +83,7 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
                 <div className="flex flex-col h-full">
                   <div className="mb-8">
                     <Dialog.Title className="font-bold text-2xl">
-                      Select Asset
+                      Select Network
                     </Dialog.Title>
                   </div>
                   <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
