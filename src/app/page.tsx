@@ -3,7 +3,7 @@
 import { ethers } from "ethers";
 import ChainSelect, { Chain } from "@/components/ChainSelect";
 import AssetSelect, { Asset } from "@/components/AssetSelect";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Fragment, Suspense, useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useChain, useManager } from "@cosmos-kit/react";
@@ -11,6 +11,13 @@ import { WalletStatus } from "@cosmos-kit/core";
 import Long from "long";
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import { cosmos, ibc } from "juno-network";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
+import {
+  GasPrice,
+  SigningStargateClient,
+  defaultRegistryTypes,
+} from "@cosmjs/stargate";
+import { GeneratedType, Registry } from "@cosmjs/proto-signing";
 
 const chains = [
   {
@@ -76,6 +83,7 @@ function useAssetsQuery(chain: string) {
     queryFn: () => {
       return getAssets(chain);
     },
+    retry: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -86,6 +94,9 @@ const mapChainlistIDToSolveID: Record<string, string> = {
   cosmos: "cosmoshub-4",
   osmosis: "osmosis-1",
   juno: "juno-1",
+  terra: "phoenix-1",
+  neutron: "neutron-1",
+  evmos: "evmos_9001-2",
 };
 
 interface IBCHop {
@@ -129,7 +140,7 @@ function useSolveRouteQuery(
       // https://solve-testnet.skip.money
 
       const response = await axios.get(
-        `http://localhost:8080/v1/ibc/route?source_token=${
+        `https://solve-testnet.skip.money/v1/ibc/route?source_token=${
           asset.denom
         }&source_chain_id=${
           mapChainlistIDToSolveID[sourceChain] ?? sourceChain
@@ -138,8 +149,13 @@ function useSolveRouteQuery(
         }`
       );
 
+      if (response.status !== 200) {
+        return null;
+      }
+
       return response.data as SolveRouteResponse;
     },
+    retry: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -181,6 +197,11 @@ export default function Home() {
   const [selectedAssetBalance, setSelectedAssetBalance] = useState("0");
 
   const [balances, setBalances] = useState<Record<string, string>>({});
+
+  const [txPending, setTxPending] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
+
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     if (assets) {
@@ -240,177 +261,148 @@ export default function Home() {
       selectedChains.targetChain.id,
       selectedAsset
     );
-  // console.log(solveRoute);
-  // console.log(solveRouteQueryStatus);
 
   const signAndSubmitIBCTransfer = async () => {
-    // osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e
-    // cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet
-
     if (!address || !solveRoute || !selectedAsset) {
       return;
     }
 
-    console.log(address);
+    setTxPending(true);
 
-    const decoded = fromBech32(address);
+    try {
+      const formattedAmount = ethers.parseUnits(amount, selectedAsset.decimals);
 
-    console.log(toBech32("cosmos", decoded.data));
+      const client = await getSigningStargateClient();
 
-    const client = await getSigningStargateClient();
+      let forwardMemo = {};
+      if (solveRoute.route.length > 1) {
+        const nextHop = solveRoute.route[1];
 
-    let forwardMemo = {};
-    if (solveRoute.route.length > 1) {
-      const nextHop = solveRoute.route[1];
+        const nextChain = chainRecords.find(
+          (c) =>
+            c.chain.chain_id ===
+              mapChainlistIDToSolveID[selectedChains.targetChain.id] ??
+            selectedChains.targetChain.id
+        );
+
+        if (!nextChain) {
+          throw new Error("nextChain not found");
+        }
+
+        const receiver = toBech32(
+          nextChain.chain.bech32_prefix,
+          fromBech32(address).data
+        );
+
+        forwardMemo = {
+          forward: {
+            receiver,
+            port: nextHop.port,
+            channel: nextHop.channel,
+            timeout: 0,
+            retries: 2,
+          },
+        };
+      }
+
+      const routeChains: string[] = [];
+      for (const hop of solveRoute.route) {
+        routeChains.push(hop.chainId);
+      }
+      routeChains.push(mapChainlistIDToSolveID[selectedChains.targetChain.id]);
 
       const nextChain = chainRecords.find(
-        (c) =>
-          c.chain.chain_id ===
-            mapChainlistIDToSolveID[selectedChains.targetChain.id] ??
-          selectedChains.targetChain.id
+        (c) => c.chain.chain_id === routeChains[1]
       );
 
       if (!nextChain) {
         throw new Error("nextChain not found");
       }
 
-      const receiver = toBech32(
-        nextChain.chain.bech32_prefix,
-        fromBech32(address).data
+      const currentHeight = await client.getHeight();
+
+      client.registry.register(
+        "/ibc.applications.transfer.v1.MsgTransfer",
+        MsgTransfer
       );
 
-      forwardMemo = {
-        forward: {
-          receiver,
-          port: nextHop.port,
-          channel: nextHop.channel,
-          timeout: 0,
-          retries: 2,
+      const msg = {
+        typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+        value: {
+          sender: address,
+          receiver: toBech32(
+            nextChain.chain.bech32_prefix,
+            fromBech32(address).data
+          ),
+          sourceChannel: solveRoute.route[0].channel,
+          sourcePort: solveRoute.route[0].port,
+          token: {
+            denom: selectedAsset.denom,
+            amount: formattedAmount.toString(),
+          },
+          timeoutHeight: {
+            revisionHeight: Long.fromNumber(currentHeight).add(100),
+            revisionNumber: Long.fromNumber(currentHeight).add(100),
+          },
+          timeoutTimestamp: Long.fromNumber(0),
+          memo: solveRoute.route.length > 1 ? JSON.stringify(forwardMemo) : "",
         },
       };
+
+      const signer = await rest.getOfflineSignerDirect();
+
+      const rpcEndpoint = await rest.getRpcEndpoint();
+
+      const msgTransferType = defaultRegistryTypes.find((registryType) => {
+        if (registryType[0] === "/ibc.applications.transfer.v1.MsgTransfer") {
+          return true;
+        }
+
+        return false;
+      }) as [string, GeneratedType];
+
+      const originalEncode = msgTransferType[1].encode;
+
+      // @ts-ignore
+      msgTransferType[1].encode = (msg: any) => {
+        console.log("called");
+
+        const writer = originalEncode(msg);
+
+        if (msg.memo !== "") {
+          console.log(msg.memo);
+          writer.uint32(66).string(msg.memo);
+        }
+
+        return writer;
+      };
+
+      const feeDenom = rest.chain.fees?.fee_tokens[0].denom ?? "ucosmos";
+
+      const feeAmount =
+        rest.chain.fees?.fee_tokens[0].average_gas_price ?? "0.025";
+
+      const otherClient = await SigningStargateClient.connectWithSigner(
+        rpcEndpoint,
+        signer,
+        {
+          // @ts-ignore
+          registry: new Registry([...defaultRegistryTypes]),
+          gasPrice: GasPrice.fromString(`${feeAmount}${feeDenom}`),
+        }
+      );
+
+      const tx = await otherClient.signAndBroadcast(address, [msg], "auto");
+
+      setTxHash(tx.transactionHash);
+    } catch (error) {
+    } finally {
+      setTxPending(false);
     }
-
-    const routeChains: string[] = [];
-    for (const hop of solveRoute.route) {
-      routeChains.push(hop.chainId);
-    }
-    routeChains.push(selectedChains.targetChain.id);
-
-    const nextChain = chainRecords.find(
-      (c) => c.chain.chain_id === routeChains[1]
-    );
-
-    if (!nextChain) {
-      throw new Error("nextChain not found");
-    }
-
-    const currentHeight = await client.getHeight();
-
-    // const { transfer } =
-    //   ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
-
-    const msg = {
-      typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
-      value: {
-        sender: address,
-        receiver: toBech32(
-          nextChain.chain.bech32_prefix,
-          fromBech32(address).data
-        ),
-        sourceChannel: solveRoute.route[0].channel,
-        sourcePort: solveRoute.route[0].port,
-        token: {
-          denom: selectedAsset.denom,
-          amount: "1000",
-        },
-        timeoutHeight: {
-          revisionHeight: Long.fromNumber(currentHeight).add(100),
-          revisionNumber: Long.fromNumber(currentHeight).add(100),
-        },
-        timeoutTimestamp: Long.fromNumber(0),
-      },
-      memo: JSON.stringify(forwardMemo),
-    };
-
-    const tx = await client.signAndBroadcast(address, [msg], "auto");
-
-    console.log(tx);
-
-    // console.log(
-    //   toBech32(nextChain.chain.bech32_prefix, fromBech32(address).data)
-    // );
-
-    // const currentHeight = await client.getHeight();
-
-    // const tx = await client.sendIbcTokens(
-    //   address,
-    //   toBech32(nextChain.chain.bech32_prefix, fromBech32(address).data),
-    //   {
-    //     denom: selectedAsset.denom,
-    //     amount: "1000",
-    //   },
-    //   solveRoute.route[0].port,
-    //   solveRoute.route[0].channel,
-    //   {
-    //     revisionHeight: Long.fromNumber(currentHeight).add(100),
-    //     revisionNumber: Long.fromNumber(currentHeight).add(100),
-    //   },
-    //   undefined,
-    //   "auto",
-    //   JSON.stringify(forwardMemo)
-    // );
-
-    // console.log(tx);
-
-    /* 
-    
-{
-  "forward": {
-    "receiver": "juno1caf8d22rfrjwm3dganyyv85fydhednkk534t9z",
-    "port": "transfer",
-    "channel": "channel-42",
-    "timeout": 0,
-    "retries": 2,
-    "next": {
-      "forward": {
-        "receiver": "chihuahua1caf8d22rfrjwm3dganyyv85fydhednkkpkm7ru",
-        "port": "transfer",
-        "channel": "channel-28",
-        "timeout": 0,
-        "retries": 2
-      }
-    }
-  }
-}
-
-
-    */
-
-    //
-
-    // const tx = await client.sendIbcTokens(
-    //   "osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e",
-    //   "cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet",
-    //   {
-    //     denom: "uosmo",
-    //     amount: "100",
-    //   },
-    //   "transfer",
-    //   "channel-0",
-    // {
-    //   revisionHeight: Long.fromNumber(currentHeight).add(100),
-    //   revisionNumber: Long.fromNumber(currentHeight).add(100),
-    // },
-    // undefined,
-    // "auto"
-    // );
-
-    // console.log(tx);
-    // client.sendIbcTokens()
   };
 
   return (
-    <main className="px-4">
+    <main className="px-4 pb-24">
       <div className="py-16">
         <p className="text-center font-black text-xl tracking-wider">
           ibc<span className="text-indigo-500">.fun</span>
@@ -479,6 +471,7 @@ export default function Home() {
                     className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
                     type="text"
                     placeholder="0.000"
+                    onChange={(e) => setAmount(e.target.value)}
                   />
                 </div>
               </div>
@@ -511,30 +504,149 @@ export default function Home() {
             )}
             {status === WalletStatus.Connected && (
               <button
-                className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors"
+                className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center"
                 onClick={signAndSubmitIBCTransfer}
               >
-                {solveRouteQueryStatus === "loading" ? (
-                  <span>Loading...</span>
-                ) : (
-                  <span>Bridge {selectedAsset?.symbol}</span>
+                {solveRouteQueryStatus === "loading" && <span>Loading...</span>}
+                {solveRouteQueryStatus === "error" && (
+                  <span>No Route found</span>
+                )}
+                {solveRouteQueryStatus === "success" && !txPending && (
+                  <span>Transfer {selectedAsset?.symbol}</span>
+                )}
+                {solveRouteQueryStatus === "success" && txPending && (
+                  <div className="text-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  </div>
                 )}
               </button>
             )}
           </div>
         </Suspense>
-        <div>{solveRoute && <div>{JSON.stringify(solveRoute)}</div>}</div>
         <div>
           {solveRoute && (
-            <div>
-              {solveRoute.route.map((route) => (
-                <div key={route.chainId}>{route.chainId}</div>
-              ))}
-              {selectedChains.targetChain.id}
+            <div className="pt-8">
+              <p className="font-semibold text-gray-400 text-center">
+                IBC Path:
+              </p>
+              <div className="flex items-center justify-center p-4 max-w-md mx-auto">
+                {solveRoute.route.map((route) => {
+                  const hopChain = chainRecords.find(
+                    (chain) => chain.chain.chain_id === route.chainId
+                  );
+
+                  return (
+                    <Fragment key={route.chainId}>
+                      <p className="bg-indigo-100 text-indigo-600 text-sm font-semibold p-2 px-4 rounded">
+                        {hopChain ? hopChain.chain.pretty_name : route.chainId}
+                      </p>
+                      <div className="flex-1 w-full h-[2px] border-t border-zinc-500 border-dashed" />
+                    </Fragment>
+                  );
+                })}
+                <p className="bg-indigo-100 text-indigo-600 text-sm font-semibold p-2 px-4 rounded">
+                  {chainRecords.find(
+                    (chain) =>
+                      chain.chain.chain_id ===
+                      mapChainlistIDToSolveID[selectedChains.targetChain.id]
+                  )?.chain.pretty_name || selectedChains.targetChain.id}
+                </p>
+              </div>
             </div>
           )}
         </div>
       </div>
+      {(txPending || txHash) && (
+        <div
+          aria-live="assertive"
+          className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
+        >
+          <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
+            {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+            <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+              <div className="p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    {txPending && (
+                      <svg
+                        className="animate-spin -ml-1 h-5 w-5 inline-block text-indigo-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
+
+                    {txHash && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="w-5 h-5 text-emerald-400"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="ml-3 w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      Transaction {txPending ? "Pending" : "Complete"}
+                    </p>
+                  </div>
+                  <div className="ml-4 flex flex-shrink-0">
+                    {txHash && (
+                      <a
+                        className="text-sm font-medium  text-indigo-500 underline"
+                        href={`https://www.mintscan.io/${selectedChains.sourceChain.id}/txs/${txHash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
