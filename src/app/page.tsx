@@ -3,7 +3,14 @@
 import { ethers } from "ethers";
 import ChainSelect, { Chain } from "@/components/ChainSelect";
 import AssetSelect, { Asset } from "@/components/AssetSelect";
-import { Fragment, Suspense, useCallback, useEffect, useState } from "react";
+import {
+  Fragment,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useChain, useManager } from "@cosmos-kit/react";
@@ -18,6 +25,7 @@ import {
   defaultRegistryTypes,
 } from "@cosmjs/stargate";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import PathDisplay from "@/components/PathDisplay";
 
 const chains = [
   {
@@ -103,6 +111,7 @@ interface IBCHop {
   port: string;
   channel: string;
   chainId: string;
+  pfmEnabled: boolean;
 }
 
 interface SolveRouteResponse {
@@ -151,6 +160,16 @@ function useSolveRouteQuery(
 
       if (response.status !== 200) {
         return null;
+      }
+
+      const route = response.data as SolveRouteResponse;
+
+      if (route.route.length > 1) {
+        for (const hop of route.route.slice(1)) {
+          if (!hop.pfmEnabled) {
+            return null;
+          }
+        }
       }
 
       return response.data as SolveRouteResponse;
@@ -261,6 +280,29 @@ export default function Home() {
       selectedChains.targetChain.id,
       selectedAsset
     );
+
+  console.log(solveRoute);
+
+  const routeChainIDs = useMemo(() => {
+    const startChain = mapChainlistIDToSolveID[selectedChains.sourceChain.id];
+    const lastChain = mapChainlistIDToSolveID[selectedChains.targetChain.id];
+
+    if (!solveRoute) {
+      return [startChain, lastChain];
+    }
+
+    const IDs = solveRoute.route.map((hop) => hop.chainId);
+
+    if (lastChain) {
+      IDs.push(lastChain);
+    }
+
+    return IDs;
+  }, [
+    selectedChains.sourceChain.id,
+    selectedChains.targetChain.id,
+    solveRoute,
+  ]);
 
   const signAndSubmitIBCTransfer = async () => {
     if (!address || !solveRoute || !selectedAsset) {
@@ -542,37 +584,18 @@ export default function Home() {
             )}
           </div>
         </Suspense>
-        <div>
-          {solveRoute && (
-            <div className="pt-8">
-              <p className="font-semibold text-gray-400 text-center">
-                IBC Path:
-              </p>
-              <div className="flex items-center justify-center p-4 max-w-md mx-auto">
-                {solveRoute.route.map((route) => {
-                  const hopChain = chainRecords.find(
-                    (chain) => chain.chain.chain_id === route.chainId
-                  );
-
-                  return (
-                    <Fragment key={route.chainId}>
-                      <p className="bg-indigo-100 text-indigo-600 text-sm font-semibold p-2 px-4 rounded">
-                        {hopChain ? hopChain.chain.pretty_name : route.chainId}
-                      </p>
-                      <div className="flex-1 w-full h-[2px] border-t border-zinc-500 border-dashed" />
-                    </Fragment>
-                  );
-                })}
-                <p className="bg-indigo-100 text-indigo-600 text-sm font-semibold p-2 px-4 rounded">
-                  {chainRecords.find(
-                    (chain) =>
-                      chain.chain.chain_id ===
-                      mapChainlistIDToSolveID[selectedChains.targetChain.id]
-                  )?.chain.pretty_name || selectedChains.targetChain.id}
-                </p>
-              </div>
-            </div>
-          )}
+        <div className="border border-zinc-700 rounded-lg p-6 py-6">
+          <div className="pb-4">
+            <p className="font-bold">IBC Transfer Route</p>
+          </div>
+          <PathDisplay
+            chainIDs={routeChainIDs}
+            loading={solveRouteQueryStatus === "loading"}
+            noPathExists={
+              solveRouteQueryStatus === "error" ||
+              (solveRouteQueryStatus === "success" && !solveRoute)
+            }
+          />
         </div>
       </div>
       {(txPending || txHash) && (
