@@ -137,7 +137,7 @@ function useSolveRouteQuery(
       // https://solve-testnet.skip.money
 
       const response = await axios.get(
-        `https://solve-testnet.skip.money/v1/ibc/route?source_token=${
+        `http://localhost:8080/v1/ibc/route?source_token=${
           asset.denom
         }&source_chain_id=${
           mapChainlistIDToSolveID[sourceChain] ?? sourceChain
@@ -429,6 +429,18 @@ export default function Home() {
     }
   };
 
+  const isButtonDisabled = useMemo(() => {
+    if (solveRouteQueryStatus !== "success") {
+      return true;
+    }
+
+    if (txPending) {
+      return true;
+    }
+
+    return false;
+  }, [solveRouteQueryStatus, txPending]);
+
   return (
     <Fragment>
       <NavBar
@@ -554,6 +566,7 @@ export default function Home() {
                 <button
                   className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center"
                   onClick={signAndSubmitIBCTransfer}
+                  disabled={isButtonDisabled}
                 >
                   {solveRouteQueryStatus === "loading" && (
                     <span>Loading...</span>
