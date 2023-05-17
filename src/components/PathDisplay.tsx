@@ -5,6 +5,7 @@ import { useManager } from "@cosmos-kit/react";
 import { Fragment } from "react";
 
 const HopDisplay: React.FC<{ chainID: string }> = ({ chainID }) => {
+  console.log(chainID);
   const { chainRecords } = useManager();
 
   const chain = chainRecords.find(({ chain }) => chain.chain_id === chainID);

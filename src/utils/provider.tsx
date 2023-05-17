@@ -14,6 +14,8 @@ function Providers({ children }: React.PropsWithChildren) {
     new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
   );
 
+  console.log(chains);
+
   return (
     <QueryClientProvider client={client}>
       <ChakraProvider theme={defaultTheme}>

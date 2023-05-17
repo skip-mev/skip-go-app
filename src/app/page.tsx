@@ -26,6 +26,8 @@ import {
 } from "@cosmjs/stargate";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
 import PathDisplay from "@/components/PathDisplay";
+import { format } from "path";
+import NavBar from "@/components/NavBar";
 
 const chains = [
   {
@@ -37,42 +39,25 @@ const chains = [
     name: "Cosmos Hub",
   },
   {
-    id: "terra",
-    name: "Terra 2.0",
-  },
-  {
-    id: "neutron",
-    name: "Neutron",
-  },
-  {
-    id: "evmos",
-    name: "Evmos",
+    id: "juno",
+    name: "Juno",
+    chainID: "juno-1",
   },
   {
     id: "axelar",
     name: "Axelar",
   },
   {
+    id: "evmos",
+    name: "Evmos",
+  },
+  {
     id: "stride",
     name: "Stride",
   },
   {
-    id: "quicksilver",
-    name: "Quicksilver",
-  },
-  {
     id: "gravity-bridge",
     name: "Gravity Bridge",
-  },
-  {
-    id: "noble",
-    name: "Noble",
-    chainID: "noble-1",
-  },
-  {
-    id: "juno",
-    name: "Juno",
-    chainID: "juno-1",
   },
 ];
 
@@ -105,6 +90,9 @@ const mapChainlistIDToSolveID: Record<string, string> = {
   terra: "phoenix-1",
   neutron: "neutron-1",
   evmos: "evmos_9001-2",
+  stride: "stride-1",
+  "gravity-bridge": "gravity-bridge-3",
+  axelar: "axelar-dojo-1",
 };
 
 interface IBCHop {
@@ -205,7 +193,7 @@ export default function Home() {
   } = useChain(
     selectedChains.sourceChain.id === "cosmos"
       ? "cosmoshub"
-      : selectedChains.sourceChain.id
+      : selectedChains.sourceChain.id.replace("-", "")
   );
 
   const { chainRecords } = useManager();
@@ -280,8 +268,6 @@ export default function Home() {
       selectedChains.targetChain.id,
       selectedAsset
     );
-
-  console.log(solveRoute);
 
   const routeChainIDs = useMemo(() => {
     const startChain = mapChainlistIDToSolveID[selectedChains.sourceChain.id];
@@ -444,174 +430,144 @@ export default function Home() {
   };
 
   return (
-    <main className="px-4 pb-24">
-      <div className="py-16">
-        <p className="text-center font-black text-xl tracking-wider">
-          ibc<span className="text-indigo-500">.fun</span>
-        </p>
-      </div>
-      <div className="w-full max-w-2xl mx-auto space-y-4">
-        <div className="px-4 py-6 border border-zinc-700 rounded-lg space-y-8">
-          <div className="md:grid grid-cols-2 gap-4">
-            <div className="bg-zinc-800 p-4 rounded-t-md md:rounded-md">
-              <p className="font-semibold text-sm mb-3">Source Chain</p>
-              <ChainSelect
-                chain={selectedChains.sourceChain}
-                chains={chains}
-                onSelect={(chain) =>
-                  setSelectedChains({
-                    ...selectedChains,
-                    sourceChain: chain,
-                    targetChain:
-                      chain.id === selectedChains.targetChain.id
-                        ? (chains.find(
-                            (chain) =>
-                              chain.id !== selectedChains.targetChain.id
-                          ) as Chain)
-                        : selectedChains.targetChain,
-                  })
-                }
-              />
-            </div>
-            <div className="bg-zinc-800 p-4 rounded-b-md md:rounded-md">
-              <p className="font-semibold text-sm mb-3">Destination Chain</p>
-              <ChainSelect
-                chain={selectedChains.targetChain}
-                chains={chains}
-                onSelect={(chain) =>
-                  setSelectedChains({
-                    ...selectedChains,
-                    targetChain: chain,
-                    sourceChain:
-                      chain.id === selectedChains.sourceChain.id
-                        ? (chains.find(
-                            (chain) =>
-                              chain.id !== selectedChains.sourceChain.id
-                          ) as Chain)
-                        : selectedChains.sourceChain,
-                  })
-                }
-              />
-            </div>
-          </div>
-          <div className="bg-zinc-800 p-4 rounded-md">
-            <p className="font-semibold text-sm mb-3">Asset</p>
-            <div className="border border-zinc-600 rounded-md p-4 space-y-4">
-              <div className="sm:flex items-center">
-                <div className="sm:w-48">
-                  {selectedAsset && assets && (
-                    <AssetSelect
-                      asset={selectedAsset}
-                      assets={assets}
-                      balances={balances}
-                      onSelect={(asset) => setSelectedAsset(asset)}
-                    />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <input
-                    className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
-                    type="text"
-                    placeholder="0.000"
-                    onChange={(e) => setAmount(e.target.value)}
-                  />
-                </div>
+    <Fragment>
+      <NavBar
+        chainID={
+          selectedChains.sourceChain.id === "cosmos"
+            ? "cosmoshub"
+            : selectedChains.sourceChain.id
+        }
+      />
+      <main className="px-4 pb-24">
+        <div className="pb-16">
+          <p className="text-center font-black text-xl tracking-wider">
+            ibc<span className="text-indigo-500">.fun</span>
+          </p>
+        </div>
+        <div className="w-full max-w-2xl mx-auto space-y-4">
+          <div className="px-4 py-6 border border-zinc-700 rounded-lg space-y-8">
+            <div className="md:grid grid-cols-2 gap-4">
+              <div className="bg-zinc-800 p-4 rounded-t-md md:rounded-md">
+                <p className="font-semibold text-sm mb-3">Source Chain</p>
+                <ChainSelect
+                  chain={selectedChains.sourceChain}
+                  chains={chains}
+                  onSelect={(chain) =>
+                    setSelectedChains({
+                      ...selectedChains,
+                      sourceChain: chain,
+                      targetChain:
+                        chain.id === selectedChains.targetChain.id
+                          ? (chains.find(
+                              (chain) =>
+                                chain.id !== selectedChains.targetChain.id
+                            ) as Chain)
+                          : selectedChains.targetChain,
+                    })
+                  }
+                />
               </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm">
-                  <span className="text-zinc-400">Amount Available:</span>{" "}
-                  <span className="font-medium">
-                    {ethers.formatUnits(
-                      selectedAssetBalance,
-                      selectedAsset?.decimals
+              <div className="bg-zinc-800 p-4 rounded-b-md md:rounded-md">
+                <p className="font-semibold text-sm mb-3">Destination Chain</p>
+                <ChainSelect
+                  chain={selectedChains.targetChain}
+                  chains={chains}
+                  onSelect={(chain) =>
+                    setSelectedChains({
+                      ...selectedChains,
+                      targetChain: chain,
+
+                      sourceChain:
+                        chain.id === selectedChains.sourceChain.id
+                          ? (chains.find(
+                              (chain) =>
+                                chain.id !== selectedChains.sourceChain.id
+                            ) as Chain)
+                          : selectedChains.sourceChain,
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <div className="bg-zinc-800 p-4 rounded-md">
+              <p className="font-semibold text-sm mb-3">Asset</p>
+              <div className="border border-zinc-600 rounded-md p-4 space-y-4">
+                <div className="sm:flex items-center">
+                  <div className="sm:w-48">
+                    {selectedAsset && assets && (
+                      <AssetSelect
+                        asset={selectedAsset}
+                        assets={assets}
+                        balances={balances}
+                        onSelect={(asset) => setSelectedAsset(asset)}
+                      />
                     )}
-                  </span>
-                </p>
-                <button className="font-bold text-sm text-indigo-500 hover:text-indigo-400 active:text-indigo-500">
-                  MAX
-                </button>
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
+                      type="text"
+                      placeholder="0.000"
+                      onChange={(e) => setAmount(e.target.value)}
+                      value={amount}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm">
+                    <span className="text-zinc-400">Amount Available:</span>{" "}
+                    <span className="font-medium">
+                      {ethers.formatUnits(
+                        selectedAssetBalance,
+                        selectedAsset?.decimals
+                      )}
+                    </span>
+                  </p>
+                  <button
+                    className="font-bold text-sm text-indigo-500 hover:text-indigo-400 active:text-indigo-500"
+                    onClick={() => {
+                      setAmount(
+                        ethers.formatUnits(
+                          selectedAssetBalance,
+                          selectedAsset?.decimals ?? 0
+                        )
+                      );
+                    }}
+                  >
+                    MAX
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <Suspense fallback={null}>
-          <div>
-            {status === WalletStatus.Disconnected && (
-              <button
-                className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors"
-                onClick={connectWallet}
-              >
-                Connect Wallet
-              </button>
-            )}
-            {status === WalletStatus.Connected && (
-              <button
-                className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center"
-                onClick={signAndSubmitIBCTransfer}
-              >
-                {solveRouteQueryStatus === "loading" && <span>Loading...</span>}
-                {solveRouteQueryStatus === "error" && (
-                  <span>No Route found</span>
-                )}
-                {solveRouteQueryStatus === "success" && !txPending && (
-                  <span>Transfer {selectedAsset?.symbol}</span>
-                )}
-                {solveRouteQueryStatus === "success" && txPending && (
-                  <div className="text-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  </div>
-                )}
-              </button>
-            )}
-          </div>
-        </Suspense>
-        <div className="border border-zinc-700 rounded-lg p-6 py-6">
-          <div className="pb-4">
-            <p className="font-bold">IBC Transfer Route</p>
-          </div>
-          <PathDisplay
-            chainIDs={routeChainIDs}
-            loading={solveRouteQueryStatus === "loading"}
-            noPathExists={
-              solveRouteQueryStatus === "error" ||
-              (solveRouteQueryStatus === "success" && !solveRoute)
-            }
-          />
-        </div>
-      </div>
-      {(txPending || txHash) && (
-        <div
-          aria-live="assertive"
-          className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
-        >
-          <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
-            {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
-            <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-              <div className="p-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    {txPending && (
+          <Suspense fallback={null}>
+            <div>
+              {status === WalletStatus.Disconnected && (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors"
+                  onClick={connectWallet}
+                >
+                  Connect Wallet
+                </button>
+              )}
+              {status === WalletStatus.Connected && (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center"
+                  onClick={signAndSubmitIBCTransfer}
+                >
+                  {solveRouteQueryStatus === "loading" && (
+                    <span>Loading...</span>
+                  )}
+                  {solveRouteQueryStatus === "error" && (
+                    <span>No Route found</span>
+                  )}
+                  {solveRouteQueryStatus === "success" && !txPending && (
+                    <span>Transfer {selectedAsset?.symbol}</span>
+                  )}
+                  {solveRouteQueryStatus === "success" && txPending && (
+                    <div className="text-center">
                       <svg
-                        className="animate-spin -ml-1 h-5 w-5 inline-block text-indigo-500"
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -630,46 +586,99 @@ export default function Home() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                    )}
+                    </div>
+                  )}
+                </button>
+              )}
+            </div>
+          </Suspense>
+          <div className="border border-zinc-700 rounded-lg p-6 py-6">
+            <div className="pb-4">
+              <p className="font-bold">IBC Transfer Route</p>
+            </div>
+            <PathDisplay
+              chainIDs={routeChainIDs}
+              loading={solveRouteQueryStatus === "loading"}
+              noPathExists={
+                solveRouteQueryStatus === "error" ||
+                (solveRouteQueryStatus === "success" && !solveRoute)
+              }
+            />
+          </div>
+        </div>
+        {(txPending || txHash) && (
+          <div
+            aria-live="assertive"
+            className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
+          >
+            <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
+              {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+              <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      {txPending && (
+                        <svg
+                          className="animate-spin -ml-1 h-5 w-5 inline-block text-indigo-500"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      )}
 
-                    {txHash && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="w-5 h-5 text-emerald-400"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="ml-3 w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      Transaction {txPending ? "Pending" : "Complete"}
-                    </p>
-                  </div>
-                  <div className="ml-4 flex flex-shrink-0">
-                    {txHash && (
-                      <a
-                        className="text-sm font-medium  text-indigo-500 underline"
-                        href={`https://www.mintscan.io/${selectedChains.sourceChain.id}/txs/${txHash}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View
-                      </a>
-                    )}
+                      {txHash && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="w-5 h-5 text-emerald-400"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="ml-3 w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Transaction {txPending ? "Pending" : "Complete"}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex flex-shrink-0">
+                      {txHash && (
+                        <a
+                          className="text-sm font-medium  text-indigo-500 underline"
+                          href={`https://www.mintscan.io/${selectedChains.sourceChain.id}/txs/${txHash}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </main>
+        )}
+      </main>
+    </Fragment>
   );
 }
