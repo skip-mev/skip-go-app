@@ -137,7 +137,7 @@ function useSolveRouteQuery(
       // https://solve-testnet.skip.money
 
       const response = await axios.get(
-        `http://localhost:8080/v1/ibc/route?source_token=${
+        `https://solve-testnet.skip.money/v1/ibc/route?source_token=${
           asset.denom
         }&source_chain_id=${
           mapChainlistIDToSolveID[sourceChain] ?? sourceChain
