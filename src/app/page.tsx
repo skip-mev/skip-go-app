@@ -70,11 +70,37 @@ async function getAssets(chain: string) {
   return responseJSON as Asset[];
 }
 
-function useAssetsQuery(chain: string) {
+function useAssetsQuery(sourceChain: string, destinationChain: string) {
   return useQuery({
-    queryKey: ["assets", chain],
-    queryFn: () => {
-      return getAssets(chain);
+    queryKey: ["assets", sourceChain, destinationChain],
+    queryFn: async () => {
+      const sourceChainAssets = await getAssets(sourceChain);
+      const destinationChainAssets = await getAssets(destinationChain);
+
+      // for (const sourceChainAsset of sourceChainAssets) {
+      //   const destinationChainAsset = destinationChainAssets.find((asset) => {
+      //     return (
+      //       sourceChainAsset.origin_chain === asset.origin_chain &&
+      //       sourceChainAsset.origin_denom === asset.origin_denom
+      //     );
+      //   });
+
+      //   if (destinationChainAsset) {
+      //     console.log(sourceChainAsset);
+      //     console.log(destinationChainAsset);
+      //     console.log("------------------");
+      //   }
+      // }
+
+      return sourceChainAssets.filter((sourceChainAsset) => {
+        return destinationChainAssets.some((destinationChainAsset) => {
+          return (
+            sourceChainAsset.origin_chain ===
+              destinationChainAsset.origin_chain &&
+            sourceChainAsset.origin_denom === destinationChainAsset.origin_denom
+          );
+        });
+      });
     },
     retry: false,
     refetchOnMount: false,
@@ -127,7 +153,9 @@ function useSolveRouteQuery(
 
       // this is probably a bad assumption to make
       let maybeMatchingAsset = destinationChainAssets.find(
-        (otherAsset) => otherAsset.symbol === asset?.symbol
+        (otherAsset) =>
+          asset.origin_chain === otherAsset.origin_chain &&
+          asset.origin_denom === otherAsset.origin_denom
       );
 
       if (!maybeMatchingAsset) {
@@ -152,11 +180,15 @@ function useSolveRouteQuery(
 
       const route = response.data as SolveRouteResponse;
 
-      if (route.route.length > 1) {
-        for (const hop of route.route.slice(1)) {
-          if (!hop.pfmEnabled) {
-            return null;
-          }
+      if (route.route.length === 1) {
+        return route;
+      }
+
+      for (const hop of route.route.slice(1)) {
+        if (!hop.pfmEnabled) {
+          console.log("route found but not pfm enabled");
+          console.log(route);
+          return null;
         }
       }
 
@@ -198,7 +230,10 @@ export default function Home() {
 
   const { chainRecords } = useManager();
 
-  const { data: assets } = useAssetsQuery(selectedChains.sourceChain.id);
+  const { data: assets } = useAssetsQuery(
+    selectedChains.sourceChain.id,
+    selectedChains.targetChain.id
+  );
 
   const [selectedAsset, setSelectedAsset] = useState(assets ? assets[0] : null);
   const [selectedAssetBalance, setSelectedAssetBalance] = useState("0");

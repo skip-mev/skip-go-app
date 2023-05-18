@@ -9,6 +9,8 @@ export interface Asset {
   symbol: string;
   denom: string;
   decimals: number;
+  origin_chain: string;
+  origin_denom: string;
 }
 
 interface Props {

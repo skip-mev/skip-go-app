@@ -17,16 +17,12 @@ const NavBar: React.FC<Props> = ({ chainID }) => {
     ? formatAddress(chain.address, chain.chain.bech32_prefix)
     : "";
 
-  // console.log(address);
-  //
   const feeDenom = useMemo(() => {
     if (chain.chain.fees) {
       return chain.chain.fees.fee_tokens[0].denom;
     }
     return "ucosmos";
   }, [chain]);
-
-  // console.log(feeDenom);
 
   const loadFeeDenomBalance = useCallback(async () => {
     if (!chain.address || !chain.assets) {
