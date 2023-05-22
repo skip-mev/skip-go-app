@@ -8,6 +8,7 @@ export function chainIDToChainlistName(chainID: string) {
     "stride-1": "stride",
     "gravity-bridge-3": "gravity-bridge",
     "axelar-dojo-1": "axelar",
+    "neutron-1": "neutron",
   };
 
   if (map[chainID]) {

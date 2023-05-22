@@ -44,6 +44,10 @@ const chains = [
     chainID: "juno-1",
   },
   {
+    id: "neutron",
+    name: "Neutron",
+  },
+  {
     id: "axelar",
     name: "Axelar",
   },
