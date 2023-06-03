@@ -209,13 +209,23 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
         throw new Error("No transfer messages");
       }
 
-      if (messages.length > 1) {
-        throw new Error("Too many messages");
-      }
+      // if (messages.length > 1) {
+      //   throw new Error("Too many messages");
+      // }
 
-      // multiHopMsg
+      for (let i = 0; i < messages.length; i++) {
+        const multiHopMsg = messages[i];
 
-      for (const multiHopMsg of messages) {
+        console.log(`tx ${i + 1} of ${messages.length}`);
+
+        const decodedMsg = JSON.parse(multiHopMsg.msg);
+
+        const denomIn: string = decodedMsg.token.denom;
+        const denomOut: string =
+          i === messages.length - 1
+            ? solveRoute[solveRoute.length - 1].destDenom
+            : JSON.parse(messages[i + 1].msg).token.denom;
+
         const originChainRecord = chainRecords.find(
           (record) => multiHopMsg.chainId === record.chain.chain_id
         ) as ChainRecord;
@@ -249,14 +259,19 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
         );
         const destinationChainAddress =
           userAddresses.find(
-            (address) => address.chainId === destinationChain.chainId
+            (address) =>
+              address.chainId === multiHopMsg.path[multiHopMsg.path.length - 1]
           )?.address ?? "";
 
         const destinationChainBalanceBefore =
           await destinationChainClient.getBalance(
             destinationChainAddress,
-            solveRoute[solveRoute.length - 1].destDenom
+            denomOut
           );
+
+        if (!window.keplr) {
+          throw new Error("Keplr not installed");
+        }
 
         const signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
 
@@ -282,8 +297,6 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
 
         const currentHeight = await client.getHeight();
 
-        const decodedMsg = JSON.parse(multiHopMsg.msg);
-
         const msg = {
           typeUrl: multiHopMsg.msgTypeUrl,
           value: {
@@ -301,6 +314,8 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
           },
         };
 
+        console.log(msg);
+
         await client.signAndBroadcast(decodedMsg.sender, [msg], "auto");
 
         while (true) {
@@ -308,7 +323,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
 
           const balance = await destinationChainClient.getBalance(
             destinationChainAddress,
-            solveRoute[solveRoute.length - 1].destDenom
+            denomOut
           );
           if (
             parseInt(balance.amount) >
@@ -318,9 +333,12 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
           }
           await wait(1000);
         }
-
-        setDisplaySuccessMessage(true);
       }
+
+      // for (const multiHopMsg of messages) {
+
+      setDisplaySuccessMessage(true);
+      // }
     } catch (err) {
       console.log(err);
     } finally {

@@ -38,13 +38,13 @@ export function useSolveRoute(
 
         const route = response.recs[0].route;
 
-        for (const hop of route.slice(1)) {
-          if (!hop.pfmEnabled) {
-            console.log("route found but not pfm enabled");
-            console.log(route);
-            return [];
-          }
-        }
+        // for (const hop of route.slice(1)) {
+        //   if (!hop.pfmEnabled) {
+        //     console.log("route found but not pfm enabled");
+        //     console.log(route);
+        //     return [];
+        //   }
+        // }
 
         return route;
       } catch {
