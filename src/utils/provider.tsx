@@ -6,7 +6,6 @@ import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
 import { chains, assets } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { Chain } from "@/components/ChainSelect";
 import { GasPrice } from "@cosmjs/stargate";
 
 function Providers({ children }: React.PropsWithChildren) {
