@@ -1,12 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { chainIDToChainlistURL, chainNameToChainlistURL } from "@/config";
+import { Chain } from "@/solve/api";
+import { useManager } from "@cosmos-kit/react";
 import { Transition, Dialog } from "@headlessui/react";
 import { FC, Fragment, useState } from "react";
-
-export interface Chain {
-  id: string;
-  name: string;
-}
 
 interface Props {
   chain: Chain;
@@ -17,6 +16,28 @@ interface Props {
 const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const { chainRecords } = useManager();
+
+  const selectedChainRecord = chainRecords.find(
+    (chainRecord) => chainRecord.chain.chain_id === chain.chainId
+  );
+
+  const sortedChains = chains
+    .filter((c) => {
+      return chainRecords.find(
+        (chainRecord) => chainRecord.chain.chain_id === c.chainId
+      );
+    })
+    .sort((a, b) => {
+      if (a.chainName < b.chainName) {
+        return -1;
+      } else if (a.chainName > b.chainName) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
   return (
     <Fragment>
       <button
@@ -25,12 +46,20 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
       >
         <div className="px-4">
           <img
-            alt={chain.name}
-            src={`https://raw.githubusercontent.com/cosmostation/chainlist/7433f9672d2cf33870e505318ee1eb50f5d149c6/chain/${chain.id}/chainImg/_chainImg.svg`}
-            className="w-9 h-9"
+            alt={chain.chainName}
+            src={`${chainNameToChainlistURL(
+              chain.chainName
+            )}/chainImg/_chainImg.svg`}
+            className="w-9 h-9 rounded-full"
+            onError={(error) => {
+              error.currentTarget.src =
+                "https://api.dicebear.com/6.x/shapes/svg";
+            }}
           />
         </div>
-        <span className="flex-1 text-left">{chain.name}</span>
+        <span className="flex-1 text-left">
+          {selectedChainRecord?.chain.pretty_name ?? chain.chainName}
+        </span>
         <span className="px-4 text-zinc-500 group-hover:text-zinc-400 group-active:text-zinc-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -87,9 +116,17 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
                     </Dialog.Title>
                   </div>
                   <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
-                    {chains.map((chain) => {
+                    {sortedChains.map((chain) => {
+                      const chainRecord = chainRecords.find(
+                        (chainRecord) =>
+                          chainRecord.chain.chain_id === chain.chainId
+                      );
+
+                      const name =
+                        chainRecord?.chain.pretty_name ?? chain.chainName;
+
                       return (
-                        <div key={chain.id}>
+                        <div key={chain.chainId}>
                           <button
                             className="bg-zinc-800/50 hover:bg-zinc-800 active:bg-zinc-800/50 transition-colors flex items-center gap-4 p-4 rounded-lg w-full text-left"
                             onClick={() => {
@@ -98,11 +135,17 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
                             }}
                           >
                             <img
-                              className="w-16 h-16"
-                              src={`https://raw.githubusercontent.com/cosmostation/chainlist/7433f9672d2cf33870e505318ee1eb50f5d149c6/chain/${chain.id}/chainImg/_chainImg.svg`}
-                              alt={chain.name}
+                              alt={chain.chainName}
+                              className="w-16 h-16 rounded-full"
+                              src={`${chainNameToChainlistURL(
+                                chain.chainName
+                              )}/chainImg/_chainImg.svg`}
+                              onError={(error) => {
+                                error.currentTarget.src =
+                                  "https://api.dicebear.com/6.x/shapes/svg";
+                              }}
                             />
-                            <p className="font-bold">{chain.name}</p>
+                            <p className="font-bold">{name}</p>
                           </button>
                         </div>
                       );

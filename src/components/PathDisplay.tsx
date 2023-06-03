@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { chainIDToChainlistName } from "@/utils/utils";
+// import { chainIDToChainlistName } from "@/utils/utils";
+import { chainIDToChainlistURL, chainNameToChainlistURL } from "@/config";
 import { ChainRecord } from "@cosmos-kit/core";
 import { useManager } from "@cosmos-kit/react";
 import { Fragment } from "react";
@@ -18,8 +19,8 @@ const HopDisplay: React.FC<{ chainID: string }> = ({ chainID }) => {
           <img
             alt=""
             className="w-8 h-8"
-            src={`https://raw.githubusercontent.com/cosmostation/chainlist/7433f9672d2cf33870e505318ee1eb50f5d149c6/chain/${chainIDToChainlistName(
-              chain.chain.chain_id
+            src={`${chainNameToChainlistURL(
+              chain.name
             )}/chainImg/_chainImg.svg`}
           />
           <p className="text-sm font-bold">{chain.chain.pretty_name}</p>
