@@ -1,7 +1,6 @@
 import { FC, Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { IBCHop, useSolveForm } from "@/solve";
+import { IBCHop } from "@/solve/api";
 import ChainSelect from "./ChainSelect";
-import { ChainConfig } from "@/config";
 import AssetSelect, { Asset } from "./AssetSelect";
 import { useChainByID } from "@/utils/utils";
 import {
@@ -23,8 +22,8 @@ import { useChainAssets, useSolveChains, useSolveRoute } from "@/solve/queries";
 import { Chain, IBCAddress, getTransferMsgs } from "@/solve/api";
 import { useManager } from "@cosmos-kit/react";
 import Long from "long";
-import { Decimal } from "@cosmjs/math";
 import { Disclosure } from "@headlessui/react";
+import { useQuery } from "@tanstack/react-query";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -32,6 +31,31 @@ async function getBalances(address: string, client: StargateClient) {
   const response = await client.getAllBalances(address);
 
   return response;
+}
+
+function useAssetBalance(
+  address: string,
+  denom: string,
+  getClient: () => Promise<StargateClient>
+) {
+  return useQuery({
+    queryKey: ["assetBalance", address, denom, getClient],
+    queryFn: async () => {
+      const client = await getClient();
+
+      const balance = await client.getBalance(address, denom);
+
+      console.log(balance);
+
+      return balance.amount;
+    },
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+    enabled: !!address && !!denom,
+  });
 }
 
 function useAssetBalances(assets: Asset[], chainID?: string) {
@@ -66,19 +90,9 @@ const DEFAULT_DESTINATION_CHAIN_ID = "cosmoshub-4";
 
 interface Props {
   onSourceChainChange?: (chain: Chain) => void;
-  onSubmit?: (
-    amount: string,
-    denom: string,
-    senderAddr: string,
-    sourceChainID: string,
-    destinationChainID: string,
-    route: IBCHop[],
-    offlineSigner: OfflineSigner,
-    rpcEndpoint: string | ExtendedHttpEndpoint
-  ) => Promise<DeliverTxResponse>;
 }
 
-const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
+const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
   const [sourceChain, setSourceChain] = useState<Chain | null>(null);
   const [destinationChain, setDestinationChain] = useState<Chain | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
@@ -118,13 +132,13 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
 
   const balances = useAssetBalances(assets ?? [], sourceChain?.chainId);
 
-  const selectedAssetBalance = useMemo(() => {
-    if (selectedAsset) {
-      return balances[selectedAsset.denom] ?? "0";
-    }
+  // const selectedAssetBalance = useMemo(() => {
+  //   if (selectedAsset) {
+  //     return balances[selectedAsset.denom] ?? "0";
+  //   }
 
-    return "0";
-  }, [selectedAsset, balances]);
+  //   return "0";
+  // }, [selectedAsset, balances]);
 
   const {
     status: walletStatus,
@@ -133,7 +147,14 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
     getSigningStargateClient,
     address,
     getRpcEndpoint,
+    getStargateClient,
   } = useChainByID(sourceChain?.chainId ?? "cosmoshub-4");
+
+  const { data: selectedAssetBalance } = useAssetBalance(
+    address ?? "",
+    selectedAsset?.denom ?? "",
+    getStargateClient
+  );
 
   const { chainRecords } = useManager();
 
@@ -432,7 +453,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
                     <span className="text-zinc-400">Amount Available:</span>{" "}
                     <span className="font-medium">
                       {ethers.formatUnits(
-                        selectedAssetBalance,
+                        selectedAssetBalance ?? "0",
                         selectedAsset?.decimals
                       )}
                     </span>
@@ -442,7 +463,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
                     onClick={() => {
                       setTransferAmount(
                         ethers.formatUnits(
-                          selectedAssetBalance,
+                          selectedAssetBalance ?? "0",
                           selectedAsset?.decimals ?? 0
                         )
                       );

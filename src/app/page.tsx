@@ -1,15 +1,12 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { useIBCTransfer } from "@/solve";
 import { Chain } from "@/solve/api";
 import NavBar from "@/components/NavBar";
 import SolveForm from "@/components/SolveForm";
 
 export default function Home() {
   const [selectedChain, setSelectedChain] = useState<Chain | null>(null);
-
-  const signAndBroadcastIBCTransfer = useIBCTransfer();
 
   return (
     <Fragment>
@@ -25,7 +22,6 @@ export default function Home() {
             onSourceChainChange={(newSourceChain) => {
               setSelectedChain(newSourceChain);
             }}
-            onSubmit={signAndBroadcastIBCTransfer}
           />
         </div>
       </main>
