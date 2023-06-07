@@ -20,33 +20,35 @@ export function useSolveChains() {
 export function useSolveRoute(
   sourceAsset: string,
   sourceChainID: string,
+  destAsset: string,
   destChainID: string
 ) {
   return useQuery({
-    queryKey: ["solve-route", sourceAsset, sourceChainID, destChainID],
+    queryKey: [
+      "solve-route",
+      sourceAsset,
+      sourceChainID,
+      destAsset,
+      destChainID,
+    ],
     queryFn: async () => {
       try {
         const response = await getRoute(
           sourceAsset,
           sourceChainID,
+          destAsset,
           destChainID
         );
+
+        if (response.requested.length > 0) {
+          return response.requested;
+        }
 
         if (response.recs.length <= 0) {
           return [];
         }
 
-        const route = response.recs[0].route;
-
-        // for (const hop of route.slice(1)) {
-        //   if (!hop.pfmEnabled) {
-        //     console.log("route found but not pfm enabled");
-        //     console.log(route);
-        //     return [];
-        //   }
-        // }
-
-        return route;
+        return response.recs[0].route;
       } catch {
         return [];
       }

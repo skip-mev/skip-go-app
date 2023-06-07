@@ -18,10 +18,14 @@ const HopDisplay: React.FC<{ chainID: string }> = ({ chainID }) => {
         <Fragment>
           <img
             alt=""
-            className="w-8 h-8"
+            className="w-8 h-8 rounded-full"
             src={`${chainNameToChainlistURL(
               chain.name
             )}/chainImg/_chainImg.svg`}
+            onError={(error) => {
+              error.currentTarget.src =
+                "https://api.dicebear.com/6.x/shapes/svg";
+            }}
           />
           <p className="text-sm font-bold">{chain.chain.pretty_name}</p>
         </Fragment>

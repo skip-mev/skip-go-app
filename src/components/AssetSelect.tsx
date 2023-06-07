@@ -2,15 +2,13 @@
 "use client";
 import { Dialog, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useMemo, useState } from "react";
 
 export interface Asset {
   image: string;
   symbol: string;
   denom: string;
   decimals: number;
-  origin_chain: string;
-  origin_denom: string;
 }
 
 interface Props {
@@ -21,9 +19,44 @@ interface Props {
 }
 
 const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
+  const [searchValue, setSearchValue] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const sortedAssets = assets.sort((a, b) => {
+  // ibc/116AC0D0B3AE76D5CEF80755CF5C5595ACDE68FC6A800279E2574BC0702D95AB
+
+  const filteredAssets = useMemo(() => {
+    const _filteredAssets = assets.filter((asset) => {
+      if (!searchValue) {
+        return true;
+      }
+
+      if (asset.denom.toLowerCase().includes(searchValue.toLowerCase())) {
+        return true;
+      }
+
+      if (asset.symbol.toLowerCase().includes(searchValue.toLowerCase())) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (_filteredAssets.length === 0) {
+      return [
+        {
+          image: `${searchValue}.png`,
+          symbol: searchValue,
+          denom: searchValue,
+          decimals: 6,
+        },
+      ];
+    }
+
+    return _filteredAssets;
+  }, [assets, searchValue]);
+
+  const sortedAssets = filteredAssets.sort((a, b) => {
     const aBalance = balances[a.denom]
       ? parseFloat(ethers.formatUnits(balances[a.denom], a.decimals))
       : 0;
@@ -44,7 +77,11 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
           <img
             alt={asset.symbol}
             src={`https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${asset.image}`}
-            className="w-10 h-10"
+            className="w-10 h-10 rounded-full"
+            onError={(error) => {
+              error.currentTarget.src =
+                "https://api.dicebear.com/6.x/shapes/svg";
+            }}
           />
         </div>
         <span className="flex-1 text-left whitespace-nowrap truncate">
@@ -98,12 +135,20 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="mx-auto max-w-lg w-full rounded">
+              <Dialog.Panel className="mx-auto max-w-lg w-full rounded p-8">
                 <div className="flex flex-col h-full">
                   <div className="mb-8">
                     <Dialog.Title className="font-bold text-2xl">
                       Select Asset
                     </Dialog.Title>
+                  </div>
+                  <div className="pb-4">
+                    <input
+                      className="p-4 rounded-lg w-full bg-zinc-800/50 focus:ring-2 focus:ring-inset focus:ring-indigo-500 outline-none"
+                      type="text"
+                      placeholder="Search name or paste address"
+                      onChange={(e) => setSearchValue(e.target.value.trim())}
+                    />
                   </div>
                   <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
                     {sortedAssets.map((asset) => {
@@ -111,8 +156,9 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
 
                       return (
                         <div key={asset.symbol}>
+                          {/* bg-zinc-800/50 */}
                           <button
-                            className="bg-zinc-800/50 hover:bg-zinc-800 active:bg-zinc-800/50 transition-colors flex items-center gap-4 p-4 rounded-lg w-full text-left"
+                            className=" hover:bg-zinc-800 active:bg-zinc-800/50 transition-colors flex items-center gap-4 p-4 rounded-lg w-full text-left"
                             onClick={() => {
                               onSelect(asset);
                               setIsOpen(false);
@@ -120,10 +166,16 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
                           >
                             <img
                               alt={asset.symbol}
-                              className="w-16 h-16"
+                              className="w-16 h-16 rounded-full"
                               src={`https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${asset.image}`}
+                              onError={(error) => {
+                                error.currentTarget.src =
+                                  "https://api.dicebear.com/6.x/shapes/svg";
+                              }}
                             />
-                            <p className="font-bold flex-1">{asset.symbol}</p>
+                            <p className="font-bold flex-1 whitespace-nowrap truncate">
+                              {asset.symbol}
+                            </p>
                             {balance && (
                               <p className="text-sm text-white/40">
                                 {parseFloat(

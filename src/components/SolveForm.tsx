@@ -24,6 +24,7 @@ import { Chain, IBCAddress, getTransferMsgs } from "@/solve/api";
 import { useManager } from "@cosmos-kit/react";
 import Long from "long";
 import { Decimal } from "@cosmjs/math";
+import { Disclosure } from "@headlessui/react";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -84,6 +85,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
   const [transferAmount, setTransferAmount] = useState("");
   const [txPending, setTxPending] = useState(false);
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
+  const [destinationDenomOverride, setDestinationDenomOverride] = useState("");
 
   const { data: assets } = useChainAssets(sourceChain?.chainName);
 
@@ -92,6 +94,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
   const { data: solveRoute, status: solveRouteStatus } = useSolveRoute(
     selectedAsset?.denom ?? "",
     sourceChain?.chainId ?? "",
+    destinationDenomOverride,
     destinationChain?.chainId ?? ""
   );
 
@@ -399,54 +402,110 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
               />
             </div>
           </div>
-          <div className="bg-zinc-800 p-4 rounded-md">
-            <p className="font-semibold text-sm mb-3">Asset</p>
-            <div className="border border-zinc-600 rounded-md p-4 space-y-4">
-              <div className="sm:flex items-center">
-                <div className="sm:w-48">
-                  {selectedAsset && assets.length > 0 && (
-                    <AssetSelect
-                      asset={selectedAsset}
-                      assets={assets}
-                      balances={balances}
-                      onSelect={setSelectedAsset}
-                    />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <input
-                    className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
-                    type="text"
-                    placeholder="0.000"
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                    value={transferAmount}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm">
-                  <span className="text-zinc-400">Amount Available:</span>{" "}
-                  <span className="font-medium">
-                    {ethers.formatUnits(
-                      selectedAssetBalance,
-                      selectedAsset?.decimals
+          <div className="space-y-4">
+            <div className="bg-zinc-800 p-4 rounded-md">
+              <p className="font-semibold text-sm mb-3">Asset</p>
+              <div className="border border-zinc-600 rounded-md p-4 space-y-4">
+                <div className="sm:flex items-center">
+                  <div className="sm:w-48">
+                    {selectedAsset && assets.length > 0 && (
+                      <AssetSelect
+                        asset={selectedAsset}
+                        assets={assets}
+                        balances={balances}
+                        onSelect={setSelectedAsset}
+                      />
                     )}
-                  </span>
-                </p>
-                <button
-                  className="font-bold text-sm text-indigo-500 hover:text-indigo-400 active:text-indigo-500"
-                  onClick={() => {
-                    setTransferAmount(
-                      ethers.formatUnits(
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
+                      type="text"
+                      placeholder="0.000"
+                      onChange={(e) => setTransferAmount(e.target.value)}
+                      value={transferAmount}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm">
+                    <span className="text-zinc-400">Amount Available:</span>{" "}
+                    <span className="font-medium">
+                      {ethers.formatUnits(
                         selectedAssetBalance,
-                        selectedAsset?.decimals ?? 0
-                      )
-                    );
-                  }}
-                >
-                  MAX
-                </button>
+                        selectedAsset?.decimals
+                      )}
+                    </span>
+                  </p>
+                  <button
+                    className="font-bold text-sm text-indigo-500 hover:text-indigo-400 active:text-indigo-500"
+                    onClick={() => {
+                      setTransferAmount(
+                        ethers.formatUnits(
+                          selectedAssetBalance,
+                          selectedAsset?.decimals ?? 0
+                        )
+                      );
+                    }}
+                  >
+                    MAX
+                  </button>
+                </div>
               </div>
+            </div>
+            <div>
+              <Disclosure>
+                {({ open }) => (
+                  <Fragment>
+                    <Disclosure.Button
+                      className="text-gray-300 text-sm font-semibold flex items-center justify-between gap-2 hover:underline"
+                      onClick={() => setDestinationDenomOverride("")}
+                    >
+                      <span>Specify Destination Denom</span>
+                      <span>
+                        {open ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </span>
+                    </Disclosure.Button>
+                    <Disclosure.Panel className="pt-4">
+                      <input
+                        className="p-4 rounded-lg w-full bg-zinc-800/50 focus:ring-2 focus:ring-inset focus:ring-indigo-500 outline-none"
+                        type="text"
+                        placeholder="ibc/..."
+                        onChange={(e) =>
+                          setDestinationDenomOverride(e.target.value)
+                        }
+                        value={destinationDenomOverride}
+                      />
+                    </Disclosure.Panel>
+                  </Fragment>
+                )}
+              </Disclosure>
             </div>
           </div>
         </div>
@@ -460,7 +519,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {}, onSubmit }) => {
         )}
         {walletStatus === WalletStatus.Connected && (
           <button
-            className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center"
+            className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center whitespace-nowrap truncate"
             onClick={transferAssets}
             disabled={isButtonDisabled}
           >

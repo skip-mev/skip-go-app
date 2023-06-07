@@ -71,14 +71,21 @@ export interface TransferRouteResponse {
 export async function getRoute(
   sourceAsset: string,
   sourceChainID: string,
+  destAsset: string,
   destChainID: string
 ) {
-  const data: TransferRouteRequest = {
+  const data = {
     sourceAsset: {
       denom: sourceAsset,
       chainId: sourceChainID,
     },
-    destAssetChainId: destChainID,
+    destAsset: destAsset
+      ? {
+          denom: destAsset,
+          chainId: destChainID,
+        }
+      : undefined,
+    destAssetChainId: !destAsset ? destChainID : undefined,
   };
 
   const response = await axios.post(`${API_URL}/ibc/transfer_route`, data);
