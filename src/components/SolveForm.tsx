@@ -24,6 +24,7 @@ import { useManager } from "@cosmos-kit/react";
 import Long from "long";
 import { Disclosure } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -202,6 +203,26 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
         transferAmount,
         selectedAsset.decimals
       );
+
+      const chainInfos = await window.keplr.getChainInfosWithoutEndpoints();
+
+      // console.log(chainInfos);
+
+      for (const chainID of routeChainIDs) {
+        if (chainInfos.findIndex((chain) => chain.chainId === chainID) == -1) {
+          const record = chainRecords.find(
+            (record) => record.chain.chain_id === chainID
+          );
+
+          if (record) {
+            const chainInfo = await axios.get(
+              `https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/cosmos/${record.name}.json`
+            );
+
+            await window.keplr.experimentalSuggestChain(chainInfo.data);
+          }
+        }
+      }
 
       // make sure all wallets are connected
       await window.keplr.enable(routeChainIDs);
