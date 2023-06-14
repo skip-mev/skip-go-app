@@ -596,7 +596,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
             )}
           </button>
         )}
-        <div className="border border-zinc-700 rounded-lg p-6 py-6">
+        {/* <div className="border border-zinc-700 rounded-lg p-6 py-6">
           <div className="pb-4">
             <p className="font-bold">IBC Transfer Route</p>
           </div>
@@ -608,7 +608,7 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
               (solveRouteStatus === "success" && solveRoute?.length === 0)
             }
           />
-        </div>
+        </div> */}
       </div>
       {displaySuccessMessage && (
         <div
