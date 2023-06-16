@@ -25,6 +25,7 @@ import Long from "long";
 import { Disclosure } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Decimal } from "@cosmjs/math";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -318,6 +319,8 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
           throw new Error("Keplr not installed");
         }
 
+        console.log(originChainRecord);
+
         const signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
 
         const endpoint = await getFastestEndpoint(
@@ -330,13 +333,17 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
           throw new Error("No fee info");
         }
 
+        const gasPrice =
+          feeInfo.average_gas_price || feeInfo.fixed_min_gas_price || 0.0;
+
         const client = await SigningStargateClient.connectWithSigner(
           endpoint,
           signer,
           {
-            gasPrice: GasPrice.fromString(
-              `${feeInfo.average_gas_price}${feeInfo.denom}`
-            ),
+            gasPrice: {
+              amount: Decimal.fromUserInput(`${gasPrice}`, 18),
+              denom: feeInfo.denom,
+            },
           }
         );
 
