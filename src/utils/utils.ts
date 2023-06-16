@@ -1,4 +1,12 @@
+import { OfflineSigner } from "@cosmjs/proto-signing";
+import {
+  SigningStargateClient,
+  SigningStargateClientOptions,
+  StargateClient,
+} from "@cosmjs/stargate";
+import { getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
+import * as chainRegistry from "chain-registry";
 import { useRef, useEffect } from "react";
 
 export function formatAddress(address: string, prefix: string) {
@@ -36,4 +44,70 @@ export function useTimeout(callback: () => void, delay: number | null) {
       return () => clearTimeout(id);
     }
   }, [delay]);
+}
+
+export async function getFeeDenomsForChainID(chainID: string) {
+  const chain = chainRegistry.chains.find(
+    (chain) => chain.chain_id === chainID
+  );
+
+  if (!chain) {
+    throw new Error(`Chain with ID ${chainID} not found`);
+  }
+
+  const denoms = chain.fees?.fee_tokens ?? [];
+
+  return denoms;
+}
+
+export async function getStargateClientForChainID(chainID: string) {
+  const chain = chainRegistry.chains.find(
+    (chain) => chain.chain_id === chainID
+  );
+
+  if (!chain) {
+    throw new Error(`Chain with ID ${chainID} not found`);
+  }
+
+  const rpcEndpoints = chain.apis?.rpc ?? [];
+
+  const endpoint = await getFastestEndpoint(
+    rpcEndpoints.reduce((acc, endpoint) => {
+      return [...acc, endpoint.address];
+    }, [] as string[])
+  );
+
+  const client = await StargateClient.connect(endpoint);
+
+  return client;
+}
+
+export async function getSigningStargateClientForChainID(
+  chainID: string,
+  signer: OfflineSigner,
+  options?: SigningStargateClientOptions
+) {
+  const chain = chainRegistry.chains.find(
+    (chain) => chain.chain_id === chainID
+  );
+
+  if (!chain) {
+    throw new Error(`Chain with ID ${chainID} not found`);
+  }
+
+  const rpcEndpoints = chain.apis?.rpc ?? [];
+
+  const endpoint = await getFastestEndpoint(
+    rpcEndpoints.reduce((acc, endpoint) => {
+      return [...acc, endpoint.address];
+    }, [] as string[])
+  );
+
+  const client = await SigningStargateClient.connectWithSigner(
+    endpoint,
+    signer,
+    options
+  );
+
+  return client;
 }

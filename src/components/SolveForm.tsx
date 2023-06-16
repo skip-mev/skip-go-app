@@ -25,6 +25,7 @@ import Long from "long";
 import { Disclosure } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { on } from "stream";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -86,52 +87,32 @@ function useAssetBalances(assets: Asset[], chainID?: string) {
   return assetBalances;
 }
 
-const DEFAULT_SOURCE_CHAIN_ID = "osmosis-1";
-const DEFAULT_DESTINATION_CHAIN_ID = "cosmoshub-4";
+export const DEFAULT_SOURCE_CHAIN_ID = "osmosis-1";
+export const DEFAULT_DESTINATION_CHAIN_ID = "cosmoshub-4";
 
-interface Props {
-  onSourceChainChange?: (chain: Chain) => void;
+export interface SolveFormValues {
+  sourceChain?: Chain;
+  destinationChain?: Chain;
+  asset?: Asset;
+  amount: string;
+  destinationAssetOverride: string;
 }
 
-const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
-  const [sourceChain, setSourceChain] = useState<Chain | null>(null);
-  const [destinationChain, setDestinationChain] = useState<Chain | null>(null);
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [transferAmount, setTransferAmount] = useState("");
-  const [txPending, setTxPending] = useState(false);
-  const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
-  const [destinationDenomOverride, setDestinationDenomOverride] = useState("");
+interface Props {
+  onChange: (values: SolveFormValues) => void;
+  values: SolveFormValues;
+  onSubmit: () => void;
+  txPending?: boolean;
+}
 
-  const { data: assets } = useChainAssets(sourceChain?.chainName);
+const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
+  const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
+
+  const { data: assets } = useChainAssets(values.sourceChain?.chainName);
 
   const { data: supportedChains } = useSolveChains();
 
-  const { data: solveRoute, status: solveRouteStatus } = useSolveRoute(
-    selectedAsset?.denom ?? "",
-    sourceChain?.chainId ?? "",
-    destinationDenomOverride,
-    destinationChain?.chainId ?? ""
-  );
-
-  const routeChainIDs = useMemo(() => {
-    if (!sourceChain || !destinationChain) {
-      return [];
-    }
-
-    if (!solveRoute || solveRoute.length === 0) {
-      return [sourceChain.chainId, destinationChain.chainId];
-    }
-
-    const IDs = solveRoute.map((hop) => hop.chainId);
-
-    if (destinationChain) {
-      IDs.push(destinationChain.chainId);
-    }
-
-    return IDs;
-  }, [sourceChain, destinationChain, solveRoute]);
-
-  const balances = useAssetBalances(assets ?? [], sourceChain?.chainId);
+  const balances = useAssetBalances(assets ?? [], values.sourceChain?.chainId);
 
   // const selectedAssetBalance = useMemo(() => {
   //   if (selectedAsset) {
@@ -149,46 +130,25 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
     address,
     getRpcEndpoint,
     getStargateClient,
-  } = useChainByID(sourceChain?.chainId ?? "cosmoshub-4");
+  } = useChainByID(values.sourceChain?.chainId ?? "cosmoshub-4");
 
   const { data: selectedAssetBalance } = useAssetBalance(
     address ?? "",
-    selectedAsset?.denom ?? "",
+    values.asset?.denom ?? "",
     getStargateClient
   );
 
   const { chainRecords } = useManager();
 
-  useEffect(() => {
-    if (!sourceChain && supportedChains) {
-      const _sourceChain =
-        supportedChains.find(
-          (chain) => chain.chainId === DEFAULT_SOURCE_CHAIN_ID
-        ) ?? supportedChains[0];
-      setSourceChain(_sourceChain);
-      onSourceChainChange(_sourceChain);
-    }
-
-    if (!destinationChain && supportedChains) {
-      setDestinationChain(
-        supportedChains.find(
-          (chain) => chain.chainId === DEFAULT_DESTINATION_CHAIN_ID
-        ) ?? supportedChains[0]
-      );
-    }
-  }, [destinationChain, onSourceChainChange, sourceChain, supportedChains]);
-
-  useEffect(() => {
-    if (assets && assets.length > 0) {
-      setSelectedAsset(assets[0]);
-    }
-  }, [assets]);
-
   const transferAssets = useCallback(async () => {
+    const solveRoute: IBCHop[] = [];
+
+    const routeChainIDs = ["osmosis-1", "axelar-dojo-1"];
+
     if (
-      !selectedAsset ||
-      !sourceChain ||
-      !destinationChain ||
+      !values.asset ||
+      !values.sourceChain ||
+      !values.destinationChain ||
       !solveRoute ||
       solveRoute.length === 0 ||
       !window.keplr
@@ -196,12 +156,12 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
       return;
     }
 
-    setTxPending(true);
+    // setTxPending(true);
 
     try {
       const formattedAmount = ethers.parseUnits(
-        transferAmount,
-        selectedAsset.decimals
+        values.amount,
+        values.asset.decimals
       );
 
       const chainInfos = await window.keplr.getChainInfosWithoutEndpoints();
@@ -242,10 +202,10 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
       const messages = await getTransferMsgs(
         formattedAmount.toString(),
         {
-          denom: selectedAsset.denom,
-          chainId: sourceChain.chainId,
+          denom: values.asset.denom,
+          chainId: values.sourceChain.chainId,
         },
-        destinationChain.chainId,
+        values.destinationChain.chainId,
         solveRoute,
         userAddresses
       );
@@ -380,40 +340,40 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
         }
       }
 
-      // for (const multiHopMsg of messages) {
-
       setDisplaySuccessMessage(true);
-      // }
     } catch (err) {
       console.log(err);
     } finally {
-      setTxPending(false);
+      // setTxPending(false);
       await wait(5000);
       setDisplaySuccessMessage(false);
     }
   }, [
     chainRecords,
-    destinationChain,
-    routeChainIDs,
-    selectedAsset,
-    solveRoute,
-    sourceChain,
-    transferAmount,
+    values.destinationChain,
+    values.asset,
+    values.sourceChain,
+    values.amount,
   ]);
 
   const isButtonDisabled = useMemo(() => {
-    if (solveRouteStatus !== "success") {
-      return true;
-    }
+    // if (solveRouteStatus !== "success") {
+    //   return true;
+    // }
 
     if (txPending) {
       return true;
     }
 
     return false;
-  }, [solveRouteStatus, txPending]);
+  }, [txPending]);
 
-  if (!sourceChain || !destinationChain || !supportedChains || !assets) {
+  if (
+    !values.sourceChain ||
+    !values.destinationChain ||
+    !supportedChains ||
+    !assets
+  ) {
     return null;
   }
 
@@ -425,21 +385,27 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
             <div className="bg-zinc-800 p-4 rounded-t-md md:rounded-md">
               <p className="font-semibold text-sm mb-3">Source Chain</p>
               <ChainSelect
-                chain={sourceChain}
+                chain={values.sourceChain}
                 chains={supportedChains}
                 onSelect={(value) => {
-                  setSourceChain(value);
-                  onSourceChainChange(value);
+                  onChange({
+                    ...values,
+                    sourceChain: value,
+                    asset: undefined,
+                  });
                 }}
               />
             </div>
             <div className="bg-zinc-800 p-4 rounded-t-md md:rounded-md">
               <p className="font-semibold text-sm mb-3">Destination Chain</p>
               <ChainSelect
-                chain={destinationChain}
+                chain={values.destinationChain}
                 chains={supportedChains}
                 onSelect={(value) => {
-                  setDestinationChain(value);
+                  onChange({
+                    ...values,
+                    destinationChain: value,
+                  });
                 }}
               />
             </div>
@@ -450,12 +416,17 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
               <div className="border border-zinc-600 rounded-md p-4 space-y-4">
                 <div className="sm:flex items-center">
                   <div className="sm:w-48">
-                    {selectedAsset && assets.length > 0 && (
+                    {values.asset && assets.length > 0 && (
                       <AssetSelect
-                        asset={selectedAsset}
+                        asset={values.asset}
                         assets={assets}
                         balances={balances}
-                        onSelect={setSelectedAsset}
+                        onSelect={(value) => {
+                          onChange({
+                            ...values,
+                            asset: value,
+                          });
+                        }}
                       />
                     )}
                   </div>
@@ -464,8 +435,10 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
                       className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none"
                       type="text"
                       placeholder="0.000"
-                      onChange={(e) => setTransferAmount(e.target.value)}
-                      value={transferAmount}
+                      onChange={(e) =>
+                        onChange({ ...values, amount: e.target.value })
+                      }
+                      value={values.amount}
                     />
                   </div>
                 </div>
@@ -475,19 +448,20 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
                     <span className="font-medium">
                       {ethers.formatUnits(
                         selectedAssetBalance ?? "0",
-                        selectedAsset?.decimals
+                        values.asset?.decimals
                       )}
                     </span>
                   </p>
                   <button
                     className="font-bold text-sm text-indigo-500 hover:text-indigo-400 active:text-indigo-500"
                     onClick={() => {
-                      setTransferAmount(
-                        ethers.formatUnits(
+                      onChange({
+                        ...values,
+                        amount: ethers.formatUnits(
                           selectedAssetBalance ?? "0",
-                          selectedAsset?.decimals ?? 0
-                        )
-                      );
+                          values.asset?.decimals ?? 0
+                        ),
+                      });
                     }}
                   >
                     MAX
@@ -501,7 +475,9 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
                   <Fragment>
                     <Disclosure.Button
                       className="text-gray-300 text-sm font-semibold flex items-center justify-between gap-2 hover:underline"
-                      onClick={() => setDestinationDenomOverride("")}
+                      onClick={() =>
+                        onChange({ ...values, destinationAssetOverride: "" })
+                      }
                     >
                       <span>Specify Destination Denom</span>
                       <span>
@@ -540,9 +516,12 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
                         type="text"
                         placeholder="ibc/..."
                         onChange={(e) =>
-                          setDestinationDenomOverride(e.target.value)
+                          onChange({
+                            ...values,
+                            destinationAssetOverride: e.target.value,
+                          })
                         }
-                        value={destinationDenomOverride}
+                        value={values.destinationAssetOverride}
                       />
                     </Disclosure.Panel>
                   </Fragment>
@@ -562,15 +541,15 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
         {walletStatus === WalletStatus.Connected && (
           <button
             className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center whitespace-nowrap truncate"
-            onClick={transferAssets}
+            onClick={onSubmit}
             disabled={isButtonDisabled}
           >
-            {solveRouteStatus === "loading" && <span>Loading...</span>}
-            {solveRouteStatus === "error" && <span>No Route found</span>}
-            {solveRouteStatus === "success" && !txPending && (
-              <span>Transfer {selectedAsset?.symbol}</span>
-            )}
-            {solveRouteStatus === "success" && txPending && (
+            {/* {solveRouteStatus === "loading" && <span>Loading...</span>} */}
+            {/* {solveRouteStatus === "error" && <span>No Route found</span>} */}
+            {/* {solveRouteStatus === "success" && !txPending && ( */}
+            {!txPending && <span>Transfer {values.asset?.symbol}</span>}
+            {/* )} */}
+            {txPending && (
               <div className="text-center">
                 <svg
                   className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
@@ -596,19 +575,6 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
             )}
           </button>
         )}
-        {/* <div className="border border-zinc-700 rounded-lg p-6 py-6">
-          <div className="pb-4">
-            <p className="font-bold">IBC Transfer Route</p>
-          </div>
-          <PathDisplay
-            chainIDs={routeChainIDs}
-            loading={solveRouteStatus === "loading"}
-            noPathExists={
-              solveRouteStatus === "error" ||
-              (solveRouteStatus === "success" && solveRoute?.length === 0)
-            }
-          />
-        </div> */}
       </div>
       {displaySuccessMessage && (
         <div
@@ -616,7 +582,6 @@ const SolveForm: FC<Props> = ({ onSourceChainChange = () => {} }) => {
           className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
         >
           <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
-            {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
             <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
               <div className="p-4">
                 <div className="flex items-center">

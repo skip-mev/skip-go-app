@@ -4,6 +4,8 @@ import axios from "axios";
 import { chainNameToChainlistURL } from "@/config";
 import { Asset } from "@/components/AssetSelect";
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function useSolveChains() {
   return useQuery({
     queryKey: ["solve-chains"],
@@ -32,6 +34,8 @@ export function useSolveRoute(
       destChainID,
     ],
     queryFn: async () => {
+      // await wait(2000);
+
       try {
         const response = await getRoute(
           sourceAsset,
