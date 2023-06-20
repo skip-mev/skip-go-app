@@ -2,7 +2,7 @@ import { FC, Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { IBCHop } from "@/solve/api";
 import ChainSelect from "./ChainSelect";
 import AssetSelect, { Asset } from "./AssetSelect";
-import { useChainByID } from "@/utils/utils";
+import { getStargateClientForChainID, useChainByID } from "@/utils/utils";
 import {
   DeliverTxResponse,
   GasPrice,
@@ -35,19 +35,13 @@ async function getBalances(address: string, client: StargateClient) {
   return response;
 }
 
-function useAssetBalance(
-  address: string,
-  denom: string,
-  getClient: () => Promise<StargateClient>
-) {
+function useAssetBalance(address: string, denom: string, chainID: string) {
   return useQuery({
-    queryKey: ["assetBalance", address, denom, getClient],
+    queryKey: ["assetBalance", address, denom, chainID],
     queryFn: async () => {
-      const client = await getClient();
+      const client = await getStargateClientForChainID(chainID);
 
       const balance = await client.getBalance(address, denom);
-
-      console.log(balance);
 
       return balance.amount;
     },
@@ -65,12 +59,14 @@ function useAssetBalances(assets: Asset[], chainID?: string) {
     {}
   );
 
-  const { address, getStargateClient } = useChainByID(chainID ?? "cosmoshub-4");
+  const { address } = useChainByID(chainID ?? "cosmoshub-4");
 
   useEffect(() => {
     if (assets.length > 0 && address) {
       (async () => {
-        const client = await getStargateClient();
+        const client = await getStargateClientForChainID(
+          chainID ?? "cosmoshub-4"
+        );
         const balances = await getBalances(address, client);
 
         const balancesMap = balances.reduce((acc, coin) => {
@@ -82,7 +78,7 @@ function useAssetBalances(assets: Asset[], chainID?: string) {
         setAssetBalances(balancesMap);
       })();
     }
-  }, [assets, address, getStargateClient]);
+  }, [assets, address, chainID]);
 
   return assetBalances;
 }
@@ -125,17 +121,13 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
   const {
     status: walletStatus,
     connect: connectWallet,
-    getOfflineSignerDirect,
-    getSigningStargateClient,
     address,
-    getRpcEndpoint,
-    getStargateClient,
   } = useChainByID(values.sourceChain?.chainId ?? "cosmoshub-4");
 
   const { data: selectedAssetBalance } = useAssetBalance(
     address ?? "",
     values.asset?.denom ?? "",
-    getStargateClient
+    values.sourceChain?.chainId ?? "cosmoshub-4"
   );
 
   const { chainRecords } = useManager();

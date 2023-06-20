@@ -69,6 +69,12 @@ export async function getStargateClientForChainID(chainID: string) {
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
+  const preferredEndpoint = `https://${chain.chain_name}-rpc.polkachu.com`;
+  try {
+    const client = await StargateClient.connect(preferredEndpoint, {});
+    return client;
+  } catch {}
+
   const rpcEndpoints = chain.apis?.rpc ?? [];
 
   const endpoint = await getFastestEndpoint(
@@ -77,7 +83,7 @@ export async function getStargateClientForChainID(chainID: string) {
     }, [] as string[])
   );
 
-  const client = await StargateClient.connect(endpoint);
+  const client = await StargateClient.connect(endpoint, {});
 
   return client;
 }
@@ -94,6 +100,17 @@ export async function getSigningStargateClientForChainID(
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
   }
+
+  const preferredEndpoint = `https://${chain.chain_name}-rpc.polkachu.com`;
+  try {
+    const client = await SigningStargateClient.connectWithSigner(
+      preferredEndpoint,
+      signer,
+      options
+    );
+
+    return client;
+  } catch {}
 
   const rpcEndpoints = chain.apis?.rpc ?? [];
 

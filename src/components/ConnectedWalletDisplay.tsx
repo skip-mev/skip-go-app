@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { formatAddress, useChainByID } from "@/utils/utils";
+import {
+  formatAddress,
+  getStargateClientForChainID,
+  useChainByID,
+} from "@/utils/utils";
 import { ethers } from "ethers";
 
 interface Props {
@@ -34,7 +38,7 @@ const NavBar: React.FC<Props> = ({ chainID }) => {
       return;
     }
 
-    const client = await chain.getStargateClient();
+    const client = await getStargateClientForChainID(chainID);
 
     const balance = await client.getBalance(chain.address, asset.base);
 
@@ -45,7 +49,7 @@ const NavBar: React.FC<Props> = ({ chainID }) => {
 
     setBalanceDisplay(balanceString);
     setReady(true);
-  }, [chain, feeDenom]);
+  }, [chain.address, chain.assets, chainID, feeDenom]);
 
   useEffect(() => {
     loadFeeDenomBalance();

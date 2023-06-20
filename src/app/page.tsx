@@ -16,7 +16,6 @@ import { Asset } from "@/components/AssetSelect";
 import { useManager } from "@cosmos-kit/react";
 import { ChainRecord } from "@cosmos-kit/core";
 import { chainNameToChainlistURL } from "@/config";
-import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import axios from "axios";
 import {
   getFeeDenomsForChainID,
@@ -102,6 +101,8 @@ export default function Home() {
     amount: "",
     destinationAssetOverride: "",
   });
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { data: supportedChains } = useSolveChains();
 
@@ -204,6 +205,7 @@ export default function Home() {
   // ]);
 
   const [routeMetadata, setRouteMetadata] = useState<Transaction[]>([]);
+  const [txStatus, setTxStatus] = useState<string[]>([]);
 
   useEffect(() => {
     if (
@@ -325,7 +327,9 @@ export default function Home() {
         const feeDenomBalance = await client.getBalance(addr, feeDenom.denom);
 
         if (parseInt(feeDenomBalance.amount) < amountNeeded) {
-          throw new Error("insufficient balance");
+          throw new Error(
+            `Insufficient fee token to initiate transfer on ${multiHopMsg.chainId}. Need ${amountNeeded} ${feeDenom.denom}, but only have ${feeDenomBalance.amount} ${feeDenom.denom}.`
+          );
         }
       }
 
@@ -333,8 +337,8 @@ export default function Home() {
       for (const multiHopMsg of messages) {
         const msgIdx = messages.indexOf(multiHopMsg);
 
-        setRouteMetadata(
-          routeMetadata.map((metadata, i) => {
+        setRouteMetadata((prev) =>
+          prev.map((metadata, i) => {
             if (i === msgIdx) {
               return {
                 ...metadata,
@@ -389,31 +393,87 @@ export default function Home() {
           },
         };
 
-        console.log(msg);
+        try {
+          await client.signAndBroadcast(decodedMsg.sender, [msg], "auto");
 
-        await wait(2000);
+          const destinationChainID =
+            multiHopMsg.path[multiHopMsg.path.length - 1];
 
-        setRouteMetadata(
-          routeMetadata.map((metadata, i) => {
-            if (i === msgIdx) {
-              return {
-                ...metadata,
-                status: "success",
-              };
+          const destinationChainClient = await getStargateClientForChainID(
+            destinationChainID
+          );
+          const destinationChainAddress =
+            userAddresses[destinationChainID].address;
+
+          const denomOut: string =
+            msgIdx === messages.length - 1
+              ? solveRoute[solveRoute.length - 1].destDenom
+              : JSON.parse(messages[msgIdx + 1].msg).token.denom;
+
+          const balanceBefore = await destinationChainClient.getBalance(
+            destinationChainAddress,
+            denomOut
+          );
+
+          while (true) {
+            console.log("polling...");
+
+            const balance = await destinationChainClient.getBalance(
+              destinationChainAddress,
+              denomOut
+            );
+
+            if (parseInt(balance.amount) > parseInt(balanceBefore.amount)) {
+              break;
             }
-            return metadata;
-          })
-        );
 
-        // await client.signAndBroadcast(decodedMsg.sender, [msg], {});
+            await wait(1000);
+          }
+
+          setRouteMetadata((prev) =>
+            prev.map((metadata, i) => {
+              if (i === msgIdx) {
+                return {
+                  ...metadata,
+                  status: "success",
+                };
+              }
+
+              return metadata;
+            })
+          );
+        } catch (e) {
+          if (e instanceof Error) {
+            if (e.message === "Request rejected") {
+              setRouteMetadata((prev) =>
+                prev.map((metadata, i) => {
+                  if (i === msgIdx) {
+                    return {
+                      ...metadata,
+                      status: "init",
+                    };
+                  }
+                  return metadata;
+                })
+              );
+
+              break;
+            }
+
+            setErrorMessage(e.message);
+          } else {
+            setErrorMessage("Unknown error, please try again");
+            // console.log("---");
+            // console.log(e);
+            // console.log("---");
+          }
+        }
       }
-
-      console.log("good.");
     } catch (e: any) {
       console.log("error");
       console.log(e);
+      setErrorMessage(e.message);
     } finally {
-      await wait(5000);
       setTxPending(false);
     }
   }, [
@@ -423,7 +483,6 @@ export default function Home() {
     formState.destinationChain,
     formState.sourceChain,
     routeChainIDs,
-    routeMetadata,
     solveRoute,
   ]);
 
@@ -441,13 +500,20 @@ export default function Home() {
       <main className="px-4 pt-4 pb-24">
         <div className="w-full max-w-screen-xl mx-auto">
           <div className="flex gap-6">
-            <div className="w-full max-w-xl">
+            <div className="w-full max-w-xl space-y-4">
               <SolveForm
                 onChange={(newFormState) => setFormState(newFormState)}
                 values={formState}
                 onSubmit={handleSubmit}
                 txPending={txPending}
               />
+              {errorMessage !== "" && (
+                <div>
+                  <div className="rounded-md bg-red-400/10 px-2 py-2 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20 text-center">
+                    <p>Error: {errorMessage}</p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <div className="p-6">

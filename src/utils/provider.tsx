@@ -7,6 +7,7 @@ import { chains, assets } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { GasPrice } from "@cosmjs/stargate";
+import { EndpointOptions, Endpoints } from "@cosmos-kit/core";
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(
@@ -155,6 +156,22 @@ function Providers({ children }: React.PropsWithChildren) {
       },
     ],
   });
+
+  // const endpointOptions = chains.reduce((acc, chain) => {
+  // return {
+  // ...acc,
+  // [chain.chain_name]: {
+  // endpoints: chain.apis,
+  // },
+  // [chain.chain_name]: {
+  //   endpoints: {
+  //     rpc: ['']
+  //   }
+  // }
+  // };
+  // }, {} as Record<string, { endpoints: Endpoints }>);
+
+  // console.log(endpointOptions);
 
   return (
     <QueryClientProvider client={client}>
