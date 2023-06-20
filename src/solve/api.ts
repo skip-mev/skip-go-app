@@ -46,7 +46,9 @@ interface GetChainsResponse {
 export async function getChains() {
   const response = await axios.get<GetChainsResponse>(`${API_URL}/ibc/chains`);
 
-  return response.data.chains as Chain[];
+  const chains = response.data.chains as Chain[];
+
+  return chains.filter((chain) => chain.chainName !== "agoric");
 }
 
 interface TransferRouteRequestWithDestAsset {
