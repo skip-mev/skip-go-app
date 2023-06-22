@@ -5,7 +5,7 @@ import { chainIDToChainlistURL, chainNameToChainlistURL } from "@/config";
 import { Chain } from "@/solve/api";
 import { useManager } from "@cosmos-kit/react";
 import { Transition, Dialog } from "@headlessui/react";
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useMemo, useState } from "react";
 
 interface Props {
   chain: Chain;
@@ -14,6 +14,8 @@ interface Props {
 }
 
 const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
+  const [searchValue, setSearchValue] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
 
   const { chainRecords } = useManager();
@@ -22,7 +24,23 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
     (chainRecord) => chainRecord.chain.chain_id === chain.chainId
   );
 
-  const sortedChains = chains
+  const filteredChains = useMemo(() => {
+    const _filteredChains = chains.filter((chain) => {
+      if (!searchValue) {
+        return true;
+      }
+
+      if (chain.chainName.toLowerCase().includes(searchValue.toLowerCase())) {
+        return true;
+      }
+
+      return false;
+    });
+
+    return _filteredChains;
+  }, [chains, searchValue]);
+
+  const sortedChains = filteredChains
     .filter((c) => {
       return chainRecords.find(
         (chainRecord) => chainRecord.chain.chain_id === c.chainId
@@ -81,6 +99,7 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
           className="relative z-50"
           onClose={() => {
             setIsOpen(false);
+            setSearchValue("");
           }}
         >
           <Transition.Child
@@ -114,6 +133,14 @@ const ChainSelect: FC<Props> = ({ chain, chains, onSelect }) => {
                     <Dialog.Title className="font-bold text-2xl">
                       Select Network
                     </Dialog.Title>
+                  </div>
+                  <div className="pb-4">
+                    <input
+                      className="p-4 rounded-lg w-full bg-zinc-800/50 focus:ring-2 focus:ring-inset focus:ring-indigo-500 outline-none"
+                      type="text"
+                      placeholder="Search for a chain"
+                      onChange={(e) => setSearchValue(e.target.value.trim())}
+                    />
                   </div>
                   <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
                     {sortedChains.map((chain) => {

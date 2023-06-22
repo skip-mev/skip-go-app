@@ -23,8 +23,6 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onSelect }) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // ibc/116AC0D0B3AE76D5CEF80755CF5C5595ACDE68FC6A800279E2574BC0702D95AB
-
   const filteredAssets = useMemo(() => {
     const _filteredAssets = assets.filter((asset) => {
       if (!searchValue) {
