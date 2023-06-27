@@ -25,6 +25,7 @@ import {
 import { ethers } from "ethers";
 import Long from "long";
 import { GasPrice } from "@cosmjs/stargate";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -351,7 +352,14 @@ export default function Home() {
 
         const decodedMsg = JSON.parse(multiHopMsg.msg);
 
-        const signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
+        const key = await window.keplr.getKey(multiHopMsg.chainId);
+
+        let signer: OfflineSigner;
+        if (key.isNanoLedger) {
+          signer = window.keplr.getOfflineSignerOnlyAmino(multiHopMsg.chainId);
+        } else {
+          signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
+        }
 
         const feeDenoms = await getFeeDenomsForChainID(multiHopMsg.chainId);
         const feeDenom = feeDenoms[0];
