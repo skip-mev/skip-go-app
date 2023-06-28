@@ -1,5 +1,3 @@
-import ConnectedWalletDisplay from "./ConnectedWalletDisplay";
-
 interface Props {
   chainID?: string;
 }
@@ -14,9 +12,9 @@ const NavBar: React.FC<Props> = ({ chainID }) => {
           </p>
         </div>
       </div>
-      <div className="absolute top-0 right-0 inset-y-0 flex items-center px-4">
+      {/* <div className="absolute top-0 right-0 inset-y-0 flex items-center px-4">
         <div>{chainID && <ConnectedWalletDisplay chainID={chainID} />}</div>
-      </div>
+      </div> */}
     </nav>
   );
 };

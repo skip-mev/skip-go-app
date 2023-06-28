@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://api.skip.money/v1";
+// const API_URL = "https://api.skip.money/v1";
+const API_URL = "https://solve-dev.skip.money/v1";
 
 export interface Chain {
   chainId: string;
@@ -95,6 +96,40 @@ export async function getRoute(
   return response.data as TransferRouteResponse;
 }
 
+export interface SwapVenue {
+  name: string;
+  chainId: string;
+}
+
+export interface SwapIn {
+  swapVenue: SwapVenue;
+  swapOperations: SwapOperation[];
+  amountIn?: string;
+}
+
+export interface SwapOperation {
+  pool: string;
+  denomIn: string;
+  denomOut: string;
+}
+
+export interface Swap {
+  swapVenue: SwapVenue;
+  swapOperations: SwapOperation[];
+  swapAmountIn: string;
+}
+
+export interface SwapExactCoinOut {
+  swapVenue: SwapVenue;
+  swapOperations: SwapOperation[];
+  swapAmountOut: string;
+}
+
+export interface Affiliate {
+  basisPointsFee: string;
+  address: string;
+}
+
 export interface TransferMsgsRequest {
   amount: string;
   sourceAsset: IBCDenom;
@@ -127,4 +162,37 @@ export async function getTransferMsgs(
   const responseData = response.data as TransferMsgsResponse;
 
   return responseData.requested;
+}
+
+export interface SwapRouteRequest {
+  sourceAsset: IBCDenom;
+  destAsset: IBCDenom;
+  amountIn: string;
+  cumulativeAffiliateFeeBps: string;
+}
+
+export interface SwapRouteResponse {
+  preSwapHops: IBCHop[];
+  postSwapHops: IBCHop[];
+
+  chainIds: string[];
+
+  sourceAsset: IBCDenom;
+  destAsset: IBCDenom;
+
+  amountIn: string;
+
+  userSwap: SwapIn;
+  userSwapAmountOut: string;
+
+  feeSwap?: SwapExactCoinOut;
+
+  swapChainId: string;
+  totalAffiliateFee: string;
+}
+
+export async function getSwapRoute(request: SwapRouteRequest) {
+  const response = await axios.post(`${API_URL}/ibc/swap_route`, request);
+
+  return response.data as SwapRouteResponse;
 }

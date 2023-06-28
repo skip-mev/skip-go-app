@@ -1,3 +1,4 @@
+import { Asset } from "@/components/AssetSelect";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import {
   SigningStargateClient,
@@ -7,7 +8,7 @@ import {
 import { getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
 import * as chainRegistry from "chain-registry";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export function formatAddress(address: string, prefix: string) {
   return address.slice(0, prefix.length + 2) + "..." + address.slice(-4);
@@ -127,4 +128,39 @@ export async function getSigningStargateClientForChainID(
   );
 
   return client;
+}
+
+async function getBalances(address: string, client: StargateClient) {
+  const response = await client.getAllBalances(address);
+
+  return response;
+}
+
+export function useAssetBalances(assets: Asset[], chainID?: string) {
+  const [assetBalances, setAssetBalances] = useState<Record<string, string>>(
+    {}
+  );
+
+  const { address } = useChainByID(chainID ?? "cosmoshub-4");
+
+  useEffect(() => {
+    if (assets.length > 0 && address) {
+      (async () => {
+        const client = await getStargateClientForChainID(
+          chainID ?? "cosmoshub-4"
+        );
+        const balances = await getBalances(address, client);
+
+        const balancesMap = balances.reduce((acc, coin) => {
+          acc[coin.denom] = coin.amount;
+
+          return acc;
+        }, {} as Record<string, string>);
+
+        setAssetBalances(balancesMap);
+      })();
+    }
+  }, [assets, address, chainID]);
+
+  return assetBalances;
 }

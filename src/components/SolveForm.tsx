@@ -2,7 +2,11 @@ import { FC, Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { IBCHop } from "@/solve/api";
 import ChainSelect from "./ChainSelect";
 import AssetSelect, { Asset } from "./AssetSelect";
-import { getStargateClientForChainID, useChainByID } from "@/utils/utils";
+import {
+  getStargateClientForChainID,
+  useAssetBalances,
+  useChainByID,
+} from "@/utils/utils";
 import {
   DeliverTxResponse,
   GasPrice,
@@ -29,12 +33,6 @@ import { Decimal } from "@cosmjs/math";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function getBalances(address: string, client: StargateClient) {
-  const response = await client.getAllBalances(address);
-
-  return response;
-}
-
 function useAssetBalance(address: string, denom: string, chainID: string) {
   return useQuery({
     queryKey: ["assetBalance", address, denom, chainID],
@@ -52,35 +50,6 @@ function useAssetBalance(address: string, denom: string, chainID: string) {
     retry: false,
     enabled: !!address && !!denom,
   });
-}
-
-function useAssetBalances(assets: Asset[], chainID?: string) {
-  const [assetBalances, setAssetBalances] = useState<Record<string, string>>(
-    {}
-  );
-
-  const { address } = useChainByID(chainID ?? "cosmoshub-4");
-
-  useEffect(() => {
-    if (assets.length > 0 && address) {
-      (async () => {
-        const client = await getStargateClientForChainID(
-          chainID ?? "cosmoshub-4"
-        );
-        const balances = await getBalances(address, client);
-
-        const balancesMap = balances.reduce((acc, coin) => {
-          acc[coin.denom] = coin.amount;
-
-          return acc;
-        }, {} as Record<string, string>);
-
-        setAssetBalances(balancesMap);
-      })();
-    }
-  }, [assets, address, chainID]);
-
-  return assetBalances;
 }
 
 export const DEFAULT_SOURCE_CHAIN_ID = "osmosis-1";
@@ -110,14 +79,6 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
 
   const balances = useAssetBalances(assets ?? [], values.sourceChain?.chainId);
 
-  // const selectedAssetBalance = useMemo(() => {
-  //   if (selectedAsset) {
-  //     return balances[selectedAsset.denom] ?? "0";
-  //   }
-
-  //   return "0";
-  // }, [selectedAsset, balances]);
-
   const {
     status: walletStatus,
     connect: connectWallet,
@@ -129,230 +90,6 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
     values.asset?.denom ?? "",
     values.sourceChain?.chainId ?? "cosmoshub-4"
   );
-
-  const { chainRecords } = useManager();
-
-  const transferAssets = useCallback(async () => {
-    const solveRoute: IBCHop[] = [];
-
-    const routeChainIDs = ["osmosis-1", "axelar-dojo-1"];
-
-    if (
-      !values.asset ||
-      !values.sourceChain ||
-      !values.destinationChain ||
-      !solveRoute ||
-      solveRoute.length === 0 ||
-      !window.keplr
-    ) {
-      return;
-    }
-
-    // setTxPending(true);
-
-    try {
-      const formattedAmount = ethers.parseUnits(
-        values.amount,
-        values.asset.decimals
-      );
-
-      const chainInfos = await window.keplr.getChainInfosWithoutEndpoints();
-
-      // console.log(chainInfos);
-
-      for (const chainID of routeChainIDs) {
-        if (chainInfos.findIndex((chain) => chain.chainId === chainID) == -1) {
-          const record = chainRecords.find(
-            (record) => record.chain.chain_id === chainID
-          );
-
-          if (record) {
-            const chainInfo = await axios.get(
-              `https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/cosmos/${record.name}.json`
-            );
-
-            await window.keplr.experimentalSuggestChain(chainInfo.data);
-          }
-        }
-      }
-
-      // make sure all wallets are connected
-      await window.keplr.enable(routeChainIDs);
-
-      const userAddresses: IBCAddress[] = [];
-
-      for (const chainID of routeChainIDs) {
-        const signer = window.keplr.getOfflineSigner(chainID);
-        const accounts = await signer.getAccounts();
-
-        userAddresses.push({
-          address: accounts[0].address,
-          chainId: chainID,
-        });
-      }
-
-      const messages = await getTransferMsgs(
-        formattedAmount.toString(),
-        {
-          denom: values.asset.denom,
-          chainId: values.sourceChain.chainId,
-        },
-        values.destinationChain.chainId,
-        solveRoute,
-        userAddresses
-      );
-
-      if (messages.length === 0) {
-        throw new Error("No transfer messages");
-      }
-
-      // if (messages.length > 1) {
-      //   throw new Error("Too many messages");
-      // }
-
-      for (let i = 0; i < messages.length; i++) {
-        const multiHopMsg = messages[i];
-
-        console.log(`tx ${i + 1} of ${messages.length}`);
-
-        const decodedMsg = JSON.parse(multiHopMsg.msg);
-
-        const denomIn: string = decodedMsg.token.denom;
-        const denomOut: string =
-          i === messages.length - 1
-            ? solveRoute[solveRoute.length - 1].destDenom
-            : JSON.parse(messages[i + 1].msg).token.denom;
-
-        const originChainRecord = chainRecords.find(
-          (record) => multiHopMsg.chainId === record.chain.chain_id
-        ) as ChainRecord;
-
-        if (
-          !originChainRecord.preferredEndpoints ||
-          !originChainRecord.preferredEndpoints.rpc
-        ) {
-          throw new Error("No preferred endpoints");
-        }
-
-        const destinationChainRecord = chainRecords.find(
-          (record) =>
-            multiHopMsg.path[multiHopMsg.path.length - 1] ===
-            record.chain.chain_id
-        ) as ChainRecord;
-
-        if (
-          !destinationChainRecord.preferredEndpoints ||
-          !destinationChainRecord.preferredEndpoints.rpc
-        ) {
-          throw new Error("No preferred endpoints");
-        }
-
-        const destinationChainEndpoint = await getFastestEndpoint(
-          destinationChainRecord.preferredEndpoints.rpc
-        );
-
-        const destinationChainClient = await StargateClient.connect(
-          destinationChainEndpoint
-        );
-        const destinationChainAddress =
-          userAddresses.find(
-            (address) =>
-              address.chainId === multiHopMsg.path[multiHopMsg.path.length - 1]
-          )?.address ?? "";
-
-        const destinationChainBalanceBefore =
-          await destinationChainClient.getBalance(
-            destinationChainAddress,
-            denomOut
-          );
-
-        if (!window.keplr) {
-          throw new Error("Keplr not installed");
-        }
-
-        console.log(originChainRecord);
-
-        const signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
-
-        const endpoint = await getFastestEndpoint(
-          originChainRecord.preferredEndpoints.rpc
-        );
-
-        const feeInfo = originChainRecord.chain.fees?.fee_tokens[0];
-
-        if (!feeInfo) {
-          throw new Error("No fee info");
-        }
-
-        const gasPrice =
-          feeInfo.average_gas_price || feeInfo.fixed_min_gas_price || 0.0;
-
-        const client = await SigningStargateClient.connectWithSigner(
-          endpoint,
-          signer,
-          {
-            gasPrice: {
-              amount: Decimal.fromUserInput(`${gasPrice}`, 18),
-              denom: feeInfo.denom,
-            },
-          }
-        );
-
-        const currentHeight = await client.getHeight();
-
-        const msg = {
-          typeUrl: multiHopMsg.msgTypeUrl,
-          value: {
-            sender: decodedMsg.sender,
-            receiver: decodedMsg.receiver,
-            sourceChannel: decodedMsg.source_channel,
-            sourcePort: decodedMsg.source_port,
-            token: decodedMsg.token,
-            timeoutHeight: {
-              revisionHeight: Long.fromNumber(currentHeight).add(100),
-              revisionNumber: Long.fromNumber(currentHeight).add(100),
-            },
-            timeoutTimestamp: Long.fromNumber(0),
-            memo: decodedMsg.memo,
-          },
-        };
-
-        console.log(msg);
-
-        await client.signAndBroadcast(decodedMsg.sender, [msg], "auto");
-
-        while (true) {
-          console.log("polling...");
-
-          const balance = await destinationChainClient.getBalance(
-            destinationChainAddress,
-            denomOut
-          );
-          if (
-            parseInt(balance.amount) >
-            parseInt(destinationChainBalanceBefore.amount)
-          ) {
-            break;
-          }
-          await wait(1000);
-        }
-      }
-
-      setDisplaySuccessMessage(true);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      // setTxPending(false);
-      await wait(5000);
-      setDisplaySuccessMessage(false);
-    }
-  }, [
-    chainRecords,
-    values.destinationChain,
-    values.asset,
-    values.sourceChain,
-    values.amount,
-  ]);
 
   const isButtonDisabled = useMemo(() => {
     // if (solveRouteStatus !== "success") {
@@ -542,11 +279,7 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
             onClick={onSubmit}
             disabled={isButtonDisabled}
           >
-            {/* {solveRouteStatus === "loading" && <span>Loading...</span>} */}
-            {/* {solveRouteStatus === "error" && <span>No Route found</span>} */}
-            {/* {solveRouteStatus === "success" && !txPending && ( */}
             {!txPending && <span>Transfer {values.asset?.symbol}</span>}
-            {/* )} */}
             {txPending && (
               <div className="text-center">
                 <svg
