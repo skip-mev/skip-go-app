@@ -3,7 +3,7 @@ import "../styles/globals.css";
 import { Fragment, useState } from "react";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { Inter } from "next/font/google";
+import { Inter, Jost } from "next/font/google";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
@@ -14,6 +14,10 @@ import { GasPrice } from "@cosmjs/stargate";
 import MainLayout from "@/components/MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const jost = Jost({
+  subsets: ["latin"],
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   const [client] = useState(
@@ -169,7 +173,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>ibc.fun</title>
         <meta name="description" content="ibc.fun" />
       </Head>
-      <main className={inter.className}>
+      <main className={jost.className}>
         <QueryClientProvider client={client}>
           <ChakraProvider theme={defaultTheme}>
             <ChainProvider
