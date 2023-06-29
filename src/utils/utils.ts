@@ -80,7 +80,8 @@ export async function getStargateClientForChainID(chainID: string) {
   const endpoint = await getFastestEndpoint(
     rpcEndpoints.reduce((acc, endpoint) => {
       return [...acc, endpoint.address];
-    }, [] as string[])
+    }, [] as string[]),
+    "rpc"
   );
 
   const client = await StargateClient.connect(endpoint, {});
@@ -117,7 +118,8 @@ export async function getSigningStargateClientForChainID(
   const endpoint = await getFastestEndpoint(
     rpcEndpoints.reduce((acc, endpoint) => {
       return [...acc, endpoint.address];
-    }, [] as string[])
+    }, [] as string[]),
+    "rpc"
   );
 
   const client = await SigningStargateClient.connectWithSigner(
