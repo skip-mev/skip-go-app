@@ -19,6 +19,8 @@ export default function App({ Component, pageProps }: AppProps) {
     new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
   );
 
+  console.log(wallets);
+
   chains.push({
     $schema: "../chain.schema.json",
     chain_name: "neutron",
@@ -174,7 +176,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <ChainProvider
               chains={chains}
               assetLists={assets}
-              wallets={wallets}
+              wallets={[wallets[0]]}
               signerOptions={{
                 signingStargate: (chain) => {
                   chain.fees?.fee_tokens;

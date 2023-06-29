@@ -95,13 +95,13 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
 
   const balances = useAssetBalances(assets ?? [], values.sourceChain?.chainId);
 
-  // const selectedAssetBalance = useMemo(() => {
-  //   if (selectedAsset) {
-  //     return balances[selectedAsset.denom] ?? "0";
-  //   }
+  const selectedAssetBalance = useMemo(() => {
+    if (values.asset) {
+      return balances[values.asset.denom] ?? "0";
+    }
 
-  //   return "0";
-  // }, [selectedAsset, balances]);
+    return "0";
+  }, [values.asset, balances]);
 
   const {
     status: walletStatus,
@@ -109,11 +109,11 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
     address,
   } = useChainByID(values.sourceChain?.chainId ?? "cosmoshub-4");
 
-  const { data: selectedAssetBalance } = useAssetBalance(
-    address ?? "",
-    values.asset?.denom ?? "",
-    values.sourceChain?.chainId ?? "cosmoshub-4"
-  );
+  // const { data: selectedAssetBalance } = useAssetBalance(
+  //   address ?? "",
+  //   values.asset?.denom ?? "",
+  //   values.sourceChain?.chainId ?? "cosmoshub-4"
+  // );
 
   const { chainRecords } = useManager();
 
