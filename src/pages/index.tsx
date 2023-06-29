@@ -1,6 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
-
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Chain, IBCAddress, IBCHop, getTransferMsgs } from "@/solve/api";
 import NavBar from "@/components/NavBar";

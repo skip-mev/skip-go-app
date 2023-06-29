@@ -157,22 +157,6 @@ function Providers({ children }: React.PropsWithChildren) {
     ],
   });
 
-  // const endpointOptions = chains.reduce((acc, chain) => {
-  // return {
-  // ...acc,
-  // [chain.chain_name]: {
-  // endpoints: chain.apis,
-  // },
-  // [chain.chain_name]: {
-  //   endpoints: {
-  //     rpc: ['']
-  //   }
-  // }
-  // };
-  // }, {} as Record<string, { endpoints: Endpoints }>);
-
-  // console.log(endpointOptions);
-
   return (
     <QueryClientProvider client={client}>
       <ChakraProvider theme={defaultTheme}>
