@@ -14,22 +14,12 @@ import {
   StargateClient,
 } from "@cosmjs/stargate";
 import { ethers } from "ethers";
-import {
-  ChainRecord,
-  ExtendedHttpEndpoint,
-  WalletStatus,
-  getFastestEndpoint,
-} from "@cosmos-kit/core";
-import PathDisplay from "./PathDisplay";
-import { OfflineSigner } from "@cosmjs/proto-signing";
-import { useChainAssets, useSolveChains, useSolveRoute } from "@/solve/queries";
-import { Chain, IBCAddress, getTransferMsgs } from "@/solve/api";
+import { WalletStatus } from "@cosmos-kit/core";
+import { useChainAssets, useSolveChains } from "@/solve/queries";
+import { Chain } from "@/solve/api";
 import { useManager } from "@cosmos-kit/react";
-import Long from "long";
 import { Disclosure } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Decimal } from "@cosmjs/math";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -79,17 +69,27 @@ const SolveForm: FC<Props> = ({ onChange, values, onSubmit, txPending }) => {
 
   const balances = useAssetBalances(assets ?? [], values.sourceChain?.chainId);
 
+  const selectedAssetBalance = useMemo(() => {
+    if (values.asset) {
+      return balances[values.asset.denom] ?? "0";
+    }
+
+    return "0";
+  }, [values.asset, balances]);
+
   const {
     status: walletStatus,
     connect: connectWallet,
     address,
   } = useChainByID(values.sourceChain?.chainId ?? "cosmoshub-4");
 
-  const { data: selectedAssetBalance } = useAssetBalance(
-    address ?? "",
-    values.asset?.denom ?? "",
-    values.sourceChain?.chainId ?? "cosmoshub-4"
-  );
+  // const { data: selectedAssetBalance } = useAssetBalance(
+  //   address ?? "",
+  //   values.asset?.denom ?? "",
+  //   values.sourceChain?.chainId ?? "cosmoshub-4"
+  // );
+
+  const { chainRecords } = useManager();
 
   const isButtonDisabled = useMemo(() => {
     // if (solveRouteStatus !== "success") {

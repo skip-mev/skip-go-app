@@ -1,6 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
-
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Chain, IBCAddress, IBCHop, getTransferMsgs } from "@/solve/api";
 import NavBar from "@/components/NavBar";
@@ -528,7 +525,7 @@ export default function Home() {
                 <div className="space-y-6">
                   <PathDisplay
                     chainIDs={routeChainIDs}
-                    asset={formState.asset}
+                    assets={[formState.asset]}
                     loading={solveRouteStatus === "loading"}
                   />
                   {routeMetadata.length > 0 && (

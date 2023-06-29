@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
 import { Dialog, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";

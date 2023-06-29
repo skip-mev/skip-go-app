@@ -1,16 +1,25 @@
-import React from "react";
+import "../styles/globals.css";
+
+import { Fragment, useState } from "react";
+import { AppProps } from "next/app";
+import Head from "next/head";
+import { Inter } from "next/font/google";
+
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
 import { chains, assets } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { GasPrice } from "@cosmjs/stargate";
-import { EndpointOptions, Endpoints } from "@cosmos-kit/core";
 
-function Providers({ children }: React.PropsWithChildren) {
-  const [client] = React.useState(
+const inter = Inter({ subsets: ["latin"] });
+
+export default function App({ Component, pageProps }: AppProps) {
+  const [client] = useState(
     new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
   );
+
+  console.log(wallets);
 
   chains.push({
     $schema: "../chain.schema.json",
@@ -156,27 +165,33 @@ function Providers({ children }: React.PropsWithChildren) {
   });
 
   return (
-    <QueryClientProvider client={client}>
-      <ChakraProvider theme={defaultTheme}>
-        <ChainProvider
-          chains={chains}
-          assetLists={assets}
-          wallets={wallets}
-          signerOptions={{
-            signingStargate: (chain) => {
-              chain.fees?.fee_tokens;
-              return {
-                gasPrice: GasPrice.fromString("0.025uosmo"),
-              };
-            },
-          }}
-          wrappedWithChakra
-        >
-          {children}
-        </ChainProvider>
-      </ChakraProvider>
-    </QueryClientProvider>
+    <Fragment>
+      <Head>
+        <title>ibc.fun</title>
+        <meta name="description" content="ibc.fun" />
+      </Head>
+      <main className={inter.className}>
+        <QueryClientProvider client={client}>
+          <ChakraProvider theme={defaultTheme}>
+            <ChainProvider
+              chains={chains}
+              assetLists={assets}
+              wallets={[wallets[0]]}
+              signerOptions={{
+                signingStargate: (chain) => {
+                  chain.fees?.fee_tokens;
+                  return {
+                    gasPrice: GasPrice.fromString("0.025uosmo"),
+                  };
+                },
+              }}
+              wrappedWithChakra
+            >
+              <Component {...pageProps} />
+            </ChainProvider>
+          </ChakraProvider>
+        </QueryClientProvider>
+      </main>
+    </Fragment>
   );
 }
-
-export default Providers;
