@@ -11,6 +11,7 @@ import { chains, assets } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { GasPrice } from "@cosmjs/stargate";
+import MainLayout from "@/components/MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const [client] = useState(
     new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
   );
-
-  console.log(wallets);
 
   chains.push({
     $schema: "../chain.schema.json",
@@ -187,7 +186,9 @@ export default function App({ Component, pageProps }: AppProps) {
               }}
               wrappedWithChakra
             >
-              <Component {...pageProps} />
+              <MainLayout>
+                <Component {...pageProps} />
+              </MainLayout>
             </ChainProvider>
           </ChakraProvider>
         </QueryClientProvider>

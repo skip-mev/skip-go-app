@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const API_URL = "https://api.skip.money/v1";
-const API_URL = "https://solve-dev.skip.money/v1";
+const API_URL = "https://api.skip.money/v1";
+// const API_URL = "https://solve-dev.skip.money/v1";
 
 export interface Chain {
   chainId: string;
@@ -195,4 +195,32 @@ export async function getSwapRoute(request: SwapRouteRequest) {
   const response = await axios.post(`${API_URL}/ibc/swap_route`, request);
 
   return response.data as SwapRouteResponse;
+}
+
+export interface SwapMsgsRequest {
+  preSwapHops: IBCHop[];
+  postSwapHops: IBCHop[];
+
+  chainIdsToAddresses: Record<string, string>;
+
+  sourceAsset: IBCDenom;
+  destAsset: IBCDenom;
+  amountIn: string;
+
+  userSwap: SwapIn;
+  userSwapAmountOut: string;
+  userSwapSlippageTolerancePercent: string;
+
+  feeSwap?: SwapExactCoinOut;
+  affiliates: Affiliate[];
+}
+
+export interface SwapMsgsResponse {
+  requested: MultiHopMsg[];
+}
+
+export async function getSwapMessages(request: SwapMsgsRequest) {
+  const response = await axios.post(`${API_URL}/ibc/swap_msgs`, request);
+
+  return response.data as SwapMsgsResponse;
 }

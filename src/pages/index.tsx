@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Chain, IBCAddress, IBCHop, getTransferMsgs } from "@/solve/api";
 import NavBar from "@/components/NavBar";
@@ -501,108 +502,85 @@ export default function Home() {
 
   return (
     <Fragment>
-      <NavBar chainID={formState.sourceChain.chainId} />
-      <main className="px-4 pt-4 pb-24">
-        <div className="w-full max-w-screen-xl mx-auto">
-          <div className="flex gap-6">
-            <div className="w-full max-w-xl space-y-4">
-              <SolveForm
-                onChange={(newFormState) => setFormState(newFormState)}
-                values={formState}
-                onSubmit={handleSubmit}
-                txPending={txPending}
+      <div className="flex gap-6">
+        <div className="w-full max-w-xl space-y-4">
+          <SolveForm
+            onChange={(newFormState) => setFormState(newFormState)}
+            values={formState}
+            onSubmit={handleSubmit}
+            txPending={txPending}
+          />
+          {errorMessage !== "" && (
+            <div>
+              <div className="rounded-md bg-red-400/10 px-2 py-2 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20 text-center">
+                <p>Error: {errorMessage}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="p-6">
+            <div className="space-y-6">
+              <PathDisplay
+                chainIDs={routeChainIDs}
+                assets={[formState.asset]}
+                loading={solveRouteStatus === "loading"}
               />
-              {errorMessage !== "" && (
-                <div>
-                  <div className="rounded-md bg-red-400/10 px-2 py-2 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20 text-center">
-                    <p>Error: {errorMessage}</p>
-                  </div>
+              {routeMetadata.length > 0 && (
+                <div className="bg-indigo-400/10 border border-indigo-400/30 text-indigo-400 text-sm font-medium text-center rounded py-2">
+                  {routeMetadata.length === 1 && (
+                    <p>This route can be completed in a single transaction</p>
+                  )}
+                  {routeMetadata.length > 1 && (
+                    <p>
+                      This route requires{" "}
+                      <span className="font-bold">
+                        {routeMetadata.length} transactions
+                      </span>{" "}
+                      to complete
+                    </p>
+                  )}
                 </div>
               )}
-            </div>
-            <div className="flex-1">
-              <div className="p-6">
-                <div className="space-y-6">
-                  <PathDisplay
-                    chainIDs={routeChainIDs}
-                    assets={[formState.asset]}
-                    loading={solveRouteStatus === "loading"}
-                  />
-                  {routeMetadata.length > 0 && (
-                    <div className="bg-indigo-400/10 border border-indigo-400/30 text-indigo-400 text-sm font-medium text-center rounded py-2">
-                      {routeMetadata.length === 1 && (
-                        <p>
-                          This route can be completed in a single transaction
-                        </p>
-                      )}
-                      {routeMetadata.length > 1 && (
-                        <p>
-                          This route requires{" "}
-                          <span className="font-bold">
-                            {routeMetadata.length} transactions
-                          </span>{" "}
-                          to complete
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  {noPathExists && (
-                    <div className="bg-red-400/10 border border-red-400/30 text-red-400 text-sm font-medium text-center rounded py-2">
-                      <p>No Path Found</p>
-                    </div>
-                  )}
-                  <div>
-                    <Accordion.Root className="AccordionRoot" type="multiple">
-                      {routeMetadata.map((tx, i) => {
-                        return (
-                          <Accordion.Item key={i} value={`item-${i}`}>
-                            <Accordion.Trigger className="font-bold text-sm hover:underline flex items-center justify-between w-full border-b border-zinc-600 py-4">
-                              <div className="flex items-center gap-2">
-                                {tx.status === "pending" && (
-                                  <svg
-                                    className="animate-spin h-5 w-5 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
-                                      stroke="currentColor"
-                                      strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                  </svg>
-                                )}
-                                {tx.status === "init" && (
-                                  <div className="w-5 h-5 border-2 border-zinc-500 rounded-full" />
-                                )}
-                                {tx.status === "success" && (
-                                  <div className="text-emerald-500">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      className="w-5 h-5"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                  </div>
-                                )}
-                                {/*  */}
-                                <span>Transaction {i + 1}</span>
-                              </div>
-                              <span>
+              {noPathExists && (
+                <div className="bg-red-400/10 border border-red-400/30 text-red-400 text-sm font-medium text-center rounded py-2">
+                  <p>No Path Found</p>
+                </div>
+              )}
+              <div>
+                <Accordion.Root className="AccordionRoot" type="multiple">
+                  {routeMetadata.map((tx, i) => {
+                    return (
+                      <Accordion.Item key={i} value={`item-${i}`}>
+                        <Accordion.Trigger className="font-bold text-sm hover:underline flex items-center justify-between w-full border-b border-zinc-600 py-4">
+                          <div className="flex items-center gap-2">
+                            {tx.status === "pending" && (
+                              <svg
+                                className="animate-spin h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                            )}
+                            {tx.status === "init" && (
+                              <div className="w-5 h-5 border-2 border-zinc-500 rounded-full" />
+                            )}
+                            {tx.status === "success" && (
+                              <div className="text-emerald-500">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   viewBox="0 0 20 20"
@@ -611,102 +589,115 @@ export default function Home() {
                                 >
                                   <path
                                     fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
                                     clipRule="evenodd"
                                   />
                                 </svg>
-                              </span>
-                            </Accordion.Trigger>
-                            <Accordion.Content className="py-6">
-                              {tx.actions.map((action, j) => {
-                                const actionStart = chainRecords.find(
-                                  (record) =>
-                                    record.chain.chain_id === action.sourceChain
-                                ) as ChainRecord;
-                                const actionEnd = chainRecords.find(
-                                  (record) =>
-                                    record.chain.chain_id ===
-                                    action.destinationChain
-                                ) as ChainRecord;
-                                return (
-                                  <div
-                                    className="py-4"
-                                    key={`action-${i}-${j}`}
-                                  >
-                                    <div className="flex items-center gap-1.5">
-                                      <div className="bg-indigo-400/10 border border-indigo-400/30 text-indigo-400 rounded-full p-1">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                          className="w-4 h-4"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <p className="text-sm text-zinc-400">
-                                        <span className="font-bold text-indigo-400">
-                                          Transfer
-                                        </span>{" "}
-                                        <img
-                                          className="w-5 h-5 inline-block"
-                                          src={`https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${action.asset.image}`}
-                                          alt=""
-                                        />{" "}
-                                        <span className="font-bold text-white">
-                                          {action.asset.symbol}
-                                        </span>{" "}
-                                        from{" "}
-                                        <img
-                                          alt={actionStart.chain.pretty_name}
-                                          src={`${chainNameToChainlistURL(
-                                            actionStart.name
-                                          )}/chainImg/_chainImg.svg`}
-                                          className="w-5 h-5 inline-block"
-                                          onError={(error) => {
-                                            error.currentTarget.src =
-                                              "https://api.dicebear.com/6.x/shapes/svg";
-                                          }}
-                                        />{" "}
-                                        <span className="font-bold text-white">
-                                          {actionStart.chain.pretty_name}
-                                        </span>{" "}
-                                        to{" "}
-                                        <img
-                                          alt={actionEnd.chain.pretty_name}
-                                          src={`${chainNameToChainlistURL(
-                                            actionEnd.name
-                                          )}/chainImg/_chainImg.svg`}
-                                          className="w-5 h-5 inline-block"
-                                          onError={(error) => {
-                                            error.currentTarget.src =
-                                              "https://api.dicebear.com/6.x/shapes/svg";
-                                          }}
-                                        />{" "}
-                                        <span className="font-bold text-white">
-                                          {actionEnd.chain.pretty_name}
-                                        </span>
-                                      </p>
-                                    </div>
+                              </div>
+                            )}
+                            {/*  */}
+                            <span>Transaction {i + 1}</span>
+                          </div>
+                          <span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                        </Accordion.Trigger>
+                        <Accordion.Content className="py-6">
+                          {tx.actions.map((action, j) => {
+                            const actionStart = chainRecords.find(
+                              (record) =>
+                                record.chain.chain_id === action.sourceChain
+                            ) as ChainRecord;
+                            const actionEnd = chainRecords.find(
+                              (record) =>
+                                record.chain.chain_id ===
+                                action.destinationChain
+                            ) as ChainRecord;
+                            return (
+                              <div className="py-4" key={`action-${i}-${j}`}>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="bg-indigo-400/10 border border-indigo-400/30 text-indigo-400 rounded-full p-1">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      className="w-4 h-4"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
                                   </div>
-                                );
-                              })}
-                            </Accordion.Content>
-                          </Accordion.Item>
-                        );
-                      })}
-                    </Accordion.Root>
-                  </div>
-                </div>
+                                  <p className="text-sm text-zinc-400">
+                                    <span className="font-bold text-indigo-400">
+                                      Transfer
+                                    </span>{" "}
+                                    <img
+                                      className="w-5 h-5 inline-block"
+                                      src={`https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${action.asset.image}`}
+                                      alt=""
+                                    />{" "}
+                                    <span className="font-bold text-white">
+                                      {action.asset.symbol}
+                                    </span>{" "}
+                                    from{" "}
+                                    <img
+                                      alt={actionStart.chain.pretty_name}
+                                      src={`${chainNameToChainlistURL(
+                                        actionStart.name
+                                      )}/chainImg/_chainImg.svg`}
+                                      className="w-5 h-5 inline-block"
+                                      onError={(error) => {
+                                        error.currentTarget.src =
+                                          "https://api.dicebear.com/6.x/shapes/svg";
+                                      }}
+                                    />{" "}
+                                    <span className="font-bold text-white">
+                                      {actionStart.chain.pretty_name}
+                                    </span>{" "}
+                                    to{" "}
+                                    <img
+                                      alt={actionEnd.chain.pretty_name}
+                                      src={`${chainNameToChainlistURL(
+                                        actionEnd.name
+                                      )}/chainImg/_chainImg.svg`}
+                                      className="w-5 h-5 inline-block"
+                                      onError={(error) => {
+                                        error.currentTarget.src =
+                                          "https://api.dicebear.com/6.x/shapes/svg";
+                                      }}
+                                    />{" "}
+                                    <span className="font-bold text-white">
+                                      {actionEnd.chain.pretty_name}
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    );
+                  })}
+                </Accordion.Root>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </Fragment>
   );
 }

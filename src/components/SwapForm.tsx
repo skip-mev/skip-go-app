@@ -6,6 +6,7 @@ import AssetSelect, { Asset } from "./AssetSelect";
 import { useAssetBalances, useChainByID } from "@/utils/utils";
 import { WalletStatus } from "@cosmos-kit/core";
 import { ethers } from "ethers";
+import { spawn } from "child_process";
 
 export interface SwapFormValues {
   sourceChain?: Chain;
@@ -18,9 +19,18 @@ export interface SwapFormValues {
 interface Props {
   onChange: (values: SwapFormValues) => void;
   values: SwapFormValues;
+  amountOut?: string;
+  onSubmit: () => void;
+  txPending?: boolean;
 }
 
-const SwapForm: FC<Props> = ({ onChange, values }) => {
+const SwapForm: FC<Props> = ({
+  amountOut,
+  onChange,
+  onSubmit,
+  txPending,
+  values,
+}) => {
   const { data: supportedChains } = useSolveChains();
 
   const {
@@ -200,12 +210,12 @@ const SwapForm: FC<Props> = ({ onChange, values }) => {
                 </div>
                 <div className="flex-1">
                   <span className="bg-transparent font-bold text-xl p-4 placeholder:text-zinc-500 w-full outline-none">
-                    {/* {values.destinationAsset &&
-                      swapRouteResponse &&
+                    {values.destinationAsset &&
+                      amountOut &&
                       ethers.formatUnits(
-                        swapRouteResponse.userSwapAmountOut,
+                        amountOut,
                         values.destinationAsset.decimals
-                      )} */}
+                      )}
                   </span>
                 </div>
               </div>
@@ -224,35 +234,34 @@ const SwapForm: FC<Props> = ({ onChange, values }) => {
       {walletStatus === WalletStatus.Connected && (
         <button
           className="bg-indigo-600 hover:bg-indigo-500/90 active:bg-indigo-600 disabled:bg-indigo-500 disabled:opacity-70 disabled:pointer-events-none text-white focus-visible:outline-indigo-600 w-full rounded-md px-6 py-2.5 h-16 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors text-center whitespace-nowrap truncate"
-          // onClick={onSubmit}
-          // disabled={isButtonDisabled}
+          onClick={onSubmit}
+          disabled={txPending}
         >
-          Swap
-          {/* {!txPending && <span>Transfer {values.asset?.symbol}</span>} */}
-          {/* {txPending && (
-              <div className="text-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              </div>
-            )} */}
+          {!txPending && <span>Swap</span>}
+          {txPending && (
+            <div className="text-center">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 inline-block text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+          )}
         </button>
       )}
     </div>

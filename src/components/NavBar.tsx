@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface Props {
   chainID?: string;
 }
@@ -7,9 +9,11 @@ const NavBar: React.FC<Props> = ({ chainID }) => {
     <nav className="relative">
       <div className="flex items-center justify-center p-4 h-28 ">
         <div>
-          <p className="font-black text-xl tracking-wider">
-            ibc<span className="text-indigo-500">.fun</span>
-          </p>
+          <Link href="/">
+            <p className="font-black text-xl tracking-wider">
+              ibc<span className="text-indigo-500">.fun</span>
+            </p>
+          </Link>
         </div>
       </div>
       {/* <div className="absolute top-0 right-0 inset-y-0 flex items-center px-4">

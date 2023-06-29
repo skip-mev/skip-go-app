@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { getChains, getRoute, getSwapRoute } from "./api";
+import {
+  SwapMsgsRequest,
+  SwapRouteResponse,
+  getChains,
+  getRoute,
+  getSwapRoute,
+} from "./api";
 import axios from "axios";
 import { chainNameToChainlistURL } from "@/config";
 import { Asset } from "@/components/AssetSelect";
@@ -151,5 +157,41 @@ export function useSwapRoute(
     refetchOnReconnect: false,
     enabled:
       !!amount && !!sourceAsset && !!sourceChain && !!destAsset && !!destChain,
+  });
+}
+
+export function useSwapMessages(route?: SwapRouteResponse) {
+  return useQuery({
+    queryKey: ["swap-messages", route],
+    queryFn: async () => {
+      if (!route) {
+        // THIS SHOULD BE UNREACHABLE
+        return [];
+      }
+      const data: SwapMsgsRequest = {
+        preSwapHops: [],
+        postSwapHops: [],
+
+        chainIdsToAddresses: {},
+
+        sourceAsset: route.sourceAsset,
+        destAsset: route.destAsset,
+        amountIn: route.amountIn,
+
+        userSwap: route.userSwap,
+        userSwapAmountOut: route.userSwapAmountOut,
+        userSwapSlippageTolerancePercent: "5.0",
+
+        feeSwap: route.feeSwap,
+        affiliates: [],
+      };
+      return [];
+    },
+    retry: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: !!route,
   });
 }

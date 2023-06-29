@@ -72,3 +72,25 @@ export function chainNameToChainlistURL(chainName: string) {
 
   return `https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/${name}`;
 }
+
+export interface SwapVenueConfig {
+  name: string;
+  imageURL: string;
+}
+
+export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
+  "neutron-astroport": {
+    name: "Astroport",
+    imageURL: "https://avatars.githubusercontent.com/u/87135340",
+  },
+  "osmosis-xcs": {
+    name: "Osmosis",
+    imageURL:
+      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
+  },
+  "osmosis-sq": {
+    name: "Osmosis",
+    imageURL:
+      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
+  },
+};

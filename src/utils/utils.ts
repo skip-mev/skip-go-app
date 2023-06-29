@@ -1,6 +1,10 @@
 import { Asset } from "@/components/AssetSelect";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import {
+  SigningCosmWasmClient,
+  SigningCosmWasmClientOptions,
+} from "@cosmjs/cosmwasm-stargate";
+import {
   SigningStargateClient,
   SigningStargateClientOptions,
   StargateClient,
@@ -12,6 +16,12 @@ import { useRef, useEffect, useState } from "react";
 
 export function formatAddress(address: string, prefix: string) {
   return address.slice(0, prefix.length + 2) + "..." + address.slice(-4);
+}
+
+export function getChainByID(chainID: string) {
+  return chainRegistry.chains.find(
+    (chain) => chain.chain_id === chainID
+  ) as (typeof chainRegistry.chains)[0];
 }
 
 // helper method to get the chain name from the chain ID and return the corresponding chain record.
@@ -172,4 +182,57 @@ export function useAssetBalances(assets: Asset[], chainID?: string) {
   }, [assets, address, chainID]);
 
   return assetBalances;
+}
+
+export async function getAddressForChain(chainId: string) {
+  if (!window.keplr) {
+    throw new Error("Keplr extension is not installed");
+  }
+
+  const signer = window.keplr.getOfflineSigner(chainId);
+  const accounts = await signer.getAccounts();
+
+  return accounts[0].address;
+}
+
+export async function getSigningCosmWasmClientForChainID(
+  chainID: string,
+  signer: OfflineSigner,
+  options?: SigningCosmWasmClientOptions
+) {
+  const chain = chainRegistry.chains.find(
+    (chain) => chain.chain_id === chainID
+  );
+
+  if (!chain) {
+    throw new Error(`Chain with ID ${chainID} not found`);
+  }
+
+  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
+  try {
+    const client = await SigningCosmWasmClient.connectWithSigner(
+      preferredEndpoint,
+      signer,
+      options
+    );
+
+    return client;
+  } catch {}
+
+  const rpcEndpoints = chain.apis?.rpc ?? [];
+
+  const endpoint = await getFastestEndpoint(
+    rpcEndpoints.reduce((acc, endpoint) => {
+      return [...acc, endpoint.address];
+    }, [] as string[]),
+    "rpc"
+  );
+
+  const client = await SigningCosmWasmClient.connectWithSigner(
+    endpoint,
+    signer,
+    options
+  );
+
+  return client;
 }
