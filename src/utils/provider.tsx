@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";

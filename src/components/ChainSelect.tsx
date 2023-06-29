@@ -1,6 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
-
 import { chainIDToChainlistURL, chainNameToChainlistURL } from "@/config";
 import { Chain } from "@/solve/api";
 import { useManager } from "@cosmos-kit/react";
