@@ -199,7 +199,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     <MainLayout>
                       <Component {...pageProps} />
                     </MainLayout>
-                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0" />
+                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
                   </RadixToast.ToastProvider>
                 </AssetsProvider>
               </ChainsProvider>

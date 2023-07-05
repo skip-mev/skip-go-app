@@ -310,22 +310,29 @@ export function useSolveForm() {
 
 export async function executeRoute(
   route: Route,
-  onTxSuccess: (tx: any, index: number) => void
+  onTxSuccess: (tx: any, index: number) => void,
+  onError: (error: any) => void
 ) {
-  if (route.actionType === "SWAP") {
-    await executeSwapRoute(route.data as SwapRouteResponse, onTxSuccess);
-  }
+  try {
+    if (route.actionType === "SWAP") {
+      await executeSwapRoute(route.data as SwapRouteResponse, onTxSuccess);
+    }
 
-  if (route.actionType === "TRANSFER") {
-    await executeTransferRoute(
-      ethers.parseUnits(route.amountIn, route.sourceAsset.decimals).toString(),
-      route.sourceAsset,
-      route.sourceChain,
-      route.destinationAsset,
-      route.destinationChain,
-      route.data as IBCHop[],
-      onTxSuccess
-    );
+    if (route.actionType === "TRANSFER") {
+      await executeTransferRoute(
+        ethers
+          .parseUnits(route.amountIn, route.sourceAsset.decimals)
+          .toString(),
+        route.sourceAsset,
+        route.sourceChain,
+        route.destinationAsset,
+        route.destinationChain,
+        route.data as IBCHop[],
+        onTxSuccess
+      );
+    }
+  } catch (e) {
+    onError(e);
   }
 }
 
