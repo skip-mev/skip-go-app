@@ -168,8 +168,13 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <Fragment>
       <Head>
-        <title>ibc.fun</title>
-        <meta name="description" content="ibc.fun" />
+        <title>
+          ibc.fun | Interchain transfers and swaps on any Cosmos chain
+        </title>
+        <meta
+          name="description"
+          content="Interchain transfers and swaps on any Cosmos chain"
+        />
       </Head>
       <main className={jost.className}>
         <QueryClientProvider client={queryClient}>
