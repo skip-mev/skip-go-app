@@ -20,6 +20,8 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "site-bg": "url('/site-bg.svg')",
+        "site-bg-2": "url('/site-bg-2.svg')",
+        squiggle: "url('/squiggle.svg')",
       },
     },
   },

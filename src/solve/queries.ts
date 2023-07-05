@@ -1,16 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import {
   SwapMsgsRequest,
   SwapRouteResponse,
+  compareDenoms,
   getChains,
-  getRoute,
   getSwapRoute,
+  getTransferRoute,
 } from "./api";
-import axios from "axios";
-import { chainNameToChainlistURL } from "@/config";
-import { Asset } from "@/components/AssetSelect";
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { IBCDenom, IBCHop } from "./types";
 
 export function useSolveChains() {
   return useQuery({
@@ -18,6 +15,7 @@ export function useSolveChains() {
     queryFn: () => {
       return getChains();
     },
+    placeholderData: [],
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -25,173 +23,76 @@ export function useSolveChains() {
   });
 }
 
-export function useSolveRoute(
-  sourceAsset: string,
-  sourceChainID: string,
-  destAsset: string,
-  destChainID: string
+export function useCompareDenoms(assets: IBCDenom[]) {
+  return useQuery({
+    queryKey: ["solve-compare-denoms", ...assets],
+    queryFn: () => {
+      return compareDenoms(assets);
+    },
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: assets.length >= 2,
+  });
+}
+
+export function useTransferRoute(
+  sourceAsset?: IBCDenom,
+  destinationAsset?: IBCDenom,
+  enabled?: boolean
 ) {
   return useQuery({
-    queryKey: [
-      "solve-route",
-      sourceAsset,
-      sourceChainID,
-      destAsset,
-      destChainID,
-    ],
+    queryKey: ["solve-transfer-route", sourceAsset, destinationAsset],
     queryFn: async () => {
-      // await wait(2000);
-
-      try {
-        const response = await getRoute(
-          sourceAsset,
-          sourceChainID,
-          destAsset,
-          destChainID
-        );
-
-        if (response.requested.length > 0) {
-          return response.requested;
-        }
-
-        if (response.recs.length <= 0) {
-          return [];
-        }
-
-        return response.recs[0].route;
-      } catch {
-        return [];
-      }
-    },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    retry: false,
-    enabled: !!sourceAsset && !!sourceChainID && !!destChainID,
-  });
-}
-
-export function useChainAssets(chainName?: string) {
-  return useQuery({
-    queryKey: ["chain-assets", chainName],
-    queryFn: async () => {
-      if (!chainName) {
-        return [];
+      if (!sourceAsset || !destinationAsset) {
+        return [] as IBCHop[];
       }
 
-      const response = await axios.get(
-        `${chainNameToChainlistURL(chainName)}/assets.json`
+      const response = await getTransferRoute(
+        sourceAsset.denom,
+        sourceAsset.chainId,
+        destinationAsset.denom,
+        destinationAsset.chainId
       );
 
-      const responseJSON = response.data as Asset[];
-
-      return responseJSON;
+      return response.requested;
     },
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    enabled: !!chainName,
-  });
-}
-
-export function useAssetBalances(chainName?: string) {
-  return useQuery({
-    queryKey: ["asset-balances", chainName],
-    queryFn: async () => {
-      if (!chainName) {
-        return [];
-      }
-
-      const response = await axios.get(
-        `${chainNameToChainlistURL(chainName)}/balances.json`
-      );
-
-      const responseJSON = response.data as Asset[];
-
-      return responseJSON;
-    },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled: !!chainName,
+    enabled: enabled && !!sourceAsset && !!destinationAsset,
   });
 }
 
 export function useSwapRoute(
-  amount: string,
-  sourceAsset: string,
-  sourceChain: string,
-  destAsset: string,
-  destChain: string
+  amountIn: string,
+  sourceAsset?: IBCDenom,
+  destinationAsset?: IBCDenom,
+  enabled?: boolean
 ) {
   return useQuery({
-    queryKey: [
-      "swap-route",
-      amount,
-      sourceAsset,
-      sourceChain,
-      destAsset,
-      destChain,
-    ],
-    queryFn: () => {
-      return getSwapRoute({
-        amountIn: amount,
-        sourceAsset: {
-          denom: sourceAsset,
-          chainId: sourceChain,
-        },
-        destAsset: {
-          denom: destAsset,
-          chainId: destChain,
-        },
+    queryKey: ["solve-swap-route", amountIn, sourceAsset, destinationAsset],
+    queryFn: async () => {
+      if (!sourceAsset || !destinationAsset) {
+        return {} as SwapRouteResponse;
+      }
+
+      const response = await getSwapRoute({
+        amountIn,
+        sourceAsset,
+        destAsset: destinationAsset,
         cumulativeAffiliateFeeBps: "0",
       });
+
+      return response;
     },
-    retry: false,
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    enabled:
-      !!amount && !!sourceAsset && !!sourceChain && !!destAsset && !!destChain,
-  });
-}
-
-export function useSwapMessages(route?: SwapRouteResponse) {
-  return useQuery({
-    queryKey: ["swap-messages", route],
-    queryFn: async () => {
-      if (!route) {
-        // THIS SHOULD BE UNREACHABLE
-        return [];
-      }
-      const data: SwapMsgsRequest = {
-        preSwapHops: [],
-        postSwapHops: [],
-
-        chainIdsToAddresses: {},
-
-        sourceAsset: route.sourceAsset,
-        destAsset: route.destAsset,
-        amountIn: route.amountIn,
-
-        userSwap: route.userSwap,
-        userSwapAmountOut: route.userSwapAmountOut,
-        userSwapSlippageTolerancePercent: "5.0",
-
-        feeSwap: route.feeSwap,
-        affiliates: [],
-      };
-      return [];
-    },
     retry: false,
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled: !!route,
+    enabled: enabled && !!sourceAsset && !!destinationAsset && amountIn !== "0",
   });
 }

@@ -1,4 +1,3 @@
-import { Asset } from "@/components/AssetSelect";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import {
   SigningCosmWasmClient,
@@ -71,7 +70,13 @@ export async function getFeeDenomsForChainID(chainID: string) {
   return denoms;
 }
 
+const STARGATE_CLIENTS: Record<string, StargateClient> = {};
+
 export async function getStargateClientForChainID(chainID: string) {
+  if (STARGATE_CLIENTS[chainID]) {
+    return STARGATE_CLIENTS[chainID];
+  }
+
   const chain = chainRegistry.chains.find(
     (chain) => chain.chain_id === chainID
   );
@@ -86,6 +91,8 @@ export async function getStargateClientForChainID(chainID: string) {
     const client = await StargateClient.connect(preferredEndpoint, {});
 
     console.log(`Connected to ${preferredEndpoint}`);
+
+    STARGATE_CLIENTS[chainID] = client;
 
     return client;
   } catch {}
@@ -147,41 +154,6 @@ export async function getSigningStargateClientForChainID(
   );
 
   return client;
-}
-
-async function getBalances(address: string, client: StargateClient) {
-  const response = await client.getAllBalances(address);
-
-  return response;
-}
-
-export function useAssetBalances(assets: Asset[], chainID?: string) {
-  const [assetBalances, setAssetBalances] = useState<Record<string, string>>(
-    {}
-  );
-
-  const { address } = useChainByID(chainID ?? "cosmoshub-4");
-
-  useEffect(() => {
-    if (assets.length > 0 && address) {
-      (async () => {
-        const client = await getStargateClientForChainID(
-          chainID ?? "cosmoshub-4"
-        );
-        const balances = await getBalances(address, client);
-
-        const balancesMap = balances.reduce((acc, coin) => {
-          acc[coin.denom] = coin.amount;
-
-          return acc;
-        }, {} as Record<string, string>);
-
-        setAssetBalances(balancesMap);
-      })();
-    }
-  }, [assets, address, chainID]);
-
-  return assetBalances;
 }
 
 export async function getAddressForChain(chainId: string) {

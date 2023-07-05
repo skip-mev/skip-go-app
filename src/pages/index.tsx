@@ -1,43 +1,203 @@
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { Fragment, useEffect, useMemo } from "react";
+import { useChains } from "@/context/chains";
+import AssetInput from "@/components/AssetInput";
+import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import { useSolveForm } from "@/solve/form";
+import { useChain, useManager } from "@cosmos-kit/react";
+import { WalletStatus } from "@cosmos-kit/core";
+import TransactionDialog from "@/components/TransactionDialog";
+import { queryClient } from "@/utils/query";
+import { getBalancesByChain } from "@/cosmos";
+import { useInterval } from "@/utils/hooks";
 
 export default function Home() {
+  const { chains } = useChains();
+
+  const {
+    sourceChain,
+    destinationChain,
+    sourceAsset,
+    destinationAsset,
+    amountIn,
+    amountOut,
+    formValues,
+    setFormValues,
+    routeLoading,
+    numberOfTransactions,
+    isError,
+    route,
+    insufficientBalance,
+  } = useSolveForm();
+
+  const { status: walletConnectStatus, connect: connectWallet } = useChain(
+    sourceChain?.record?.chain.chain_name ?? "cosmoshub"
+  );
+
+  const { walletRepos, on } = useManager();
+
+  async function prefetchBalances(address: string, chainID: string) {
+    const balances = await getBalancesByChain(address, chainID);
+
+    queryClient.setQueryData(["balances-by-chain", address, chainID], balances);
+  }
+
+  useInterval(() => {
+    for (const repo of walletRepos) {
+      if (repo.current && repo.current.address) {
+        prefetchBalances(repo.current.address, repo.chainRecord.chain.chain_id);
+      }
+    }
+  }, 5000);
+
   return (
-    <div className="bg-white max-w-xl mx-auto shadow-xl rounded-3xl">
-      <div className="p-10">
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <button className="hover:bg-neutral-100 inline-flex items-center gap-1 px-4 pr-2 py-1.5 rounded-md font-semibold transition-colors">
-              <span>Osmosis</span>
-              <ChevronDownIcon className="mt-0.5 h-4 w-4" />
+    <div className="bg-white max-w-lg mx-auto shadow-xl rounded-3xl p-6 py-6 relative overflow-hidden">
+      <div className="space-y-6">
+        <div>
+          <p className="font-semibold text-2xl">From</p>
+        </div>
+        <AssetInput
+          amount={amountIn}
+          onAmountChange={(amount) =>
+            setFormValues({
+              ...formValues,
+              amountIn: amount,
+            })
+          }
+          asset={sourceAsset}
+          onAssetChange={(asset) => {
+            setFormValues({
+              ...formValues,
+              sourceAsset: asset,
+            });
+          }}
+          chain={sourceChain}
+          onChainChange={(chain) =>
+            setFormValues({
+              ...formValues,
+              sourceChain: chain,
+              sourceAsset: undefined,
+              amountIn: "",
+            })
+          }
+          chains={chains}
+          showBalance
+        />
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <button
+              className="bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform"
+              onClick={() =>
+                setFormValues({
+                  ...formValues,
+                  sourceChain: destinationChain,
+                  sourceAsset: destinationAsset,
+                  destinationChain: sourceChain,
+                  destinationAsset: sourceAsset,
+                  amountIn: "",
+                })
+              }
+            >
+              <ArrowsUpDownIcon className="w-4 h-4" />
             </button>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-400">
-                AVAILABLE: <span className="text-neutral-700">100.00 OSMO</span>
-              </p>
+          </div>
+          <p className="font-semibold text-2xl">To</p>
+        </div>
+        <AssetInput
+          amount={amountOut}
+          asset={destinationAsset}
+          onAssetChange={(asset) => {
+            setFormValues({
+              ...formValues,
+              destinationAsset: asset,
+            });
+          }}
+          chain={destinationChain}
+          onChainChange={(chain) =>
+            setFormValues({
+              ...formValues,
+              destinationChain: chain,
+              destinationAsset: undefined,
+            })
+          }
+          chains={chains}
+        />
+        {(routeLoading || numberOfTransactions > 0) && (
+          <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+            {routeLoading && (
+              <Fragment>
+                <p className="flex-1">Finding best route...</p>
+                <svg
+                  className="animate-spin h-4 w-4 inline-block text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </Fragment>
+            )}
+            {!routeLoading && (
+              <Fragment>
+                <p className="flex-1">
+                  This route requires{" "}
+                  {numberOfTransactions === 1 && (
+                    <span className="text-white">1 Transaction</span>
+                  )}
+                  {numberOfTransactions > 1 && (
+                    <span className="text-white">
+                      {numberOfTransactions} Transactions
+                    </span>
+                  )}{" "}
+                  to complete
+                </p>
+              </Fragment>
+            )}
+          </div>
+        )}
+        {isError && (
+          <div className="bg-rose-300 text-rose-700 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+            <p>No route found</p>
+          </div>
+        )}
+        <div>
+          {!sourceChain && (
+            <button
+              className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed outline-none"
+              disabled
+            >
+              Submit
+            </button>
+          )}
+          {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
+            <button
+              className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
+              onClick={connectWallet}
+            >
+              Connect Wallet
+            </button>
+          )}
+          {sourceChain && walletConnectStatus === WalletStatus.Connected && (
+            <div className="space-y-4">
+              <TransactionDialog route={route} />
+              {insufficientBalance && (
+                <p className="text-center font-semibold text-sm text-red-500">
+                  Insufficient Balance
+                </p>
+              )}
             </div>
-            <button className="font-extrabold text-xs bg-neutral-400 hover:bg-neutral-500 text-white px-3 py-1 rounded-md transition-colors">
-              MAX
-            </button>
-          </div>
-          <div className="flex items-center">
-            <button className="bg-neutral-200 hover:bg-neutral-300 inline-flex items-center text-sm font-semibold rounded-md w-[132px] text-left transition-colors">
-              <div className="px-3 py-2">
-                <img
-                  alt="OSMO"
-                  className="w-6 h-6"
-                  src="https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png"
-                />
-              </div>
-              <span className="flex-1">OSMO</span>
-              <div className="pr-2">
-                <ChevronDownIcon className="h-4 w-4" />
-              </div>
-            </button>
-            <input
-              className="flex-1 font-medium text-2xl px-4 py-4 focus:outline-none"
-              placeholder="0.0"
-            />
-          </div>
+          )}
         </div>
       </div>
     </div>

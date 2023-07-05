@@ -1,44 +1,17 @@
 import axios from "axios";
+import {
+  Affiliate,
+  Chain,
+  IBCAddress,
+  IBCDenom,
+  IBCHop,
+  MultiHopMsg,
+  Recommendation,
+  SwapExactCoinOut,
+  SwapIn,
+} from "./types";
 
 const API_URL = "https://api.skip.money/v1";
-// const API_URL = "https://solve-dev.skip.money/v1";
-
-export interface Chain {
-  chainId: string;
-  chainName: string;
-  pfmEnabled: boolean;
-}
-
-export interface IBCAddress {
-  address: string;
-  chainId: string;
-}
-
-export interface IBCDenom {
-  denom: string;
-  chainId: string;
-}
-
-export interface IBCHop {
-  port: string;
-  channel: string;
-  chainId: string;
-  pfmEnabled: boolean;
-  destDenom: string;
-}
-
-export interface Recommendation {
-  destAsset: IBCDenom;
-  reason: string;
-  route: IBCHop[];
-}
-
-export interface MultiHopMsg {
-  chainId: string;
-  path: string[];
-  msg: string;
-  msgTypeUrl: string;
-}
 
 interface GetChainsResponse {
   chains: Chain[];
@@ -71,7 +44,7 @@ export interface TransferRouteResponse {
   recs: Recommendation[];
 }
 
-export async function getRoute(
+export async function getTransferRoute(
   sourceAsset: string,
   sourceChainID: string,
   destAsset: string,
@@ -94,40 +67,6 @@ export async function getRoute(
   const response = await axios.post(`${API_URL}/ibc/transfer_route`, data);
 
   return response.data as TransferRouteResponse;
-}
-
-export interface SwapVenue {
-  name: string;
-  chainId: string;
-}
-
-export interface SwapIn {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  amountIn?: string;
-}
-
-export interface SwapOperation {
-  pool: string;
-  denomIn: string;
-  denomOut: string;
-}
-
-export interface Swap {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  swapAmountIn: string;
-}
-
-export interface SwapExactCoinOut {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  swapAmountOut: string;
-}
-
-export interface Affiliate {
-  basisPointsFee: string;
-  address: string;
 }
 
 export interface TransferMsgsRequest {
@@ -223,4 +162,21 @@ export async function getSwapMessages(request: SwapMsgsRequest) {
   const response = await axios.post(`${API_URL}/ibc/swap_msgs`, request);
 
   return response.data as SwapMsgsResponse;
+}
+
+export interface CompareDenomsRequest {
+  assets: IBCDenom[];
+}
+
+export interface CompareDenomsResponse {
+  same: boolean;
+  originAsset: IBCDenom;
+}
+
+export async function compareDenoms(assets: IBCDenom[]) {
+  const response = await axios.post(`${API_URL}/ibc/compare_denoms`, {
+    assets,
+  });
+
+  return response.data as CompareDenomsResponse;
 }

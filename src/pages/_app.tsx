@@ -9,21 +9,19 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
 import { chains, assets } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { GasPrice } from "@cosmjs/stargate";
 import MainLayout from "@/components/MainLayout";
-
-const inter = Inter({ subsets: ["latin"] });
+import { ChainsProvider } from "@/context/chains";
+import * as RadixToast from "@radix-ui/react-toast";
+import { AssetsProvider } from "@/context/assets";
+import { queryClient } from "@/utils/query";
 
 const jost = Jost({
   subsets: ["latin"],
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [client] = useState(
-    new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
-  );
-
   chains.push({
     $schema: "../chain.schema.json",
     chain_name: "neutron",
@@ -174,7 +172,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="description" content="ibc.fun" />
       </Head>
       <main className={jost.className}>
-        <QueryClientProvider client={client}>
+        <QueryClientProvider client={queryClient}>
           <ChakraProvider theme={defaultTheme}>
             <ChainProvider
               chains={chains}
@@ -190,9 +188,16 @@ export default function App({ Component, pageProps }: AppProps) {
               }}
               wrappedWithChakra
             >
-              <MainLayout>
-                <Component {...pageProps} />
-              </MainLayout>
+              <ChainsProvider>
+                <AssetsProvider>
+                  <RadixToast.ToastProvider>
+                    <MainLayout>
+                      <Component {...pageProps} />
+                    </MainLayout>
+                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0" />
+                  </RadixToast.ToastProvider>
+                </AssetsProvider>
+              </ChainsProvider>
             </ChainProvider>
           </ChakraProvider>
         </QueryClientProvider>
