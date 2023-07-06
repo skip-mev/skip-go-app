@@ -11,6 +11,7 @@ import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
 import { useAssets } from "@/context/assets";
 import { useToast } from "@/context/toast";
+import Toast from "@/elements/Toast";
 
 export default function Home() {
   const { chains } = useChains();
