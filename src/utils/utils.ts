@@ -1,4 +1,5 @@
-import { OfflineSigner } from "@cosmjs/proto-signing";
+import { useRef, useEffect } from "react";
+import { EncodeObject, OfflineSigner } from "@cosmjs/proto-signing";
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
@@ -11,7 +12,22 @@ import {
 import { getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
 import * as chainRegistry from "chain-registry";
-import { useRef, useEffect, useState } from "react";
+import {
+  generateEndpointAccount,
+  generatePostBodyBroadcast,
+  generateEndpointBroadcast,
+} from "@evmos/provider";
+import axios from "axios";
+import {
+  Chain,
+  Fee,
+  IBCMsgTransferParams,
+  Sender,
+  TxContext,
+  createTxIBCMsgTransfer,
+} from "@evmos/transactions";
+import { createTxRaw } from "@evmos/proto";
+import Long from "long";
 
 export function formatAddress(address: string, prefix: string) {
   return address.slice(0, prefix.length + 2) + "..." + address.slice(-4);
@@ -207,4 +223,95 @@ export async function getSigningCosmWasmClientForChainID(
   );
 
   return client;
+}
+
+export async function signAndBroadcastEvmos(
+  signerAddress: string,
+  params: IBCMsgTransferParams
+) {
+  // console.log(params);
+  const chainID = "evmos_9001-2";
+
+  if (!window.keplr) {
+    throw new Error("Keplr extension is not installed");
+  }
+
+  const result = await axios.get(
+    `https://rest.bd.evmos.org:1317${generateEndpointAccount(signerAddress)}`
+  );
+
+  const account = await window.keplr.getKey(chainID);
+  const pk = Buffer.from(account.pubKey).toString("base64");
+
+  console.log(result.data);
+  console.log(pk);
+
+  const chain: Chain = {
+    chainId: 9001,
+    cosmosChainId: "evmos_9001-2",
+  };
+
+  // Populate the transaction sender parameters using the
+  // query API.
+
+  const sender: Sender = {
+    accountAddress: signerAddress,
+    sequence: result.data.account.base_account.sequence,
+    accountNumber: result.data.account.base_account.account_number,
+    // Use the public key from the account query, or retrieve
+    // the public key from the code snippet above.
+    pubkey: pk,
+  };
+
+  const fee: Fee = {
+    amount: "4000000000000000",
+    denom: "aevmos",
+    gas: "200000",
+  };
+
+  const memo = "";
+
+  const context: TxContext = {
+    chain,
+    sender,
+    fee,
+    memo,
+  };
+
+  const tx = createTxIBCMsgTransfer(context, params);
+
+  const { signDirect } = tx;
+
+  const signResponse = await window.keplr.signDirect(
+    chain.cosmosChainId,
+    sender.accountAddress,
+    {
+      bodyBytes: signDirect.body.toBinary(),
+      authInfoBytes: signDirect.authInfo.toBinary(),
+      chainId: chain.cosmosChainId,
+      accountNumber: new Long(sender.accountNumber),
+    }
+  );
+
+  if (!signResponse) {
+    // Handle signature failure here.
+    throw new Error("Signature failed");
+  }
+
+  const signatures = [
+    new Uint8Array(Buffer.from(signResponse.signature.signature, "base64")),
+  ];
+
+  const { signed } = signResponse;
+
+  const signedTx = createTxRaw(
+    signed.bodyBytes,
+    signed.authInfoBytes,
+    signatures
+  );
+
+  const response = await axios.post(
+    `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
+    generatePostBodyBroadcast(signedTx)
+  );
 }

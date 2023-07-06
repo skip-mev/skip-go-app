@@ -17,8 +17,9 @@ import {
   getSigningCosmWasmClientForChainID,
   getSigningStargateClientForChainID,
   getStargateClientForChainID,
+  signAndBroadcastEvmos,
 } from "@/utils/utils";
-import { EncodeObject, OfflineSigner } from "@cosmjs/proto-signing";
+import { EncodeObject, OfflineSigner, coin } from "@cosmjs/proto-signing";
 import { GasPrice } from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
@@ -361,6 +362,7 @@ async function executeTransferRoute(
   // get addresses
   for (const chainID of chainIDs) {
     const address = await getAddressForChain(chainID);
+
     userAddresses[chainID] = {
       address,
       chainId: chainID,
@@ -452,9 +454,27 @@ async function executeTransferRoute(
       },
     };
 
-    const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+    console.log("sending tx...");
 
-    console.log(tx);
+    if (multiHopMsg.chainId === "evmos_9001-2") {
+      await signAndBroadcastEvmos(msgJSON.sender, {
+        sourcePort: msgJSON.source_port,
+        sourceChannel: msgJSON.source_channel,
+        receiver: msgJSON.receiver,
+        timeoutTimestamp: msgJSON.timeout_timestamp,
+        memo: msgJSON.memo,
+        amount: msg.value.token.amount,
+        denom: msg.value.token.denom,
+        revisionNumber: 0,
+        revisionHeight: 0,
+      });
+    } else {
+      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+
+      console.log("sent");
+
+      console.log(tx);
+    }
 
     const destinationChainID = multiHopMsg.path[multiHopMsg.path.length - 1];
 
@@ -618,9 +638,23 @@ async function executeSwapRoute(
         },
       };
 
-      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+      if (multiHopMsg.chainId === "evmos_9001-2") {
+        await signAndBroadcastEvmos(msgJSON.sender, {
+          sourcePort: msgJSON.source_port,
+          sourceChannel: msgJSON.source_channel,
+          receiver: msgJSON.receiver,
+          timeoutTimestamp: msgJSON.timeout_timestamp,
+          memo: msgJSON.memo,
+          amount: msg.value.token.amount,
+          denom: msg.value.token.denom,
+          revisionNumber: 0,
+          revisionHeight: 0,
+        });
+      } else {
+        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
 
-      console.log(tx);
+        console.log(tx);
+      }
     } else {
       msg = {
         typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
