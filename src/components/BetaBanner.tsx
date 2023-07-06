@@ -10,9 +10,6 @@ const BetaBanner: FC = () => {
   if (shouldShow === "false") {
     return null;
   }
-  // const shouldShow = localStorage.getItem("IBC_DOT_FUN_DISMISSED_BETA_BANNER");
-
-  // console.log(shouldShow);
 
   return (
     <div className="bg-indigo-400 text-white rounded-lg p-4 shadow-lg">
