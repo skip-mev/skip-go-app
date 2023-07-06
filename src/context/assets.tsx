@@ -8,6 +8,7 @@ interface AssetsContext {
   assetsByChainID: (chainID: string) => Asset[];
   getAsset(denom: string, chainID: string): Asset | undefined;
   getFeeDenom(chainID: string): Asset | undefined;
+  getNativeAssets(): Asset[];
 }
 
 export const AssetsContext = createContext<AssetsContext>({
@@ -15,6 +16,7 @@ export const AssetsContext = createContext<AssetsContext>({
   assetsByChainID: () => [],
   getAsset: () => undefined,
   getFeeDenom: () => undefined,
+  getNativeAssets: () => [],
 });
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -40,9 +42,29 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     return getAsset(feeDenom, chainID);
   }
 
+  function getNativeAssets() {
+    const nativeAssets: Asset[] = [];
+
+    for (const chainAssetList of Object.values(ASSET_LIST)) {
+      for (const asset of chainAssetList) {
+        if (asset.type === "native" || asset.type === "staking") {
+          nativeAssets.push(asset);
+        }
+      }
+    }
+
+    return nativeAssets;
+  }
+
   return (
     <AssetsContext.Provider
-      value={{ assets: ASSET_LIST, assetsByChainID, getAsset, getFeeDenom }}
+      value={{
+        assets: ASSET_LIST,
+        assetsByChainID,
+        getAsset,
+        getFeeDenom,
+        getNativeAssets,
+      }}
     >
       {children}
     </AssetsContext.Provider>

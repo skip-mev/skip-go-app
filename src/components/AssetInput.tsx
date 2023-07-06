@@ -31,15 +31,17 @@ const AssetInput: FC<Props> = ({
 }) => {
   const [isError, setIsError] = useState(false);
 
-  const { assetsByChainID } = useAssets();
+  const { assetsByChainID, getNativeAssets } = useAssets();
 
   const assets = useMemo(() => {
     if (!chain) {
-      return [];
+      return getNativeAssets();
     }
 
     return assetsByChainID(chain.chainId);
-  }, [assetsByChainID, chain]);
+  }, [assetsByChainID, chain, getNativeAssets]);
+
+  const showChainInfo = chain ? false : true;
 
   const { address } = useChain(chain?.record?.name ?? "cosmoshub");
 
@@ -88,6 +90,7 @@ const AssetInput: FC<Props> = ({
               assets={assets}
               balances={balances}
               onChange={onAssetChange}
+              showChainInfo={showChainInfo}
             />
           </div>
         </div>

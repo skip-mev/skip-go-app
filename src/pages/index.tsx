@@ -9,6 +9,7 @@ import TransactionDialog from "@/components/TransactionDialog";
 import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
+import { useAssets } from "@/context/assets";
 
 export default function Home() {
   const { chains } = useChains();

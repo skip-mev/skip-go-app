@@ -84,6 +84,47 @@ export function useSolveForm() {
     getFeeDenom,
   ]);
 
+  useEffect(() => {
+    if (formValues.destinationAsset && !formValues.destinationChain) {
+      const chain = chains.find(
+        (c) => c.chainId === formValues.destinationAsset?.chainID
+      );
+
+      if (chain) {
+        setFormValues((values) => ({
+          ...values,
+          destinationChain: chain,
+        }));
+      }
+    }
+  }, [chains, formValues.destinationAsset, formValues.destinationChain]);
+
+  useEffect(() => {
+    if (formValues.destinationChain && !formValues.destinationAsset) {
+      const feeAsset = getFeeDenom(formValues.destinationChain.chainId);
+
+      if (feeAsset) {
+        setFormValues((values) => ({
+          ...values,
+          destinationAsset: feeAsset,
+        }));
+      } else {
+        const assets = assetsByChainID(formValues.destinationChain.chainId);
+        if (assets.length > 0) {
+          setFormValues((values) => ({
+            ...values,
+            destinationAsset: assets[0],
+          }));
+        }
+      }
+    }
+  }, [
+    assetsByChainID,
+    formValues.destinationAsset,
+    formValues.destinationChain,
+    getFeeDenom,
+  ]);
+
   // store last selected source chain in local storage
   useEffect(() => {
     if (formValues.sourceChain) {

@@ -10,9 +10,16 @@ interface Props {
   assets?: Asset[];
   balances?: Record<string, string>;
   onChange?: (asset: Asset) => void;
+  showChainInfo?: boolean;
 }
 
-const AssetSelect: FC<Props> = ({ asset, assets, balances, onChange }) => {
+const AssetSelect: FC<Props> = ({
+  asset,
+  assets,
+  balances,
+  onChange,
+  showChainInfo,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -48,6 +55,7 @@ const AssetSelect: FC<Props> = ({ asset, assets, balances, onChange }) => {
           balances={balances ?? {}}
           onChange={onChange}
           onClose={() => setIsOpen(false)}
+          showChainInfo={showChainInfo}
         />
       </DialogContent>
     </Dialog>

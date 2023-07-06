@@ -14,6 +14,7 @@ export interface Asset {
   description?: string;
   image: string;
   coinGeckoId?: string;
+  chainID: string;
 }
 
 export function chainIDToChainlistURL(chainID: string) {

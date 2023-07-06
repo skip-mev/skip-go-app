@@ -13,6 +13,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       description: "Passage Staking Coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/passage/asset/pasg.png",
+      chainID: "passage-1",
     },
   ],
   "noble-1": [
@@ -27,6 +28,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       description: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/noble/asset/stake.png",
+      chainID: "noble-1",
     },
     {
       denom: "uusdc",
@@ -40,6 +42,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "noble-1",
     },
     {
       denom: "ufrienzies",
@@ -53,6 +56,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/noble/asset/frnz.png",
+      chainID: "noble-1",
     },
     {
       denom:
@@ -66,6 +70,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "noble-1",
     },
   ],
   "canto_7700-1": [
@@ -81,6 +86,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "canto",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/canto/asset/canto.png",
+      chainID: "canto_7700-1",
     },
     {
       denom:
@@ -94,6 +100,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "canto_7700-1",
     },
     {
       denom:
@@ -107,6 +114,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "canto_7700-1",
     },
     {
       denom:
@@ -120,6 +128,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "canto_7700-1",
     },
     {
       denom:
@@ -133,6 +142,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "canto_7700-1",
     },
   ],
   "omniflixhub-1": [
@@ -148,6 +158,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "omniflix-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/omniflix/asset/flix.png",
+      chainID: "omniflixhub-1",
     },
     {
       denom:
@@ -161,6 +172,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "omniflixhub-1",
     },
     {
       denom:
@@ -174,6 +186,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "omniflixhub-1",
     },
     {
       denom:
@@ -187,6 +200,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "omniflixhub-1",
     },
     {
       denom:
@@ -200,6 +214,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "omniflixhub-1",
     },
     {
       denom:
@@ -213,6 +228,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "omniflixhub-1",
     },
   ],
   "kichain-2": [
@@ -228,6 +244,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ki",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ki-chain/asset/xki.png",
+      chainID: "kichain-2",
     },
     {
       denom:
@@ -241,6 +258,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "kichain-2",
     },
     {
       denom:
@@ -254,6 +272,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "kichain-2",
     },
     {
       denom:
@@ -267,6 +286,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "kichain-2",
     },
   ],
   "mars-1": [
@@ -282,6 +302,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mars-protocol-a7fcbcfb-fd61-4017-92f0-7ee9f9cc6da3",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/mars-protocol/asset/mars.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -295,6 +316,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -308,6 +330,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -321,6 +344,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -334,6 +358,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -347,6 +372,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kujira",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kujira/asset/kuji.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -360,6 +386,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "mars-1",
     },
     {
       denom:
@@ -373,6 +400,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "mars-1",
     },
   ],
   "mantle-1": [
@@ -388,6 +416,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "assetmantle",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/asset-mantle/asset/mntl.png",
+      chainID: "mantle-1",
     },
     {
       denom:
@@ -401,6 +430,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "mantle-1",
     },
     {
       denom:
@@ -414,6 +444,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "mantle-1",
     },
     {
       denom:
@@ -427,6 +458,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "mantle-1",
     },
   ],
   "injective-1": [
@@ -442,6 +474,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -455,6 +488,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -468,6 +502,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -481,6 +516,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -494,6 +530,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -507,6 +544,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xcdot",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/moonbeam/asset/xcdot.png",
+      chainID: "injective-1",
     },
     {
       denom:
@@ -519,6 +557,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nois/asset/nois.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x8d983cb9388eac77af0474fa441c4815500cb7bb",
@@ -531,6 +570,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/atom.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xe28b3b32b6c345a34ff64674606124dd5aceca30",
@@ -543,6 +583,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "inj",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/inj.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9",
@@ -555,6 +596,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra-luna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lunc.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xa47c8bf37f92abed4a126bda807a7b7498661acd",
@@ -567,6 +609,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terrausd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ustc.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xaaaebe6fe48e54f431b0c390cfaf0b017d09d42d",
@@ -579,6 +622,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "celsius-degree-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cel.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xdac17f958d2ee523a2206206994597c13d831ec7",
@@ -591,6 +635,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
@@ -603,6 +648,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xb8c77482e45f1f44de1745f52c74426c631bdd52",
@@ -615,6 +661,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binancecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-beacon-chain/asset/bnb.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41",
@@ -627,6 +674,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/defi5.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xdc9ac3c20d1ed0b540df9b1fedc10039df13f99c",
@@ -639,6 +687,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "utrust",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/utk.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc944e90c64b2c07662a292be6244bdf05cda44a7",
@@ -651,6 +700,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "the-graph",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/grt.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc55c2175e90a46602fd42e931f62b3acc1a013ca",
@@ -663,6 +713,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mogul-productions",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/stars.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xac9bb427953ac7fddc562adca86cf42d988047fd",
@@ -675,6 +726,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/stt.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xa8c8cfb141a3bb59fea1e2ea6b79b5ecbcd7b6ca",
@@ -687,6 +739,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "noia-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/noia.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c",
@@ -699,6 +752,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "enjincoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/enj.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xe41d2489571d322189246dafa5ebde1f4699f498",
@@ -711,6 +765,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "0x",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/zrx.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xcc4304a31d09258b0029ea7fe63d032f52e44efe",
@@ -723,6 +778,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "trustswap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/swap.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
@@ -735,6 +791,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f",
@@ -747,6 +804,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "havven",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/snx.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xbb0e17ef65f82ab018d8edd776e8dd940327b28b",
@@ -759,6 +817,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axie-infinity",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/axs.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206",
@@ -771,6 +830,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "nexo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/nexo.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xaaef88cea01475125522e117bfe45cf32044e238",
@@ -783,6 +843,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "guildfi",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/gf.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x967da4048cd07ab37855c090aaf366e4ce1b9f48",
@@ -795,6 +856,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ocean-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ocean.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
@@ -807,6 +869,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "shiba-inu",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/shib.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
@@ -819,6 +882,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aave",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/aave.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
@@ -831,6 +895,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "matic-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/matic.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x6f259637dcd74c767781e37bc6133cd6a68aa161",
@@ -843,6 +908,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "huobi-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ht.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
@@ -855,6 +921,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sushi",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sushi.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -867,6 +934,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x514910771af9ca656af840dff83e8264ecf986ca",
@@ -879,6 +947,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chainlink",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/link.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x50f09629d0afdf40398a3f317cc676ca9132055c",
@@ -891,6 +960,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/evai.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x4a220e6096b25eadb88358cb44068a3248254675",
@@ -903,6 +973,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "quant-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/qnt.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x4fabb145d64652a948d72533023f6e7a623c7c53",
@@ -915,6 +986,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binance-usd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/busd.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x4e15361fd6b4bb609fa63c81a2be19d873717870",
@@ -927,6 +999,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "fantom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ftm.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x45804880de22913dafe09f4980848ece6ecbaf78",
@@ -939,6 +1012,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pax-gold",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/paxg.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x3506424f91fd33084466f402d5d97f05f8e3b4af",
@@ -951,6 +1025,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chiliz",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/chz.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x3155ba85d5f96b2d030a4966af206230e46849cb",
@@ -963,6 +1038,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "thorchain-erc20",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rune.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
@@ -975,6 +1051,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
@@ -987,6 +1064,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uniswap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uni.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x04fa0d235c4abf4bcf4787af4cf447de572ef828",
@@ -999,6 +1077,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uma",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uma.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x0d8775f648430679a709e98d2b0cb6250d2887ef",
@@ -1011,6 +1090,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "basic-attention-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/bat.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x0cec1a9154ff802e7934fc916ed7ca50bde6844e",
@@ -1023,6 +1103,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pooltogether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pool.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x111111111117dc0aa78b770fa6a738034120c302",
@@ -1035,6 +1116,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "1inch",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/1inch.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
@@ -1047,6 +1129,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "yearn-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/yfi.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc00e94cb662c3520282e6f5717214004a7f26888",
@@ -1059,6 +1142,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "compound-governance-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/comp.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x26c8afbbfe1ebaca03c2bb082e69d0476bffe099",
@@ -1071,6 +1155,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cellframe",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cell.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x080b12e80c9b45e97c23b6ad10a16b3e2a123949",
@@ -1083,6 +1168,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/xbx.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xde4c5a791913838027a2185709e98c5c6027ea63",
@@ -1095,6 +1181,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "general-attention-currency",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/xac.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x92D6C1e31e14520e676a687F0a93788B716BEff5",
@@ -1107,6 +1194,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dydx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dydx.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0x4d224452801ACEd8B2F0aebE155379bb5D594381",
@@ -1119,6 +1207,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "apecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ape.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
@@ -1131,6 +1220,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "staked-ether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/steth.png",
+      chainID: "injective-1",
     },
     {
       denom: "peggy0xc690F7C7FcfFA6a82b79faB7508c466FEfdfc8c5",
@@ -1143,6 +1233,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "lympo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lym.png",
+      chainID: "injective-1",
     },
   ],
   "comdex-1": [
@@ -1158,6 +1249,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "comdex-1",
     },
     {
       denom: "uharbor",
@@ -1171,6 +1263,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/harbor.png",
+      chainID: "comdex-1",
     },
     {
       denom: "ucmst",
@@ -1184,6 +1277,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "composite",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmst.png",
+      chainID: "comdex-1",
     },
     {
       denom:
@@ -1197,6 +1291,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "comdex-1",
     },
     {
       denom:
@@ -1210,6 +1305,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "comdex-1",
     },
     {
       denom:
@@ -1223,6 +1319,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "comdex-1",
     },
     {
       denom:
@@ -1236,6 +1333,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "comdex-1",
     },
     {
       denom:
@@ -1249,6 +1347,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "comdex-1",
     },
   ],
   "sifchain-1": [
@@ -1264,6 +1363,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1277,6 +1377,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sentinel",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sentinel/asset/dvpn.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1290,6 +1391,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1303,6 +1405,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "regen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/regen.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1316,6 +1419,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "starname",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/starname/asset/iov.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1329,6 +1433,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1342,6 +1447,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1355,6 +1461,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/ngm.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1368,6 +1475,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money-eur",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/eeur.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1381,6 +1489,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1394,6 +1503,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1407,6 +1517,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iris-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/iris/asset/iris.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1420,6 +1531,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -1433,6 +1545,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ceth",
@@ -1445,6 +1558,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ethereum",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/eth.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cusdc",
@@ -1457,6 +1571,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csrm",
@@ -1469,6 +1584,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "serum",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/srm.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cusdt",
@@ -1481,6 +1597,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ccro",
@@ -1493,6 +1610,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "c1inch",
@@ -1505,6 +1623,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "1inch",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/1inch.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "caave",
@@ -1517,6 +1636,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aave",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/aave.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cakro",
@@ -1529,6 +1649,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akropolis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/akro.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cant",
@@ -1541,6 +1662,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aragon",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ant.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "caxs",
@@ -1553,6 +1675,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axie-infinity",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/axs.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cb20",
@@ -1565,6 +1688,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "b20",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/b20.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cbal",
@@ -1577,6 +1701,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "balancer",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/bal.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cband",
@@ -1589,6 +1714,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "band-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/band.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cbat",
@@ -1601,6 +1727,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "basic-attention-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/bat.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cbnt",
@@ -1613,6 +1740,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bancor",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/bnt.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cbond",
@@ -1625,6 +1753,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "barnbridge",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/bond.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cbtsg",
@@ -1637,6 +1766,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitsong",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/btsg.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ccocos",
@@ -1648,6 +1778,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 18,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cocos.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ccomp",
@@ -1660,6 +1791,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xxxxx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/comp.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cconv",
@@ -1672,6 +1804,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "convergence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/conv.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ccream",
@@ -1684,6 +1817,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cream-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cream.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdai",
@@ -1696,6 +1830,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdaofi",
@@ -1708,6 +1843,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xxxxx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/daofi.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdfyn",
@@ -1720,6 +1856,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dfyn-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dfyn.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdino",
@@ -1731,6 +1868,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 18,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dino.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdnxc",
@@ -1743,6 +1881,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dinox",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dnxc.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cdon",
@@ -1755,6 +1894,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "donkey-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/don.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cenj",
@@ -1767,6 +1907,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "enjincoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/enj.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cern",
@@ -1779,6 +1920,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ethernity-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ern.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cesd",
@@ -1791,6 +1933,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "empty-set-dollar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/esd.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cfrax",
@@ -1803,6 +1946,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "frax",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/frax.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cftm",
@@ -1815,6 +1959,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "fantom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ftm.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cfxs",
@@ -1827,6 +1972,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "frax-share",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/fxs.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cgrt",
@@ -1839,6 +1985,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "the-graph",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/grt.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ciotx",
@@ -1851,6 +1998,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iotex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/iotx.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ckeep",
@@ -1863,6 +2011,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "keep-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/keep.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ckft",
@@ -1875,6 +2024,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "knit-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/kft.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cldo",
@@ -1887,6 +2037,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "lido-dao",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ldo.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cleash",
@@ -1899,6 +2050,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "leash",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/leash.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "clgcy",
@@ -1911,6 +2063,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "lgcy-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lgcy.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "clina",
@@ -1923,6 +2076,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "linear",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lina.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "clink",
@@ -1935,6 +2089,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chainlink",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/link.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "clon",
@@ -1947,6 +2102,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tokenlon",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lon.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "clrc",
@@ -1959,6 +2115,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "loopring",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/lrc.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cmana",
@@ -1971,6 +2128,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "decentraland",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/mana.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cmatic",
@@ -1983,6 +2141,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "matic-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/matic.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cmetis",
@@ -1995,6 +2154,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "metis-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/metis.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cocean",
@@ -2007,6 +2167,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ocean-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ocean.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cogn",
@@ -2019,6 +2180,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "origin-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ogn.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "coh",
@@ -2031,6 +2193,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "oh-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/oh.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cpaid",
@@ -2043,6 +2206,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "paid-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/paid.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cpols",
@@ -2055,6 +2219,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "polkastarter",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pols.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cpond",
@@ -2067,6 +2232,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "marlin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pond.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cquick",
@@ -2079,6 +2245,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "quick",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/quick.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "crail",
@@ -2091,6 +2258,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "railgun",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rail.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cratom",
@@ -2103,6 +2271,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stafi-ratom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ratom.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "creef",
@@ -2115,6 +2284,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "reef",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/reef.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "crfuel",
@@ -2127,6 +2297,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rio-defi",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rfuel.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "crly",
@@ -2139,6 +2310,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rally-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rly.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "crndr",
@@ -2151,6 +2323,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "render-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rndr.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "crune",
@@ -2163,6 +2336,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "thorchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rune.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csaito",
@@ -2175,6 +2349,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "saito",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/saito.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csand",
@@ -2187,6 +2362,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "the-sandbox",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sand.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cshib",
@@ -2199,6 +2375,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "shiba-inu",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/shib.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csnx",
@@ -2211,6 +2388,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "havven",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/snx.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csusd",
@@ -2223,6 +2401,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "nusd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/susd.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csushi",
@@ -2235,6 +2414,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sushi",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sushi.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "csxp",
@@ -2247,6 +2427,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "swipe",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sxp.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ctidal",
@@ -2259,6 +2440,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tidal-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/tidal.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ctoke",
@@ -2271,6 +2453,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tokemak",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/toke.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ctshp",
@@ -2283,6 +2466,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "12ships",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/tshp.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "ctusd",
@@ -2295,6 +2479,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "true-usd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/tusd.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cufo",
@@ -2307,6 +2492,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ufo-gaming",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ufo.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cuma",
@@ -2319,6 +2505,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uma",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uma.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cuni",
@@ -2331,6 +2518,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uniswap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uni.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cust",
@@ -2343,6 +2531,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-ust",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ust.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cwbtc",
@@ -2355,6 +2544,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cwfil",
@@ -2367,6 +2557,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-filecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wfil.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cwscrt",
@@ -2379,6 +2570,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret-erc20",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wscrt.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "cyfi",
@@ -2391,6 +2583,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "yearn-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/yfi.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "czcn",
@@ -2403,6 +2596,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "0chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/zcn.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "czcx",
@@ -2415,6 +2609,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "unizen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/zcx.png",
+      chainID: "sifchain-1",
     },
     {
       denom: "czrx",
@@ -2427,6 +2622,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "0x",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/zrx.png",
+      chainID: "sifchain-1",
     },
     {
       denom:
@@ -2440,6 +2636,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "medasdigital",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/medasdigital/asset/medas.png",
+      chainID: "sifchain-1",
     },
   ],
   "neutron-1": [
@@ -2455,6 +2652,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "neutron",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/neutron/asset/ntrn.png",
+      chainID: "neutron-1",
     },
     {
       denom:
@@ -2468,6 +2666,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "neutron-1",
     },
     {
       denom:
@@ -2481,6 +2680,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "neutron-1",
     },
     {
       denom:
@@ -2494,6 +2694,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "neutron-1",
     },
     {
       denom:
@@ -2507,6 +2708,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "astroport-fi",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/astro.png",
+      chainID: "neutron-1",
     },
     {
       denom:
@@ -2520,6 +2722,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-atom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/statom.png",
+      chainID: "neutron-1",
     },
   ],
   darchub: [
@@ -2535,6 +2738,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "darcmatter-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/konstellation/asset/darc.png",
+      chainID: "darchub",
     },
     {
       denom:
@@ -2548,6 +2752,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "darchub",
     },
     {
       denom:
@@ -2561,6 +2766,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "darchub",
     },
   ],
   "quicksilver-2": [
@@ -2576,6 +2782,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "quicksilver",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qck.png",
+      chainID: "quicksilver-2",
     },
     {
       denom: "uqstars",
@@ -2589,6 +2796,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qstars.png",
+      chainID: "quicksilver-2",
     },
     {
       denom: "uqatom",
@@ -2602,6 +2810,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qatom.png",
+      chainID: "quicksilver-2",
     },
     {
       denom: "uqregen",
@@ -2615,6 +2824,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qregen.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2628,6 +2838,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2641,6 +2852,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2654,6 +2866,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2667,6 +2880,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/pstake.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2680,6 +2894,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "quicksilver-2",
     },
     {
       denom:
@@ -2693,6 +2908,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "regen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/regen.png",
+      chainID: "quicksilver-2",
     },
     {
       denom: "uqosmo",
@@ -2706,6 +2922,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qosmo.png",
+      chainID: "quicksilver-2",
     },
   ],
   "fetchhub-4": [
@@ -2721,6 +2938,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "fetch-ai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fetchai/asset/fet.png",
+      chainID: "fetchhub-4",
     },
     {
       denom: "nanomobx",
@@ -2734,6 +2952,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mobix",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fetchai/asset/mobx.png",
+      chainID: "fetchhub-4",
     },
   ],
   "akashnet-2": [
@@ -2749,6 +2968,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2762,6 +2982,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2775,6 +2996,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2788,6 +3010,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/kava.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2801,6 +3024,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava-swap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/swp.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2814,6 +3038,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava-lend",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/hard.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2827,6 +3052,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usdx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/usdx.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2840,6 +3066,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2853,6 +3080,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "akashnet-2",
     },
     {
       denom:
@@ -2866,6 +3094,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "akashnet-2",
     },
   ],
   nyx: [
@@ -2880,6 +3109,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       description: "Nyx Staking Coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nyx/asset/nyx.png",
+      chainID: "nyx",
     },
     {
       denom: "unym",
@@ -2893,6 +3123,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "nym",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nyx/asset/nym.png",
+      chainID: "nyx",
     },
     {
       denom:
@@ -2906,6 +3137,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "nyx",
     },
   ],
   "umee-1": [
@@ -2921,6 +3153,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "umee",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/umee/asset/umee.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2934,6 +3167,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2947,6 +3181,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2960,6 +3195,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2973,6 +3209,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2986,6 +3223,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -2999,6 +3237,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3012,6 +3251,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-osmo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stosmo.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3025,6 +3265,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binancecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-smart-chain/asset/wbnb.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3038,6 +3279,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xcdot",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/moonbeam/asset/xcdot.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3051,6 +3293,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "inter-stable-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/agoric/asset/ist.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3064,6 +3307,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3077,6 +3321,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-atom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/statom.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3090,6 +3335,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3103,6 +3349,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3116,6 +3363,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3129,6 +3377,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wmatic",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/polygon/asset/wmatic.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3142,6 +3391,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "umee-1",
     },
     {
       denom:
@@ -3155,6 +3405,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra-luna-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "umee-1",
     },
   ],
   "chihuahua-1": [
@@ -3170,6 +3421,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "chihuahua-1",
     },
     {
       denom:
@@ -3183,6 +3435,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "chihuahua-1",
     },
     {
       denom:
@@ -3196,6 +3449,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "chihuahua-1",
     },
     {
       denom:
@@ -3209,6 +3463,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "chihuahua-1",
     },
     {
       denom:
@@ -3222,6 +3477,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "chihuahua-1",
     },
     {
       denom:
@@ -3235,6 +3491,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "chihuahua-1",
     },
   ],
   "columbus-5": [
@@ -3250,6 +3507,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra-luna-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "columbus-5",
     },
   ],
   "nois-1": [
@@ -3264,6 +3522,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       description: "Nois Staking Coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nois/asset/nois.png",
+      chainID: "nois-1",
     },
   ],
   "crescent-1": [
@@ -3279,6 +3538,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "crescent-1",
     },
     {
       denom: "ubcre",
@@ -3292,6 +3552,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "liquid-staking-crescent",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/bcre.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3305,6 +3566,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3318,6 +3580,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3331,6 +3594,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3344,6 +3608,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3357,6 +3622,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3370,6 +3636,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3383,6 +3650,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "agoric",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/agoric/asset/bld.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3396,6 +3664,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "inter-stable-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/agoric/asset/ist.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3409,6 +3678,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3422,6 +3692,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra-luna-classic",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra-classic/asset/lunc.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3435,6 +3706,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3448,6 +3720,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3461,6 +3734,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3474,6 +3748,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "composite",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmst.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3487,6 +3762,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3500,6 +3776,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mars-protocol-a7fcbcfb-fd61-4017-92f0-7ee9f9cc6da3",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/mars-protocol/asset/mars.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3513,6 +3790,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "gravity-bridge-wbtc",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3526,6 +3804,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stevmos.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3539,6 +3818,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "canto",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/canto/asset/canto.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3552,6 +3832,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terraclassicusd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra-classic/asset/uusd.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3565,6 +3846,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3578,6 +3860,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "okc-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/okt.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3591,6 +3874,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-atom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/statom.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3604,6 +3888,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stkatom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/stkatom.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3617,6 +3902,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iris-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/iris/asset/iris.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3630,6 +3916,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/noble/asset/frnz.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3643,6 +3930,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/harbor.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3656,6 +3944,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "crescent-1",
     },
     {
       denom:
@@ -3669,6 +3958,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/neok.png",
+      chainID: "crescent-1",
     },
   ],
   "dimension_37-1": [
@@ -3684,6 +3974,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xpla",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/xpla/asset/xpla.png",
+      chainID: "dimension_37-1",
     },
     {
       denom:
@@ -3697,6 +3988,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "dimension_37-1",
     },
   ],
   "gravity-bridge-3": [
@@ -3712,6 +4004,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3725,6 +4018,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3738,6 +4032,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3751,6 +4046,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3764,6 +4060,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "nym",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nyx/asset/nym.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3777,6 +4074,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3790,6 +4088,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3803,6 +4102,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cheqd-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cheqd/asset/cheq.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3816,6 +4116,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iris-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/iris/asset/iris.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3829,6 +4130,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3842,6 +4144,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3855,6 +4158,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3868,6 +4172,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "liquid-staking-crescent",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/bcre.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom:
@@ -3881,6 +4186,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "unification",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/unification/asset/fund.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
@@ -3893,6 +4199,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
@@ -3905,6 +4212,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -3917,6 +4225,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -3929,6 +4238,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
@@ -3941,6 +4251,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uniswap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uni.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x45804880de22913dafe09f4980848ece6ecbaf78",
@@ -3953,6 +4264,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pax-gold",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/paxg.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xb64ef51c888972c908cfacf59b47c1afbc0ab8ac",
@@ -3965,6 +4277,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "storj",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/storj.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
@@ -3977,6 +4290,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "staked-ether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/steth.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xfB5c6815cA3AC72Ce9F5006869AE67f18bF77006",
@@ -3989,6 +4303,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pstake-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pstake.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -4001,6 +4316,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x2C5Bcad9Ade17428874855913Def0A02D8bE2324",
@@ -4013,6 +4329,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pstake-staked-eth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/stketh.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x30D20208d987713f46DFD34EF128Bb16C404D10f",
@@ -4025,6 +4342,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stader",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sd.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x60e683C6514Edd5F758A55b6f393BeBBAfaA8d5e",
@@ -4037,6 +4355,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "page",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/page.png",
+      chainID: "gravity-bridge-3",
     },
     {
       denom: "gravity0x853d955aCEf822Db058eb8505911ED77F175b99e",
@@ -4049,6 +4368,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "frax",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/frax.png",
+      chainID: "gravity-bridge-3",
     },
   ],
   "meme-1": [
@@ -4064,6 +4384,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "meme-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/meme/asset/meme.png",
+      chainID: "meme-1",
     },
     {
       denom:
@@ -4077,6 +4398,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "meme-1",
     },
   ],
   "quasar-1": [
@@ -4092,6 +4414,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quasar/asset/qsr.png",
+      chainID: "quasar-1",
     },
     {
       denom:
@@ -4105,6 +4428,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "quasar-1",
     },
     {
       denom:
@@ -4118,6 +4442,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "quasar-1",
     },
     {
       denom:
@@ -4131,6 +4456,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "quasar-1",
     },
   ],
   "bitcanna-1": [
@@ -4146,6 +4472,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitcanna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitcanna/asset/bcna.png",
+      chainID: "bitcanna-1",
     },
     {
       denom:
@@ -4159,6 +4486,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "bitcanna-1",
     },
     {
       denom:
@@ -4172,6 +4500,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "bitcanna-1",
     },
     {
       denom:
@@ -4185,6 +4514,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "bitcanna-1",
     },
     {
       denom:
@@ -4198,6 +4528,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "bitcanna-1",
     },
   ],
   "evmos_9001-2": [
@@ -4213,6 +4544,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4226,6 +4558,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4239,6 +4572,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4252,6 +4586,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4265,6 +4600,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4278,6 +4614,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4291,6 +4628,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4304,6 +4642,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4317,6 +4656,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4330,6 +4670,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4343,6 +4684,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4356,6 +4698,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4369,6 +4712,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tgrade",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/tgrade/asset/tgd.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4382,6 +4726,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4395,6 +4740,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4408,6 +4754,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4421,6 +4768,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4434,6 +4782,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "arable-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/acrechain/asset/acre.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom:
@@ -4446,6 +4795,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 18,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/acrechain/asset/cnto.png",
+      chainID: "evmos_9001-2",
     },
     {
       denom: "erc20/0x655ecB57432CC1370f65e5dc2309588b71b473A9",
@@ -4457,6 +4807,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 18,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/neok.png",
+      chainID: "evmos_9001-2",
     },
   ],
   "eightball-1": [
@@ -4472,6 +4823,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/8ball/asset/8ball.png",
+      chainID: "eightball-1",
     },
   ],
   "migaloo-1": [
@@ -4487,6 +4839,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/migaloo/asset/whitewhale.png",
+      chainID: "migaloo-1",
     },
     {
       denom:
@@ -4500,6 +4853,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/cub.png",
+      chainID: "migaloo-1",
     },
     {
       denom:
@@ -4513,6 +4867,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/blue.png",
+      chainID: "migaloo-1",
     },
   ],
   "teritori-1": [
@@ -4528,6 +4883,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "teritori",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/teritori/asset/tori.png",
+      chainID: "teritori-1",
     },
     {
       denom:
@@ -4541,6 +4897,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "teritori-1",
     },
   ],
   "core-1": [
@@ -4556,6 +4913,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "core-1",
     },
     {
       denom: "stk/uatom",
@@ -4569,6 +4927,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stkatom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/stkatom.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4582,6 +4941,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pstake-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pstake.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4595,6 +4955,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4608,6 +4969,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4621,6 +4983,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4634,6 +4997,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4647,6 +5011,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "core-1",
     },
     {
       denom:
@@ -4660,6 +5025,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "core-1",
     },
   ],
   "shentu-2.2": [
@@ -4675,6 +5041,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "certik",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/shentu/asset/ctk.png",
+      chainID: "shentu-2.2",
     },
   ],
   "axelar-dojo-1": [
@@ -4690,6 +5057,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4703,6 +5071,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4716,6 +5085,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4729,6 +5099,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4742,6 +5113,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4755,6 +5127,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4768,6 +5141,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "liquid-staking-crescent",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/bcre.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4781,6 +5155,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4794,6 +5169,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4807,6 +5183,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kujira",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kujira/asset/kuji.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4820,6 +5197,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4833,6 +5211,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "assetmantle",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/asset-mantle/asset/mntl.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4846,6 +5225,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "fetch-ai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fetchai/asset/fet.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4859,6 +5239,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ki",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ki-chain/asset/xki.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4872,6 +5253,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4885,6 +5267,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "regen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/regen.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4898,6 +5281,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/ngm.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4911,6 +5295,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money-eur",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/eeur.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4923,6 +5308,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/enok.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4935,6 +5321,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/esek.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4947,6 +5334,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/echf.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom:
@@ -4959,6 +5347,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/edkk.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "uusdc",
@@ -4971,6 +5360,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "uusdt",
@@ -4983,6 +5373,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wbtc-satoshi",
@@ -4995,6 +5386,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "ape-wei",
@@ -5007,6 +5399,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "apecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/ape.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "aave-wei",
@@ -5019,6 +5412,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aave",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/aave.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "dai-wei",
@@ -5031,6 +5425,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "frax-wei",
@@ -5043,6 +5438,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "frax",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/frax.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "weth-wei",
@@ -5055,6 +5451,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "link-wei",
@@ -5067,6 +5464,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chainlink",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/link.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "mkr-wei",
@@ -5079,6 +5477,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "maker",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/mkr.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "rai-wei",
@@ -5091,6 +5490,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/rai.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "shib-wei",
@@ -5103,6 +5503,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "shiba-inu",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/shib.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "steth-wei",
@@ -5115,6 +5516,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "staked-ether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/steth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "uni-wei",
@@ -5127,6 +5529,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "uniswap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/uni.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wmatic-wei",
@@ -5139,6 +5542,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wmatic",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/polygon/asset/wmatic.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wglmr-wei",
@@ -5151,6 +5555,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-moonbeam",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/moonbeam/asset/wglmr.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "dot-planck",
@@ -5163,6 +5568,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xcdot",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/moonbeam/asset/xcdot.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wftm-wei",
@@ -5175,6 +5581,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-fantom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fantom/asset/wftm.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wavax-wei",
@@ -5187,6 +5594,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-avax",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/avalanche/asset/wavax.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wbnb-wei",
@@ -5199,6 +5607,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wbnb",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-smart-chain/asset/wbnb.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "busd-wei",
@@ -5211,6 +5620,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binance-usd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-smart-chain/asset/busd.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wsteth-wei",
@@ -5223,6 +5633,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-steth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wsteth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "sfrxeth-wei",
@@ -5235,6 +5646,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "staked-frax-ether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sfrxeth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "reth-wei",
@@ -5247,6 +5659,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rocket-pool-eth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/reth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "cbeth-wei",
@@ -5259,6 +5672,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "coinbase-wrapped-staked-eth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cbeth.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "pepe-wei",
@@ -5271,6 +5685,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pepe",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pepe.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "cusd-wei",
@@ -5283,6 +5698,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "celo-dollar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celo/asset/cusd.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "mpx-wei",
@@ -5295,6 +5711,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mpx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fantom/asset/mpx.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "wfil-wei",
@@ -5307,6 +5724,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "filecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/filecoin/asset/fil.png",
+      chainID: "axelar-dojo-1",
     },
     {
       denom: "arb-wei",
@@ -5319,6 +5737,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "arbitrum",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/arbitrum/asset/arb.png",
+      chainID: "axelar-dojo-1",
     },
   ],
   "stride-1": [
@@ -5334,6 +5753,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/strd.png",
+      chainID: "stride-1",
     },
     {
       denom: "stuatom",
@@ -5347,6 +5767,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-atom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/statom.png",
+      chainID: "stride-1",
     },
     {
       denom: "stustars",
@@ -5360,6 +5781,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-stars",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/ststars.png",
+      chainID: "stride-1",
     },
     {
       denom: "stujuno",
@@ -5373,6 +5795,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-juno",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stjuno.png",
+      chainID: "stride-1",
     },
     {
       denom: "stuosmo",
@@ -5386,6 +5809,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-osmo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stosmo.png",
+      chainID: "stride-1",
     },
     {
       denom: "stuluna",
@@ -5399,6 +5823,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-luna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stluna.png",
+      chainID: "stride-1",
     },
     {
       denom: "staevmos",
@@ -5412,6 +5837,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stevmos.png",
+      chainID: "stride-1",
     },
     {
       denom: "stinj",
@@ -5425,6 +5851,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-injective",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stinj.png",
+      chainID: "stride-1",
     },
     {
       denom: "stuumee",
@@ -5438,6 +5865,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stumee.png",
+      chainID: "stride-1",
     },
     {
       denom: "stucmdx",
@@ -5451,6 +5879,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stcmdx.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5464,6 +5893,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5477,6 +5907,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5490,6 +5921,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5503,6 +5935,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5516,6 +5949,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5529,6 +5963,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "arable-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/acrechain/asset/acre.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5541,6 +5976,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 18,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/acrechain/asset/cnto.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5554,6 +5990,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5567,6 +6004,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5580,6 +6018,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5593,6 +6032,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "umee",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/umee/asset/umee.png",
+      chainID: "stride-1",
     },
     {
       denom:
@@ -5606,6 +6046,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "stride-1",
     },
   ],
   "kaiyo-1": [
@@ -5621,6 +6062,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kujira",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kujira/asset/kuji.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5636,6 +6078,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usk",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kujira/asset/usk.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5649,6 +6092,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5662,6 +6106,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5675,6 +6120,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5688,6 +6134,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5701,6 +6148,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5714,6 +6162,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5727,6 +6176,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5740,6 +6190,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5753,6 +6204,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5766,6 +6218,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5779,6 +6232,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5792,6 +6246,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5805,6 +6260,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-avax",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/avalanche/asset/wavax.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5818,6 +6274,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5831,6 +6288,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5844,6 +6302,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/cub.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5857,6 +6316,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/blue.png",
+      chainID: "kaiyo-1",
     },
     {
       denom:
@@ -5870,6 +6330,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mars-protocol-a7fcbcfb-fd61-4017-92f0-7ee9f9cc6da3",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/mars-protocol/asset/mars.png",
+      chainID: "kaiyo-1",
     },
   ],
   "phoenix-1": [
@@ -5885,6 +6346,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "terra-luna-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/luna.png",
+      chainID: "phoenix-1",
     },
   ],
   "cosmoshub-4": [
@@ -5900,6 +6362,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5915,6 +6378,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5930,6 +6394,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5945,6 +6410,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5960,6 +6426,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5975,6 +6442,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -5990,6 +6458,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6005,6 +6474,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6020,6 +6490,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6035,6 +6506,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6050,6 +6522,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6065,6 +6538,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6080,6 +6554,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6095,6 +6570,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6110,6 +6586,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6125,6 +6602,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/pool.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6138,6 +6616,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6151,6 +6630,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6164,6 +6644,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "starname",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/starname/asset/iov.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6177,6 +6658,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iris-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/iris/asset/iris.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6190,6 +6672,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6203,6 +6686,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "regen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/regen.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6216,6 +6700,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sentinel",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sentinel/asset/dvpn.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6229,6 +6714,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6242,6 +6728,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6255,6 +6742,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6268,6 +6756,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money-eur",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/eeur.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6281,6 +6770,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/ngm.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6294,6 +6784,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6307,6 +6798,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "likecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/likecoin/asset/like.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6320,6 +6812,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6333,6 +6826,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ki",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ki-chain/asset/xki.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6346,6 +6840,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitsong",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitsong/asset/btsg.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6359,6 +6854,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitcanna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitcanna/asset/bcna.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6372,6 +6868,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/kava.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6385,6 +6882,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rizon",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/rizon/asset/atolo.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6398,6 +6896,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6411,6 +6910,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "liquid-staking-crescent",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/bcre.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6424,6 +6924,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "umee",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/umee/asset/umee.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6437,6 +6938,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6450,6 +6952,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6463,6 +6966,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6476,6 +6980,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aioz-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/aioz/asset/aioz.png",
+      chainID: "cosmoshub-4",
     },
     {
       denom:
@@ -6489,6 +6994,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "neutron",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/neutron/asset/ntrn.png",
+      chainID: "cosmoshub-4",
     },
   ],
   "kava_2222-10": [
@@ -6504,6 +7010,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/kava.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "erc20/multichain/dai",
@@ -6517,6 +7024,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/bdai.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "erc20/multichain/usdc",
@@ -6530,6 +7038,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/busdc.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "erc20/multichain/usdt",
@@ -6543,6 +7052,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/busdt.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "erc20/axelar/usdc",
@@ -6555,6 +7065,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "swp",
@@ -6568,6 +7079,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava-swap",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/swp.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "usdx",
@@ -6581,6 +7093,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usdx",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/usdx.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "hard",
@@ -6594,6 +7107,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava-lend",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/hard.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "debt",
@@ -6607,6 +7121,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/debt.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "hbtc",
@@ -6620,6 +7135,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "huobi-btc",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/hbtc.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "bnb",
@@ -6632,6 +7148,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binancecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-beacon-chain/asset/bnb.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "btcb",
@@ -6644,6 +7161,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitcoin-bep2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-beacon-chain/asset/btcb.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "busd",
@@ -6656,6 +7174,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binance-usd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-beacon-chain/asset/busd.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "xrpb",
@@ -6668,6 +7187,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ripple",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-beacon-chain/asset/xrpb.png",
+      chainID: "kava_2222-10",
     },
     {
       denom:
@@ -6681,6 +7201,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "kava_2222-10",
     },
     {
       denom:
@@ -6694,6 +7215,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "kava_2222-10",
     },
     {
       denom:
@@ -6707,6 +7229,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "kava_2222-10",
     },
     {
       denom:
@@ -6720,6 +7243,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "kava_2222-10",
     },
     {
       denom: "erc20/multichain/wbtc",
@@ -6733,6 +7257,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/unknown.png",
+      chainID: "kava_2222-10",
     },
   ],
   "sommelier-3": [
@@ -6748,6 +7273,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sommelier",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sommelier/asset/somm.png",
+      chainID: "sommelier-3",
     },
     {
       denom:
@@ -6761,6 +7287,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "sommelier-3",
     },
   ],
   "crypto-org-chain-mainnet-1": [
@@ -6776,6 +7303,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
     {
       denom:
@@ -6789,6 +7317,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
     {
       denom:
@@ -6802,6 +7331,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
     {
       denom:
@@ -6815,6 +7345,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
     {
       denom:
@@ -6828,6 +7359,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
     {
       denom:
@@ -6841,6 +7373,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "crypto-org-chain-mainnet-1",
     },
   ],
   "stargaze-1": [
@@ -6856,6 +7389,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6869,6 +7403,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6882,6 +7417,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6895,6 +7431,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6908,6 +7445,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6921,6 +7459,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/pool.png",
+      chainID: "stargaze-1",
     },
     {
       denom:
@@ -6933,6 +7472,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nois/asset/nois.png",
+      chainID: "stargaze-1",
     },
   ],
   "juno-1": [
@@ -6948,6 +7488,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -6961,6 +7502,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -6974,6 +7516,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -6987,6 +7530,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitsong",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitsong/asset/btsg.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7000,6 +7544,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rizon",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/rizon/asset/atolo.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7013,6 +7558,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7026,6 +7572,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7039,6 +7586,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dig-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/dig-chain/asset/dig.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7052,6 +7600,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7065,6 +7614,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7078,6 +7628,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7091,6 +7642,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7104,6 +7656,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7117,6 +7670,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7130,6 +7684,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitcanna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitcanna/asset/bcna.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7143,6 +7698,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/ngm.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7156,6 +7712,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money-eur",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/eeur.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7169,6 +7726,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7182,6 +7740,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mars-protocol-a7fcbcfb-fd61-4017-92f0-7ee9f9cc6da3",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/mars-protocol/asset/mars.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7195,6 +7754,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7208,6 +7768,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/migaloo/asset/whitewhale.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7221,6 +7782,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/migaloo/asset/ampwhale.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7234,6 +7796,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/migaloo/asset/bwhale.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7247,6 +7810,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/cub.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7260,6 +7824,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/blue.png",
+      chainID: "juno-1",
     },
     {
       denom:
@@ -7272,6 +7837,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       decimals: 6,
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/nois/asset/nois.png",
+      chainID: "juno-1",
     },
   ],
   "osmosis-1": [
@@ -7287,6 +7853,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "osmosis",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/osmo.png",
+      chainID: "osmosis-1",
     },
     {
       denom: "uion",
@@ -7300,6 +7867,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ion",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/asset/ion.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7313,6 +7881,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/strd.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7326,6 +7895,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-atom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/statom.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7339,6 +7909,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-osmo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stosmo.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7352,6 +7923,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "likecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/likecoin/asset/like.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7365,6 +7937,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cheqd-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cheqd/asset/cheq.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7378,6 +7951,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crypto-com-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crypto-org/asset/cro.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7391,6 +7965,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "switcheo",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/carbon/asset/swth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7404,6 +7979,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bostrom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bostrom/asset/boot.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7417,6 +7993,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cosmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cosmos/asset/atom.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7430,6 +8007,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "akash-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/akash/asset/akt.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7443,6 +8021,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chihuahua-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/chihuahua/asset/huahua.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7456,6 +8035,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "lum-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/lum/asset/lum.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7469,6 +8049,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "vidulum",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/vidulum/asset/vdl.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7482,6 +8063,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dig-chain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/dig-chain/asset/dig.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7495,6 +8077,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "desmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/desmos/asset/dsm.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7508,6 +8091,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "certik",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/shentu/asset/ctk.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7521,6 +8105,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "band-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/band/asset/band.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7534,6 +8119,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "starname",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/starname/asset/iov.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7547,6 +8133,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sommelier",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sommelier/asset/somm.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7560,6 +8147,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "darcmatter-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/konstellation/asset/darc.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7573,6 +8161,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "decentr",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/decentr/asset/dec.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7586,6 +8175,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "umee",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/umee/asset/umee.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7599,6 +8189,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "omniflix-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/omniflix/asset/flix.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7612,6 +8203,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sentinel",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sentinel/asset/dvpn.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7625,6 +8217,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "evmos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/evmos/asset/evmos.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7638,6 +8231,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cerberus-2",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cerberus/asset/crbrus.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7651,6 +8245,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rizon",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/rizon/asset/atolo.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7664,6 +8259,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "fetch-ai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/fetchai/asset/fet.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7677,6 +8273,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "assetmantle",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/asset-mantle/asset/mntl.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7690,6 +8287,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "microtick",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/microtick/asset/tick.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7703,6 +8301,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "sifchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/sifchain/asset/rowan.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7716,6 +8315,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitcanna",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitcanna/asset/bcna.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7729,6 +8329,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "iris-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/iris/asset/iris.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7742,6 +8343,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "bitsong",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bitsong/asset/btsg.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7755,6 +8357,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stargaze",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stargaze/asset/stars.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7768,6 +8371,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "ki",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ki-chain/asset/xki.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7781,6 +8385,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "regen",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/regen.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7794,6 +8399,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "medibloc",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/medibloc/asset/med.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7807,6 +8413,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "comdex",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmdx.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7820,6 +8427,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "secret",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/secret/asset/scrt.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7833,6 +8441,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kujira",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kujira/asset/kuji.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7846,6 +8455,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "injective-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/injective/asset/inj.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7859,6 +8469,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tgrade",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/tgrade/asset/tgd.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7872,6 +8483,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "kava",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/kava/asset/kava.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7885,6 +8497,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "persistence",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/xprt.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7898,6 +8511,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stkatom",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/persistence/asset/stkatom.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7911,6 +8525,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pstake-finance",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pstake.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7924,6 +8539,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney//asset/ngm.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7937,6 +8553,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "e-money-eur",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/emoney/asset/eeur.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7950,6 +8567,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "graviton",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/gravity-bridge/asset/grav.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7963,6 +8581,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7976,6 +8595,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -7989,6 +8609,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8002,6 +8623,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "axelar",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/axelar/asset/axl.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8015,6 +8637,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "usd-coin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdc.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8028,6 +8651,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "dai",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/dai.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8041,6 +8665,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-bitcoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wbtc.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8054,6 +8679,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "weth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/weth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8067,6 +8693,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "chainlink",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/link.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8080,6 +8707,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "maker",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/mkr.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8093,6 +8721,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "xcdot",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/moonbeam/asset/xcdot.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8106,6 +8735,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binancecoin",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-smart-chain/asset/wbnb.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8119,6 +8749,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "binance-usd",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/bnb-smart-chain/asset/busd.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8132,6 +8763,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wmatic",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/polygon/asset/wmatic.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8145,6 +8777,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "tether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/usdt.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8158,6 +8791,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "wrapped-steth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/wsteth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8171,6 +8805,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "staked-frax-ether",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/sfrxeth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8184,6 +8819,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "rocket-pool-eth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/reth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8197,6 +8833,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "coinbase-wrapped-staked-eth",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/cbeth.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8210,6 +8847,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "pepe",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/ethereum/asset/pepe.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8223,6 +8861,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "juno-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/juno.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8236,6 +8875,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "hope-galaxy",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/hope.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8249,6 +8889,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "neta",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/neta.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8262,6 +8903,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "marble",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/marble.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8275,6 +8917,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/sejuno.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8288,6 +8931,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/cub.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8301,6 +8945,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/terra/asset/blue.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8314,6 +8959,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/bjuno.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8327,6 +8973,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/juno/asset/seasy.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8340,6 +8987,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "cudos",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/cudos/asset/cudos.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8353,6 +9001,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "provenance-blockchain",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/provenance/asset/hash.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8366,6 +9015,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "crescent-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/crescent/asset/cre.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8379,6 +9029,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "teritori",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/teritori/asset/tori.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8392,6 +9043,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "agoric",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/agoric/asset/bld.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8405,6 +9057,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "inter-stable-token",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/agoric/asset/ist.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8418,6 +9071,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "arable-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/acrechain/asset/acre.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8431,6 +9085,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "medasdigital",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/medasdigital/asset/medas.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8444,6 +9099,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "mars-protocol-a7fcbcfb-fd61-4017-92f0-7ee9f9cc6da3",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/mars-protocol/asset/mars.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8457,6 +9113,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "quicksilver",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qck.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8470,6 +9127,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qstars.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8483,6 +9141,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qatom.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8496,6 +9155,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qregen.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8509,6 +9169,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quicksilver/asset/qosmo.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8522,6 +9183,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "toucan-protocol-nature-carbon-tonne",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/regen/asset/nct.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8535,6 +9197,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "aioz-network",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/aioz/asset/aioz.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8548,6 +9211,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "odin-protocol",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/https://raw.githubusercontent.com/cosmos/chain-registry/master/odin/images/odin.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8561,6 +9225,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "arbitrum",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/arbitrum/asset/arb.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8574,6 +9239,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "white-whale",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/whitewhale/asset/whale.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8587,6 +9253,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "composite",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/comdex/asset/cmst.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8600,6 +9267,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stumee.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8613,6 +9281,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stevmos.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8626,6 +9295,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-stars",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/ststars.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8639,6 +9309,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "stride-staked-juno",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/stride/asset/stjuno.png",
+      chainID: "osmosis-1",
     },
     {
       denom:
@@ -8652,6 +9323,7 @@ export const ASSET_LIST: Record<string, Asset[]> = {
       coinGeckoId: "",
       image:
         "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/quasar/asset/qsr.png",
+      chainID: "osmosis-1",
     },
   ],
 };

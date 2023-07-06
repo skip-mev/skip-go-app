@@ -9,6 +9,7 @@ interface Props {
   balances: Record<string, string>;
   onChange?: (asset: Asset) => void;
   onClose: () => void;
+  showChainInfo?: boolean;
 }
 
 const AssetSelectContent: FC<Props> = ({
@@ -16,6 +17,7 @@ const AssetSelectContent: FC<Props> = ({
   balances,
   onChange,
   onClose,
+  showChainInfo,
 }) => {
   const inputEl = useRef<HTMLInputElement>(null);
 
@@ -85,7 +87,7 @@ const AssetSelectContent: FC<Props> = ({
           {filteredAssets?.map((asset) => (
             <button
               className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
-              key={asset.denom}
+              key={`${asset.chainID}-${asset.denom}`}
               onClick={() => {
                 onClose();
 
@@ -107,6 +109,9 @@ const AssetSelectContent: FC<Props> = ({
               />
               <div className="flex-1">
                 <p className="font-semibold text-lg">{asset.symbol}</p>
+                {showChainInfo && (
+                  <p className="text-sm text-neutral-400">{asset.chainID}</p>
+                )}
               </div>
               <div>
                 {balances[asset.denom] && (
