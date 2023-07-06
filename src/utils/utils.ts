@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { EncodeObject, OfflineSigner } from "@cosmjs/proto-signing";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
@@ -32,7 +32,6 @@ import {
   BaseAccount,
   ChainRestAuthApi,
   ChainRestTendermintApi,
-  MsgTransfer,
   Msgs,
   TxRestClient,
   createTransaction,
@@ -42,11 +41,6 @@ import {
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
 } from "@injectivelabs/utils";
-import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-
-export function formatAddress(address: string, prefix: string) {
-  return address.slice(0, prefix.length + 2) + "..." + address.slice(-4);
-}
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -54,53 +48,7 @@ export function getChainByID(chainID: string) {
   ) as (typeof chainRegistry.chains)[0];
 }
 
-// helper method to get the chain name from the chain ID and return the corresponding chain record.
-export function useChainByID(chainID: string) {
-  const { chainRecords } = useManager();
-
-  const chainRecord =
-    chainRecords.find((record) => record.chain.chain_id === chainID) ??
-    chainRecords[0];
-
-  return useChain(chainRecord.name);
-}
-
-export function useTimeout(callback: () => void, delay: number | null) {
-  const savedCallback = useRef<() => void>();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  });
-
-  useEffect(() => {
-    function tick() {
-      if (savedCallback.current) {
-        savedCallback.current();
-      }
-    }
-
-    if (delay !== null) {
-      const id = setTimeout(tick, delay);
-
-      return () => clearTimeout(id);
-    }
-  }, [delay]);
-}
-
-export async function getFeeDenomsForChainID(chainID: string) {
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID
-  );
-
-  if (!chain) {
-    throw new Error(`Chain with ID ${chainID} not found`);
-  }
-
-  const denoms = chain.fees?.fee_tokens ?? [];
-
-  return denoms;
-}
-
+// cache clients to reuse later
 const STARGATE_CLIENTS: Record<string, StargateClient> = {};
 
 export async function getStargateClientForChainID(chainID: string) {
@@ -120,8 +68,6 @@ export async function getStargateClientForChainID(chainID: string) {
 
   try {
     const client = await StargateClient.connect(preferredEndpoint, {});
-
-    console.log(`Connected to ${preferredEndpoint}`);
 
     STARGATE_CLIENTS[chainID] = client;
 
@@ -326,6 +272,8 @@ export async function signAndBroadcastEvmos(
     `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
     generatePostBodyBroadcast(signedTx)
   );
+
+  return response;
 }
 
 export async function signAndBroadcastInjective(
