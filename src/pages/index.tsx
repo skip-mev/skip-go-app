@@ -33,12 +33,17 @@ export default function Home() {
     sourceChain?.record?.chain.chain_name ?? "cosmoshub"
   );
 
-  const { walletRepos, on } = useManager();
+  const { walletRepos } = useManager();
 
   async function prefetchBalances(address: string, chainID: string) {
-    const balances = await getBalancesByChain(address, chainID);
+    try {
+      const balances = await getBalancesByChain(address, chainID);
 
-    queryClient.setQueryData(["balances-by-chain", address, chainID], balances);
+      queryClient.setQueryData(
+        ["balances-by-chain", address, chainID],
+        balances
+      );
+    } catch {}
   }
 
   useInterval(() => {

@@ -18,11 +18,13 @@ import {
   getSigningStargateClientForChainID,
   getStargateClientForChainID,
   signAndBroadcastEvmos,
+  signAndBroadcastInjective,
 } from "@/utils/utils";
 import { EncodeObject, OfflineSigner, coin } from "@cosmjs/proto-signing";
 import { GasPrice } from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
+import { MsgTransfer } from "@injectivelabs/sdk-ts";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -468,6 +470,21 @@ async function executeTransferRoute(
         revisionNumber: 0,
         revisionHeight: 0,
       });
+    } else if (multiHopMsg.chainId === "injective-1") {
+      const tx = await signAndBroadcastInjective(
+        msgJSON.sender,
+        MsgTransfer.fromJSON({
+          amount: msgJSON.token,
+          memo: msgJSON.memo,
+          sender: msgJSON.sender,
+          port: msgJSON.source_port,
+          receiver: msgJSON.receiver,
+          channelId: msgJSON.source_channel,
+          timeout: msgJSON.timeout_timestamp,
+        })
+      );
+
+      console.log(tx);
     } else {
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
 
@@ -650,6 +667,21 @@ async function executeSwapRoute(
           revisionNumber: 0,
           revisionHeight: 0,
         });
+      } else if (multiHopMsg.chainId === "injective-1") {
+        const tx = await signAndBroadcastInjective(
+          msgJSON.sender,
+          MsgTransfer.fromJSON({
+            amount: msgJSON.token,
+            memo: msgJSON.memo,
+            sender: msgJSON.sender,
+            port: msgJSON.source_port,
+            receiver: msgJSON.receiver,
+            channelId: msgJSON.source_channel,
+            timeout: msgJSON.timeout_timestamp,
+          })
+        );
+
+        console.log(tx);
       } else {
         const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
 

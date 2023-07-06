@@ -23,6 +23,8 @@
     "@evmos/transactions": "^0.3.2",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
+    "@injectivelabs/sdk-ts": "^1.11.0",
+    "@injectivelabs/utils": "^1.11.0",
     "@keplr-wallet/types": "^0.12.4",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dialog": "^1.0.4",

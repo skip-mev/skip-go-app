@@ -28,6 +28,21 @@ import {
 } from "@evmos/transactions";
 import { createTxRaw } from "@evmos/proto";
 import Long from "long";
+import {
+  BaseAccount,
+  ChainRestAuthApi,
+  ChainRestTendermintApi,
+  MsgTransfer,
+  Msgs,
+  TxRestClient,
+  createTransaction,
+  getTxRawFromTxRawOrDirectSignResponse,
+} from "@injectivelabs/sdk-ts";
+import {
+  DEFAULT_BLOCK_TIMEOUT_HEIGHT,
+  BigNumberInBase,
+} from "@injectivelabs/utils";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export function formatAddress(address: string, prefix: string) {
   return address.slice(0, prefix.length + 2) + "..." + address.slice(-4);
@@ -243,9 +258,6 @@ export async function signAndBroadcastEvmos(
   const account = await window.keplr.getKey(chainID);
   const pk = Buffer.from(account.pubKey).toString("base64");
 
-  console.log(result.data);
-  console.log(pk);
-
   const chain: Chain = {
     chainId: 9001,
     cosmosChainId: "evmos_9001-2",
@@ -314,4 +326,61 @@ export async function signAndBroadcastEvmos(
     `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
     generatePostBodyBroadcast(signedTx)
   );
+}
+
+export async function signAndBroadcastInjective(
+  signerAddress: string,
+  msgs: Msgs | Msgs[]
+) {
+  const chainID = "injective-1";
+  const restEndpoint = "https://lcd.injective.network";
+
+  const chainRestAuthApi = new ChainRestAuthApi(restEndpoint);
+
+  const accountDetailsResponse = await chainRestAuthApi.fetchAccount(
+    signerAddress
+  );
+  const baseAccount = BaseAccount.fromRestApi(accountDetailsResponse);
+
+  /** Block Details */
+  const chainRestTendermintApi = new ChainRestTendermintApi(restEndpoint);
+  const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
+  const latestHeight = latestBlock.header.height;
+  const timeoutHeight = new BigNumberInBase(latestHeight).plus(
+    DEFAULT_BLOCK_TIMEOUT_HEIGHT
+  );
+
+  if (!window.keplr) {
+    throw new Error("Keplr extension is not installed");
+  }
+
+  const account = await window.keplr.getKey(chainID);
+  const pk = Buffer.from(account.pubKey).toString("base64");
+
+  const { signDoc } = createTransaction({
+    pubKey: pk,
+    chainId: chainID,
+    message: msgs,
+    sequence: baseAccount.sequence,
+    accountNumber: baseAccount.accountNumber,
+    timeoutHeight: timeoutHeight.toNumber(),
+  });
+
+  const directSignResponse = await window.keplr.signDirect(
+    chainID,
+    signerAddress,
+    // @ts-ignore
+    signDoc
+  );
+
+  const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
+
+  const txRestClient = new TxRestClient(restEndpoint);
+
+  const tx = await txRestClient.broadcast(txRaw, {
+    // @ts-ignore
+    mode: "sync",
+  });
+
+  return tx;
 }
