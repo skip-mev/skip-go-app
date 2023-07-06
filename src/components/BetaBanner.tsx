@@ -32,7 +32,7 @@ const BetaBanner: FC = () => {
       </div>
       <p>
         ibc.fun is a beta product. We are actively working on improving the
-        reliability and responsiveness.
+        reliability and responsiveness, please use with caution.
       </p>
     </div>
   );

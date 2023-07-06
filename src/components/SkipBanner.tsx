@@ -7,7 +7,7 @@ const SkipBanner: FC = () => {
         <p>Powered by the Skip API </p>
         <a
           className="bg-indigo-400 px-2 py-1 pr-1 rounded inline-flex items-center gap-1 hover:underline"
-          href="https://api-docs.skip.money/"
+          href="https://skip.money/docs/frontends"
           target="_blank"
           rel="noreferrer"
         >
