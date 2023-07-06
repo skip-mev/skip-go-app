@@ -10,6 +10,7 @@ import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
 import { useAssets } from "@/context/assets";
+import { useToast } from "@/context/toast";
 
 export default function Home() {
   const { chains } = useChains();

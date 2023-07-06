@@ -9,6 +9,10 @@ import {
 } from "./api";
 import { IBCDenom, IBCHop } from "./types";
 
+interface QueryOptions {
+  onError?: ((err: unknown) => void) | undefined;
+}
+
 export function useSolveChains() {
   return useQuery({
     queryKey: ["solve-chains"],
@@ -23,12 +27,17 @@ export function useSolveChains() {
   });
 }
 
-export function useCompareDenoms(assets: IBCDenom[]) {
+export function useCompareDenoms(
+  assets: IBCDenom[],
+  options: QueryOptions = {}
+) {
   return useQuery({
     queryKey: ["solve-compare-denoms", ...assets],
     queryFn: () => {
       return compareDenoms(assets);
     },
+    onError: options.onError,
+    retry: false,
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,

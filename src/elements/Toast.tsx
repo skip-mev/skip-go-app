@@ -2,8 +2,8 @@ import { FC, Fragment } from "react";
 import * as RadixToast from "@radix-ui/react-toast";
 
 interface Props {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
   title?: string;
   description?: string;
 }

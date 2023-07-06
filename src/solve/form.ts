@@ -25,6 +25,7 @@ import { GasPrice } from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
 import { MsgTransfer } from "@injectivelabs/sdk-ts";
+import { useToast } from "@/context/toast";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,6 +40,8 @@ export interface FormValues {
 }
 
 export function useSolveForm() {
+  const { toast } = useToast();
+
   const { chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
@@ -172,7 +175,12 @@ export function useSolveForm() {
   }, [formValues.destinationAsset, formValues.destinationChain]);
 
   const { data: compareDenomsResponse } = useCompareDenoms(
-    [denomIn, denomOut].filter(Boolean) as IBCDenom[]
+    [denomIn, denomOut].filter(Boolean) as IBCDenom[],
+    {
+      onError: (err: any) => {
+        toast("Error comparing assets", err.message);
+      },
+    }
   );
 
   // Use compare denom response to determine whether we are performing a transfer or swap
