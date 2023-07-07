@@ -1,13 +1,26 @@
-import { FC } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import { FC, useEffect, useState } from "react";
+import { useIsClient, useReadLocalStorage } from "usehooks-ts";
 
 const BetaBanner: FC = () => {
-  const [shouldShow, setShouldShow] = useLocalStorage(
-    "IBC_DOT_FUN_SHOW_BETA_BANNER",
-    "true"
+  const showBannerPreference = useReadLocalStorage(
+    "IBC_DOT_FUN_SHOW_BETA_BANNER"
   );
 
-  if (shouldShow === "false") {
+  const [shouldShow, setShouldShow] = useState(false);
+
+  const isClient = useIsClient();
+
+  useEffect(() => {
+    if (!isClient) {
+      return;
+    }
+
+    if (showBannerPreference === null || showBannerPreference === true) {
+      setShouldShow(true);
+    }
+  }, [isClient, showBannerPreference]);
+
+  if (shouldShow === false) {
     return null;
   }
 
@@ -17,7 +30,9 @@ const BetaBanner: FC = () => {
         <p className="font-bold">Important</p>
         <button
           onClick={() => {
-            setShouldShow("false");
+            // @ts-ignore
+            localStorage.setItem("IBC_DOT_FUN_SHOW_BETA_BANNER", false);
+            setShouldShow(false);
           }}
         >
           <svg
