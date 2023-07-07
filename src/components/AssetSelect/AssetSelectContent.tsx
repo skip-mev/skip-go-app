@@ -3,6 +3,7 @@ import { Asset } from "@/cosmos";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
+import { useWindowSize } from "usehooks-ts";
 
 interface Props {
   assets?: Asset[];
@@ -19,11 +20,15 @@ const AssetSelectContent: FC<Props> = ({
   onClose,
   showChainInfo,
 }) => {
+  const { width } = useWindowSize();
+
   const inputEl = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputEl.current?.focus();
-  }, []);
+    if (width >= 768) {
+      inputEl.current?.focus();
+    }
+  }, [width]);
 
   const [searchValue, setSearchValue] = useState("");
 

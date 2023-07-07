@@ -76,7 +76,7 @@ const AssetInput: FC<Props> = ({
   return (
     <Fragment>
       <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <ChainSelect
               chain={chain}

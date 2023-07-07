@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { chainNameToChainlistURL } from "@/cosmos";
-import { Chain, useChains } from "@/context/chains";
+import { Chain } from "@/context/chains";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { useWindowSize } from "usehooks-ts";
 
 interface Props {
   chains: Chain[];
@@ -11,11 +12,15 @@ interface Props {
 }
 
 const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
+  const { width } = useWindowSize();
+
   const inputEl = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputEl.current?.focus();
-  }, []);
+    if (width >= 768) {
+      inputEl.current?.focus();
+    }
+  }, [width]);
 
   const [searchValue, setSearchValue] = useState("");
 

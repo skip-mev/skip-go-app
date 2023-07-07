@@ -24,7 +24,7 @@ export const DialogContent: FC<Props> = ({ children, onInteractOutside }) => {
           leaveTo="opacity-0 scale-95"
         >
           <RadixDialog.Content
-            className="DialogContent absolute inset-0 bg-white z-[999]"
+            className="DialogContent absolute inset-0 bg-white rounded-3xl z-[999]"
             onInteractOutside={onInteractOutside}
             style={{ zIndex: "999" }}
           >

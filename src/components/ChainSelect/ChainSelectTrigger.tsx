@@ -12,7 +12,7 @@ const ChainSelectTrigger = forwardRef(function ChainSelectTrigger(
 ) {
   return (
     <button
-      className="font-semibold text-left bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center p-4 w-full transition-colors"
+      className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center p-4 w-full transition-colors"
       ref={ref}
       {...props}
     >
