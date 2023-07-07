@@ -1,6 +1,6 @@
 import { Chain, useChains } from "@/context/chains";
 import { Asset, useBalancesByChain } from "@/cosmos";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { IBCAddress, IBCDenom, IBCHop } from "./types";
 import { useCompareDenoms, useSwapRoute, useTransferRoute } from "./queries";
 import { ethers } from "ethers";
@@ -12,8 +12,12 @@ import {
   getTransferMsgs,
 } from "./api";
 import {
+  enableChains,
+  getAccount,
   getAddressForChain,
   getChainByID,
+  getOfflineSigner,
+  getOfflineSignerOnlyAmino,
   getSigningCosmWasmClientForChainID,
   getSigningStargateClientForChainID,
   getStargateClientForChainID,
@@ -26,6 +30,7 @@ import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
 import { MsgTransfer } from "@injectivelabs/sdk-ts";
 import { useToast } from "@/context/toast";
+import { WalletClient } from "@cosmos-kit/core";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -361,17 +366,23 @@ export function useSolveForm() {
 }
 
 export async function executeRoute(
+  walletClient: WalletClient,
   route: Route,
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
   try {
     if (route.actionType === "SWAP") {
-      await executeSwapRoute(route.data as SwapRouteResponse, onTxSuccess);
+      await executeSwapRoute(
+        walletClient,
+        route.data as SwapRouteResponse,
+        onTxSuccess
+      );
     }
 
     if (route.actionType === "TRANSFER") {
       await executeTransferRoute(
+        walletClient,
         ethers
           .parseUnits(route.amountIn, route.sourceAsset.decimals)
           .toString(),
@@ -389,6 +400,7 @@ export async function executeRoute(
 }
 
 async function executeTransferRoute(
+  walletClient: WalletClient,
   amount: string,
   sourceAsset: Asset,
   sourceChain: Chain,
@@ -397,22 +409,18 @@ async function executeTransferRoute(
   hops: IBCHop[],
   onTxSuccess: (tx: any, index: number) => void
 ) {
-  if (!window.keplr) {
-    throw new Error("Keplr extension is not installed");
-  }
-
   const chainIDs = [
     ...hops.map((hop) => hop.chainId),
     destinationChain.chainId,
   ];
 
-  await window.keplr.enable(chainIDs);
+  await enableChains(walletClient, chainIDs);
 
   const userAddresses: Record<string, IBCAddress> = {};
 
   // get addresses
   for (const chainID of chainIDs) {
-    const address = await getAddressForChain(chainID);
+    const address = await getAddressForChain(walletClient, chainID);
 
     userAddresses[chainID] = {
       address,
@@ -453,6 +461,8 @@ async function executeTransferRoute(
       feeInfo.denom
     );
 
+    console.log(feeInfo.denom, balance.amount);
+
     if (parseInt(balance.amount) < amountNeeded) {
       throw new Error(
         `Insufficient fee token to initiate transfer on ${multiHopMsg.chainId}. Need ${amountNeeded} ${feeInfo.denom}, but only have ${balance.amount} ${feeInfo.denom}.`
@@ -463,12 +473,16 @@ async function executeTransferRoute(
   for (let i = 0; i < messages.length; i++) {
     const multiHopMsg = messages[i];
 
-    const key = await window.keplr.getKey(multiHopMsg.chainId);
+    const account = await getAccount(walletClient, multiHopMsg.chainId);
+
     let signer: OfflineSigner;
-    if (key.isNanoLedger) {
-      signer = window.keplr.getOfflineSignerOnlyAmino(multiHopMsg.chainId);
+    if (account.isNanoLedger) {
+      signer = await getOfflineSignerOnlyAmino(
+        walletClient,
+        multiHopMsg.chainId
+      );
     } else {
-      signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
+      signer = await getOfflineSigner(walletClient, multiHopMsg.chainId);
     }
 
     const chain = getChainByID(multiHopMsg.chainId);
@@ -491,6 +505,8 @@ async function executeTransferRoute(
       }
     );
 
+    console.log("here");
+
     const msg = {
       typeUrl: multiHopMsg.msgTypeUrl,
       value: {
@@ -508,7 +524,7 @@ async function executeTransferRoute(
     console.log("sending tx...");
 
     if (multiHopMsg.chainId === "evmos_9001-2") {
-      await signAndBroadcastEvmos(msgJSON.sender, {
+      await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
         sourcePort: msgJSON.source_port,
         sourceChannel: msgJSON.source_channel,
         receiver: msgJSON.receiver,
@@ -521,6 +537,7 @@ async function executeTransferRoute(
       });
     } else if (multiHopMsg.chainId === "injective-1") {
       const tx = await signAndBroadcastInjective(
+        walletClient,
         msgJSON.sender,
         MsgTransfer.fromJSON({
           amount: msgJSON.token,
@@ -580,23 +597,20 @@ async function executeTransferRoute(
 }
 
 async function executeSwapRoute(
+  walletClient: WalletClient,
   route: SwapRouteResponse,
   onTxSuccess: (tx: any, index: number) => void
 ) {
-  if (!window.keplr) {
-    throw new Error("Keplr extension is not installed");
-  }
-
   // get all chain IDs in path and connect in keplr
   const chainIDs = route.chainIds;
 
-  await window.keplr.enable(chainIDs);
+  await enableChains(walletClient, chainIDs);
 
   const userAddresses: Record<string, string> = {};
 
   // get addresses
   for (const chainID of chainIDs) {
-    const address = await getAddressForChain(chainID);
+    const address = await getAddressForChain(walletClient, chainID);
     userAddresses[chainID] = address;
   }
 
@@ -657,12 +671,16 @@ async function executeSwapRoute(
   for (let i = 0; i < msgsResponse.requested.length; i++) {
     const multiHopMsg = msgsResponse.requested[i];
 
-    const key = await window.keplr.getKey(multiHopMsg.chainId);
+    const account = await getAccount(walletClient, multiHopMsg.chainId);
+
     let signer: OfflineSigner;
-    if (key.isNanoLedger) {
-      signer = window.keplr.getOfflineSignerOnlyAmino(multiHopMsg.chainId);
+    if (account.isNanoLedger) {
+      signer = await getOfflineSignerOnlyAmino(
+        walletClient,
+        multiHopMsg.chainId
+      );
     } else {
-      signer = window.keplr.getOfflineSigner(multiHopMsg.chainId);
+      signer = await getOfflineSigner(walletClient, multiHopMsg.chainId);
     }
 
     const chain = getChainByID(multiHopMsg.chainId);
@@ -705,7 +723,7 @@ async function executeSwapRoute(
       };
 
       if (multiHopMsg.chainId === "evmos_9001-2") {
-        await signAndBroadcastEvmos(msgJSON.sender, {
+        await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
           sourcePort: msgJSON.source_port,
           sourceChannel: msgJSON.source_channel,
           receiver: msgJSON.receiver,
@@ -718,6 +736,7 @@ async function executeSwapRoute(
         });
       } else if (multiHopMsg.chainId === "injective-1") {
         const tx = await signAndBroadcastInjective(
+          walletClient,
           msgJSON.sender,
           MsgTransfer.fromJSON({
             amount: msgJSON.token,

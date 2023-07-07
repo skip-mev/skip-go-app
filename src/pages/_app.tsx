@@ -6,10 +6,12 @@ import Head from "next/head";
 import { Jost } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 
+import { wallets as keplrWallets } from "@cosmos-kit/keplr";
+import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
+
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
 import { chains, assets } from "chain-registry";
-import { wallets } from "@cosmos-kit/keplr";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { GasPrice } from "@cosmjs/stargate";
 import MainLayout from "@/components/MainLayout";
@@ -184,7 +186,8 @@ export default function App({ Component, pageProps }: AppProps) {
             <ChainProvider
               chains={chains}
               assetLists={assets}
-              wallets={[wallets[0]]}
+              // @ts-ignore
+              wallets={[keplrWallets[0], ...cosmostationWallets]}
               signerOptions={{
                 signingStargate: (chain) => {
                   chain.fees?.fee_tokens;

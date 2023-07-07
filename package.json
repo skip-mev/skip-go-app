@@ -16,6 +16,7 @@
     "@cosmjs/stargate": "^0.30.1",
     "@cosmjs/tendermint-rpc": "^0.30.1",
     "@cosmos-kit/core": "^1.4.1",
+    "@cosmos-kit/cosmostation-extension": "^0.17.2-beta.4",
     "@cosmos-kit/keplr": "^0.33.40",
     "@cosmos-kit/react": "^1.3.21",
     "@evmos/proto": "^0.2.1",

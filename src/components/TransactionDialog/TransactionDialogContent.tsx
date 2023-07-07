@@ -4,6 +4,7 @@ import RouteDisplay from "../RouteDisplay";
 import { Route } from ".";
 import { executeRoute } from "@/solve/form";
 import Toast from "@/elements/Toast";
+import { useWallet, useWalletClient } from "@cosmos-kit/react";
 
 interface Props {
   route: Route;
@@ -16,6 +17,14 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
+  const wallet = useWallet();
+
+  // console.log(wallet.wallet.);
+
+  const { client: walletClient } = useWalletClient();
+
+  // console.log(walletClient);
+
   const [txStatuses, setTxStatuses] = useState(() =>
     Array.from({ length: route.transactionCount }, () => "INIT")
   );
@@ -26,7 +35,12 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
     try {
       setTxStatuses(["PENDING", ...txStatuses.slice(1)]);
 
+      if (!walletClient) {
+        throw new Error("No wallet client found");
+      }
+
       await executeRoute(
+        walletClient,
         route,
         (_, i) => {
           setTxStatuses((statuses) => {
@@ -41,6 +55,8 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
           });
         },
         (error: any) => {
+          console.error(error);
+
           setTxError(error.message);
           setIsError(true);
 

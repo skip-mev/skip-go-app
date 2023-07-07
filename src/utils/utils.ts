@@ -9,7 +9,7 @@ import {
   SigningStargateClientOptions,
   StargateClient,
 } from "@cosmjs/stargate";
-import { getFastestEndpoint } from "@cosmos-kit/core";
+import { WalletClient, getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
 import * as chainRegistry from "chain-registry";
 import {
@@ -133,15 +133,18 @@ export async function getSigningStargateClientForChainID(
   return client;
 }
 
-export async function getAddressForChain(chainId: string) {
-  if (!window.keplr) {
-    throw new Error("Keplr extension is not installed");
+export async function getAddressForChain(
+  walletClient: WalletClient,
+  chainId: string
+) {
+  if (walletClient.getOfflineSigner) {
+    const signer = await walletClient.getOfflineSigner(chainId);
+    const accounts = await signer.getAccounts();
+
+    return accounts[0].address;
   }
 
-  const signer = window.keplr.getOfflineSigner(chainId);
-  const accounts = await signer.getAccounts();
-
-  return accounts[0].address;
+  throw new Error("unsupported wallet");
 }
 
 export async function getSigningCosmWasmClientForChainID(
@@ -187,22 +190,20 @@ export async function getSigningCosmWasmClientForChainID(
 }
 
 export async function signAndBroadcastEvmos(
+  walletClient: WalletClient,
   signerAddress: string,
   params: IBCMsgTransferParams
 ) {
   // console.log(params);
   const chainID = "evmos_9001-2";
 
-  if (!window.keplr) {
-    throw new Error("Keplr extension is not installed");
-  }
-
   const result = await axios.get(
     `https://rest.bd.evmos.org:1317${generateEndpointAccount(signerAddress)}`
   );
 
-  const account = await window.keplr.getKey(chainID);
-  const pk = Buffer.from(account.pubKey).toString("base64");
+  const account = await getAccount(walletClient, chainID);
+
+  const pk = Buffer.from(account.pubkey).toString("base64");
 
   const chain: Chain = {
     chainId: 9001,
@@ -240,16 +241,14 @@ export async function signAndBroadcastEvmos(
 
   const { signDirect } = tx;
 
-  const signResponse = await window.keplr.signDirect(
-    chain.cosmosChainId,
-    sender.accountAddress,
-    {
-      bodyBytes: signDirect.body.toBinary(),
-      authInfoBytes: signDirect.authInfo.toBinary(),
-      chainId: chain.cosmosChainId,
-      accountNumber: new Long(sender.accountNumber),
-    }
-  );
+  const signer = await getOfflineSigner(walletClient, chainID);
+
+  const signResponse = await signer.signDirect(sender.accountAddress, {
+    bodyBytes: signDirect.body.toBinary(),
+    authInfoBytes: signDirect.authInfo.toBinary(),
+    chainId: chain.cosmosChainId,
+    accountNumber: new Long(sender.accountNumber),
+  });
 
   if (!signResponse) {
     // Handle signature failure here.
@@ -273,10 +272,13 @@ export async function signAndBroadcastEvmos(
     generatePostBodyBroadcast(signedTx)
   );
 
+  console.log(response.data);
+
   return response;
 }
 
 export async function signAndBroadcastInjective(
+  walletClient: WalletClient,
   signerAddress: string,
   msgs: Msgs | Msgs[]
 ) {
@@ -298,12 +300,8 @@ export async function signAndBroadcastInjective(
     DEFAULT_BLOCK_TIMEOUT_HEIGHT
   );
 
-  if (!window.keplr) {
-    throw new Error("Keplr extension is not installed");
-  }
-
-  const account = await window.keplr.getKey(chainID);
-  const pk = Buffer.from(account.pubKey).toString("base64");
+  const account = await getAccount(walletClient, chainID);
+  const pk = Buffer.from(account.pubkey).toString("base64");
 
   const { signDoc } = createTransaction({
     pubKey: pk,
@@ -314,8 +312,9 @@ export async function signAndBroadcastInjective(
     timeoutHeight: timeoutHeight.toNumber(),
   });
 
-  const directSignResponse = await window.keplr.signDirect(
-    chainID,
+  const signer = await getOfflineSigner(walletClient, chainID);
+
+  const directSignResponse = await signer.signDirect(
     signerAddress,
     // @ts-ignore
     signDoc
@@ -331,4 +330,52 @@ export async function signAndBroadcastInjective(
   });
 
   return tx;
+}
+
+// generic wrapper to support enabling chains on many different wallets
+export async function enableChains(
+  walletClient: WalletClient,
+  chains: string[]
+) {
+  if (walletClient.enable) {
+    return walletClient.enable(chains);
+  }
+
+  // @ts-ignore
+  if (walletClient.ikeplr) {
+    // @ts-ignore
+    return walletClient.ikeplr.enable(chains);
+  }
+
+  throw new Error("Unsupported wallet");
+}
+
+export async function getAccount(walletClient: WalletClient, chainId: string) {
+  if (walletClient.getAccount) {
+    return walletClient.getAccount(chainId);
+  }
+
+  throw new Error("unsupported wallet");
+}
+
+export async function getOfflineSigner(
+  walletClient: WalletClient,
+  chainId: string
+) {
+  if (walletClient.getOfflineSignerDirect) {
+    return walletClient.getOfflineSignerDirect(chainId);
+  }
+
+  throw new Error("unsupported wallet");
+}
+
+export async function getOfflineSignerOnlyAmino(
+  walletClient: WalletClient,
+  chainId: string
+) {
+  if (walletClient.getOfflineSignerAmino) {
+    return walletClient.getOfflineSignerAmino(chainId);
+  }
+
+  throw new Error("unsupported wallet");
 }
