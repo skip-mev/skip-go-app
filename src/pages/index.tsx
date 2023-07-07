@@ -9,9 +9,7 @@ import TransactionDialog from "@/components/TransactionDialog";
 import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
-import { useAssets } from "@/context/assets";
-import { useToast } from "@/context/toast";
-import Toast from "@/elements/Toast";
+import va from "@vercel/analytics";
 
 export default function Home() {
   const { chains } = useChains();
@@ -32,9 +30,11 @@ export default function Home() {
     insufficientBalance,
   } = useSolveForm();
 
-  const { status: walletConnectStatus, connect: connectWallet } = useChain(
-    sourceChain?.record?.chain.chain_name ?? "cosmoshub"
-  );
+  const {
+    status: walletConnectStatus,
+    connect: connectWallet,
+    chain,
+  } = useChain(sourceChain?.record?.chain.chain_name ?? "cosmoshub");
 
   const { walletRepos } = useManager();
 
@@ -191,7 +191,13 @@ export default function Home() {
           {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
-              onClick={connectWallet}
+              onClick={async () => {
+                await connectWallet();
+
+                va.track("wallet-connect", {
+                  chainID: chain.chain_id,
+                });
+              }}
             >
               Connect Wallet
             </button>
