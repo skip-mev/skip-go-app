@@ -1,9 +1,10 @@
 import "../styles/globals.css";
 
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { Inter, Jost } from "next/font/google";
+import { Jost } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
@@ -210,6 +211,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </ChakraProvider>
         </QueryClientProvider>
       </main>
+      <Analytics />
     </Fragment>
   );
 }
