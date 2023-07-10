@@ -17,13 +17,7 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
-  const wallet = useWallet();
-
-  // console.log(wallet.wallet.);
-
   const { client: walletClient } = useWalletClient();
-
-  // console.log(walletClient);
 
   const [txStatuses, setTxStatuses] = useState(() =>
     Array.from({ length: route.transactionCount }, () => "INIT")

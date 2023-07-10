@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
+import { wallets as leapWallets } from "@cosmos-kit/leap";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
@@ -187,7 +188,11 @@ export default function App({ Component, pageProps }: AppProps) {
               chains={chains}
               assetLists={assets}
               // @ts-ignore
-              wallets={[keplrWallets[0], ...cosmostationWallets]}
+              wallets={[
+                keplrWallets[0],
+                ...cosmostationWallets,
+                leapWallets[0],
+              ]}
               signerOptions={{
                 signingStargate: (chain) => {
                   chain.fees?.fee_tokens;

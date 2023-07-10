@@ -10,10 +10,8 @@ import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
 import va from "@vercel/analytics";
-import { useToast } from "@/context/toast";
 
 export default function Home() {
-  const { toast } = useToast();
   const { chains } = useChains();
 
   const {

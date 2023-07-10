@@ -26,7 +26,6 @@ interface Props {
 const TransactionDialog: FC<Props> = ({ route }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log(route);
   return (
     <Fragment>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

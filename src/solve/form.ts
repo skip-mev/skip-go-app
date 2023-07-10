@@ -332,8 +332,6 @@ export function useSolveForm() {
 
     const amountIn = parseFloat(formValues.amountIn);
 
-    console.log(amountIn);
-
     if (isNaN(amountIn)) {
       return false;
     }
@@ -462,8 +460,6 @@ async function executeTransferRoute(
       feeInfo.denom
     );
 
-    console.log(feeInfo.denom, balance.amount);
-
     if (parseInt(balance.amount) < amountNeeded) {
       throw new Error(
         `Insufficient fee token to initiate transfer on ${multiHopMsg.chainId}. Need ${amountNeeded} ${feeInfo.denom}, but only have ${balance.amount} ${feeInfo.denom}.`
@@ -506,8 +502,6 @@ async function executeTransferRoute(
       }
     );
 
-    console.log("here");
-
     const msg = {
       typeUrl: multiHopMsg.msgTypeUrl,
       value: {
@@ -521,8 +515,6 @@ async function executeTransferRoute(
         memo: msgJSON.memo,
       },
     };
-
-    console.log("sending tx...");
 
     if (multiHopMsg.chainId === "evmos_9001-2") {
       await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
@@ -550,14 +542,8 @@ async function executeTransferRoute(
           timeout: msgJSON.timeout_timestamp,
         })
       );
-
-      console.log(tx);
     } else {
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
-
-      console.log("sent");
-
-      console.log(tx);
     }
 
     const destinationChainID = multiHopMsg.path[multiHopMsg.path.length - 1];
@@ -749,12 +735,8 @@ async function executeSwapRoute(
             timeout: msgJSON.timeout_timestamp,
           })
         );
-
-        console.log(tx);
       } else {
         const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
-
-        console.log(tx);
       }
     } else {
       msg = {
@@ -779,8 +761,6 @@ async function executeSwapRoute(
       );
 
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
-
-      console.log(tx);
     }
 
     const destinationChainID =

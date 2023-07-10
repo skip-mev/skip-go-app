@@ -194,7 +194,6 @@ export async function signAndBroadcastEvmos(
   signerAddress: string,
   params: IBCMsgTransferParams
 ) {
-  // console.log(params);
   const chainID = "evmos_9001-2";
 
   const result = await axios.get(
@@ -271,8 +270,6 @@ export async function signAndBroadcastEvmos(
     `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
     generatePostBodyBroadcast(signedTx)
   );
-
-  console.log(response.data);
 
   return response;
 }

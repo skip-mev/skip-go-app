@@ -56,7 +56,6 @@ function getActionsFromSwapRoute(route: SwapRouteResponse) {
   }
 
   route.postSwapHops.forEach((hop, i) => {
-    // console.log(hop);
     const asset =
       i === 0
         ? route.userSwap.swapOperations[
@@ -128,6 +127,8 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
+  console.log(action);
+
   const { chains } = useChains();
 
   const sourceChain = chains.find(
@@ -141,7 +142,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   const { getAsset } = useAssets();
 
   const asset = getAsset(action.asset, sourceChain.chainId);
-
+  console.log(asset);
   if (!asset) {
     return null;
   }
