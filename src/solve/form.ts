@@ -279,6 +279,7 @@ export function useSolveForm() {
 
   const route = useMemo(() => {
     if (
+      !formValues.amountIn ||
       !formValues.sourceAsset ||
       !formValues.destinationAsset ||
       !formValues.sourceChain ||

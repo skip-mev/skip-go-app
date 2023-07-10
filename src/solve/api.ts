@@ -17,12 +17,14 @@ interface GetChainsResponse {
   chains: Chain[];
 }
 
+const IGNORE_CHAINS = ["agoric", "8ball"];
+
 export async function getChains() {
   const response = await axios.get<GetChainsResponse>(`${API_URL}/ibc/chains`);
 
   const chains = response.data.chains as Chain[];
 
-  return chains.filter((chain) => chain.chainName !== "agoric");
+  return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chainName));
 }
 
 interface TransferRouteRequestWithDestAsset {
