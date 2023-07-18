@@ -17,7 +17,9 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
-  const { client: walletClient } = useWalletClient();
+  const walletName = localStorage.getItem("cosmos-kit@2:core//current-wallet");
+
+  const { client: walletClient } = useWalletClient(walletName ?? undefined);
 
   const [txStatuses, setTxStatuses] = useState(() =>
     Array.from({ length: route.transactionCount }, () => "INIT")
