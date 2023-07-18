@@ -3,7 +3,7 @@ import { FC } from "react";
 const SkipBanner: FC = () => {
   return (
     <div className="bg-[#FF486E] font-semibold text-sm text-white py-2">
-      <div className="flex items-center justify-between gap-2 px-4 max-w-screen-lg mx-auto">
+      <div className="flex items-center justify-between gap-2 px-6 w-[400px]">
         <p>Powered by the Skip API </p>
         <a
           className="bg-indigo-400 px-2 py-1 pr-1 rounded inline-flex items-center gap-1 hover:underline"

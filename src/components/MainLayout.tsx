@@ -13,7 +13,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       <main className="px-4 pt-4 pb-24">
         <div className="w-full max-w-screen-xl mx-auto">{children}</div>
       </main>
-      <div className="fixed right-0 bottom-0 lg:bottom-auto lg:top-11 flex items-center p-6 max-w-[400px] z-[999]">
+      <div className="fixed left-0 bottom-0 lg:bottom-auto lg:top-11 flex items-center p-6 max-w-[400px] z-[999]">
         <BetaBanner />
       </div>
     </div>
