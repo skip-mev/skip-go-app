@@ -373,11 +373,12 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    if (!feeInfo.average_gas_price) {
-      throw new Error("no average gas price found");
+    let averageGasPrice = 0;
+    if (feeInfo.average_gas_price) {
+      averageGasPrice = feeInfo.average_gas_price;
     }
 
-    const amountNeeded = feeInfo.average_gas_price * 200000;
+    const amountNeeded = averageGasPrice * 200000;
 
     const balance = await client.getBalance(
       userAddresses[multiHopMsg.chain_id],
@@ -426,7 +427,7 @@ export async function executeRoute(
         signer,
         {
           gasPrice: GasPrice.fromString(
-            `${feeInfo.average_gas_price}${feeInfo.denom}`
+            `${feeInfo.average_gas_price ?? 0}${feeInfo.denom}`
           ),
         }
       );
