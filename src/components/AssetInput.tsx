@@ -41,6 +41,8 @@ const AssetInput: FC<Props> = ({
     return assetsByChainID(chain.chain_id);
   }, [assetsByChainID, chain, getNativeAssets]);
 
+  // console.log(assets);
+
   const showChainInfo = chain ? false : true;
 
   const { address } = useChain(chain?.record?.name ?? "cosmoshub");
