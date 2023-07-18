@@ -27,11 +27,17 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
   const filteredChains = useMemo(() => {
     if (!searchValue) return chains;
     return chains.filter((chain) => {
-      if (chain.chain_id.toLowerCase().includes(searchValue.toLowerCase())) {
+      if (
+        chain.chain_id &&
+        chain.chain_id.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
         return true;
       }
 
-      if (chain.chain_name.toLowerCase().includes(searchValue.toLowerCase())) {
+      if (
+        chain.chain_name &&
+        chain.chain_name.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
         return true;
       }
 
