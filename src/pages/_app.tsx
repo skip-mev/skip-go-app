@@ -203,11 +203,7 @@ export default function App({ Component, pageProps }: AppProps) {
               chains={chains}
               assetLists={assets}
               // @ts-ignore
-              wallets={[
-                keplrWallets[0],
-                // ...cosmostationWallets,
-                // leapWallets[0],
-              ]}
+              wallets={wallets}
               signerOptions={{
                 signingStargate: (chain) => {
                   chain.fees?.fee_tokens;
@@ -216,6 +212,8 @@ export default function App({ Component, pageProps }: AppProps) {
                   };
                 },
               }}
+              // @ts-ignore
+              throwErrors={false}
               wrappedWithChakra
             >
               <ChainsProvider>
