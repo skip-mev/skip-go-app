@@ -46,13 +46,19 @@ export function useRoute(
         return;
       }
 
-      return getRoute({
+      const route = await getRoute({
         amount_in: amountIn,
         source_asset_denom: sourceAsset,
         source_asset_chain_id: sourceAssetChainID,
         dest_asset_denom: destinationAsset,
         dest_asset_chain_id: destinationAssetChainID,
       });
+
+      if (!route.operations) {
+        throw new Error("No route found");
+      }
+
+      return route;
     },
     refetchInterval: false,
     refetchOnMount: false,
