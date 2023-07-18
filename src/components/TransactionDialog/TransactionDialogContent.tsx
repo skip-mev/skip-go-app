@@ -1,5 +1,5 @@
 import { FC, Fragment, useState } from "react";
-import { useWalletClient } from "@cosmos-kit/react";
+import { useChain, useManager, useWalletClient } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import Toast from "@/elements/Toast";
 import { executeRoute } from "@/solve/form";
@@ -19,7 +19,11 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
 
   const walletName = localStorage.getItem("cosmos-kit@2:core//current-wallet");
 
-  const { client: walletClient } = useWalletClient(walletName ?? undefined);
+  const chain = useChain(route.sourceChain.record?.name ?? "");
+
+  const walletClient = chain.chainWallet?.client;
+
+  // const { client: walletClient } = useWalletClient(walletName ?? undefined);
 
   const [txStatuses, setTxStatuses] = useState(() =>
     Array.from({ length: route.transactionCount }, () => "INIT")
