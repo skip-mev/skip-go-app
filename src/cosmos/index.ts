@@ -72,13 +72,13 @@ export function useBalancesByChain(
   enabled: boolean = true
 ) {
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain?.chainId],
+    queryKey: ["balances-by-chain", address, chain?.chain_id],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
       }
 
-      const balances = await getBalancesByChain(address, chain.chainId);
+      const balances = await getBalancesByChain(address, chain.chain_id);
 
       return balances;
     },

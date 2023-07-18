@@ -1,10 +1,10 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { FC, Fragment, useState } from "react";
+import { useWalletClient } from "@cosmos-kit/react";
+import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
+import Toast from "@/elements/Toast";
+import { executeRoute } from "@/solve/form";
 import RouteDisplay from "../RouteDisplay";
 import { Route } from ".";
-import { executeRoute } from "@/solve/form";
-import Toast from "@/elements/Toast";
-import { useWallet, useWalletClient } from "@cosmos-kit/react";
 
 interface Props {
   route: Route;

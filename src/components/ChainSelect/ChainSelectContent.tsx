@@ -27,11 +27,11 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
   const filteredChains = useMemo(() => {
     if (!searchValue) return chains;
     return chains.filter((chain) => {
-      if (chain.chainId.toLowerCase().includes(searchValue.toLowerCase())) {
+      if (chain.chain_id.toLowerCase().includes(searchValue.toLowerCase())) {
         return true;
       }
 
-      if (chain.chainName.toLowerCase().includes(searchValue.toLowerCase())) {
+      if (chain.chain_name.toLowerCase().includes(searchValue.toLowerCase())) {
         return true;
       }
 
@@ -92,7 +92,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
-                  key={chain.chainId}
+                  key={chain.chain_id}
                   onClick={() => {
                     onChange(chain);
                   }}
@@ -101,7 +101,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
                     src={`${chainNameToChainlistURL(
-                      chain.chainName
+                      chain.chain_name
                     )}/chainImg/_chainImg.svg`}
                     onError={(e) =>
                       (e.currentTarget.src =
@@ -110,7 +110,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                   />
                   <div>
                     <p className="font-semibold text-lg">{chain.prettyName}</p>
-                    <p className="text-sm text-neutral-500">{chain.chainId}</p>
+                    <p className="text-sm text-neutral-500">{chain.chain_id}</p>
                   </div>
                 </button>
               );

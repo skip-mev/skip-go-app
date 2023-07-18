@@ -2,7 +2,7 @@ import { FC, Fragment, useState } from "react";
 import TransactionDialogTrigger from "./TransactionDialogTrigger";
 import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 import TransactionDialogContent from "./TransactionDialogContent";
-import { IBCHop, SwapRouteResponse } from "@/solve";
+import { Operation, RouteResponse } from "@/solve";
 import { Asset } from "@/cosmos";
 import { Chain } from "@/context/chains";
 import { ActionType } from "@/solve/form";
@@ -15,8 +15,9 @@ export interface Route {
   destinationAsset: Asset;
   destinationChain: Chain;
   actionType: ActionType;
-  data: SwapRouteResponse | IBCHop[];
+  operations: Operation[];
   transactionCount: number;
+  rawRoute: RouteResponse;
 }
 
 interface Props {

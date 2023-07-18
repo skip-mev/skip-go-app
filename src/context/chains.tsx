@@ -25,10 +25,10 @@ export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
     supportedChains
       ? supportedChains.map((c) => {
           const record = chainRecords.find(
-            (record) => record.chain.chain_id === c.chainId
+            (record) => record.chain.chain_id === c.chain_id
           );
 
-          const prettyName = record?.chain.pretty_name ?? c.chainName;
+          const prettyName = record?.chain.pretty_name ?? c.chain_name;
 
           return {
             ...c,
@@ -38,8 +38,8 @@ export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       : []
   ).sort((a, b) => {
-    const repoA = walletRepos.find((repo) => repo.chainName === a.chainName);
-    const repoB = walletRepos.find((repo) => repo.chainName === b.chainName);
+    const repoA = walletRepos.find((repo) => repo.chainName === a.chain_name);
+    const repoB = walletRepos.find((repo) => repo.chainName === b.chain_name);
 
     if (repoA && repoB) {
       if (repoA.current && !repoB.current) {

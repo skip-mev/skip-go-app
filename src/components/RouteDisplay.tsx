@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC, Fragment, useMemo, useState } from "react";
-import { Route } from "./TransactionDialog";
-import { IBCHop, SwapRouteResponse } from "@/solve";
+import { isSwapOperation } from "@/solve";
 import { Chain, useChains } from "@/context/chains";
-import { Asset, chainNameToChainlistURL } from "@/cosmos";
+import { chainNameToChainlistURL } from "@/cosmos";
 import { SWAP_VENUES } from "@/config";
 import { useAssets } from "@/context/assets";
+import { Route } from "./TransactionDialog";
 
 interface TransferAction {
   type: "TRANSFER";
@@ -23,87 +23,6 @@ interface SwapAction {
 }
 
 type Action = TransferAction | SwapAction;
-
-function getActionsFromSwapRoute(route: SwapRouteResponse) {
-  const actions: Action[] = [];
-
-  route.preSwapHops.forEach((hop, i) => {
-    const asset =
-      i === 0 ? route.sourceAsset.denom : route.preSwapHops[i - 1].destDenom;
-    const sourceChain = hop.chainId;
-
-    const destinationChain =
-      i === route.preSwapHops.length - 1
-        ? route.userSwap.swapVenue.chainId
-        : route.preSwapHops[i + 1].chainId;
-
-    actions.push({
-      type: "TRANSFER",
-      asset,
-      sourceChain,
-      destinationChain,
-    });
-  });
-
-  for (const swap of route.userSwap.swapOperations) {
-    actions.push({
-      type: "SWAP",
-      sourceAsset: swap.denomIn,
-      destinationAsset: swap.denomOut,
-      chain: route.userSwap.swapVenue.chainId,
-      venue: route.userSwap.swapVenue.name,
-    });
-  }
-
-  route.postSwapHops.forEach((hop, i) => {
-    const asset =
-      i === 0
-        ? route.userSwap.swapOperations[
-            route.userSwap.swapOperations.length - 1
-          ].denomOut
-        : route.postSwapHops[i - 1].destDenom;
-
-    const sourceChain = hop.chainId;
-
-    const destinationChain =
-      i === route.postSwapHops.length - 1
-        ? route.destAsset.chainId
-        : route.postSwapHops[i + 1].chainId;
-
-    actions.push({
-      type: "TRANSFER",
-      asset,
-      sourceChain,
-      destinationChain,
-    });
-  });
-
-  return actions;
-}
-
-function getActionsFromTransferRoute(
-  sourceAsset: Asset,
-  sourceChain: Chain,
-  destinationAsset: Asset,
-  destinationChain: Chain,
-  hops: IBCHop[]
-) {
-  const actions: Action[] = [];
-
-  for (let i = 0; i < hops.length; i++) {
-    const hop = hops[i];
-
-    actions.push({
-      type: "TRANSFER",
-      asset: i === 0 ? sourceAsset.denom : hops[i - 1].destDenom,
-      sourceChain: hop.chainId,
-      destinationChain:
-        i === hops.length - 1 ? destinationChain.chainId : hops[i + 1].chainId,
-    });
-  }
-
-  return actions;
-}
 
 const RouteEnd: FC<{
   amount: string;
@@ -127,23 +46,24 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  console.log(action);
-
   const { chains } = useChains();
 
   const sourceChain = chains.find(
-    (c) => c.chainId === action.sourceChain
+    (c) => c.chain_id === action.sourceChain
   ) as Chain;
 
   const destinationChain = chains.find(
-    (c) => c.chainId === action.destinationChain
+    (c) => c.chain_id === action.destinationChain
   ) as Chain;
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, sourceChain.chainId);
-  console.log(asset);
+  const asset = getAsset(action.asset, sourceChain.chain_id);
+
+  // console.log(asset);
+
   if (!asset) {
+    console.log(action);
     return null;
   }
 
@@ -164,7 +84,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              sourceChain.chainName
+              sourceChain.chain_name
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -175,7 +95,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              destinationChain.chainName
+              destinationChain.chain_name
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -191,13 +111,13 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
   const { chains } = useChains();
 
-  const chain = chains.find((c) => c.chainId === action.chain) as Chain;
+  const chain = chains.find((c) => c.chain_id === action.chain) as Chain;
 
   const { getAsset } = useAssets();
 
-  const assetIn = getAsset(action.sourceAsset, chain.chainId);
+  const assetIn = getAsset(action.sourceAsset, chain.chain_id);
 
-  const assetOut = getAsset(action.destinationAsset, chain.chainId);
+  const assetOut = getAsset(action.destinationAsset, chain.chain_id);
 
   const venue = SWAP_VENUES[action.venue];
 
@@ -254,29 +174,68 @@ const RouteDisplay: FC<Props> = ({ route }) => {
   } = route;
 
   const actions = useMemo(() => {
-    if (route.actionType === "SWAP") {
-      return getActionsFromSwapRoute(route.data as SwapRouteResponse);
-    }
+    const _actions: Action[] = [];
 
-    if (route.actionType === "TRANSFER") {
-      return getActionsFromTransferRoute(
-        sourceAsset,
+    let asset = route.sourceAsset.denom;
+
+    // console.log(route);
+
+    route.operations.forEach((operation, i) => {
+      if (isSwapOperation(operation)) {
+        if (operation.swap.swap_in) {
+          _actions.push({
+            type: "SWAP",
+            sourceAsset: operation.swap.swap_in.swap_operations[0].denom_in,
+            destinationAsset:
+              operation.swap.swap_in.swap_operations[
+                operation.swap.swap_in.swap_operations.length - 1
+              ].denom_out,
+            chain: operation.swap.swap_in.swap_venue.chain_id,
+            venue: operation.swap.swap_in.swap_venue.name,
+          });
+
+          asset =
+            operation.swap.swap_in.swap_operations[
+              operation.swap.swap_in.swap_operations.length - 1
+            ].denom_out;
+        }
+
+        // TODO: do something
+        return;
+      }
+
+      const sourceChain = operation.transfer.chain_id;
+
+      let destinationChain = "";
+      if (i === route.operations.length - 1) {
+        destinationChain = route.destinationChain.chain_id;
+      } else {
+        const nextOperation = route.operations[i + 1];
+        if (isSwapOperation(nextOperation)) {
+          if (nextOperation.swap.swap_in) {
+            destinationChain = nextOperation.swap.swap_in.swap_venue.chain_id;
+          }
+
+          if (nextOperation.swap.swap_out) {
+            destinationChain = nextOperation.swap.swap_out.swap_venue.chain_id;
+          }
+        } else {
+          destinationChain = nextOperation.transfer.chain_id;
+        }
+      }
+
+      _actions.push({
+        type: "TRANSFER",
+        asset,
         sourceChain,
-        destinationAsset,
         destinationChain,
-        route.data as IBCHop[]
-      );
-    }
+      });
 
-    return [];
-  }, [
-    destinationAsset,
-    destinationChain,
-    route.actionType,
-    route.data,
-    sourceAsset,
-    sourceChain,
-  ]);
+      asset = operation.transfer.dest_denom;
+    });
+
+    return _actions;
+  }, [route]);
 
   return (
     <div className="relative h-full">

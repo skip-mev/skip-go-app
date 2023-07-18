@@ -1,16 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
 import { Chain, useChains } from "@/context/chains";
 import { Asset, useBalancesByChain } from "@/cosmos";
-import { use, useEffect, useMemo, useState } from "react";
-import { IBCAddress, IBCDenom, IBCHop } from "./types";
-import { useCompareDenoms, useSwapRoute, useTransferRoute } from "./queries";
+import { Operation, Swap, SwapOperation, isSwapOperation } from "./types";
+import { useRoute } from "./queries";
 import { ethers } from "ethers";
 import { Route } from "@/components/TransactionDialog";
-import {
-  SwapMsgsRequest,
-  SwapRouteResponse,
-  getSwapMessages,
-  getTransferMsgs,
-} from "./api";
 import {
   enableChains,
   getAccount,
@@ -31,6 +25,7 @@ import { useChain } from "@cosmos-kit/react";
 import { MsgTransfer } from "@injectivelabs/sdk-ts";
 import { useToast } from "@/context/toast";
 import { WalletClient } from "@cosmos-kit/core";
+import { MsgsRequest, getMessages } from "./api";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -45,8 +40,6 @@ export interface FormValues {
 }
 
 export function useSolveForm() {
-  const { toast } = useToast();
-
   const { chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
@@ -61,14 +54,14 @@ export function useSolveForm() {
         localStorage.getItem("IBC_DOT_FUN__LAST_SOURCE_CHAIN") ?? "cosmoshub-4";
       setFormValues((values) => ({
         ...values,
-        sourceChain: chains.find((chain) => chain.chainId === chainID),
+        sourceChain: chains.find((chain) => chain.chain_id === chainID),
       }));
     }
   }, [chains, formValues.sourceChain]);
 
   useEffect(() => {
     if (formValues.sourceChain && !formValues.sourceAsset) {
-      const feeAsset = getFeeDenom(formValues.sourceChain.chainId);
+      const feeAsset = getFeeDenom(formValues.sourceChain.chain_id);
 
       if (feeAsset) {
         setFormValues((values) => ({
@@ -76,7 +69,7 @@ export function useSolveForm() {
           sourceAsset: feeAsset,
         }));
       } else {
-        const assets = assetsByChainID(formValues.sourceChain.chainId);
+        const assets = assetsByChainID(formValues.sourceChain.chain_id);
         if (assets.length > 0) {
           setFormValues((values) => ({
             ...values,
@@ -95,7 +88,7 @@ export function useSolveForm() {
   useEffect(() => {
     if (formValues.destinationAsset && !formValues.destinationChain) {
       const chain = chains.find(
-        (c) => c.chainId === formValues.destinationAsset?.chainID
+        (c) => c.chain_id === formValues.destinationAsset?.chainID
       );
 
       if (chain) {
@@ -109,7 +102,7 @@ export function useSolveForm() {
 
   useEffect(() => {
     if (formValues.destinationChain && !formValues.destinationAsset) {
-      const feeAsset = getFeeDenom(formValues.destinationChain.chainId);
+      const feeAsset = getFeeDenom(formValues.destinationChain.chain_id);
 
       if (feeAsset) {
         setFormValues((values) => ({
@@ -117,7 +110,7 @@ export function useSolveForm() {
           destinationAsset: feeAsset,
         }));
       } else {
-        const assets = assetsByChainID(formValues.destinationChain.chainId);
+        const assets = assetsByChainID(formValues.destinationChain.chain_id);
         if (assets.length > 0) {
           setFormValues((values) => ({
             ...values,
@@ -138,7 +131,7 @@ export function useSolveForm() {
     if (formValues.sourceChain) {
       localStorage.setItem(
         "IBC_DOT_FUN__LAST_SOURCE_CHAIN",
-        formValues.sourceChain.chainId
+        formValues.sourceChain.chain_id
       );
     }
   }, [formValues.sourceChain]);
@@ -157,125 +150,90 @@ export function useSolveForm() {
     }
   }, [formValues.amountIn, formValues.sourceAsset]);
 
-  const denomIn = useMemo(() => {
-    if (!formValues.sourceAsset || !formValues.sourceChain) {
-      return undefined;
-    }
+  // const denomIn = useMemo(() => {
+  //   if (!formValues.sourceAsset || !formValues.sourceChain) {
+  //     return undefined;
+  //   }
 
-    return {
-      denom: formValues.sourceAsset.denom,
-      chainId: formValues.sourceChain.chainId,
-    } as IBCDenom;
-  }, [formValues.sourceAsset, formValues.sourceChain]);
+  //   return {
+  //     denom: formValues.sourceAsset.denom,
+  //     chainId: formValues.sourceChain.chain_id,
+  //   } as IBCDenom;
+  // }, [formValues.sourceAsset, formValues.sourceChain]);
 
-  const denomOut = useMemo(() => {
-    if (!formValues.destinationAsset || !formValues.destinationChain) {
-      return undefined;
-    }
+  // const denomOut = useMemo(() => {
+  //   if (!formValues.destinationAsset || !formValues.destinationChain) {
+  //     return undefined;
+  //   }
 
-    return {
-      denom: formValues.destinationAsset.denom,
-      chainId: formValues.destinationChain.chainId,
-    } as IBCDenom;
-  }, [formValues.destinationAsset, formValues.destinationChain]);
-
-  const { data: compareDenomsResponse } = useCompareDenoms(
-    [denomIn, denomOut].filter(Boolean) as IBCDenom[],
-    {
-      onError: (err: any) => {
-        toast("Error comparing assets", err.message);
-      },
-    }
-  );
+  //   return {
+  //     denom: formValues.destinationAsset.denom,
+  //     chainId: formValues.destinationChain.chain_id,
+  //   } as IBCDenom;
+  // }, [formValues.destinationAsset, formValues.destinationChain]);
 
   // Use compare denom response to determine whether we are performing a transfer or swap
-  const actionType: ActionType = useMemo(() => {
-    if (!compareDenomsResponse) {
-      return "NONE";
-    }
-
-    if (compareDenomsResponse.same) {
-      return "TRANSFER";
-    }
-
-    return "SWAP";
-  }, [compareDenomsResponse]);
+  const actionType = "NONE";
 
   const {
-    data: transferRouteResponse,
-    fetchStatus: transferRouteFetchStatus,
-    isError: transferRouteHasError,
-  } = useTransferRoute(denomIn, denomOut, actionType === "TRANSFER");
-
-  const {
-    data: swapRouteResponse,
-    fetchStatus: swapRouteFetchStatus,
-    isError: swapRouteHasError,
-  } = useSwapRoute(amountInWei, denomIn, denomOut, actionType === "SWAP");
+    data: routeResponse,
+    fetchStatus: routeFetchStatus,
+    isError,
+  } = useRoute(
+    amountInWei,
+    formValues.sourceAsset?.denom,
+    formValues.sourceAsset?.chainID,
+    formValues.destinationAsset?.denom,
+    formValues.destinationAsset?.chainID,
+    true
+  );
 
   const routeLoading = useMemo(() => {
-    if (actionType === "TRANSFER") {
-      return transferRouteFetchStatus === "fetching";
-    }
-
-    if (actionType === "SWAP") {
-      return swapRouteFetchStatus === "fetching";
-    }
-
-    return false;
-  }, [actionType, swapRouteFetchStatus, transferRouteFetchStatus]);
-
-  const isError = useMemo(() => {
-    if (actionType === "TRANSFER") {
-      return transferRouteHasError;
-    }
-
-    if (actionType === "SWAP") {
-      return swapRouteHasError;
-    }
-
-    return false;
-  }, [actionType, swapRouteHasError, transferRouteHasError]);
+    return routeFetchStatus === "fetching";
+  }, [routeFetchStatus]);
 
   const amountOut = useMemo(() => {
-    if (transferRouteResponse) {
-      return formValues.amountIn;
+    if (!routeResponse) {
+      return "0.0";
     }
 
-    if (swapRouteResponse) {
+    if (routeResponse.does_swap && routeResponse.estimated_amount_out) {
       return ethers.formatUnits(
-        swapRouteResponse.userSwapAmountOut,
+        routeResponse.estimated_amount_out,
         formValues.destinationAsset?.decimals ?? 6
       );
     }
 
-    return "0.0";
+    return formValues.amountIn;
   }, [
     formValues.amountIn,
     formValues.destinationAsset?.decimals,
-    swapRouteResponse,
-    transferRouteResponse,
+    routeResponse,
   ]);
 
   const numberOfTransactions = useMemo(() => {
-    if (swapRouteResponse) {
+    if (!routeResponse) {
+      return 0;
+    }
+
+    if (routeResponse.does_swap) {
       return 1;
     }
 
-    if (transferRouteResponse) {
-      let n = 1;
+    let n = 1;
 
-      transferRouteResponse.forEach((hop, i) => {
-        if (i !== 0 && !hop.pfmEnabled) {
-          n += 1;
-        }
-      });
+    routeResponse.operations.forEach((hop, i) => {
+      if (isSwapOperation(hop)) {
+        return;
+      }
 
-      return n;
-    }
+      if (i !== 0 && !hop.transfer.pfm_enabled) {
+        n += 1;
+      }
+    });
 
-    return 0;
-  }, [swapRouteResponse, transferRouteResponse]);
+    return n;
+  }, [routeResponse]);
 
   const route = useMemo(() => {
     if (
@@ -284,8 +242,8 @@ export function useSolveForm() {
       !formValues.destinationAsset ||
       !formValues.sourceChain ||
       !formValues.destinationChain ||
-      !amountOut ||
-      actionType === "NONE"
+      !routeResponse ||
+      !amountOut
     ) {
       return;
     }
@@ -297,14 +255,14 @@ export function useSolveForm() {
       sourceChain: formValues.sourceChain,
       destinationAsset: formValues.destinationAsset,
       destinationChain: formValues.destinationChain,
-      data: swapRouteResponse ?? transferRouteResponse ?? [],
+      operations: routeResponse?.operations ?? [],
       transactionCount: numberOfTransactions,
       actionType,
+      rawRoute: routeResponse,
     };
 
     return _route;
   }, [
-    actionType,
     amountOut,
     formValues.amountIn,
     formValues.destinationAsset,
@@ -312,15 +270,14 @@ export function useSolveForm() {
     formValues.sourceAsset,
     formValues.sourceChain,
     numberOfTransactions,
-    swapRouteResponse,
-    transferRouteResponse,
+    routeResponse,
   ]);
 
   const { address } = useChain(
-    formValues.sourceChain?.chainName ?? "cosmoshub"
+    formValues.sourceChain?.chain_name ?? "cosmoshub"
   );
 
-  const { data: balances, fetchStatus } = useBalancesByChain(
+  const { data: balances } = useBalancesByChain(
     address,
     formValues.sourceChain
   );
@@ -338,7 +295,6 @@ export function useSolveForm() {
 
     const balanceStr = balances[formValues.sourceAsset.denom] ?? "0";
 
-    // const balance = parseFloat(balances[formValues.sourceAsset.denom] ?? "0");
     const balance = parseFloat(
       ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals)
     );
@@ -370,264 +326,46 @@ export async function executeRoute(
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
-  try {
-    if (route.actionType === "SWAP") {
-      await executeSwapRoute(
-        walletClient,
-        route.data as SwapRouteResponse,
-        onTxSuccess
-      );
-    }
-
-    if (route.actionType === "TRANSFER") {
-      await executeTransferRoute(
-        walletClient,
-        ethers
-          .parseUnits(route.amountIn, route.sourceAsset.decimals)
-          .toString(),
-        route.sourceAsset,
-        route.sourceChain,
-        route.destinationAsset,
-        route.destinationChain,
-        route.data as IBCHop[],
-        onTxSuccess
-      );
-    }
-  } catch (e) {
-    onError(e);
-  }
-}
-
-async function executeTransferRoute(
-  walletClient: WalletClient,
-  amount: string,
-  sourceAsset: Asset,
-  sourceChain: Chain,
-  destinationAsset: Asset,
-  destinationChain: Chain,
-  hops: IBCHop[],
-  onTxSuccess: (tx: any, index: number) => void
-) {
-  const chainIDs = [
-    ...hops.map((hop) => hop.chainId),
-    destinationChain.chainId,
-  ];
-
-  await enableChains(walletClient, chainIDs);
-
-  const userAddresses: Record<string, IBCAddress> = {};
-
-  // get addresses
-  for (const chainID of chainIDs) {
-    const address = await getAddressForChain(walletClient, chainID);
-
-    userAddresses[chainID] = {
-      address,
-      chainId: chainID,
-    };
-  }
-
-  const messages = await getTransferMsgs(
-    amount,
-    { denom: sourceAsset.denom, chainId: sourceChain.chainId },
-    destinationChain.chainId,
-    hops,
-    Object.values(userAddresses)
-  );
-
-  // check balances on chains where a tx is initiated
-  for (let i = 0; i < messages.length; i++) {
-    const multiHopMsg = messages[i];
-
-    const chain = getChainByID(multiHopMsg.chainId);
-
-    const client = await getStargateClientForChainID(multiHopMsg.chainId);
-
-    const feeInfo = chain.fees?.fee_tokens[0];
-
-    if (!feeInfo) {
-      throw new Error("No fee info found");
-    }
-
-    if (!feeInfo.average_gas_price) {
-      throw new Error("no average gas price found");
-    }
-
-    const amountNeeded = feeInfo.average_gas_price * 200000;
-
-    const balance = await client.getBalance(
-      userAddresses[multiHopMsg.chainId].address,
-      feeInfo.denom
-    );
-
-    if (parseInt(balance.amount) < amountNeeded) {
-      throw new Error(
-        `Insufficient fee token to initiate transfer on ${multiHopMsg.chainId}. Need ${amountNeeded} ${feeInfo.denom}, but only have ${balance.amount} ${feeInfo.denom}.`
-      );
-    }
-  }
-
-  for (let i = 0; i < messages.length; i++) {
-    const multiHopMsg = messages[i];
-
-    const account = await getAccount(walletClient, multiHopMsg.chainId);
-
-    let signer: OfflineSigner;
-    if (account.isNanoLedger) {
-      signer = await getOfflineSignerOnlyAmino(
-        walletClient,
-        multiHopMsg.chainId
-      );
-    } else {
-      signer = await getOfflineSigner(walletClient, multiHopMsg.chainId);
-    }
-
-    const chain = getChainByID(multiHopMsg.chainId);
-
-    const feeInfo = chain.fees?.fee_tokens[0];
-
-    if (!feeInfo) {
-      throw new Error("No fee info found");
-    }
-
-    const msgJSON = JSON.parse(multiHopMsg.msg);
-
-    const client = await getSigningStargateClientForChainID(
-      multiHopMsg.chainId,
-      signer,
-      {
-        gasPrice: GasPrice.fromString(
-          `${feeInfo.average_gas_price}${feeInfo.denom}`
-        ),
-      }
-    );
-
-    const msg = {
-      typeUrl: multiHopMsg.msgTypeUrl,
-      value: {
-        sourcePort: msgJSON.source_port,
-        sourceChannel: msgJSON.source_channel,
-        token: msgJSON.token,
-        sender: msgJSON.sender,
-        receiver: msgJSON.receiver,
-        timeoutHeight: msgJSON.timeout_height,
-        timeoutTimestamp: msgJSON.timeout_timestamp,
-        memo: msgJSON.memo,
-      },
-    };
-
-    if (multiHopMsg.chainId === "evmos_9001-2") {
-      await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
-        sourcePort: msgJSON.source_port,
-        sourceChannel: msgJSON.source_channel,
-        receiver: msgJSON.receiver,
-        timeoutTimestamp: msgJSON.timeout_timestamp,
-        memo: msgJSON.memo,
-        amount: msg.value.token.amount,
-        denom: msg.value.token.denom,
-        revisionNumber: 0,
-        revisionHeight: 0,
-      });
-    } else if (multiHopMsg.chainId === "injective-1") {
-      const tx = await signAndBroadcastInjective(
-        walletClient,
-        msgJSON.sender,
-        MsgTransfer.fromJSON({
-          amount: msgJSON.token,
-          memo: msgJSON.memo,
-          sender: msgJSON.sender,
-          port: msgJSON.source_port,
-          receiver: msgJSON.receiver,
-          channelId: msgJSON.source_channel,
-          timeout: msgJSON.timeout_timestamp,
-        })
-      );
-    } else {
-      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
-    }
-
-    const destinationChainID = multiHopMsg.path[multiHopMsg.path.length - 1];
-
-    const destinationChainClient = await getStargateClientForChainID(
-      destinationChainID
-    );
-
-    const destinationChainAddress = userAddresses[destinationChainID].address;
-
-    const denomOut: string =
-      i === messages.length - 1
-        ? destinationAsset.denom
-        : JSON.parse(messages[i + 1].msg).token.denom;
-
-    const balanceBefore = await destinationChainClient.getBalance(
-      destinationChainAddress,
-      denomOut
-    );
-
-    while (true) {
-      console.log("polling...");
-
-      const balance = await destinationChainClient.getBalance(
-        destinationChainAddress,
-        denomOut
-      );
-
-      if (parseInt(balance.amount) > parseInt(balanceBefore.amount)) {
-        break;
-      }
-
-      await wait(1000);
-    }
-
-    onTxSuccess({}, i);
-  }
-}
-
-async function executeSwapRoute(
-  walletClient: WalletClient,
-  route: SwapRouteResponse,
-  onTxSuccess: (tx: any, index: number) => void
-) {
-  // get all chain IDs in path and connect in keplr
-  const chainIDs = route.chainIds;
-
-  await enableChains(walletClient, chainIDs);
+  await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
 
   // get addresses
-  for (const chainID of chainIDs) {
+  for (const chainID of route.rawRoute.chain_ids) {
     const address = await getAddressForChain(walletClient, chainID);
+
     userAddresses[chainID] = address;
   }
 
-  const data: SwapMsgsRequest = {
-    preSwapHops: route.preSwapHops,
-    postSwapHops: route.postSwapHops,
+  const msgRequest: MsgsRequest = {
+    source_asset_denom: route.sourceAsset.denom,
+    source_asset_chain_id: route.sourceChain.chain_id,
+    dest_asset_denom: route.destinationAsset.denom,
+    dest_asset_chain_id: route.destinationChain.chain_id,
+    amount_in: ethers
+      .parseUnits(route.amountIn, route.sourceAsset.decimals)
+      .toString(),
+    chain_ids_to_addresses: userAddresses,
+    operations: route.operations,
 
-    chainIdsToAddresses: userAddresses,
-
-    sourceAsset: route.sourceAsset,
-    destAsset: route.destAsset,
-    amountIn: route.amountIn,
-
-    userSwap: route.userSwap,
-    userSwapAmountOut: route.userSwapAmountOut,
-    userSwapSlippageTolerancePercent: "5.0",
-
-    feeSwap: route.feeSwap,
+    estimated_amount_out: ethers
+      .parseUnits(route.amountOut, route.destinationAsset.decimals)
+      .toString(),
+    slippage_tolerance_percent: "5.0",
     affiliates: [],
   };
 
-  const msgsResponse = await getSwapMessages(data);
+  const msgsResponse = await getMessages(msgRequest);
+
+  // console.log(response);
 
   // check balances on chains where a tx is initiated
-  for (let i = 0; i < msgsResponse.requested.length; i++) {
-    const multiHopMsg = msgsResponse.requested[i];
+  for (let i = 0; i < msgsResponse.msgs.length; i++) {
+    const multiHopMsg = msgsResponse.msgs[i];
 
-    const chain = getChainByID(multiHopMsg.chainId);
+    const chain = getChainByID(multiHopMsg.chain_id);
 
-    const client = await getStargateClientForChainID(multiHopMsg.chainId);
+    const client = await getStargateClientForChainID(multiHopMsg.chain_id);
 
     const feeInfo = chain.fees?.fee_tokens[0];
 
@@ -642,35 +380,33 @@ async function executeSwapRoute(
     const amountNeeded = feeInfo.average_gas_price * 200000;
 
     const balance = await client.getBalance(
-      userAddresses[multiHopMsg.chainId],
+      userAddresses[multiHopMsg.chain_id],
       feeInfo.denom
     );
 
     if (parseInt(balance.amount) < amountNeeded) {
       throw new Error(
-        `Insufficient fee token to initiate transfer on ${multiHopMsg.chainId}. Need ${amountNeeded} ${feeInfo.denom}, but only have ${balance.amount} ${feeInfo.denom}.`
+        `Insufficient fee token to initiate transfer on ${multiHopMsg.chain_id}. Need ${amountNeeded} ${feeInfo.denom}, but only have ${balance.amount} ${feeInfo.denom}.`
       );
     }
   }
 
-  const messages = msgsResponse.requested;
+  for (let i = 0; i < msgsResponse.msgs.length; i++) {
+    const multiHopMsg = msgsResponse.msgs[i];
 
-  for (let i = 0; i < msgsResponse.requested.length; i++) {
-    const multiHopMsg = msgsResponse.requested[i];
-
-    const account = await getAccount(walletClient, multiHopMsg.chainId);
+    const account = await getAccount(walletClient, multiHopMsg.chain_id);
 
     let signer: OfflineSigner;
     if (account.isNanoLedger) {
       signer = await getOfflineSignerOnlyAmino(
         walletClient,
-        multiHopMsg.chainId
+        multiHopMsg.chain_id
       );
     } else {
-      signer = await getOfflineSigner(walletClient, multiHopMsg.chainId);
+      signer = await getOfflineSigner(walletClient, multiHopMsg.chain_id);
     }
 
-    const chain = getChainByID(multiHopMsg.chainId);
+    const chain = getChainByID(multiHopMsg.chain_id);
 
     const feeInfo = chain.fees?.fee_tokens[0];
 
@@ -683,10 +419,10 @@ async function executeSwapRoute(
     let msg: EncodeObject;
 
     if (
-      multiHopMsg.msgTypeUrl === "/ibc.applications.transfer.v1.MsgTransfer"
+      multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
       const client = await getSigningStargateClientForChainID(
-        multiHopMsg.chainId,
+        multiHopMsg.chain_id,
         signer,
         {
           gasPrice: GasPrice.fromString(
@@ -696,7 +432,7 @@ async function executeSwapRoute(
       );
 
       msg = {
-        typeUrl: multiHopMsg.msgTypeUrl,
+        typeUrl: multiHopMsg.msg_type_url,
         value: {
           sourcePort: msgJSON.source_port,
           sourceChannel: msgJSON.source_channel,
@@ -709,7 +445,7 @@ async function executeSwapRoute(
         },
       };
 
-      if (multiHopMsg.chainId === "evmos_9001-2") {
+      if (multiHopMsg.chain_id === "evmos_9001-2") {
         await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
           sourcePort: msgJSON.source_port,
           sourceChannel: msgJSON.source_channel,
@@ -721,7 +457,7 @@ async function executeSwapRoute(
           revisionNumber: 0,
           revisionHeight: 0,
         });
-      } else if (multiHopMsg.chainId === "injective-1") {
+      } else if (multiHopMsg.chain_id === "injective-1") {
         const tx = await signAndBroadcastInjective(
           walletClient,
           msgJSON.sender,
@@ -750,7 +486,7 @@ async function executeSwapRoute(
       };
 
       const client = await getSigningCosmWasmClientForChainID(
-        multiHopMsg.chainId,
+        multiHopMsg.chain_id,
         signer,
         {
           // @ts-ignore
@@ -764,9 +500,9 @@ async function executeSwapRoute(
     }
 
     const destinationChainID =
-      i === msgsResponse.requested.length - 1
-        ? route.destAsset.chainId
-        : msgsResponse.requested[i + 1].chainId;
+      i === msgsResponse.msgs.length - 1
+        ? route.destinationChain.chain_id
+        : msgsResponse.msgs[i + 1].chain_id;
 
     const destinationChainClient = await getStargateClientForChainID(
       destinationChainID
@@ -775,9 +511,9 @@ async function executeSwapRoute(
     const destinationChainAddress = userAddresses[destinationChainID];
 
     const denomOut: string =
-      i === messages.length - 1
-        ? route.destAsset.denom
-        : JSON.parse(messages[i + 1].msg).token.denom;
+      i === msgsResponse.msgs.length - 1
+        ? route.destinationAsset.denom
+        : JSON.parse(msgsResponse.msgs[i + 1].msg).token.denom;
 
     const balanceBefore = await destinationChainClient.getBalance(
       destinationChainAddress,

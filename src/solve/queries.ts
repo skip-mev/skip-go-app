@@ -1,13 +1,5 @@
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
-import {
-  SwapMsgsRequest,
-  SwapRouteResponse,
-  compareDenoms,
-  getChains,
-  getSwapRoute,
-  getTransferRoute,
-} from "./api";
-import { IBCDenom, IBCHop } from "./types";
+import { useQuery } from "@tanstack/react-query";
+import { getChains, getRoute } from "./api";
 
 interface QueryOptions {
   onError?: ((err: unknown) => void) | undefined;
@@ -27,81 +19,52 @@ export function useSolveChains() {
   });
 }
 
-export function useCompareDenoms(
-  assets: IBCDenom[],
-  options: QueryOptions = {}
-) {
-  return useQuery({
-    queryKey: ["solve-compare-denoms", ...assets],
-    queryFn: () => {
-      return compareDenoms(assets);
-    },
-    onError: options.onError,
-    retry: false,
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled: assets.length >= 2,
-  });
-}
-
-export function useTransferRoute(
-  sourceAsset?: IBCDenom,
-  destinationAsset?: IBCDenom,
-  enabled?: boolean
-) {
-  return useQuery({
-    queryKey: ["solve-transfer-route", sourceAsset, destinationAsset],
-    queryFn: async () => {
-      if (!sourceAsset || !destinationAsset) {
-        return [] as IBCHop[];
-      }
-
-      const response = await getTransferRoute(
-        sourceAsset.denom,
-        sourceAsset.chainId,
-        destinationAsset.denom,
-        destinationAsset.chainId
-      );
-
-      return response.requested;
-    },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled: enabled && !!sourceAsset && !!destinationAsset,
-  });
-}
-
-export function useSwapRoute(
+export function useRoute(
   amountIn: string,
-  sourceAsset?: IBCDenom,
-  destinationAsset?: IBCDenom,
+  sourceAsset?: string,
+  sourceAssetChainID?: string,
+  destinationAsset?: string,
+  destinationAssetChainID?: string,
   enabled?: boolean
 ) {
   return useQuery({
-    queryKey: ["solve-swap-route", amountIn, sourceAsset, destinationAsset],
+    queryKey: [
+      "solve-route",
+      amountIn,
+      sourceAsset,
+      destinationAsset,
+      sourceAssetChainID,
+      destinationAssetChainID,
+    ],
     queryFn: async () => {
-      if (!sourceAsset || !destinationAsset) {
-        return {} as SwapRouteResponse;
+      if (
+        !sourceAsset ||
+        !sourceAssetChainID ||
+        !destinationAsset ||
+        !destinationAssetChainID
+      ) {
+        return;
       }
 
-      const response = await getSwapRoute({
-        amountIn,
-        sourceAsset,
-        destAsset: destinationAsset,
-        cumulativeAffiliateFeeBps: "0",
+      return getRoute({
+        amount_in: amountIn,
+        source_asset_denom: sourceAsset,
+        source_asset_chain_id: sourceAssetChainID,
+        dest_asset_denom: destinationAsset,
+        dest_asset_chain_id: destinationAssetChainID,
       });
-
-      return response;
     },
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     retry: false,
-    enabled: enabled && !!sourceAsset && !!destinationAsset && amountIn !== "0",
+    enabled:
+      enabled &&
+      !!sourceAsset &&
+      !!destinationAsset &&
+      !!sourceAssetChainID &&
+      !!destinationAssetChainID &&
+      amountIn !== "0",
   });
 }
