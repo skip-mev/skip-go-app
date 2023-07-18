@@ -173,17 +173,7 @@ export default function App({ Component, pageProps }: AppProps) {
     ],
   });
 
-  const wallets = [keplrWallets[0]];
-
-  // @ts-ignore
-  if (isClient && window.cosmostation) {
-    wallets.push(...cosmostationWallets);
-  }
-
-  // @ts-ignore
-  if (isClient && window.leap) {
-    wallets.push(leapWallets[0]);
-  }
+  const wallets = [keplrWallets[0], ...cosmostationWallets, leapWallets[0]];
 
   return (
     <Fragment>
