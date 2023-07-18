@@ -21,12 +21,15 @@ import * as RadixToast from "@radix-ui/react-toast";
 import { AssetsProvider } from "@/context/assets";
 import { queryClient } from "@/utils/query";
 import { ToastProvider } from "@/context/toast";
+import { useIsClient } from "usehooks-ts";
 
 const jost = Jost({
   subsets: ["latin"],
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const isClient = useIsClient();
+
   chains.push({
     $schema: "../chain.schema.json",
     chain_name: "neutron",
@@ -170,6 +173,18 @@ export default function App({ Component, pageProps }: AppProps) {
     ],
   });
 
+  const wallets = [keplrWallets[0]];
+
+  // @ts-ignore
+  if (isClient && window.cosmostation) {
+    wallets.push(...cosmostationWallets);
+  }
+
+  // @ts-ignore
+  if (isClient && window.leap) {
+    wallets.push(leapWallets[0]);
+  }
+
   return (
     <Fragment>
       <Head>
@@ -190,8 +205,8 @@ export default function App({ Component, pageProps }: AppProps) {
               // @ts-ignore
               wallets={[
                 keplrWallets[0],
-                ...cosmostationWallets,
-                leapWallets[0],
+                // ...cosmostationWallets,
+                // leapWallets[0],
               ]}
               signerOptions={{
                 signingStargate: (chain) => {
