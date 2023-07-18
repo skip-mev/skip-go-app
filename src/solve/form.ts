@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chain, useChains } from "@/context/chains";
 import { Asset, useBalancesByChain } from "@/cosmos";
+import { chains } from "chain-registry";
 import { Operation, Swap, SwapOperation, isSwapOperation } from "./types";
 import { useRoute } from "./queries";
 import { ethers } from "ethers";
