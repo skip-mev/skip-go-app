@@ -2,7 +2,7 @@ import { FC } from "react";
 
 const SkipBanner: FC = () => {
   return (
-    <div className="bg-[#FF486E] font-semibold text-sm text-white py-2">
+    <div className="bg-[#FF486E] font-semibold text-sm text-white py-2 z-[9999999]">
       {/* animate-banner-rotate */}
       <a
         href="https://skip.money/docs/frontends"

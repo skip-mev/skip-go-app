@@ -29,11 +29,36 @@ const TransactionDialog: FC<Props> = ({ route }) => {
 
   return (
     <Fragment>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <div>
+        <button
+          className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+          disabled={!route}
+          onClick={() => setIsOpen(true)}
+        >
+          Submit
+        </button>
+        {isOpen && (
+          <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+            {route && (
+              <TransactionDialogContent
+                route={route}
+                onClose={() => setIsOpen(false)}
+              />
+            )}
+          </div>
+        )}
+      </div>
+      {/* <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger>
           <TransactionDialogTrigger disabled={!route} />
         </DialogTrigger>
-        <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+        <DialogContent
+          onInteractOutside={(event) => {
+            event.preventDefault();
+
+            console.log(event.currentTarget);
+          }}
+        >
           {route && (
             <TransactionDialogContent
               route={route}
@@ -41,7 +66,7 @@ const TransactionDialog: FC<Props> = ({ route }) => {
             />
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </Fragment>
   );
 };
