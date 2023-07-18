@@ -63,6 +63,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   // console.log(asset);
 
   if (!asset) {
+    console.log(action);
     return null;
   }
 

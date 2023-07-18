@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, createContext, useContext } from "react";
 import { Asset } from "@/cosmos";
-import { ASSET_LIST } from "../config/assets";
+import { ASSET_LIST, SKIP_ASSETS } from "../config/assets";
 import { useChains } from "./chains";
 
 interface AssetsContext {
@@ -27,7 +27,30 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getAsset(denom: string, chainID: string) {
-    return ASSET_LIST[chainID]?.find((asset) => asset.denom === denom);
+    const asset = ASSET_LIST[chainID]?.find((asset) => asset.denom === denom);
+
+    if (!asset) {
+      // @ts-ignore
+      const skipAsset = SKIP_ASSETS[chainID].assets.find(
+        // @ts-ignore
+        (asset) => asset.denom === denom
+      );
+
+      return {
+        denom: skipAsset.denom,
+        type: "ibc",
+        origin_chain: skipAsset.origin_chain_id,
+        origin_denom: skipAsset.origin_denom,
+        origin_type: "unknown",
+        symbol: skipAsset.symbol,
+        name: skipAsset.name,
+        image: skipAsset.logo_uri,
+        chainID: skipAsset.chain_id,
+        decimals: 6,
+      };
+    }
+
+    return asset;
   }
 
   function getFeeDenom(chainID: string) {
