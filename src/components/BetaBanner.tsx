@@ -1,24 +1,7 @@
-import { FC, useEffect, useState } from "react";
-import { useIsClient, useReadLocalStorage } from "usehooks-ts";
+import { FC, useState } from "react";
 
 const BetaBanner: FC = () => {
-  const showBannerPreference = useReadLocalStorage(
-    "IBC_DOT_FUN_SHOW_BETA_BANNER"
-  );
-
   const [shouldShow, setShouldShow] = useState(false);
-
-  const isClient = useIsClient();
-
-  useEffect(() => {
-    if (!isClient) {
-      return;
-    }
-
-    if (showBannerPreference === null || showBannerPreference === true) {
-      setShouldShow(true);
-    }
-  }, [isClient, showBannerPreference]);
 
   if (shouldShow === false) {
     return null;
