@@ -31,7 +31,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getFeeDenom(chainID: string) {
-    const chain = chains.find((c) => c.chainId === chainID);
+    const chain = chains.find((c) => c.chain_id === chainID);
 
     if (!chain || !chain.record?.chain.fees) {
       return undefined;

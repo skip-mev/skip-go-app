@@ -1,17 +1,7 @@
 import axios from "axios";
-import {
-  Affiliate,
-  Chain,
-  IBCAddress,
-  IBCDenom,
-  IBCHop,
-  MultiHopMsg,
-  Recommendation,
-  SwapExactCoinOut,
-  SwapIn,
-} from "./types";
+import { Affiliate, Chain, MultiChainMsg, Operation, SwapVenue } from "./types";
 
-const API_URL = "https://api.skip.money/v1";
+const API_URL = "https://solve-dev.skip.money/v1";
 
 interface GetChainsResponse {
   chains: Chain[];
@@ -20,165 +10,68 @@ interface GetChainsResponse {
 const IGNORE_CHAINS = ["agoric", "8ball"];
 
 export async function getChains() {
-  const response = await axios.get<GetChainsResponse>(`${API_URL}/ibc/chains`);
+  const response = await axios.get<GetChainsResponse>(`${API_URL}/info/chains`);
 
   const chains = response.data.chains as Chain[];
 
-  return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chainName));
+  return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chain_name));
 }
 
-interface TransferRouteRequestWithDestAsset {
-  sourceAsset: IBCDenom;
-  destAsset: IBCDenom;
+export interface RouteRequest {
+  source_asset_denom: string;
+  source_asset_chain_id: string;
+  dest_asset_denom: string;
+  dest_asset_chain_id: string;
+  amount_in: string;
+
+  cumulative_affiliate_fee_bps?: string;
+  swap_venue?: SwapVenue;
 }
 
-interface TransferRouteRequestWithDestAssetChainID {
-  sourceAsset: IBCDenom;
-  destAssetChainId: string;
+export interface RouteResponse {
+  source_asset_denom: string;
+  source_asset_chain_id: string;
+  dest_asset_denom: string;
+  dest_asset_chain_id: string;
+  amount_in: string;
+
+  operations: Operation[];
+  chain_ids: string[];
+
+  does_swap: boolean;
+  estimated_amount_out?: string;
+  swap_venue?: SwapVenue;
 }
 
-export type TransferRouteRequest =
-  | TransferRouteRequestWithDestAsset
-  | TransferRouteRequestWithDestAssetChainID;
-
-export interface TransferRouteResponse {
-  requested: IBCHop[];
-  recs: Recommendation[];
-}
-
-export async function getTransferRoute(
-  sourceAsset: string,
-  sourceChainID: string,
-  destAsset: string,
-  destChainID: string
-) {
-  const data = {
-    sourceAsset: {
-      denom: sourceAsset,
-      chainId: sourceChainID,
-    },
-    destAsset: destAsset
-      ? {
-          denom: destAsset,
-          chainId: destChainID,
-        }
-      : undefined,
-    destAssetChainId: !destAsset ? destChainID : undefined,
-  };
-
-  const response = await axios.post(`${API_URL}/ibc/transfer_route`, data);
-
-  return response.data as TransferRouteResponse;
-}
-
-export interface TransferMsgsRequest {
-  amount: string;
-  sourceAsset: IBCDenom;
-  destAssetChainId: string;
-  route: IBCHop[];
-  userAddresses: IBCAddress[];
-}
-
-export interface TransferMsgsResponse {
-  requested: MultiHopMsg[];
-}
-
-export async function getTransferMsgs(
-  amount: string,
-  sourceAsset: IBCDenom,
-  destAssetChainId: string,
-  route: IBCHop[],
-  userAddresses: IBCAddress[]
-) {
-  const data: TransferMsgsRequest = {
-    amount,
-    sourceAsset,
-    destAssetChainId,
-    route,
-    userAddresses,
-  };
-
-  const response = await axios.post(`${API_URL}/ibc/transfer_msgs`, data);
-
-  const responseData = response.data as TransferMsgsResponse;
-
-  return responseData.requested;
-}
-
-export interface SwapRouteRequest {
-  sourceAsset: IBCDenom;
-  destAsset: IBCDenom;
-  amountIn: string;
-  cumulativeAffiliateFeeBps: string;
-}
-
-export interface SwapRouteResponse {
-  preSwapHops: IBCHop[];
-  postSwapHops: IBCHop[];
-
-  chainIds: string[];
-
-  sourceAsset: IBCDenom;
-  destAsset: IBCDenom;
-
-  amountIn: string;
-
-  userSwap: SwapIn;
-  userSwapAmountOut: string;
-
-  feeSwap?: SwapExactCoinOut;
-
-  swapChainId: string;
-  totalAffiliateFee: string;
-}
-
-export async function getSwapRoute(request: SwapRouteRequest) {
-  const response = await axios.post(`${API_URL}/ibc/swap_route`, request);
-
-  return response.data as SwapRouteResponse;
-}
-
-export interface SwapMsgsRequest {
-  preSwapHops: IBCHop[];
-  postSwapHops: IBCHop[];
-
-  chainIdsToAddresses: Record<string, string>;
-
-  sourceAsset: IBCDenom;
-  destAsset: IBCDenom;
-  amountIn: string;
-
-  userSwap: SwapIn;
-  userSwapAmountOut: string;
-  userSwapSlippageTolerancePercent: string;
-
-  feeSwap?: SwapExactCoinOut;
-  affiliates: Affiliate[];
-}
-
-export interface SwapMsgsResponse {
-  requested: MultiHopMsg[];
-}
-
-export async function getSwapMessages(request: SwapMsgsRequest) {
-  const response = await axios.post(`${API_URL}/ibc/swap_msgs`, request);
-
-  return response.data as SwapMsgsResponse;
-}
-
-export interface CompareDenomsRequest {
-  assets: IBCDenom[];
-}
-
-export interface CompareDenomsResponse {
-  same: boolean;
-  originAsset: IBCDenom;
-}
-
-export async function compareDenoms(assets: IBCDenom[]) {
-  const response = await axios.post(`${API_URL}/ibc/compare_denoms`, {
-    assets,
+export async function getRoute(request: RouteRequest) {
+  const response = await axios.post(`${API_URL}/fungible/route`, {
+    ...request,
+    cumulative_affiliate_fee_bps: "0",
   });
 
-  return response.data as CompareDenomsResponse;
+  return response.data as RouteResponse;
+}
+
+export interface MsgsRequest {
+  source_asset_denom: string;
+  source_asset_chain_id: string;
+  dest_asset_denom: string;
+  dest_asset_chain_id: string;
+  amount_in: string;
+  chain_ids_to_addresses: Record<string, string>;
+  operations: Operation[];
+
+  estimated_amount_out?: string;
+  slippage_tolerance_percent?: string;
+  affiliates?: Affiliate[];
+}
+
+export interface MsgsResponse {
+  msgs: MultiChainMsg[];
+}
+
+export async function getMessages(request: MsgsRequest) {
+  const response = await axios.post(`${API_URL}/fungible/msgs`, request);
+
+  return response.data as MsgsResponse;
 }

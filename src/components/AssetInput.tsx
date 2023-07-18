@@ -38,7 +38,7 @@ const AssetInput: FC<Props> = ({
       return getNativeAssets();
     }
 
-    return assetsByChainID(chain.chainId);
+    return assetsByChainID(chain.chain_id);
   }, [assetsByChainID, chain, getNativeAssets]);
 
   const showChainInfo = chain ? false : true;

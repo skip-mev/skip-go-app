@@ -1,70 +1,88 @@
+import exp from "constants";
+
 export interface Chain {
-  chainId: string;
-  chainName: string;
-  pfmEnabled: boolean;
+  chain_name: string;
+  chain_id: string;
+  pfm_enabled: boolean;
+  cosmos_sdk_version: string;
+  modules: Record<string, ModuleVersionInfo>;
 }
 
-export interface IBCAddress {
-  address: string;
-  chainId: string;
-}
-
-export interface IBCDenom {
-  denom: string;
-  chainId: string;
-}
-
-export interface IBCHop {
-  port: string;
-  channel: string;
-  chainId: string;
-  pfmEnabled: boolean;
-  destDenom: string;
-}
-
-export interface Recommendation {
-  destAsset: IBCDenom;
-  reason: string;
-  route: IBCHop[];
-}
-
-export interface MultiHopMsg {
-  chainId: string;
-  path: string[];
-  msg: string;
-  msgTypeUrl: string;
+export interface ModuleVersionInfo {
+  path: string;
+  version: string;
+  sum: string;
 }
 
 export interface SwapVenue {
   name: string;
-  chainId: string;
-}
-
-export interface SwapIn {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  amountIn?: string;
+  chain_id: string;
 }
 
 export interface SwapOperation {
   pool: string;
-  denomIn: string;
-  denomOut: string;
-}
-
-export interface Swap {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  swapAmountIn: string;
+  denom_in: string;
+  denom_out: string;
 }
 
 export interface SwapExactCoinOut {
-  swapVenue: SwapVenue;
-  swapOperations: SwapOperation[];
-  swapAmountOut: string;
+  swap_venue: SwapVenue;
+  swap_operations: SwapOperation[];
+  swap_amount_out: string;
+}
+
+export interface SwapIn {
+  swap_venue: SwapVenue;
+  swap_operations: SwapOperation[];
+  swap_amount_in?: string;
+}
+
+export interface Transfer {
+  port: string;
+  channel: string;
+  chain_id: string;
+  pfm_enabled: boolean;
+  dest_denom: string;
+}
+
+export interface Swap {
+  swap_in?: SwapIn;
+  swap_out?: SwapExactCoinOut;
+  estimated_affiliate_fee?: string;
+}
+
+export interface OperationWithSwap {
+  swap: Swap;
+  transfer: never;
+}
+
+export interface OperationWithTransfer {
+  swap: never;
+  transfer: Transfer;
+}
+
+export type Operation = OperationWithSwap | OperationWithTransfer;
+
+export function isSwapOperation(
+  operation: Operation
+): operation is OperationWithSwap {
+  return operation.swap !== undefined;
+}
+
+export function isTransferOperation(
+  operation: Operation
+): operation is OperationWithTransfer {
+  return operation.transfer !== undefined;
 }
 
 export interface Affiliate {
-  basisPointsFee: string;
+  basis_points_fee: string;
   address: string;
+}
+
+export interface MultiChainMsg {
+  chain_id: string;
+  path: string[];
+  msg: string;
+  msg_type_url: string;
 }
