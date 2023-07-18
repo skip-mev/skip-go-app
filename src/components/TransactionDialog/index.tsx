@@ -35,7 +35,7 @@ const TransactionDialog: FC<Props> = ({ route }) => {
           disabled={!route}
           onClick={() => setIsOpen(true)}
         >
-          Submit
+          Preview Route
         </button>
         {isOpen && (
           <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
