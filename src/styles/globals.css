@@ -77,3 +77,16 @@
     transform: translateY(0);
   }
 }
+
+.animate-banner-rotate {
+  animation: banner-rotate 10s linear infinite;
+}
+
+@keyframes banner-rotate {
+  from {
+    transform: translateX(-975px);
+  }
+  to {
+    transform: translateX(-142px);
+  }
+}
