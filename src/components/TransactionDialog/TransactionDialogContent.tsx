@@ -185,6 +185,8 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
             )}
           </button>
         </div>
+
+        {route.rawRoute.chain_ids.length > 1 && (
         <div className="bg-red-50 text-red-400 rounded-md">
           <button
             className="bg-red-50 text-red-400 font-medium uppercase text-xs p-3 flex items-center gap-2 w-full text-left"
@@ -202,7 +204,7 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="flex-1">Execution Time Depends on IBC Relaying</span>
+              <span className="flex-1">Execution Time Depends on IBC Relaying</span>
             {!warningOpen && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +262,7 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
               </p>
             </div>
           )}
-        </div>
+        </div>)}
       </div>
       <Toast open={isError} setOpen={setIsError} description={txError ?? ""} />
     </Fragment>
