@@ -202,7 +202,7 @@ const TransactionDialogContent: FC<Props> = ({ route, onClose }) => {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="flex-1">Transaction Execution Time Depends on IBC Relaying</span>
+            <span className="flex-1">Execution Time Depends on IBC Relaying</span>
             {!warningOpen && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
