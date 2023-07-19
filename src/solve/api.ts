@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Affiliate, Chain, MultiChainMsg, Operation, SwapVenue } from "./types";
 
-const API_URL = "https://solve-dev.skip.money/v1";
+const API_URL = "https://api.skip.money/v1";
 
 interface GetChainsResponse {
   chains: Chain[];
