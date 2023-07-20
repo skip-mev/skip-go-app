@@ -48,12 +48,7 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
     name: "Astroport",
     imageURL: "https://avatars.githubusercontent.com/u/87135340",
   },
-  "osmosis-xcs": {
-    name: "Osmosis",
-    imageURL:
-      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
-  },
-  "osmosis-sq": {
+  "osmosis-poolmanager": {
     name: "Osmosis",
     imageURL:
       "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",

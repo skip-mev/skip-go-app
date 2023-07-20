@@ -419,7 +419,26 @@ export async function executeRoute(
     const msgJSON = JSON.parse(multiHopMsg.msg);
 
     let msg: EncodeObject;
+    const destinationChainID =
+      i === msgsResponse.msgs.length - 1
+        ? route.destinationChain.chain_id
+        : msgsResponse.msgs[i + 1].chain_id;
 
+    const destinationChainClient = await getStargateClientForChainID(
+      destinationChainID
+    );
+
+    const destinationChainAddress = userAddresses[destinationChainID];
+
+    const denomOut: string =
+      i === msgsResponse.msgs.length - 1
+        ? route.destinationAsset.denom
+        : JSON.parse(msgsResponse.msgs[i + 1].msg).token.denom;
+
+    const balanceBefore = await destinationChainClient.getBalance(
+      destinationChainAddress,
+      denomOut
+    );
     if (
       multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
@@ -497,31 +516,11 @@ export async function executeRoute(
           ),
         }
       );
-
+      
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
     }
 
-    const destinationChainID =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationChain.chain_id
-        : msgsResponse.msgs[i + 1].chain_id;
-
-    const destinationChainClient = await getStargateClientForChainID(
-      destinationChainID
-    );
-
-    const destinationChainAddress = userAddresses[destinationChainID];
-
-    const denomOut: string =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationAsset.denom
-        : JSON.parse(msgsResponse.msgs[i + 1].msg).token.denom;
-
-    const balanceBefore = await destinationChainClient.getBalance(
-      destinationChainAddress,
-      denomOut
-    );
-
+   
     while (true) {
       console.log("polling...");
 
