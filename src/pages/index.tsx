@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import va from "@vercel/analytics";
 import { useChains } from "@/context/chains";
 import AssetInput from "@/components/AssetInput";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
@@ -9,7 +10,6 @@ import TransactionDialog from "@/components/TransactionDialog";
 import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
-import va from "@vercel/analytics";
 
 export default function Home() {
   const { chains } = useChains();

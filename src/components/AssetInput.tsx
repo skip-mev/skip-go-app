@@ -7,6 +7,7 @@ import Toast from "@/elements/Toast";
 import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useAssets } from "@/context/assets";
+import { getFee } from "@/utils/utils";
 
 interface Props {
   amount: string;
@@ -31,7 +32,7 @@ const AssetInput: FC<Props> = ({
 }) => {
   const [isError, setIsError] = useState(false);
 
-  const { assetsByChainID, getNativeAssets } = useAssets();
+  const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
 
   const assets = useMemo(() => {
     if (!chain) {
@@ -40,8 +41,6 @@ const AssetInput: FC<Props> = ({
 
     return assetsByChainID(chain.chain_id);
   }, [assetsByChainID, chain, getNativeAssets]);
-
-  // console.log(assets);
 
   const showChainInfo = chain ? false : true;
 
@@ -134,11 +133,28 @@ const AssetInput: FC<Props> = ({
                     className="font-extrabold text-xs bg-neutral-400 text-white px-3 py-1 rounded-md transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed"
                     disabled={maxButtonDisabled}
                     onClick={() => {
-                      if (!selectedAssetBalance) {
+                      if (!selectedAssetBalance || !chain || !asset) {
                         return;
                       }
 
-                      onAmountChange?.(selectedAssetBalance);
+                      const feeDenom = getFeeDenom(chain.chain_id);
+
+                      let amount = selectedAssetBalance;
+
+                      // if selected asset is the fee denom, subtract the fee
+                      if (feeDenom && feeDenom.denom === asset.denom) {
+                        const fee = getFee(chain.chain_id);
+
+                        const feeInt = parseFloat(
+                          ethers.formatUnits(fee, asset.decimals)
+                        ).toFixed(asset.decimals);
+
+                        amount = (
+                          parseFloat(selectedAssetBalance) - parseFloat(feeInt)
+                        ).toFixed(asset.decimals);
+                      }
+
+                      onAmountChange?.(amount);
                     }}
                   >
                     MAX
