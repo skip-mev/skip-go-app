@@ -1,35 +1,28 @@
 import "../styles/globals.css";
+import "@interchain-ui/react/styles";
 
-import { Fragment } from "react";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { Jost } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
-
-import { wallets as keplrWallets } from "@cosmos-kit/keplr";
+import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
-import { wallets as leapWallets } from "@cosmos-kit/leap";
-
-import { ChakraProvider } from "@chakra-ui/react";
-import { ChainProvider, defaultTheme } from "@cosmos-kit/react";
+import { wallets as leapWallets } from "@cosmos-kit/leap-extension";
+import { ChainProvider } from "@cosmos-kit/react";
 import { chains, assets } from "chain-registry";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { GasPrice } from "@cosmjs/stargate";
+import * as RadixToast from "@radix-ui/react-toast";
 import MainLayout from "@/components/MainLayout";
 import { ChainsProvider } from "@/context/chains";
-import * as RadixToast from "@radix-ui/react-toast";
 import { AssetsProvider } from "@/context/assets";
 import { queryClient } from "@/utils/query";
 import { ToastProvider } from "@/context/toast";
-import { useIsClient } from "usehooks-ts";
 
 const jost = Jost({
   subsets: ["latin"],
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const isClient = useIsClient();
-
   chains.push({
     $schema: "../chain.schema.json",
     chain_name: "neutron",
@@ -173,10 +166,10 @@ export default function App({ Component, pageProps }: AppProps) {
     ],
   });
 
-  const wallets = [keplrWallets[0], ...cosmostationWallets, leapWallets[0]];
+  const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets];
 
   return (
-    <Fragment>
+    <>
       <Head>
         <title>
           ibc.fun | Interchain transfers and swaps on any Cosmos chain
@@ -188,41 +181,29 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <main className={jost.className}>
         <QueryClientProvider client={queryClient}>
-          <ChakraProvider theme={defaultTheme}>
-            <ChainProvider
-              chains={chains}
-              assetLists={assets}
-              // @ts-ignore
-              wallets={wallets}
-              signerOptions={{
-                signingStargate: (chain) => {
-                  chain.fees?.fee_tokens;
-                  return {
-                    gasPrice: GasPrice.fromString("0.025uosmo"),
-                  };
-                },
-              }}
-              // @ts-ignore
-              throwErrors={false}
-              wrappedWithChakra
-            >
-              <ChainsProvider>
-                <AssetsProvider>
-                  <RadixToast.ToastProvider>
-                    <ToastProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                    </ToastProvider>
-                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                  </RadixToast.ToastProvider>
-                </AssetsProvider>
-              </ChainsProvider>
-            </ChainProvider>
-          </ChakraProvider>
+          <ChainProvider
+            chains={chains}
+            assetLists={assets}
+            wallets={wallets}
+            wrappedWithChakra
+            throwErrors={false}
+          >
+            <ChainsProvider>
+              <AssetsProvider>
+                <RadixToast.ToastProvider>
+                  <ToastProvider>
+                    <MainLayout>
+                      <Component {...pageProps} />
+                    </MainLayout>
+                  </ToastProvider>
+                  <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
+                </RadixToast.ToastProvider>
+              </AssetsProvider>
+            </ChainsProvider>
+          </ChainProvider>
         </QueryClientProvider>
       </main>
       <Analytics />
-    </Fragment>
+    </>
   );
 }

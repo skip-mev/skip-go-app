@@ -22,9 +22,10 @@ export interface Route {
 
 interface Props {
   route?: Route;
+  insufficientBalance?: boolean;
 }
 
-const TransactionDialog: FC<Props> = ({ route }) => {
+const TransactionDialog: FC<Props> = ({ route, insufficientBalance }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -43,6 +44,7 @@ const TransactionDialog: FC<Props> = ({ route }) => {
               <TransactionDialogContent
                 route={route}
                 onClose={() => setIsOpen(false)}
+                insufficentBalance={insufficientBalance}
               />
             )}
           </div>

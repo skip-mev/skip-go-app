@@ -1,7 +1,8 @@
 import axios from "axios";
 import { Affiliate, Chain, MultiChainMsg, Operation, SwapVenue } from "./types";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skip.money/v1";
+
 interface GetChainsResponse {
   chains: Chain[];
 }
