@@ -204,7 +204,10 @@ export default function Home() {
           )}
           {sourceChain && walletConnectStatus === WalletStatus.Connected && (
             <div className="space-y-4">
-              <TransactionDialog route={route} />
+              <TransactionDialog
+                route={route}
+                insufficientBalance={insufficientBalance}
+              />
               {insufficientBalance && (
                 <p className="text-center font-semibold text-sm text-red-500">
                   Insufficient Balance
