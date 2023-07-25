@@ -516,11 +516,10 @@ export async function executeRoute(
           ),
         }
       );
-      
+
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
     }
 
-   
     while (true) {
       console.log("polling...");
 

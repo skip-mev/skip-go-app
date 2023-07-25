@@ -376,3 +376,22 @@ export async function getOfflineSignerOnlyAmino(
 
   throw new Error("unsupported wallet");
 }
+
+export function getFee(chainID: string) {
+  const chain = getChainByID(chainID);
+
+  const feeInfo = chain.fees?.fee_tokens[0];
+
+  if (!feeInfo) {
+    throw new Error("No fee info found");
+  }
+
+  let averageGasPrice = 0;
+  if (feeInfo.average_gas_price) {
+    averageGasPrice = feeInfo.average_gas_price;
+  }
+
+  const amountNeeded = averageGasPrice * 200000;
+
+  return amountNeeded;
+}

@@ -7,7 +7,7 @@ interface GetChainsResponse {
   chains: Chain[];
 }
 
-const IGNORE_CHAINS = ["agoric", "8ball"];
+const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
 
 export async function getChains() {
   const response = await axios.get<GetChainsResponse>(`${API_URL}/info/chains`);
