@@ -217,10 +217,6 @@ export function useSolveForm() {
       return 0;
     }
 
-    if (routeResponse.does_swap) {
-      return 1;
-    }
-
     let n = 1;
 
     routeResponse.operations.forEach((hop, i) => {
