@@ -84,7 +84,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              sourceChain.chain_name
+              sourceChain.chain_id
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -95,7 +95,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              destinationChain.chain_name
+              destinationChain.chain_id
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}

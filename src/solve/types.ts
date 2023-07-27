@@ -1,5 +1,3 @@
-import exp from "constants";
-
 export interface Chain {
   chain_name: string;
   chain_id: string;

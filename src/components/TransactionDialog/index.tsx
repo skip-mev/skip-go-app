@@ -1,6 +1,4 @@
 import { FC, Fragment, useState } from "react";
-import TransactionDialogTrigger from "./TransactionDialogTrigger";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 import TransactionDialogContent from "./TransactionDialogContent";
 import { Operation, RouteResponse } from "@/solve";
 import { Asset } from "@/cosmos";

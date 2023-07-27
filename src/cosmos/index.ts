@@ -1,7 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
+
 import { Chain } from "@/context/chains";
 import { getStargateClientForChainID } from "@/utils/utils";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
 export interface Asset {
   denom: string;

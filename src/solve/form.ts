@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chain, useChains } from "@/context/chains";
 import { Asset, useBalancesByChain } from "@/cosmos";
-import { chains } from "chain-registry";
-import { Operation, Swap, SwapOperation, isSwapOperation } from "./types";
+import { isSwapOperation } from "./types";
 import { useRoute } from "./queries";
 import { ethers } from "ethers";
 import { Route } from "@/components/TransactionDialog";
@@ -24,9 +23,9 @@ import { GasPrice } from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
 import { MsgTransfer } from "@injectivelabs/sdk-ts";
-import { useToast } from "@/context/toast";
 import { WalletClient } from "@cosmos-kit/core";
-import { MsgsRequest, getMessages } from "./api";
+import { useSkipClient } from "./hooks";
+import { SkipClient, MsgsRequest } from "./client";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,6 +40,8 @@ export interface FormValues {
 }
 
 export function useSolveForm() {
+  const skipClient = useSkipClient();
+
   const { chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
@@ -181,6 +182,7 @@ export function useSolveForm() {
     fetchStatus: routeFetchStatus,
     isError,
   } = useRoute(
+    skipClient,
     amountInWei,
     formValues.sourceAsset?.denom,
     formValues.sourceAsset?.chainID,
@@ -322,6 +324,7 @@ export function useSolveForm() {
 }
 
 export async function executeRoute(
+  skipClient: SkipClient,
   walletClient: WalletClient,
   route: Route,
   onTxSuccess: (tx: any, index: number) => void,
@@ -356,7 +359,7 @@ export async function executeRoute(
     affiliates: [],
   };
 
-  const msgsResponse = await getMessages(msgRequest);
+  const msgsResponse = await skipClient.fungible.getMessages(msgRequest);
 
   // console.log(response);
 

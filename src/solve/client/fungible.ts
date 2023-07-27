@@ -1,21 +1,5 @@
-import axios from "axios";
-import { Affiliate, Chain, MultiChainMsg, Operation, SwapVenue } from "./types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skip.money/v1";
-
-interface GetChainsResponse {
-  chains: Chain[];
-}
-
-const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
-
-export async function getChains() {
-  const response = await axios.get<GetChainsResponse>(`${API_URL}/info/chains`);
-
-  const chains = response.data.chains as Chain[];
-
-  return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chain_name));
-}
+import { AxiosInstance, AxiosResponse } from "axios";
+import { Affiliate, MultiChainMsg, Operation, SwapVenue } from "../types";
 
 export interface RouteRequest {
   source_asset_denom: string;
@@ -43,15 +27,6 @@ export interface RouteResponse {
   swap_venue?: SwapVenue;
 }
 
-export async function getRoute(request: RouteRequest) {
-  const response = await axios.post(`${API_URL}/fungible/route`, {
-    ...request,
-    cumulative_affiliate_fee_bps: "0",
-  });
-
-  return response.data as RouteResponse;
-}
-
 export interface MsgsRequest {
   source_asset_denom: string;
   source_asset_chain_id: string;
@@ -70,8 +45,33 @@ export interface MsgsResponse {
   msgs: MultiChainMsg[];
 }
 
-export async function getMessages(request: MsgsRequest) {
-  const response = await axios.post(`${API_URL}/fungible/msgs`, request);
+export class FungibleService {
+  private httpClient: AxiosInstance;
 
-  return response.data as MsgsResponse;
+  constructor(httpClient: AxiosInstance) {
+    this.httpClient = httpClient;
+  }
+
+  async getRoute(request: RouteRequest): Promise<RouteResponse> {
+    const response = await this.httpClient.post<
+      RouteResponse,
+      AxiosResponse<RouteResponse, any>,
+      RouteRequest
+    >("/fungible/route", {
+      ...request,
+      cumulative_affiliate_fee_bps: request.cumulative_affiliate_fee_bps ?? "0",
+    });
+
+    return response.data;
+  }
+
+  async getMessages(request: MsgsRequest): Promise<MsgsResponse> {
+    const response = await this.httpClient.post<
+      MsgsResponse,
+      AxiosResponse<MsgsResponse, any>,
+      MsgsRequest
+    >("/fungible/msgs", request);
+
+    return response.data;
+  }
 }

@@ -5,6 +5,7 @@ import Toast from "@/elements/Toast";
 import { executeRoute } from "@/solve/form";
 import RouteDisplay from "../RouteDisplay";
 import { Route } from ".";
+import { useSkipClient } from "@/solve";
 
 interface Props {
   route: Route;
@@ -17,6 +18,8 @@ const TransactionDialogContent: FC<Props> = ({
   onClose,
   insufficentBalance,
 }) => {
+  const skipClient = useSkipClient();
+
   const [transacting, setTransacting] = useState(false);
 
   const [isError, setIsError] = useState(false);
@@ -54,6 +57,7 @@ const TransactionDialogContent: FC<Props> = ({
       }
 
       await executeRoute(
+        skipClient,
         walletClient,
         route,
         (_, i) => {
