@@ -331,6 +331,8 @@ export async function executeRoute(
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
+  trackRoute(route);
+
   await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
@@ -537,6 +539,4 @@ export async function executeRoute(
 
     onTxSuccess({}, i);
   }
-
-  trackRoute(route);
 }
