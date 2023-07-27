@@ -1,6 +1,7 @@
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { ENDPOINTS, IGNORE_CHAINS, SkipClient } from "../client";
+import { ENDPOINTS, SkipClient } from "../client";
+import { IGNORE_CHAINS } from "../../../config";
 
 const handlers = [
   rest.post(ENDPOINTS.GET_ROUTE, async (req, res, ctx) => {
@@ -150,7 +151,7 @@ describe("SkipClient", () => {
 
   describe("/v1/info/chains", () => {
     it("filters ignored chains", async () => {
-      const client = new SkipClient();
+      const client = new SkipClient(IGNORE_CHAINS);
 
       const response = await client.chains();
 

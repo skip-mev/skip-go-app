@@ -1,3 +1,5 @@
+export const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
+
 export interface ChainConfig {
   id: string;
   name: string;

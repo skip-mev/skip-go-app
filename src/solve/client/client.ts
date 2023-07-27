@@ -10,18 +10,19 @@ export const ENDPOINTS = {
   GET_ROUTE: `${API_URL}/fungible/route`,
 };
 
-export const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
-
 interface GetChainsResponse {
   chains: Chain[];
 }
 
 export class SkipClient {
   private httpClient: AxiosInstance;
+  private ignoreChains: string[];
 
   public fungible: FungibleService;
 
-  constructor() {
+  constructor(ignoreChains: string[] = []) {
+    this.ignoreChains = ignoreChains;
+
     const agent = new https.Agent({
       keepAlive: true,
     });
@@ -41,6 +42,8 @@ export class SkipClient {
 
     const { chains } = response.data;
 
-    return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chain_id));
+    return chains.filter(
+      (chain) => !this.ignoreChains.includes(chain.chain_id)
+    );
   }
 }
