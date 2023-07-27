@@ -26,6 +26,7 @@ import { MsgTransfer } from "@injectivelabs/sdk-ts";
 import { WalletClient } from "@cosmos-kit/core";
 import { useSkipClient } from "./hooks";
 import { SkipClient, MsgsRequest } from "./client";
+import { trackRoute } from "@/analytics";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -536,4 +537,6 @@ export async function executeRoute(
 
     onTxSuccess({}, i);
   }
+
+  trackRoute(route);
 }
