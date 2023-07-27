@@ -5,11 +5,6 @@ import { FungibleService } from "./fungible";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skip.money/v1";
 
-export const ENDPOINTS = {
-  GET_CHAINS: `${API_URL}/info/chains`,
-  GET_ROUTE: `${API_URL}/fungible/route`,
-};
-
 interface GetChainsResponse {
   chains: Chain[];
 }
