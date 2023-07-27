@@ -21,11 +21,41 @@ export interface Chain {
   modules: Record<string, ModuleVersionInfo>;
 }
 
+export interface ChainTransaction {
+  chain_id: string;
+  tx_hash: string;
+}
+
 export interface ModuleVersionInfo {
   path: string;
   version: string;
   sum: string;
 }
+
+export interface Packet {
+  send_tx?: ChainTransaction;
+  receive_tx?: ChainTransaction;
+  acknowledge_tx?: ChainTransaction;
+  timeout_tx?: ChainTransaction;
+
+  error?: PacketError;
+}
+
+export interface PacketError {
+  code: number;
+  message: string;
+}
+
+export interface StatusError {
+  code: number;
+  message: string;
+}
+
+export type StatusState =
+  | "STATE_UNKNOWN"
+  | "STATE_SUBMITTED"
+  | "STATE_PENDING"
+  | "STATE_COMPLETED";
 
 export interface SwapVenue {
   name: string;
