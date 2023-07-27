@@ -1,3 +1,18 @@
+export interface Asset {
+  denom: string;
+  chain_id: string;
+
+  origin_denom: string;
+  origin_chain_id: string;
+
+  symbol?: string;
+  name?: string;
+  logo_uri?: string;
+  decimals?: number;
+}
+
+export type AssetWithMetadata = Required<Asset>;
+
 export interface Chain {
   chain_name: string;
   chain_id: string;

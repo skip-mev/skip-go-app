@@ -1,14 +1,24 @@
-import { FC, PropsWithChildren, createContext, useContext } from "react";
-import { Asset } from "@/cosmos";
-import { ASSET_LIST, SKIP_ASSETS } from "../config/assets";
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useMemo,
+} from "react";
 import { useChains } from "./chains";
+import {
+  AssetWithMetadata,
+  filterAssetsWithMetadata,
+  useSkipClient,
+  useAssets as useSolveAssets,
+} from "../solve";
 
 interface AssetsContext {
-  assets: Record<string, Asset[]>;
-  assetsByChainID: (chainID: string) => Asset[];
-  getAsset(denom: string, chainID: string): Asset | undefined;
-  getFeeDenom(chainID: string): Asset | undefined;
-  getNativeAssets(): Asset[];
+  assets: Record<string, AssetWithMetadata[]>;
+  assetsByChainID: (chainID: string) => AssetWithMetadata[];
+  getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
+  getFeeDenom(chainID: string): AssetWithMetadata | undefined;
+  getNativeAssets(): AssetWithMetadata[];
 }
 
 export const AssetsContext = createContext<AssetsContext>({
@@ -20,35 +30,31 @@ export const AssetsContext = createContext<AssetsContext>({
 });
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
+  const skipClient = useSkipClient();
+
   const { chains } = useChains();
 
+  const { data: solveAssets } = useSolveAssets(skipClient);
+
+  const assets = useMemo(() => {
+    if (!solveAssets) {
+      return {};
+    }
+
+    return Object.entries(solveAssets).reduce((acc, [chainID, assets]) => {
+      return {
+        ...acc,
+        [chainID]: filterAssetsWithMetadata(assets),
+      };
+    }, {} as Record<string, AssetWithMetadata[]>);
+  }, [solveAssets]);
+
   function assetsByChainID(chainID: string) {
-    return ASSET_LIST[chainID] || [];
+    return assets[chainID] || [];
   }
 
   function getAsset(denom: string, chainID: string) {
-    const asset = ASSET_LIST[chainID]?.find((asset) => asset.denom === denom);
-
-    if (!asset) {
-      // @ts-ignore
-      const skipAsset = SKIP_ASSETS[chainID].assets.find(
-        // @ts-ignore
-        (asset) => asset.denom === denom
-      );
-
-      return {
-        denom: skipAsset.denom,
-        type: "ibc",
-        origin_chain: skipAsset.origin_chain_id,
-        origin_denom: skipAsset.origin_denom,
-        origin_type: "unknown",
-        symbol: skipAsset.symbol,
-        name: skipAsset.name,
-        image: skipAsset.logo_uri,
-        chainID: skipAsset.chain_id,
-        decimals: 6,
-      };
-    }
+    const asset = assets[chainID]?.find((asset) => asset.denom === denom);
 
     return asset;
   }
@@ -66,11 +72,11 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getNativeAssets() {
-    const nativeAssets: Asset[] = [];
+    const nativeAssets: AssetWithMetadata[] = [];
 
-    for (const chainAssetList of Object.values(ASSET_LIST)) {
+    for (const chainAssetList of Object.values(assets)) {
       for (const asset of chainAssetList) {
-        if (asset.type === "native" || asset.type === "staking") {
+        if (asset.chain_id === asset.origin_chain_id) {
           nativeAssets.push(asset);
         }
       }
@@ -82,7 +88,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   return (
     <AssetsContext.Provider
       value={{
-        assets: ASSET_LIST,
+        assets,
         assetsByChainID,
         getAsset,
         getFeeDenom,

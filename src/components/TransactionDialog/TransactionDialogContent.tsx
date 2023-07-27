@@ -1,5 +1,5 @@
 import { FC, Fragment, useState } from "react";
-import { useChain, useManager, useWalletClient } from "@cosmos-kit/react";
+import { useChain, useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import Toast from "@/elements/Toast";
 import { executeRoute } from "@/solve/form";

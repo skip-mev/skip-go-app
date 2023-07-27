@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chain, useChains } from "@/context/chains";
-import { Asset, useBalancesByChain } from "@/cosmos";
-import { isSwapOperation } from "./types";
+import { useBalancesByChain } from "@/cosmos";
+import { AssetWithMetadata, isSwapOperation } from "./types";
 import { useRoute } from "./queries";
 import { ethers } from "ethers";
 import { Route } from "@/components/TransactionDialog";
@@ -34,9 +34,9 @@ export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 export interface FormValues {
   amountIn: string;
   sourceChain?: Chain;
-  sourceAsset?: Asset;
+  sourceAsset?: AssetWithMetadata;
   destinationChain?: Chain;
-  destinationAsset?: Asset;
+  destinationAsset?: AssetWithMetadata;
 }
 
 export function useSolveForm() {
@@ -90,7 +90,7 @@ export function useSolveForm() {
   useEffect(() => {
     if (formValues.destinationAsset && !formValues.destinationChain) {
       const chain = chains.find(
-        (c) => c.chain_id === formValues.destinationAsset?.chainID
+        (c) => c.chain_id === formValues.destinationAsset?.chain_id
       );
 
       if (chain) {
@@ -185,9 +185,9 @@ export function useSolveForm() {
     skipClient,
     amountInWei,
     formValues.sourceAsset?.denom,
-    formValues.sourceAsset?.chainID,
+    formValues.sourceAsset?.chain_id,
     formValues.destinationAsset?.denom,
-    formValues.destinationAsset?.chainID,
+    formValues.destinationAsset?.chain_id,
     true
   );
 
