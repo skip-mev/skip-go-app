@@ -26,6 +26,7 @@ import { MsgTransfer } from "@injectivelabs/sdk-ts";
 import { WalletClient } from "@cosmos-kit/core";
 import { useSkipClient } from "./hooks";
 import { SkipClient, MsgsRequest } from "./client";
+import { trackRoute } from "@/analytics";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -330,6 +331,8 @@ export async function executeRoute(
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
+  trackRoute(route);
+
   await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
