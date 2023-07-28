@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chain, useChains } from "@/context/chains";
-import { Asset, useBalancesByChain } from "@/cosmos";
-import { chains } from "chain-registry";
-import { Operation, Swap, SwapOperation, isSwapOperation } from "./types";
+import { useBalancesByChain } from "@/cosmos";
+import { AssetWithMetadata, isSwapOperation } from "./types";
 import { useRoute } from "./queries";
 import { ethers } from "ethers";
 import { Route } from "@/components/TransactionDialog";
@@ -24,9 +23,10 @@ import { GasPrice } from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
 import { MsgTransfer } from "@injectivelabs/sdk-ts";
-import { useToast } from "@/context/toast";
 import { WalletClient } from "@cosmos-kit/core";
-import { MsgsRequest, getMessages } from "./api";
+import { useSkipClient } from "./hooks";
+import { SkipClient, MsgsRequest } from "./client";
+import { trackRoute } from "@/analytics";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -35,12 +35,14 @@ export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 export interface FormValues {
   amountIn: string;
   sourceChain?: Chain;
-  sourceAsset?: Asset;
+  sourceAsset?: AssetWithMetadata;
   destinationChain?: Chain;
-  destinationAsset?: Asset;
+  destinationAsset?: AssetWithMetadata;
 }
 
 export function useSolveForm() {
+  const skipClient = useSkipClient();
+
   const { chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
@@ -89,7 +91,7 @@ export function useSolveForm() {
   useEffect(() => {
     if (formValues.destinationAsset && !formValues.destinationChain) {
       const chain = chains.find(
-        (c) => c.chain_id === formValues.destinationAsset?.chainID
+        (c) => c.chain_id === formValues.destinationAsset?.chain_id
       );
 
       if (chain) {
@@ -181,11 +183,12 @@ export function useSolveForm() {
     fetchStatus: routeFetchStatus,
     isError,
   } = useRoute(
+    skipClient,
     amountInWei,
     formValues.sourceAsset?.denom,
-    formValues.sourceAsset?.chainID,
+    formValues.sourceAsset?.chain_id,
     formValues.destinationAsset?.denom,
-    formValues.destinationAsset?.chainID,
+    formValues.destinationAsset?.chain_id,
     true
   );
 
@@ -215,10 +218,6 @@ export function useSolveForm() {
   const numberOfTransactions = useMemo(() => {
     if (!routeResponse) {
       return 0;
-    }
-
-    if (routeResponse.does_swap) {
-      return 1;
     }
 
     let n = 1;
@@ -322,11 +321,14 @@ export function useSolveForm() {
 }
 
 export async function executeRoute(
+  skipClient: SkipClient,
   walletClient: WalletClient,
   route: Route,
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
+  trackRoute(route);
+
   await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
@@ -356,9 +358,7 @@ export async function executeRoute(
     affiliates: [],
   };
 
-  const msgsResponse = await getMessages(msgRequest);
-
-  // console.log(response);
+  const msgsResponse = await skipClient.fungible.getMessages(msgRequest);
 
   // check balances on chains where a tx is initiated
   for (let i = 0; i < msgsResponse.msgs.length; i++) {
@@ -419,26 +419,9 @@ export async function executeRoute(
     const msgJSON = JSON.parse(multiHopMsg.msg);
 
     let msg: EncodeObject;
-    const destinationChainID =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationChain.chain_id
-        : msgsResponse.msgs[i + 1].chain_id;
 
-    const destinationChainClient = await getStargateClientForChainID(
-      destinationChainID
-    );
+    let txHash = "";
 
-    const destinationChainAddress = userAddresses[destinationChainID];
-
-    const denomOut: string =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationAsset.denom
-        : JSON.parse(msgsResponse.msgs[i + 1].msg).token.denom;
-
-    const balanceBefore = await destinationChainClient.getBalance(
-      destinationChainAddress,
-      denomOut
-    );
     if (
       multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
@@ -494,6 +477,7 @@ export async function executeRoute(
         );
       } else {
         const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+        txHash = tx.transactionHash;
       }
     } else {
       msg = {
@@ -518,17 +502,31 @@ export async function executeRoute(
       );
 
       const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+
+      txHash = tx.transactionHash;
     }
 
-    while (true) {
-      console.log("polling...");
+    await skipClient.transaction.track(txHash, multiHopMsg.chain_id);
 
-      const balance = await destinationChainClient.getBalance(
-        destinationChainAddress,
-        denomOut
+    while (true) {
+      const statusResponse = await skipClient.transaction.status(
+        txHash,
+        multiHopMsg.chain_id
       );
 
-      if (parseInt(balance.amount) > parseInt(balanceBefore.amount)) {
+      if (statusResponse.status === "STATE_COMPLETED") {
+        if (statusResponse.error) {
+          onError(statusResponse.error);
+          return;
+        }
+
+        for (const packet of statusResponse.packets) {
+          if (packet.error) {
+            onError(packet.error);
+            return;
+          }
+        }
+
         break;
       }
 

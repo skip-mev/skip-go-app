@@ -17,6 +17,7 @@ import { ChainsProvider } from "@/context/chains";
 import { AssetsProvider } from "@/context/assets";
 import { queryClient } from "@/utils/query";
 import { ToastProvider } from "@/context/toast";
+import { SkipProvider } from "@/solve";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -180,28 +181,30 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <main className={jost.className}>
-        <QueryClientProvider client={queryClient}>
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={wallets}
-            wrappedWithChakra
-            throwErrors={false}
-          >
-            <ChainsProvider>
-              <AssetsProvider>
-                <RadixToast.ToastProvider>
-                  <ToastProvider>
-                    <MainLayout>
-                      <Component {...pageProps} />
-                    </MainLayout>
-                  </ToastProvider>
-                  <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                </RadixToast.ToastProvider>
-              </AssetsProvider>
-            </ChainsProvider>
-          </ChainProvider>
-        </QueryClientProvider>
+        <SkipProvider>
+          <QueryClientProvider client={queryClient}>
+            <ChainProvider
+              chains={chains}
+              assetLists={assets}
+              wallets={wallets}
+              wrappedWithChakra
+              throwErrors={false}
+            >
+              <ChainsProvider>
+                <AssetsProvider>
+                  <RadixToast.ToastProvider>
+                    <ToastProvider>
+                      <MainLayout>
+                        <Component {...pageProps} />
+                      </MainLayout>
+                    </ToastProvider>
+                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
+                  </RadixToast.ToastProvider>
+                </AssetsProvider>
+              </ChainsProvider>
+            </ChainProvider>
+          </QueryClientProvider>
+        </SkipProvider>
       </main>
       <Analytics />
     </>

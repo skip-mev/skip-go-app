@@ -2,18 +2,19 @@ import { FC, Fragment, useMemo, useState } from "react";
 import ChainSelect from "./ChainSelect";
 import AssetSelect from "./AssetSelect";
 import { Chain } from "@/context/chains";
-import { Asset, useBalancesByChain } from "@/cosmos";
+import { useBalancesByChain } from "@/cosmos";
 import Toast from "@/elements/Toast";
 import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useAssets } from "@/context/assets";
 import { getFee } from "@/utils/utils";
+import { AssetWithMetadata } from "@/solve";
 
 interface Props {
   amount: string;
   onAmountChange?: (amount: string) => void;
-  asset?: Asset;
-  onAssetChange?: (asset: Asset) => void;
+  asset?: AssetWithMetadata;
+  onAssetChange?: (asset: AssetWithMetadata) => void;
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];

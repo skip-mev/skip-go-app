@@ -1,9 +1,8 @@
 import { FC, PropsWithChildren, createContext, useContext } from "react";
 import { useSolveChains } from "@/solve/queries";
-import { Chain as SolveChain } from "@/solve";
+import { Chain as SolveChain, useSkipClient } from "@/solve";
 import { ChainRecord } from "@cosmos-kit/core";
 import { useManager } from "@cosmos-kit/react";
-import { ASSET_LIST } from "@/config/assets";
 
 export interface Chain extends SolveChain {
   prettyName: string;
@@ -19,28 +18,26 @@ export const ChainsContext = createContext<ChainsContext>({
 });
 
 export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { data: supportedChains } = useSolveChains();
+  const skipClient = useSkipClient();
+  const { data: supportedChains } = useSolveChains(skipClient);
+
   const { chainRecords, walletRepos } = useManager();
 
   const chains = (
     supportedChains
-      ? supportedChains
-          .map((c) => {
-            const record = chainRecords.find(
-              (record) => record.chain.chain_id === c.chain_id
-            );
+      ? supportedChains.map((c) => {
+          const record = chainRecords.find(
+            (record) => record.chain.chain_id === c.chain_id
+          );
 
-            const prettyName = record?.chain.pretty_name ?? c.chain_name;
+          const prettyName = record?.chain.pretty_name ?? c.chain_name;
 
-            return {
-              ...c,
-              record,
-              prettyName,
-            };
-          })
-          .filter((c) => {
-            return ASSET_LIST[c.chain_id] !== undefined;
-          })
+          return {
+            ...c,
+            record,
+            prettyName,
+          };
+        })
       : []
   ).sort((a, b) => {
     const repoA = walletRepos.find((repo) => repo.chainName === a.chain_name);

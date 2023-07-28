@@ -1,10 +1,11 @@
-import { FC, Fragment, useState } from "react";
-import { useChain, useManager, useWalletClient } from "@cosmos-kit/react";
+import { FC, Fragment, useEffect, useRef, useState } from "react";
+import { useChain, useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import Toast from "@/elements/Toast";
 import { executeRoute } from "@/solve/form";
 import RouteDisplay from "../RouteDisplay";
 import { Route } from ".";
+import { useSkipClient } from "@/solve";
 
 interface Props {
   route: Route;
@@ -17,12 +18,24 @@ const TransactionDialogContent: FC<Props> = ({
   onClose,
   insufficentBalance,
 }) => {
+  const skipClient = useSkipClient();
+
   const [transacting, setTransacting] = useState(false);
 
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
   const [warningOpen, setWarningOpen] = useState(false);
+
+  const warningEl = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (warningOpen) {
+      warningEl.current?.scrollIntoView({
+        behavior: "instant",
+      });
+    }
+  }, [warningOpen]);
 
   const chain = useChain(route.sourceChain.record?.name ?? "");
 
@@ -54,6 +67,7 @@ const TransactionDialogContent: FC<Props> = ({
       }
 
       await executeRoute(
+        skipClient,
         walletClient,
         route,
         (_, i) => {
@@ -270,6 +284,7 @@ const TransactionDialogContent: FC<Props> = ({
                   receive fees or payment of any kind today and subsidize gas
                   for users cross-chain)
                 </p>
+                <div ref={warningEl}></div>
               </div>
             )}
           </div>
