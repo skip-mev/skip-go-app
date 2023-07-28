@@ -1,6 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { SkipClient } from "./client";
 
+export function useAssets(client: SkipClient) {
+  return useQuery({
+    queryKey: ["solve-assets"],
+    queryFn: async () => {
+      const assets = await client.fungible.getAssets();
+
+      return assets;
+    },
+  });
+}
+
 export function useSolveChains(client: SkipClient) {
   return useQuery({
     queryKey: ["solve-chains"],

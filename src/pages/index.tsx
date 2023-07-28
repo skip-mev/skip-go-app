@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 import va from "@vercel/analytics";
 import { useChains } from "@/context/chains";
 import AssetInput from "@/components/AssetInput";
@@ -10,9 +10,17 @@ import TransactionDialog from "@/components/TransactionDialog";
 import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
+import { useAssets } from "@/context/assets";
 
 export default function Home() {
   const { chains } = useChains();
+  const { assetsByChainID } = useAssets();
+
+  const filteredChains = useMemo(() => {
+    return chains.filter((chain) => {
+      return assetsByChainID(chain.chain_id).length > 0;
+    });
+  }, [assetsByChainID, chains]);
 
   const {
     sourceChain,
@@ -87,7 +95,7 @@ export default function Home() {
               amountIn: "",
             })
           }
-          chains={chains}
+          chains={filteredChains}
           showBalance
         />
         <div className="relative">
@@ -127,7 +135,7 @@ export default function Home() {
               destinationAsset: undefined,
             })
           }
-          chains={chains}
+          chains={filteredChains}
         />
         {(routeLoading || numberOfTransactions > 0) && (
           <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">

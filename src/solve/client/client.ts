@@ -2,6 +2,7 @@ import https from "https";
 import axios, { AxiosInstance } from "axios";
 import { Chain } from "../types";
 import { FungibleService } from "./fungible";
+import { TransactionService } from "./transaction";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skip.money/v1";
 
@@ -14,6 +15,7 @@ export class SkipClient {
   private ignoreChains: string[];
 
   public fungible: FungibleService;
+  public transaction: TransactionService;
 
   constructor(ignoreChains: string[] = []) {
     this.ignoreChains = ignoreChains;
@@ -28,6 +30,7 @@ export class SkipClient {
     });
 
     this.fungible = new FungibleService(this.httpClient);
+    this.transaction = new TransactionService(this.httpClient);
   }
 
   async chains(): Promise<Chain[]> {

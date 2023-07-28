@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import { ArrowLeftIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { FC, useEffect, useRef, useState } from "react";
-import { Asset } from "@/cosmos";
+import { FC, useState } from "react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 import AssetSelectContent from "./AssetSelectContent";
+import { AssetWithMetadata } from "@/solve";
 
 interface Props {
-  asset?: Asset;
-  assets?: Asset[];
+  asset?: AssetWithMetadata;
+  assets?: AssetWithMetadata[];
   balances?: Record<string, string>;
-  onChange?: (asset: Asset) => void;
+  onChange?: (asset: AssetWithMetadata) => void;
   showChainInfo?: boolean;
 }
 
@@ -33,7 +33,7 @@ const AssetSelect: FC<Props> = ({
             <img
               alt={asset.symbol}
               className="w-6 h-6 rounded-full"
-              src={asset.image}
+              src={asset.logo_uri}
               onError={(e) =>
                 (e.currentTarget.src =
                   "https://api.dicebear.com/6.x/shapes/svg")
