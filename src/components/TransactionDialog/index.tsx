@@ -1,18 +1,15 @@
 import { FC, Fragment, useState } from "react";
-import TransactionDialogTrigger from "./TransactionDialogTrigger";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 import TransactionDialogContent from "./TransactionDialogContent";
-import { Operation, RouteResponse } from "@/solve";
-import { Asset } from "@/cosmos";
+import { AssetWithMetadata, Operation, RouteResponse } from "@/solve";
 import { Chain } from "@/context/chains";
 import { ActionType } from "@/solve/form";
 
 export interface Route {
   amountIn: string;
   amountOut: string;
-  sourceAsset: Asset;
+  sourceAsset: AssetWithMetadata;
   sourceChain: Chain;
-  destinationAsset: Asset;
+  destinationAsset: AssetWithMetadata;
   destinationChain: Chain;
   actionType: ActionType;
   operations: Operation[];

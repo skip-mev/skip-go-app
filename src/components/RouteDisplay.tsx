@@ -77,7 +77,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           Transfer{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={asset.image}
+            src={asset.logo_uri}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
@@ -135,13 +135,13 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
           Swap{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={assetIn.image}
+            src={assetIn.logo_uri}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{assetIn.symbol}</span> for{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={assetOut.image}
+            src={assetOut.logo_uri}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{assetOut.symbol}</span> on{" "}
@@ -247,7 +247,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           <RouteEnd
             amount={amountIn}
             symbol={sourceAsset.symbol}
-            logo={sourceAsset.image}
+            logo={sourceAsset.logo_uri}
             chain={sourceChain.prettyName}
           />
           {isExpanded && (
@@ -290,7 +290,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         <RouteEnd
           amount={amountOut}
           symbol={destinationAsset.symbol}
-          logo={destinationAsset.image}
+          logo={destinationAsset.logo_uri}
           chain={destinationChain.prettyName}
         />
       </div>

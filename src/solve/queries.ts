@@ -1,25 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
-import { getChains, getRoute } from "./api";
+import { SkipClient } from "./client";
 
-interface QueryOptions {
-  onError?: ((err: unknown) => void) | undefined;
+export function useAssets(client: SkipClient) {
+  return useQuery({
+    queryKey: ["solve-assets"],
+    queryFn: async () => {
+      const assets = await client.fungible.getAssets();
+
+      return assets;
+    },
+  });
 }
 
-export function useSolveChains() {
+export function useSolveChains(client: SkipClient) {
   return useQuery({
     queryKey: ["solve-chains"],
     queryFn: () => {
-      return getChains();
+      return client.chains();
     },
     placeholderData: [],
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
   });
 }
 
 export function useRoute(
+  client: SkipClient,
   amountIn: string,
   sourceAsset?: string,
   sourceAssetChainID?: string,
@@ -46,7 +50,7 @@ export function useRoute(
         return;
       }
 
-      const route = await getRoute({
+      const route = await client.fungible.getRoute({
         amount_in: amountIn,
         source_asset_denom: sourceAsset,
         source_asset_chain_id: sourceAssetChainID,
