@@ -25,6 +25,8 @@ const TransactionDialogContent: FC<Props> = ({
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
+  const [txComplete, setTxComplete] = useState(false);
+
   const [warningOpen, setWarningOpen] = useState(false);
 
   const warningEl = useRef<HTMLDivElement>(null);
@@ -103,6 +105,7 @@ const TransactionDialogContent: FC<Props> = ({
       );
     } finally {
       setTransacting(false);
+      setTxComplete(true);
     }
   };
 
@@ -201,7 +204,7 @@ const TransactionDialogContent: FC<Props> = ({
               <span>Submit</span>
             )}
           </button>
-          {insufficentBalance && (
+          {insufficentBalance && !transacting && !txComplete && (
             <p className="text-center font-semibold text-sm text-red-500">
               Insufficient Balance
             </p>

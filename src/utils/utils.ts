@@ -8,6 +8,7 @@ import {
   SigningStargateClient,
   SigningStargateClientOptions,
   StargateClient,
+  StdFee,
 } from "@cosmjs/stargate";
 import { WalletClient, getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
@@ -268,16 +269,17 @@ export async function signAndBroadcastEvmos(
 
   const response = await axios.post(
     `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
-    generatePostBodyBroadcast(signedTx)
+    generatePostBodyBroadcast(signedTx, "BROADCAST_MODE_BLOCK")
   );
 
-  return response;
+  return response.data.tx_response;
 }
 
 export async function signAndBroadcastInjective(
   walletClient: WalletClient,
   signerAddress: string,
-  msgs: Msgs | Msgs[]
+  msgs: Msgs | Msgs[],
+  fee: StdFee
 ) {
   const chainID = "injective-1";
   const restEndpoint = "https://lcd.injective.network";
@@ -307,6 +309,7 @@ export async function signAndBroadcastInjective(
     sequence: baseAccount.sequence,
     accountNumber: baseAccount.accountNumber,
     timeoutHeight: timeoutHeight.toNumber(),
+    fee,
   });
 
   const signer = await getOfflineSigner(walletClient, chainID);
@@ -391,7 +394,7 @@ export function getFee(chainID: string) {
     averageGasPrice = feeInfo.average_gas_price;
   }
 
-  const amountNeeded = averageGasPrice * 200000;
+  const amountNeeded = averageGasPrice * 1000000;
 
   return amountNeeded;
 }

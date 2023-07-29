@@ -374,12 +374,20 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
+    let gasNeeded = 200000;
+    if (
+      route.rawRoute.does_swap &&
+      route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
+    ) {
+      gasNeeded = 1000000;
+    }
+
     let averageGasPrice = 0;
     if (feeInfo.average_gas_price) {
       averageGasPrice = feeInfo.average_gas_price;
     }
 
-    const amountNeeded = averageGasPrice * 200000;
+    const amountNeeded = averageGasPrice * gasNeeded;
 
     const balance = await client.getBalance(
       userAddresses[multiHopMsg.chain_id],
@@ -416,6 +424,14 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
+    let gasNeeded = 200000;
+    if (
+      route.rawRoute.does_swap &&
+      route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
+    ) {
+      gasNeeded = 1000000;
+    }
+
     const msgJSON = JSON.parse(multiHopMsg.msg);
 
     let msg: EncodeObject;
@@ -450,7 +466,7 @@ export async function executeRoute(
       };
 
       if (multiHopMsg.chain_id === "evmos_9001-2") {
-        await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
+        const tx = await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
           sourcePort: msgJSON.source_port,
           sourceChannel: msgJSON.source_channel,
           receiver: msgJSON.receiver,
@@ -461,6 +477,8 @@ export async function executeRoute(
           revisionNumber: 0,
           revisionHeight: 0,
         });
+
+        txHash = tx.txhash;
       } else if (multiHopMsg.chain_id === "injective-1") {
         const tx = await signAndBroadcastInjective(
           walletClient,
@@ -473,10 +491,19 @@ export async function executeRoute(
             receiver: msgJSON.receiver,
             channelId: msgJSON.source_channel,
             timeout: msgJSON.timeout_timestamp,
-          })
+          }),
+          {
+            amount: [coin(0, feeInfo.denom)],
+            gas: `${gasNeeded}`,
+          }
         );
+
+        txHash = tx.txHash;
       } else {
-        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
+          amount: [coin(0, feeInfo.denom)],
+          gas: `${gasNeeded}`,
+        });
         txHash = tx.transactionHash;
       }
     } else {
@@ -501,7 +528,10 @@ export async function executeRoute(
         }
       );
 
-      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
+        amount: [coin(0, feeInfo.denom)],
+        gas: `${gasNeeded}`,
+      });
 
       txHash = tx.transactionHash;
     }
