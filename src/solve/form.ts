@@ -26,6 +26,7 @@ import { MsgTransfer } from "@injectivelabs/sdk-ts";
 import { WalletClient } from "@cosmos-kit/core";
 import { useSkipClient } from "./hooks";
 import { SkipClient, MsgsRequest } from "./client";
+import { trackRoute } from "@/analytics";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -219,10 +220,6 @@ export function useSolveForm() {
       return 0;
     }
 
-    if (routeResponse.does_swap) {
-      return 1;
-    }
-
     let n = 1;
 
     routeResponse.operations.forEach((hop, i) => {
@@ -330,6 +327,8 @@ export async function executeRoute(
   onTxSuccess: (tx: any, index: number) => void,
   onError: (error: any) => void
 ) {
+  trackRoute(route);
+
   await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
@@ -361,8 +360,6 @@ export async function executeRoute(
 
   const msgsResponse = await skipClient.fungible.getMessages(msgRequest);
 
-  // console.log(response);
-
   // check balances on chains where a tx is initiated
   for (let i = 0; i < msgsResponse.msgs.length; i++) {
     const multiHopMsg = msgsResponse.msgs[i];
@@ -377,12 +374,20 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
+    let gasNeeded = 200000;
+    if (
+      route.rawRoute.does_swap &&
+      route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
+    ) {
+      gasNeeded = 1000000;
+    }
+
     let averageGasPrice = 0;
     if (feeInfo.average_gas_price) {
       averageGasPrice = feeInfo.average_gas_price;
     }
 
-    const amountNeeded = averageGasPrice * 200000;
+    const amountNeeded = averageGasPrice * gasNeeded;
 
     const balance = await client.getBalance(
       userAddresses[multiHopMsg.chain_id],
@@ -419,29 +424,20 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
+    let gasNeeded = 200000;
+    if (
+      route.rawRoute.does_swap &&
+      route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
+    ) {
+      gasNeeded = 1000000;
+    }
+
     const msgJSON = JSON.parse(multiHopMsg.msg);
 
     let msg: EncodeObject;
-    const destinationChainID =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationChain.chain_id
-        : msgsResponse.msgs[i + 1].chain_id;
 
-    const destinationChainClient = await getStargateClientForChainID(
-      destinationChainID
-    );
+    let txHash = "";
 
-    const destinationChainAddress = userAddresses[destinationChainID];
-
-    const denomOut: string =
-      i === msgsResponse.msgs.length - 1
-        ? route.destinationAsset.denom
-        : JSON.parse(msgsResponse.msgs[i + 1].msg).token.denom;
-
-    const balanceBefore = await destinationChainClient.getBalance(
-      destinationChainAddress,
-      denomOut
-    );
     if (
       multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
@@ -470,7 +466,7 @@ export async function executeRoute(
       };
 
       if (multiHopMsg.chain_id === "evmos_9001-2") {
-        await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
+        const tx = await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
           sourcePort: msgJSON.source_port,
           sourceChannel: msgJSON.source_channel,
           receiver: msgJSON.receiver,
@@ -481,6 +477,8 @@ export async function executeRoute(
           revisionNumber: 0,
           revisionHeight: 0,
         });
+
+        txHash = tx.txhash;
       } else if (multiHopMsg.chain_id === "injective-1") {
         const tx = await signAndBroadcastInjective(
           walletClient,
@@ -493,10 +491,20 @@ export async function executeRoute(
             receiver: msgJSON.receiver,
             channelId: msgJSON.source_channel,
             timeout: msgJSON.timeout_timestamp,
-          })
+          }),
+          {
+            amount: [coin(0, feeInfo.denom)],
+            gas: `${gasNeeded}`,
+          }
         );
+
+        txHash = tx.txHash;
       } else {
-        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
+          amount: [coin(0, feeInfo.denom)],
+          gas: `${gasNeeded}`,
+        });
+        txHash = tx.transactionHash;
       }
     } else {
       msg = {
@@ -520,18 +528,35 @@ export async function executeRoute(
         }
       );
 
-      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
+        amount: [coin(0, feeInfo.denom)],
+        gas: `${gasNeeded}`,
+      });
+
+      txHash = tx.transactionHash;
     }
 
-    while (true) {
-      console.log("polling...");
+    await skipClient.transaction.track(txHash, multiHopMsg.chain_id);
 
-      const balance = await destinationChainClient.getBalance(
-        destinationChainAddress,
-        denomOut
+    while (true) {
+      const statusResponse = await skipClient.transaction.status(
+        txHash,
+        multiHopMsg.chain_id
       );
 
-      if (parseInt(balance.amount) > parseInt(balanceBefore.amount)) {
+      if (statusResponse.status === "STATE_COMPLETED") {
+        if (statusResponse.error) {
+          onError(statusResponse.error);
+          return;
+        }
+
+        for (const packet of statusResponse.packets) {
+          if (packet.error) {
+            onError(packet.error);
+            return;
+          }
+        }
+
         break;
       }
 

@@ -2,15 +2,9 @@ import https from "https";
 import axios, { AxiosInstance } from "axios";
 import { Chain } from "../types";
 import { FungibleService } from "./fungible";
+import { TransactionService } from "./transaction";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://api.skip.money/v1";
-
-export const ENDPOINTS = {
-  GET_CHAINS: `${API_URL}/info/chains`,
-  GET_ROUTE: `${API_URL}/fungible/route`,
-};
-
-export const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
 
 interface GetChainsResponse {
   chains: Chain[];
@@ -18,10 +12,14 @@ interface GetChainsResponse {
 
 export class SkipClient {
   private httpClient: AxiosInstance;
+  private ignoreChains: string[];
 
   public fungible: FungibleService;
+  public transaction: TransactionService;
 
-  constructor() {
+  constructor(ignoreChains: string[] = []) {
+    this.ignoreChains = ignoreChains;
+
     const agent = new https.Agent({
       keepAlive: true,
     });
@@ -32,6 +30,7 @@ export class SkipClient {
     });
 
     this.fungible = new FungibleService(this.httpClient);
+    this.transaction = new TransactionService(this.httpClient);
   }
 
   async chains(): Promise<Chain[]> {
@@ -41,6 +40,8 @@ export class SkipClient {
 
     const { chains } = response.data;
 
-    return chains.filter((chain) => !IGNORE_CHAINS.includes(chain.chain_id));
+    return chains.filter(
+      (chain) => !this.ignoreChains.includes(chain.chain_id)
+    );
   }
 }

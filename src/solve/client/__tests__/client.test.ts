@@ -1,73 +1,77 @@
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { ENDPOINTS, IGNORE_CHAINS, SkipClient } from "../client";
+import { SkipClient } from "../client";
+import { IGNORE_CHAINS } from "../../../config";
 
 const handlers = [
-  rest.post(ENDPOINTS.GET_ROUTE, async (req, res, ctx) => {
-    const body = await req.json();
+  rest.post(
+    "https://api.skip.money/v1/fungible/route",
+    async (req, res, ctx) => {
+      const body = await req.json();
 
-    if (!body.cumulative_affiliate_fee_bps) {
+      if (!body.cumulative_affiliate_fee_bps) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            code: 3,
+            message: "invalid cumulativeAffiliateFeeBps",
+            details: [],
+          })
+        );
+      }
+
       return res(
-        ctx.status(400),
+        ctx.status(200),
         ctx.json({
-          code: 3,
-          message: "invalid cumulativeAffiliateFeeBps",
-          details: [],
+          source_asset_denom: "uosmo",
+          source_asset_chain_id: "osmosis-1",
+          dest_asset_denom: "uatom",
+          dest_asset_chain_id: "cosmoshub-4",
+          amount_in: "1000000",
+          operations: [
+            {
+              swap: {
+                swap_in: {
+                  swap_venue: {
+                    name: "osmosis-poolmanager",
+                    chain_id: "osmosis-1",
+                  },
+                  swap_operations: [
+                    {
+                      pool: "1",
+                      denom_in: "uosmo",
+                      denom_out:
+                        "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+                    },
+                  ],
+                  swap_amount_in: "1000000",
+                },
+                estimated_affiliate_fee:
+                  "0ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+              },
+            },
+            {
+              transfer: {
+                port: "transfer",
+                channel: "channel-0",
+                chain_id: "osmosis-1",
+                pfm_enabled: true,
+                dest_denom: "uatom",
+              },
+            },
+          ],
+          chain_ids: ["osmosis-1", "cosmoshub-4"],
+          does_swap: true,
+          estimated_amount_out: "54631",
+          swap_venue: {
+            name: "osmosis-poolmanager",
+            chain_id: "osmosis-1",
+          },
         })
       );
     }
-
-    return res(
-      ctx.status(200),
-      ctx.json({
-        source_asset_denom: "uosmo",
-        source_asset_chain_id: "osmosis-1",
-        dest_asset_denom: "uatom",
-        dest_asset_chain_id: "cosmoshub-4",
-        amount_in: "1000000",
-        operations: [
-          {
-            swap: {
-              swap_in: {
-                swap_venue: {
-                  name: "osmosis-poolmanager",
-                  chain_id: "osmosis-1",
-                },
-                swap_operations: [
-                  {
-                    pool: "1",
-                    denom_in: "uosmo",
-                    denom_out:
-                      "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
-                  },
-                ],
-                swap_amount_in: "1000000",
-              },
-              estimated_affiliate_fee:
-                "0ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
-            },
-          },
-          {
-            transfer: {
-              port: "transfer",
-              channel: "channel-0",
-              chain_id: "osmosis-1",
-              pfm_enabled: true,
-              dest_denom: "uatom",
-            },
-          },
-        ],
-        chain_ids: ["osmosis-1", "cosmoshub-4"],
-        does_swap: true,
-        estimated_amount_out: "54631",
-        swap_venue: {
-          name: "osmosis-poolmanager",
-          chain_id: "osmosis-1",
-        },
-      })
-    );
-  }),
-  rest.get(ENDPOINTS.GET_CHAINS, (_, res, ctx) => {
+  ),
+  rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -150,7 +154,7 @@ describe("SkipClient", () => {
 
   describe("/v1/info/chains", () => {
     it("filters ignored chains", async () => {
-      const client = new SkipClient();
+      const client = new SkipClient(IGNORE_CHAINS);
 
       const response = await client.chains();
 
