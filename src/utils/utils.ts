@@ -42,6 +42,9 @@ import {
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
 } from "@injectivelabs/utils";
+import { KeplrClient } from "@cosmos-kit/keplr-extension";
+import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
+import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -397,4 +400,29 @@ export function getFee(chainID: string) {
   const amountNeeded = averageGasPrice * 1000000;
 
   return amountNeeded;
+}
+
+export async function isLedger(walletClient: WalletClient, chainID: string) {
+  if (walletClient instanceof KeplrClient && window.keplr) {
+    const key = await window.keplr.getKey(chainID);
+    return key.isNanoLedger;
+  }
+
+  if (walletClient instanceof CosmostationClient) {
+    // @ts-ignore
+    const account = await window.cosmostation.cosmos.request({
+      method: "cos_account",
+      params: { chainName: chainID },
+    });
+    return account.isLedger;
+  }
+
+  if (walletClient instanceof LeapClient) {
+    // @ts-ignore
+    const key = await window.leap.getKey(chainID);
+
+    return key.isNanoLedger;
+  }
+
+  return false;
 }
