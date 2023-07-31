@@ -266,7 +266,6 @@ const TransactionDialogContent: FC<Props> = ({
             </p>
           )}
         </div>
-
         {route.rawRoute.chain_ids.length > 1 && (
           <div className="bg-red-50 text-red-400 rounded-md">
             <button
