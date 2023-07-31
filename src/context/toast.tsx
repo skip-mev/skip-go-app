@@ -8,7 +8,7 @@ import {
 } from "react";
 
 interface ToastContext {
-  toast: (title: string, message: string) => void;
+  toast: (title: string, message: string, type: "success" | "error") => void;
 }
 
 export const ToastContext = createContext<ToastContext>({
@@ -18,13 +18,18 @@ export const ToastContext = createContext<ToastContext>({
 interface ToastConfig {
   title: string;
   message: string;
+  type: "success" | "error";
 }
 
 export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastConfig[]>([]);
 
-  function addToast(title: string, message: string) {
-    setToasts((toasts) => [...toasts, { title, message }]);
+  function addToast(
+    title: string,
+    message: string,
+    type: "success" | "error" = "error"
+  ) {
+    setToasts((toasts) => [...toasts, { title, message, type }]);
   }
 
   return (
@@ -35,6 +40,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
           key={`toast-${index}`}
           title={toast.title}
           description={toast.message}
+          type={toast.type}
         />
       ))}
     </ToastContext.Provider>
