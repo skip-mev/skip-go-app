@@ -103,6 +103,23 @@ const TransactionDialogContent: FC<Props> = ({
           });
         }
       );
+    } catch (err: any) {
+      console.error(err);
+
+      setTxError(err.message);
+      setIsError(true);
+
+      setTxStatuses((statuses) => {
+        const newStatuses = [...statuses];
+
+        return newStatuses.map((status) => {
+          if (status === "PENDING") {
+            return "INIT";
+          }
+
+          return status;
+        });
+      });
     } finally {
       setTransacting(false);
       setTxComplete(true);
