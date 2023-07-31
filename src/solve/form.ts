@@ -30,6 +30,8 @@ import { SkipClient, MsgsRequest } from "./client";
 import { trackRoute } from "@/analytics";
 import { KeplrClient, KeplrExtensionWallet } from "@cosmos-kit/keplr-extension";
 import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
+import { useQuery } from "@tanstack/react-query";
+import { getNumberOfTransactionsFromRoute } from "./utils";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -218,25 +220,17 @@ export function useSolveForm() {
     routeResponse,
   ]);
 
-  const numberOfTransactions = useMemo(() => {
-    if (!routeResponse) {
-      return 0;
-    }
-
-    let n = 1;
-
-    routeResponse.operations.forEach((hop, i) => {
-      if (isSwapOperation(hop)) {
-        return;
+  const { data: numberOfTransactions } = useQuery({
+    queryKey: ["solve-number-of-transactions", routeResponse],
+    queryFn: () => {
+      if (!routeResponse) {
+        return 0;
       }
 
-      if (i !== 0 && !hop.transfer.pfm_enabled) {
-        n += 1;
-      }
-    });
-
-    return n;
-  }, [routeResponse]);
+      return getNumberOfTransactionsFromRoute(routeResponse);
+    },
+    enabled: !!routeResponse,
+  });
 
   const route = useMemo(() => {
     if (
@@ -259,7 +253,7 @@ export function useSolveForm() {
       destinationAsset: formValues.destinationAsset,
       destinationChain: formValues.destinationChain,
       operations: routeResponse?.operations ?? [],
-      transactionCount: numberOfTransactions,
+      transactionCount: numberOfTransactions ?? 0,
       actionType,
       rawRoute: routeResponse,
     };
