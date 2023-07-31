@@ -311,7 +311,7 @@ export function useSolveForm() {
     setFormValues,
     routeLoading,
     isError,
-    numberOfTransactions,
+    numberOfTransactions: numberOfTransactions ?? 0,
     route,
     insufficientBalance,
   };
