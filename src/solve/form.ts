@@ -15,18 +15,49 @@ import {
   getSigningCosmWasmClientForChainID,
   getSigningStargateClientForChainID,
   getStargateClientForChainID,
+  isLedger,
+  signAmino,
   signAndBroadcastEvmos,
   signAndBroadcastInjective,
 } from "@/utils/utils";
-import { EncodeObject, OfflineSigner, coin } from "@cosmjs/proto-signing";
-import { GasPrice } from "@cosmjs/stargate";
+import {
+  EncodeObject,
+  OfflineSigner,
+  TxBodyEncodeObject,
+  coin,
+  encodePubkey,
+  makeAuthInfoBytes,
+  makeSignDoc,
+} from "@cosmjs/proto-signing";
+import {
+  GasPrice,
+  SignerData,
+  StdFee,
+  AminoTypes,
+  createDefaultAminoConverters,
+  SigningStargateClient,
+  DeliverTxResponse,
+} from "@cosmjs/stargate";
 import { useAssets } from "@/context/assets";
 import { useChain } from "@cosmos-kit/react";
-import { MsgTransfer } from "@injectivelabs/sdk-ts";
+import { MsgTransfer as MsgTransferInjective } from "@injectivelabs/sdk-ts";
 import { WalletClient } from "@cosmos-kit/core";
 import { useSkipClient } from "./hooks";
 import { SkipClient, MsgsRequest } from "./client";
 import { trackRoute } from "@/analytics";
+import { KeplrClient, KeplrExtensionWallet } from "@cosmos-kit/keplr-extension";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
+import Long from "long";
+import {
+  makeSignDoc as makeSignDocAmino,
+  encodeSecp256k1Pubkey,
+} from "@cosmjs/amino";
+import { OfflineAminoSigner } from "@keplr-wallet/types";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
+import { Int53 } from "@cosmjs/math";
+import { fromBase64 } from "@cosmjs/encoding";
+// import { LedgerSigner, LedgerConnector } from "@cosmjs/ledger-amino";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -404,10 +435,10 @@ export async function executeRoute(
   for (let i = 0; i < msgsResponse.msgs.length; i++) {
     const multiHopMsg = msgsResponse.msgs[i];
 
-    const account = await getAccount(walletClient, multiHopMsg.chain_id);
+    const signerIsLedger = await isLedger(walletClient, multiHopMsg.chain_id);
 
     let signer: OfflineSigner;
-    if (account.isNanoLedger) {
+    if (signerIsLedger) {
       signer = await getOfflineSignerOnlyAmino(
         walletClient,
         multiHopMsg.chain_id
@@ -465,6 +496,17 @@ export async function executeRoute(
         },
       };
 
+      if (signerIsLedger) {
+        const currentHeight = await client.getHeight();
+
+        msg.value.timeoutHeight = {
+          revisionHeight: Long.fromNumber(currentHeight).add(100),
+          revisionNumber: Long.fromNumber(currentHeight).add(100),
+        };
+
+        msg.value.timeoutTimestamp = Long.fromNumber(0);
+      }
+
       if (multiHopMsg.chain_id === "evmos_9001-2") {
         const tx = await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
           sourcePort: msgJSON.source_port,
@@ -483,7 +525,7 @@ export async function executeRoute(
         const tx = await signAndBroadcastInjective(
           walletClient,
           msgJSON.sender,
-          MsgTransfer.fromJSON({
+          MsgTransferInjective.fromJSON({
             amount: msgJSON.token,
             memo: msgJSON.memo,
             sender: msgJSON.sender,
@@ -500,10 +542,41 @@ export async function executeRoute(
 
         txHash = tx.txHash;
       } else {
-        const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
-          amount: [coin(0, feeInfo.denom)],
-          gas: `${gasNeeded}`,
-        });
+        const acc = await client.getAccount(msgJSON.sender);
+
+        let tx: DeliverTxResponse;
+
+        const simulatedGas = await client.simulate(msgJSON.sender, [msg], "");
+
+        if (signerIsLedger) {
+          const txRaw = await signAmino(
+            client,
+            signer as OfflineAminoSigner,
+            msgJSON.sender,
+            [
+              {
+                typeUrl: multiHopMsg.msg_type_url,
+                value: msg.value,
+              },
+            ],
+            {
+              amount: [coin(0, feeInfo.denom)],
+              gas: `${simulatedGas * 1.2}`,
+            },
+            "",
+            {
+              accountNumber: acc?.accountNumber ?? 0,
+              sequence: acc?.sequence ?? 0,
+              chainId: multiHopMsg.chain_id,
+            }
+          );
+
+          const txBytes = TxRaw.encode(txRaw).finish();
+
+          tx = await client.broadcastTx(txBytes, undefined, undefined);
+        } else {
+          tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+        }
         txHash = tx.transactionHash;
       }
     } else {

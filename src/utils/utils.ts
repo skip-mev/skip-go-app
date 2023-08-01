@@ -1,14 +1,23 @@
 import { useRef, useEffect } from "react";
-import { OfflineSigner } from "@cosmjs/proto-signing";
+import {
+  EncodeObject,
+  OfflineSigner,
+  TxBodyEncodeObject,
+  encodePubkey,
+  makeAuthInfoBytes,
+} from "@cosmjs/proto-signing";
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
 } from "@cosmjs/cosmwasm-stargate";
 import {
+  AminoTypes,
+  SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
   StargateClient,
   StdFee,
+  createDefaultAminoConverters,
 } from "@cosmjs/stargate";
 import { WalletClient, getFastestEndpoint } from "@cosmos-kit/core";
 import { useChain, useManager } from "@cosmos-kit/react";
@@ -42,6 +51,15 @@ import {
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
 } from "@injectivelabs/utils";
+import { KeplrClient } from "@cosmos-kit/keplr-extension";
+import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
+import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
+import { OfflineAminoSigner } from "@keplr-wallet/types";
+import { makeSignDoc, encodeSecp256k1Pubkey } from "@cosmjs/amino";
+import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
+import { Int53 } from "@cosmjs/math";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { fromBase64 } from "@cosmjs/encoding";
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -374,7 +392,8 @@ export async function getOfflineSignerOnlyAmino(
   chainId: string
 ) {
   if (walletClient.getOfflineSignerAmino) {
-    return walletClient.getOfflineSignerAmino(chainId);
+    const signer = walletClient.getOfflineSignerAmino(chainId);
+    return signer;
   }
 
   throw new Error("unsupported wallet");
@@ -397,4 +416,100 @@ export function getFee(chainID: string) {
   const amountNeeded = averageGasPrice * 1000000;
 
   return amountNeeded;
+}
+
+export async function isLedger(walletClient: WalletClient, chainID: string) {
+  if (walletClient instanceof KeplrClient && window.keplr) {
+    const key = await window.keplr.getKey(chainID);
+    return key.isNanoLedger;
+  }
+
+  if (walletClient instanceof CosmostationClient) {
+    // @ts-ignore
+    const account = await window.cosmostation.cosmos.request({
+      method: "cos_account",
+      params: { chainName: chainID },
+    });
+    return account.isLedger;
+  }
+
+  if (walletClient instanceof LeapClient) {
+    // @ts-ignore
+    const key = await window.leap.getKey(chainID);
+
+    return key.isNanoLedger;
+  }
+
+  return false;
+}
+
+// TODO: planning on refactoring the tx process, where this will find a better home.
+export async function signAmino(
+  client: SigningStargateClient,
+  signer: OfflineAminoSigner,
+  signerAddress: string,
+  messages: readonly EncodeObject[],
+  fee: StdFee,
+  memo: string,
+  { accountNumber, sequence, chainId }: SignerData
+) {
+  const aminoTypes = new AminoTypes(createDefaultAminoConverters());
+
+  const accountFromSigner = (await signer.getAccounts()).find(
+    (account) => account.address === signerAddress
+  );
+  if (!accountFromSigner) {
+    throw new Error("Failed to retrieve account from signer");
+  }
+
+  const pubkey = encodePubkey(encodeSecp256k1Pubkey(accountFromSigner.pubkey));
+
+  const signMode = SignMode.SIGN_MODE_LEGACY_AMINO_JSON;
+
+  const msgs = messages.map((msg) => aminoTypes.toAmino(msg));
+
+  msgs[0].value.memo = messages[0].value.memo;
+
+  const signDoc = makeSignDoc(
+    msgs,
+    fee,
+    chainId,
+    memo,
+    accountNumber,
+    sequence
+  );
+
+  const { signature, signed } = await signer.signAmino(signerAddress, signDoc);
+
+  const signedTxBody = {
+    messages: signed.msgs.map((msg) => aminoTypes.fromAmino(msg)),
+    memo: signed.memo,
+  };
+
+  signedTxBody.messages[0].value.memo = messages[0].value.memo;
+
+  const signedTxBodyEncodeObject: TxBodyEncodeObject = {
+    typeUrl: "/cosmos.tx.v1beta1.TxBody",
+    value: signedTxBody,
+  };
+
+  const signedTxBodyBytes = client.registry.encode(signedTxBodyEncodeObject);
+
+  const signedGasLimit = Int53.fromString(signed.fee.gas).toNumber();
+  const signedSequence = Int53.fromString(signed.sequence).toNumber();
+
+  const signedAuthInfoBytes = makeAuthInfoBytes(
+    [{ pubkey, sequence: signedSequence }],
+    signed.fee.amount,
+    signedGasLimit,
+    signed.fee.granter,
+    signed.fee.payer,
+    signMode
+  );
+
+  return TxRaw.fromPartial({
+    bodyBytes: signedTxBodyBytes,
+    authInfoBytes: signedAuthInfoBytes,
+    signatures: [fromBase64(signature.signature)],
+  });
 }
