@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC } from "react";
 import va from "@vercel/analytics";
 import { useSwapWidget } from "./useSwapWidget";
 import AssetInput from "../AssetInput";
@@ -66,6 +66,7 @@ export const SwapWidget: FC = () => {
     routeLoading,
     numberOfTransactions,
     route,
+    insufficientBalance,
   } = useSwapWidget();
 
   const {
@@ -176,13 +177,13 @@ export const SwapWidget: FC = () => {
             <TransactionDialog
               route={route}
               transactionCount={numberOfTransactions}
-              // insufficientBalance={insufficientBalance}
+              insufficientBalance={insufficientBalance}
             />
-            {/* {insufficientBalance && (
-                <p className="text-center font-semibold text-sm text-red-500">
-                  Insufficient Balance
-                </p>
-              )} */}
+            {insufficientBalance && (
+              <p className="text-center font-semibold text-sm text-red-500">
+                Insufficient Balance
+              </p>
+            )}
           </div>
         )}
       </div>

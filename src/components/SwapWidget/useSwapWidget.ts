@@ -1,11 +1,13 @@
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
+import { useBalancesByChain } from "@/cosmos";
 import {
   AssetWithMetadata,
   getNumberOfTransactionsFromRoute,
   useRoute,
   useSkipClient,
 } from "@/solve";
+import { useChain } from "@cosmos-kit/react";
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
@@ -84,6 +86,35 @@ export function useSwapWidget() {
     routeResponse,
   ]);
 
+  const { address } = useChain(
+    formValues.sourceChain?.chain_name ?? "cosmoshub"
+  );
+
+  const { data: balances } = useBalancesByChain(
+    address,
+    formValues.sourceChain
+  );
+
+  const insufficientBalance = useMemo(() => {
+    if (!formValues.sourceAsset || !balances) {
+      return false;
+    }
+
+    const amountIn = parseFloat(formValues.amountIn);
+
+    if (isNaN(amountIn)) {
+      return false;
+    }
+
+    const balanceStr = balances[formValues.sourceAsset.denom] ?? "0";
+
+    const balance = parseFloat(
+      ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals)
+    );
+
+    return amountIn > balance;
+  }, [balances, formValues.amountIn, formValues.sourceAsset]);
+
   return {
     amountIn: formValues.amountIn,
     amountOut,
@@ -96,6 +127,7 @@ export function useSwapWidget() {
     routeLoading,
     numberOfTransactions: numberOfTransactions ?? 0,
     route: routeResponse,
+    insufficientBalance,
   };
 }
 
