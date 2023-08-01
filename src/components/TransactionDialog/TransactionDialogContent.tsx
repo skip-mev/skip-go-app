@@ -2,16 +2,37 @@ import { FC, Fragment, useEffect, useRef, useState } from "react";
 import { useChain, useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import Toast from "@/elements/Toast";
-import { executeRoute } from "@/solve/form";
 import RouteDisplay from "../RouteDisplay";
-import { Route } from ".";
-import { useSkipClient } from "@/solve";
+import { RouteResponse, useSkipClient } from "@/solve";
 import { useToast } from "@/context/toast";
+import { getChainByID } from "@/utils/utils";
+import { executeRoute } from "@/solve/execute-route";
+import { useAssets } from "@/context/assets";
+import { Chain, useChains } from "@/context/chains";
 
-const TransactionSuccessView: FC<{ route: Route; onClose: () => void }> = ({
-  route,
-  onClose,
-}) => {
+const TransactionSuccessView: FC<{
+  route: RouteResponse;
+  onClose: () => void;
+}> = ({ route, onClose }) => {
+  const { getAsset } = useAssets();
+  const { chains } = useChains();
+
+  const sourceAsset = getAsset(
+    route.source_asset_denom,
+    route.source_asset_chain_id
+  );
+  const destinationAsset = getAsset(
+    route.dest_asset_denom,
+    route.dest_asset_chain_id
+  );
+
+  const sourceChain = chains.find(
+    (c) => c.chain_id === route.source_asset_chain_id
+  ) as Chain;
+  const destinationChain = chains.find(
+    (c) => c.chain_id === route.dest_asset_chain_id
+  ) as Chain;
+
   return (
     <div className="flex flex-col items-center h-full px-4 py-6 pt-28 overflow-y-auto scrollbar-hide">
       <div className="text-emerald-400">
@@ -30,21 +51,25 @@ const TransactionSuccessView: FC<{ route: Route; onClose: () => void }> = ({
       </div>
       <div>
         <p className="font-bold text-3xl mb-4">
-          {route.rawRoute.does_swap ? "Swap" : "Transfer"} Successful
+          {route.does_swap ? "Swap" : "Transfer"} Successful
         </p>
       </div>
       <p className="font-medium text-neutral-400 pb-8 flex-1 text-center">
-        {route.rawRoute.does_swap &&
-          `Successfully swapped ${route.sourceAsset.symbol} for ${route.destinationAsset.symbol}`}
-        {!route.rawRoute.does_swap &&
-          `Successfully transfered ${route.sourceAsset.symbol} from ${route.sourceChain.prettyName} to ${route.destinationChain.prettyName}`}
+        {route.does_swap &&
+          `Successfully swapped ${
+            sourceAsset?.symbol ?? route.source_asset_denom
+          } for ${destinationAsset?.symbol ?? route.dest_asset_denom}`}
+        {!route.does_swap &&
+          `Successfully transfered ${
+            sourceAsset?.symbol ?? route.source_asset_denom
+          } from ${sourceChain.prettyName} to ${destinationChain.prettyName}`}
       </p>
       <div className="w-full">
         <button
           className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
           onClick={onClose}
         >
-          {route.rawRoute.does_swap ? "Swap" : "Transfer"} Again
+          {route.does_swap ? "Swap" : "Transfer"} Again
         </button>
       </div>
     </div>
@@ -52,7 +77,8 @@ const TransactionSuccessView: FC<{ route: Route; onClose: () => void }> = ({
 };
 
 interface Props {
-  route: Route;
+  route: RouteResponse;
+  transactionCount: number;
   insufficentBalance?: boolean;
   onClose: () => void;
 }
@@ -61,6 +87,7 @@ const TransactionDialogContent: FC<Props> = ({
   route,
   onClose,
   insufficentBalance,
+  transactionCount,
 }) => {
   const skipClient = useSkipClient();
 
@@ -85,13 +112,15 @@ const TransactionDialogContent: FC<Props> = ({
     }
   }, [warningOpen]);
 
-  const chain = useChain(route.sourceChain.record?.name ?? "");
+  const chainRecord = getChainByID(route.source_asset_chain_id);
+
+  const chain = useChain(chainRecord?.chain_name);
 
   const { chainRecords } = useManager();
   const walletClient = chain.chainWallet?.client;
 
   const [txStatuses, setTxStatuses] = useState(() =>
-    Array.from({ length: route.transactionCount }, () => "INIT")
+    Array.from({ length: transactionCount }, () => "INIT")
   );
 
   const onSubmit = async () => {
@@ -104,10 +133,9 @@ const TransactionDialogContent: FC<Props> = ({
         throw new Error("No wallet client found");
       }
 
-      for (const chainID of route.rawRoute.chain_ids) {
+      for (const chainID of route.chain_ids) {
         if (walletClient.addChain) {
           const record = chainRecords.find((c) => c.chain.chain_id === chainID);
-
           if (record) {
             await walletClient.addChain(record);
           }
@@ -122,28 +150,22 @@ const TransactionDialogContent: FC<Props> = ({
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
             newStatuses[i] = "SUCCESS";
-
             if (i < statuses.length - 1) {
               newStatuses[i + 1] = "PENDING";
             }
-
             return newStatuses;
           });
         },
         (error: any) => {
           console.error(error);
-
           setTxError(error.message);
           setIsError(true);
-
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
-
             return newStatuses.map((status) => {
               if (status === "PENDING") {
                 return "INIT";
               }
-
               return status;
             });
           });
@@ -155,6 +177,7 @@ const TransactionDialogContent: FC<Props> = ({
         "Your transaction was successful",
         "success"
       );
+
       setTxComplete(true);
     } finally {
       setTransacting(false);
@@ -186,8 +209,8 @@ const TransactionDialogContent: FC<Props> = ({
           <p className="flex-1">
             This route requires{" "}
             <span className="text-white">
-              {route.transactionCount} Transaction
-              {route.transactionCount > 1 ? "s" : ""}
+              {transactionCount} Transaction
+              {transactionCount > 1 ? "s" : ""}
             </span>{" "}
             to complete
           </p>
@@ -266,7 +289,7 @@ const TransactionDialogContent: FC<Props> = ({
             </p>
           )}
         </div>
-        {route.rawRoute.chain_ids.length > 1 && (
+        {route.chain_ids.length > 1 && (
           <div className="bg-red-50 text-red-400 rounded-md">
             <button
               className="bg-red-50 text-red-400 font-medium uppercase text-xs p-3 flex items-center gap-2 w-full text-left"

@@ -102,6 +102,7 @@ const AssetInput: FC<Props> = ({
               className={`w-full text-3xl font-medium ${
                 amount === "0.0" ? "text-neutral-300" : "text-black"
               }`}
+              data-testid="amount"
             >
               {amount}
             </p>

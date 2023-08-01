@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC, Fragment, useMemo, useState } from "react";
-import { isSwapOperation } from "@/solve";
+import { RouteResponse, isSwapOperation } from "@/solve";
 import { Chain, useChains } from "@/context/chains";
 import { chainNameToChainlistURL } from "@/cosmos";
 import { SWAP_VENUES } from "@/config";
 import { useAssets } from "@/context/assets";
-import { Route } from "./TransactionDialog";
+import { ethers } from "ethers";
 
 interface TransferAction {
   type: "TRANSFER";
@@ -59,8 +59,6 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   const { getAsset } = useAssets();
 
   const asset = getAsset(action.asset, sourceChain.chain_id);
-
-  // console.log(asset);
 
   if (!asset) {
     console.log(action);
@@ -158,27 +156,56 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
 };
 
 interface Props {
-  route: Route;
+  route: RouteResponse;
 }
 
 const RouteDisplay: FC<Props> = ({ route }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const {
-    amountIn,
-    amountOut,
-    sourceAsset,
-    sourceChain,
-    destinationAsset,
-    destinationChain,
-  } = route;
+  const { chains } = useChains();
+  const { getAsset } = useAssets();
+
+  const sourceAsset = getAsset(
+    route.source_asset_denom,
+    route.source_asset_chain_id
+  );
+
+  const destinationAsset = getAsset(
+    route.dest_asset_denom,
+    route.dest_asset_chain_id
+  );
+
+  const sourceChain = chains.find(
+    (c) => c.chain_id === route.source_asset_chain_id
+  ) as Chain;
+
+  const destinationChain = chains.find(
+    (c) => c.chain_id === route.dest_asset_chain_id
+  ) as Chain;
+
+  const amountIn = useMemo(() => {
+    try {
+      return ethers.formatUnits(route.amount_in, sourceAsset?.decimals ?? 6);
+    } catch {
+      return "0.0";
+    }
+  }, [route.amount_in, sourceAsset?.decimals]);
+
+  const amountOut = useMemo(() => {
+    try {
+      return ethers.formatUnits(
+        route.estimated_amount_out ?? 0,
+        destinationAsset?.decimals ?? 6
+      );
+    } catch {
+      return "0.0";
+    }
+  }, [route.estimated_amount_out, destinationAsset?.decimals]);
 
   const actions = useMemo(() => {
     const _actions: Action[] = [];
 
-    let asset = route.sourceAsset.denom;
-
-    // console.log(route);
+    let asset = route.source_asset_denom;
 
     route.operations.forEach((operation, i) => {
       if (isSwapOperation(operation)) {
@@ -200,7 +227,6 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             ].denom_out;
         }
 
-        // TODO: do something
         return;
       }
 
@@ -208,7 +234,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
       let destinationChain = "";
       if (i === route.operations.length - 1) {
-        destinationChain = route.destinationChain.chain_id;
+        destinationChain = route.dest_asset_chain_id;
       } else {
         const nextOperation = route.operations[i + 1];
         if (isSwapOperation(nextOperation)) {
@@ -246,8 +272,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         <div className="flex items-center justify-between pr-4">
           <RouteEnd
             amount={amountIn}
-            symbol={sourceAsset.symbol}
-            logo={sourceAsset.logo_uri}
+            symbol={sourceAsset?.symbol ?? "UNKNOWN"}
+            logo={sourceAsset?.logo_uri ?? "UNKNOWN"}
             chain={sourceChain.prettyName}
           />
           {isExpanded && (
@@ -289,8 +315,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         )}
         <RouteEnd
           amount={amountOut}
-          symbol={destinationAsset.symbol}
-          logo={destinationAsset.logo_uri}
+          symbol={destinationAsset?.symbol ?? "UNKNOWN"}
+          logo={destinationAsset?.logo_uri ?? "UNKNOWN"}
           chain={destinationChain.prettyName}
         />
       </div>
