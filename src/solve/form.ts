@@ -546,6 +546,8 @@ export async function executeRoute(
 
         let tx: DeliverTxResponse;
 
+        const simulatedGas = await client.simulate(msgJSON.sender, [msg], "");
+
         if (signerIsLedger) {
           const txRaw = await signAmino(
             client,
@@ -559,7 +561,7 @@ export async function executeRoute(
             ],
             {
               amount: [coin(0, feeInfo.denom)],
-              gas: `${gasNeeded}`,
+              gas: `${simulatedGas * 1.2}`,
             },
             "",
             {
