@@ -1,0 +1,117 @@
+=============== Aug 2, 2023 (UTC) ===============
+18:41:03.821915 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:41:03.826173 db@open opening
+18:41:03.828218 version@stat F·[] S·0B[] Sc·[]
+18:41:03.829228 db@janitor F·2 G·0
+18:41:03.829419 db@open done T·3.027501ms
+18:44:54.348996 db@close closing
+18:44:54.352052 db@close done T·3.053167ms
+=============== Aug 2, 2023 (UTC) ===============
+18:44:57.358127 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:44:57.360070 version@stat F·[] S·0B[] Sc·[]
+18:44:57.360256 db@open opening
+18:44:57.360503 journal@recovery F·1
+18:44:57.360927 journal@recovery recovering @1
+18:44:57.369961 memdb@flush created L0@2 N·270 S·42KiB "BH:..811,v111":"blo..ore,v6"
+18:44:57.370930 version@stat F·[1] S·42KiB[42KiB] Sc·[0.25]
+18:44:57.375475 db@janitor F·3 G·0
+18:44:57.375650 db@open done T·15.193708ms
+18:51:53.903631 db@close closing
+18:51:53.906219 db@close done T·2.599416ms
+=============== Aug 2, 2023 (UTC) ===============
+18:52:35.263352 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:52:35.265908 version@stat F·[1] S·42KiB[42KiB] Sc·[0.25]
+18:52:35.266109 db@open opening
+18:52:35.266372 journal@recovery F·1
+18:52:35.266783 journal@recovery recovering @3
+18:52:35.281578 memdb@flush created L0@5 N·492 S·78KiB "BH:..a91,v532":"blo..ore,v277"
+18:52:35.282734 version@stat F·[2] S·120KiB[120KiB] Sc·[0.50]
+18:52:35.288178 db@janitor F·4 G·0
+18:52:35.288371 db@open done T·22.065709ms
+=============== Aug 2, 2023 (UTC) ===============
+18:53:00.839960 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:53:00.843610 version@stat F·[2] S·120KiB[120KiB] Sc·[0.50]
+18:53:00.843915 db@open opening
+18:53:00.844348 journal@recovery F·1
+18:53:00.845155 journal@recovery recovering @6
+18:53:00.848742 memdb@flush created L0@8 N·6 S·1KiB "BH:..bc1,v767":"blo..ore,v770"
+18:53:00.849843 version@stat F·[3] S·122KiB[122KiB] Sc·[0.75]
+18:53:00.855636 db@janitor F·5 G·0
+18:53:00.855820 db@open done T·11.56275ms
+=============== Aug 2, 2023 (UTC) ===============
+18:54:31.177531 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:54:31.179960 version@stat F·[3] S·122KiB[122KiB] Sc·[0.75]
+18:54:31.180145 db@open opening
+18:54:31.180432 journal@recovery F·1
+18:54:31.180780 journal@recovery recovering @9
+18:54:31.185284 memdb@flush created L0@11 N·96 S·15KiB "BH:..fca,v798":"blo..ore,v777"
+18:54:31.186172 version@stat F·[4] S·137KiB[137KiB] Sc·[1.00]
+18:54:31.190885 db@janitor F·6 G·0
+18:54:31.191048 db@open done T·10.671542ms
+18:54:31.191076 table@compaction L0·4 -> L1·0 S·137KiB Q·868
+18:54:31.222090 table@build created L1@14 N·721 S·136KiB "BH:..a91,v532":"blo..ore,v867"
+18:54:31.222529 version@stat F·[0 1] S·136KiB[0B 136KiB] Sc·[0.00 0.00]
+18:54:31.223137 table@compaction committed F-3 S-1KiB Ke·0 D·143 T·31.487292ms
+18:54:31.223917 table@remove removed @8
+18:54:31.235410 table@remove removed @5
+18:54:31.236155 table@remove removed @2
+=============== Aug 2, 2023 (UTC) ===============
+18:55:00.122659 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:55:00.125560 version@stat F·[0 1] S·136KiB[0B 136KiB] Sc·[0.00 0.00]
+18:55:00.125956 db@open opening
+18:55:00.126392 journal@recovery F·1
+18:55:00.126966 journal@recovery recovering @12
+18:55:00.130790 memdb@flush created L0@15 N·24 S·3KiB "BH:..d08,v877":"blo..ore,v874"
+18:55:00.132084 version@stat F·[1 1] S·139KiB[3KiB 136KiB] Sc·[0.25 0.00]
+18:55:00.137322 db@janitor F·5 G·1
+18:55:00.137492 db@janitor removing table-11
+18:55:00.138123 db@open done T·11.830583ms
+=============== Aug 2, 2023 (UTC) ===============
+18:59:15.389523 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:59:15.392327 version@stat F·[1 1] S·139KiB[3KiB 136KiB] Sc·[0.25 0.00]
+18:59:15.392672 db@open opening
+18:59:15.393040 journal@recovery F·1
+18:59:15.393620 journal@recovery recovering @16
+18:59:15.399711 memdb@flush created L0@18 N·78 S·12KiB "BH:..386,v932":"blo..ore,v899"
+18:59:15.400790 version@stat F·[2 1] S·152KiB[15KiB 136KiB] Sc·[0.50 0.00]
+18:59:15.406005 db@janitor F·5 G·0
+18:59:15.406186 db@open done T·13.241042ms
+=============== Aug 2, 2023 (UTC) ===============
+19:00:10.696834 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+19:00:10.699429 version@stat F·[2 1] S·152KiB[15KiB 136KiB] Sc·[0.50 0.00]
+19:00:10.699676 db@open opening
+19:00:10.699954 journal@recovery F·1
+19:00:10.700432 journal@recovery recovering @19
+19:00:10.705796 memdb@flush created L0@21 N·54 S·8KiB "BH:..de1,v1011":"blo..ore,v978"
+19:00:10.706947 version@stat F·[3 1] S·160KiB[24KiB 136KiB] Sc·[0.75 0.00]
+19:00:10.712055 db@janitor F·6 G·0
+19:00:10.712309 db@open done T·12.437791ms
+=============== Aug 2, 2023 (UTC) ===============
+19:05:16.739140 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+19:05:16.741773 version@stat F·[3 1] S·160KiB[24KiB 136KiB] Sc·[0.75 0.00]
+19:05:16.741976 db@open opening
+19:05:16.742236 journal@recovery F·1
+19:05:16.742643 journal@recovery recovering @22
+19:05:16.745537 memdb@flush created L0@24 N·6 S·1KiB "BH:..de6,v1030":"blo..ore,v1033"
+19:05:16.746430 version@stat F·[4 1] S·161KiB[25KiB 136KiB] Sc·[1.00 0.00]
+19:05:16.751123 db@janitor F·7 G·0
+19:05:16.751284 db@open done T·9.1125ms
+19:05:16.751321 table@compaction L0·4 -> L1·1 S·161KiB Q·1034
+19:05:16.787584 table@build created L1@27 N·856 S·161KiB "BH:..a91,v532":"blo..ore,v1033"
+19:05:16.788113 version@stat F·[0 1] S·161KiB[0B 161KiB] Sc·[0.00 0.00]
+19:05:16.788741 table@compaction committed F-4 S-167B Ke·0 D·27 T·36.739125ms
+19:05:16.790225 table@remove removed @21
+19:05:16.790734 table@remove removed @18
+19:05:16.791634 table@remove removed @15
+19:05:16.794119 table@remove removed @14
+=============== Aug 2, 2023 (UTC) ===============
+19:06:08.938171 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+19:06:08.940673 version@stat F·[0 1] S·161KiB[0B 161KiB] Sc·[0.00 0.00]
+19:06:08.940850 db@open opening
+19:06:08.941125 journal@recovery F·1
+19:06:08.941549 journal@recovery recovering @25
+19:06:08.945439 memdb@flush created L0@28 N·54 S·8KiB "BH:..2f1,v1055":"blo..ore,v1040"
+19:06:08.946326 version@stat F·[1 1] S·170KiB[8KiB 161KiB] Sc·[0.25 0.00]
+19:06:08.951530 db@janitor F·5 G·1
+19:06:08.951684 db@janitor removing table-24
+19:06:08.952326 db@open done T·11.25875ms

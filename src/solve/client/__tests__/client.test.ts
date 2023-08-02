@@ -2,6 +2,18 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { SkipClient } from "../client";
 import { IGNORE_CHAINS } from "../../../config";
+import {
+  DirectSecp256k1HdWallet,
+  coin,
+  coins,
+  decodeTxRaw,
+} from "@cosmjs/proto-signing";
+import { fromBase64 } from "@cosmjs/encoding";
+import { SigningStargateClient, isDeliverTxFailure } from "@cosmjs/stargate";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import Long from "long";
+import { spawn } from "child_process";
+import path from "path";
 
 const handlers = [
   rest.post(
@@ -141,6 +153,32 @@ const handlers = [
 
 const server = setupServer(...handlers);
 
+async function startCosmosHubLocalnet(): Promise<void> {
+  const child = spawn(
+    path.resolve(__dirname, "../../../../scripts/localnets/cosmoshub/start.sh")
+  );
+
+  return new Promise((resolve) => {
+    child.on("close", (code) => {
+      console.log(`child process exited with code ${code}`);
+      resolve();
+    });
+  });
+}
+
+async function stopCosmosHubLocalnet(): Promise<void> {
+  const child = spawn(
+    path.resolve(__dirname, "../../../../scripts/localnets/cosmoshub/stop.sh")
+  );
+
+  return new Promise((resolve) => {
+    child.on("close", (code) => {
+      console.log(`child process exited with code ${code}`);
+      resolve();
+    });
+  });
+}
+
 describe("SkipClient", () => {
   // Establish API mocking before all tests.
   beforeAll(() => server.listen());
@@ -181,4 +219,86 @@ describe("SkipClient", () => {
       ).resolves.toEqual(expect.anything());
     });
   });
+
+  test("works", async () => {
+    await startCosmosHubLocalnet();
+
+    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+      "enlist hip relief stomach skate base shallow young switch frequent cry park"
+    );
+
+    const accounts = await wallet.getAccounts();
+    const address = accounts[0].address;
+
+    const message = {
+      chain_id: "cosmoshub-4",
+      path: ["cosmoshub-4", "osmosis-1"],
+      msg: '{"source_port":"transfer","source_channel":"channel-141","token":{"denom":"uatom","amount":"5000"},"sender":"cosmos14qemq0vw6y3gc3u3e0aty2e764u4gs5le3hada","receiver":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","timeout_height":{},"timeout_timestamp":1690975247072565510}',
+      msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
+    };
+
+    const client = new SkipClient();
+
+    const stargateClient = await SigningStargateClient.connectWithSigner(
+      "localhost:26657",
+      wallet
+    );
+
+    const account = await stargateClient.getAccount(address);
+
+    if (!account) {
+      throw new Error("Account not found");
+    }
+
+    const rawTx = await client.signMultiChainMessageDirect(
+      address,
+      wallet,
+      message,
+      {
+        amount: [coin(0, "uatom")],
+        gas: "200000",
+      },
+      {
+        accountNumber: account.accountNumber,
+        sequence: account.sequence,
+        chainId: "cosmoshub-localnet-1",
+      }
+    );
+
+    const txBytes = TxRaw.encode(rawTx).finish();
+
+    const tx = await stargateClient.broadcastTx(txBytes);
+
+    // CheckTx must pass but the execution must fail in DeliverTx due to invalid channel/port
+    expect(isDeliverTxFailure(tx)).toEqual(true);
+
+    stargateClient.disconnect();
+
+    await stopCosmosHubLocalnet();
+  });
+
+  // test("with evmos")
+
+  // describe("executeRoute", () => {
+  //   it("works", async () => {
+  //     const client = new SkipClient();
+
+  //     const wallet = await DirectSecp256k1HdWallet.generate(12);
+
+  //     const route = await client.fungible.getRoute({
+  //       amount_in: "1000000",
+  //       source_asset_denom: "uosmo",
+  //       source_asset_chain_id: "osmosis-1",
+  //       dest_asset_denom: "uatom",
+  //       dest_asset_chain_id: "cosmoshub-4",
+  //     });
+
+  //     const userAddresses = {
+  //       "osmosis-1": "osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e",
+  //       "cosmoshub-4": "cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet",
+  //     };
+
+  //     await client.executeRoute(wallet, route, userAddresses);
+  //   });
+  // });
 });
