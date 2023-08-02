@@ -472,13 +472,20 @@ export async function executeRoute(
     if (
       multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
+      let gasPrice: GasPrice | undefined;
+      try {
+        gasPrice = GasPrice.fromString(
+          `${feeInfo.average_gas_price ?? 0}${feeInfo.denom}`
+        );
+      } catch {
+        // ignore error
+      }
+
       const client = await getSigningStargateClientForChainID(
         multiHopMsg.chain_id,
         signer,
         {
-          gasPrice: GasPrice.fromString(
-            `${feeInfo.average_gas_price ?? 0}${feeInfo.denom}`
-          ),
+          gasPrice,
         }
       );
 
@@ -575,7 +582,10 @@ export async function executeRoute(
 
           tx = await client.broadcastTx(txBytes, undefined, undefined);
         } else {
-          tx = await client.signAndBroadcast(msgJSON.sender, [msg], "auto");
+          tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
+            amount: [coin(0, feeInfo.denom)],
+            gas: `${gasNeeded}`,
+          });
         }
         txHash = tx.transactionHash;
       }
