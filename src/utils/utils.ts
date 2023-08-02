@@ -60,6 +60,12 @@ import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { Int53 } from "@cosmjs/math";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { fromBase64 } from "@cosmjs/encoding";
+import { MultiChainMsg, RouteResponse } from "@/solve";
+
+const NEUTRON_SWAP_GAS_AMOUNT = 1_200_000;
+const NEUTRON_TRANSFER_GAS_AMOUNT = 1_200_000;
+const SWAP_GAS_AMOUNT = 1_200_000;
+const TRANSFER_GAS_AMOUNT = 280_000;
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -380,6 +386,30 @@ export async function getOfflineSignerOnlyAmino(
   throw new Error("unsupported wallet");
 }
 
+
+export function getGasNeeded(chainID: string, route?:RouteResponse, msg?: MultiChainMsg)  {
+  if (route) {
+    if (route.does_swap && route.swap_venue?.chain_id === msg?.chain_id) {
+      if (msg?.chain_id === "neutron-1") {
+        if (route.operations.length > 1) {
+          return NEUTRON_SWAP_GAS_AMOUNT + NEUTRON_TRANSFER_GAS_AMOUNT
+        } else {
+          return NEUTRON_SWAP_GAS_AMOUNT
+        }
+      } else {
+        return SWAP_GAS_AMOUNT
+      }
+    } else {
+      return TRANSFER_GAS_AMOUNT
+    }
+  } else {
+    if (chainID === "neutron-1") {
+      return NEUTRON_SWAP_GAS_AMOUNT + NEUTRON_TRANSFER_GAS_AMOUNT
+    } else {
+      return SWAP_GAS_AMOUNT
+    }
+  }
+}
 export function getFee(chainID: string) {
   const chain = getChainByID(chainID);
 
@@ -393,8 +423,9 @@ export function getFee(chainID: string) {
   if (feeInfo.average_gas_price) {
     averageGasPrice = feeInfo.average_gas_price;
   }
+  const gasAmount = getGasNeeded(chainID); 
 
-  const amountNeeded = averageGasPrice * 1000000;
+  const amountNeeded = averageGasPrice * gasAmount;
 
   return amountNeeded;
 }

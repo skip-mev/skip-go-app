@@ -2,6 +2,7 @@ import {
   enableChains,
   getAddressForChain,
   getChainByID,
+  getGasNeeded,
   getOfflineSigner,
   getOfflineSignerOnlyAmino,
   getSigningCosmWasmClientForChainID,
@@ -70,14 +71,7 @@ export async function executeRoute(
     if (!feeInfo) {
       throw new Error("No fee info found");
     }
-
-    let gasNeeded = 200000;
-    if (
-      route.does_swap &&
-      route.swap_venue?.chain_id === multiHopMsg.chain_id
-    ) {
-      gasNeeded = 1000000;
-    }
+    const gasNeeded = getGasNeeded(multiHopMsg.chain_id, route, multiHopMsg); 
 
     let averageGasPrice = 0;
     if (feeInfo.average_gas_price) {
@@ -121,13 +115,7 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    let gasNeeded = 200000;
-    if (
-      route.does_swap &&
-      route.swap_venue?.chain_id === multiHopMsg.chain_id
-    ) {
-      gasNeeded = 1000000;
-    }
+   const gasNeeded = getGasNeeded(multiHopMsg.chain_id, route, multiHopMsg); 
 
     const msgJSON = JSON.parse(multiHopMsg.msg);
 
