@@ -185,7 +185,10 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   const amountIn = useMemo(() => {
     try {
-      return ethers.formatUnits(route.amount_in, sourceAsset?.decimals ?? 6);
+      return ethers.utils.formatUnits(
+        route.amount_in,
+        sourceAsset?.decimals ?? 6
+      );
     } catch {
       return "0.0";
     }
@@ -193,7 +196,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   const amountOut = useMemo(() => {
     try {
-      return ethers.formatUnits(
+      return ethers.utils.formatUnits(
         route.estimated_amount_out ?? 0,
         destinationAsset?.decimals ?? 6
       );

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { AssetWithMetadata } from "@/solve";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { ethers, toBigInt } from "ethers";
+import { ethers } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
@@ -45,8 +45,8 @@ const AssetSelectContent: FC<Props> = ({
       return 0;
     })
     .sort((a, b) => {
-      const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
-      const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
+      const balanceA = balances[a.denom] ? BigInt(balances[a.denom]) : 0n;
+      const balanceB = balances[b.denom] ? BigInt(balances[b.denom]) : 0n;
 
       if (balanceA > balanceB) return -1;
       if (balanceA < balanceB) return 1;
@@ -121,7 +121,10 @@ const AssetSelectContent: FC<Props> = ({
               <div>
                 {balances[asset.denom] && (
                   <p className="font-medium text-sm text-neutral-400">
-                    {ethers.formatUnits(balances[asset.denom], asset.decimals)}
+                    {ethers.utils.formatUnits(
+                      balances[asset.denom],
+                      asset.decimals
+                    )}
                   </p>
                 )}
               </div>

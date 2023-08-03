@@ -64,7 +64,7 @@ const AssetInput: FC<Props> = ({
       return "0.0";
     }
 
-    return ethers.formatUnits(balanceWei, asset.decimals);
+    return ethers.utils.formatUnits(balanceWei, asset.decimals);
   }, [asset, balances]);
 
   const maxButtonDisabled = useMemo(() => {
@@ -148,7 +148,7 @@ const AssetInput: FC<Props> = ({
                         const fee = getFee(chain.chain_id);
 
                         const feeInt = parseFloat(
-                          ethers.formatUnits(fee, asset.decimals)
+                          ethers.utils.formatUnits(fee, asset.decimals)
                         ).toFixed(asset.decimals);
 
                         amount = (

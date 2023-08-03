@@ -23,7 +23,7 @@ export function useSwapWidget() {
     }
 
     try {
-      return ethers
+      return ethers.utils
         .parseUnits(formValues.amountIn, formValues.sourceAsset.decimals)
         .toString();
     } catch (err) {
@@ -73,7 +73,7 @@ export function useSwapWidget() {
     }
 
     if (routeResponse.does_swap && routeResponse.estimated_amount_out) {
-      return ethers.formatUnits(
+      return ethers.utils.formatUnits(
         routeResponse.estimated_amount_out,
         formValues.destinationAsset?.decimals ?? 6
       );
@@ -109,7 +109,7 @@ export function useSwapWidget() {
     const balanceStr = balances[formValues.sourceAsset.denom] ?? "0";
 
     const balance = parseFloat(
-      ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals)
+      ethers.utils.formatUnits(balanceStr, formValues.sourceAsset.decimals)
     );
 
     return amountIn > balance;

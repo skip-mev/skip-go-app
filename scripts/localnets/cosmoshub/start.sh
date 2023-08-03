@@ -18,4 +18,6 @@ docker run --rm \
   --mount type=volume,source=cosmoshub_data,target=/root \
   cosmoshub-localnet start --home /.cosmoshub --x-crisis-skip-assert-invariants --rpc.laddr tcp://0.0.0.0:26657
 
+sleep 1
+
 echo "cosmoshub-localnet running"  

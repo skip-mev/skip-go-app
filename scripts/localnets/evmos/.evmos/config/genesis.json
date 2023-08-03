@@ -1,6 +1,6 @@
 {
-  "genesis_time": "2023-08-02T19:35:42.265864Z",
-  "chain_id": "evmos_9001-2",
+  "genesis_time": "2023-08-03T13:05:29.998061Z",
+  "chain_id": "evmos_9001-999",
   "initial_height": "1",
   "consensus_params": {
     "block": {
@@ -40,6 +40,16 @@
             "sequence": "0"
           },
           "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        },
+        {
+          "@type": "/ethermint.types.v1.EthAccount",
+          "base_account": {
+            "address": "evmos1z92qlcv6242k6p0c4dqr5ce7rkta5ky9qmakwq",
+            "pub_key": null,
+            "account_number": "0",
+            "sequence": "0"
+          },
+          "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
         }
       ]
     },
@@ -53,6 +63,15 @@
       },
       "balances": [
         {
+          "address": "evmos1z92qlcv6242k6p0c4dqr5ce7rkta5ky9qmakwq",
+          "coins": [
+            {
+              "denom": "aevmos",
+              "amount": "10000000000000000000000000"
+            }
+          ]
+        },
+        {
           "address": "evmos1fnyrp624gfszlfzarra977548lfwxtj4xsyra0",
           "coins": [
             {
@@ -65,7 +84,7 @@
       "supply": [
         {
           "denom": "aevmos",
-          "amount": "10000000000000000000000000"
+          "amount": "20000000000000000000000000"
         }
       ],
       "denom_metadata": []
@@ -207,7 +226,7 @@
               {
                 "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
                 "description": {
-                  "moniker": "evmos_9001-2",
+                  "moniker": "evmos_9001-999",
                   "identity": "",
                   "website": "",
                   "security_contact": "",
@@ -223,7 +242,7 @@
                 "validator_address": "evmosvaloper1fnyrp624gfszlfzarra977548lfwxtj4t7tnuj",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "nrxsL0prYE1o48IGdkoXSKsc7ZNL1ETDZ6jN0rws4Ew="
+                  "key": "gHxhPPYdAEo/In8X/vCis43m57rNbK1gqA2T6qQRXrE="
                 },
                 "value": {
                   "denom": "aevmos",
@@ -231,7 +250,7 @@
                 }
               }
             ],
-            "memo": "eab82b13c5cebce39e53e21f9129d1ef9566effb@10.239.123.118:26656",
+            "memo": "8d1f428a7d599f1e8f9e7eb574737b958e8dcf18@10.239.127.11:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -260,7 +279,7 @@
             "tip": null
           },
           "signatures": [
-            "TlbwTYpPkKZAZFiSLhcQHEiB1D67Bgcf4MmTkWg9Sgto26xWtZbsUYA34MUv0r28CJEx1Kvd73B9NpGFPJjKvgE="
+            "Rq6f5CCtvKFPhDOFjhiL5K3wYOKKUR+5NRspqChnHr9aK6DIqYkeNTstlizQp/Y4r1GelaV9L9MyZECeCxMePgA="
           ]
         }
       ]

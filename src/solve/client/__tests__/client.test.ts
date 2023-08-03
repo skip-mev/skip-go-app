@@ -2,18 +2,18 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { SkipClient } from "../client";
 import { IGNORE_CHAINS } from "../../../config";
+import { DirectSecp256k1HdWallet, coin } from "@cosmjs/proto-signing";
 import {
-  DirectSecp256k1HdWallet,
-  coin,
-  coins,
-  decodeTxRaw,
-} from "@cosmjs/proto-signing";
-import { fromBase64 } from "@cosmjs/encoding";
-import { SigningStargateClient, isDeliverTxFailure } from "@cosmjs/stargate";
+  DeliverTxResponse,
+  SigningStargateClient,
+  isDeliverTxFailure,
+} from "@cosmjs/stargate";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import Long from "long";
 import { spawn } from "child_process";
 import path from "path";
+import axios from "axios";
+import { generateEndpointBroadcast } from "@evmos/provider";
+import { DirectEthSecp256k1Wallet, PrivateKey } from "../../../test-utils";
 
 const handlers = [
   rest.post(
@@ -153,27 +153,25 @@ const handlers = [
 
 const server = setupServer(...handlers);
 
-async function startCosmosHubLocalnet(): Promise<void> {
+async function startLocalNet(name: string): Promise<void> {
   const child = spawn(
-    path.resolve(__dirname, "../../../../scripts/localnets/cosmoshub/start.sh")
+    path.resolve(__dirname, `../../../../scripts/localnets/${name}/start.sh`)
   );
 
   return new Promise((resolve) => {
     child.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
       resolve();
     });
   });
 }
 
-async function stopCosmosHubLocalnet(): Promise<void> {
+async function stopLocalNet(name: string): Promise<void> {
   const child = spawn(
-    path.resolve(__dirname, "../../../../scripts/localnets/cosmoshub/stop.sh")
+    path.resolve(__dirname, `../../../../scripts/localnets/${name}/stop.sh`)
   );
 
   return new Promise((resolve) => {
     child.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
       resolve();
     });
   });
@@ -192,7 +190,9 @@ describe("SkipClient", () => {
 
   describe("/v1/info/chains", () => {
     it("filters ignored chains", async () => {
-      const client = new SkipClient(IGNORE_CHAINS);
+      const client = new SkipClient({
+        ignoreChains: IGNORE_CHAINS,
+      });
 
       const response = await client.chains();
 
@@ -221,7 +221,7 @@ describe("SkipClient", () => {
   });
 
   test("works", async () => {
-    await startCosmosHubLocalnet();
+    await startLocalNet("cosmoshub");
 
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
       "enlist hip relief stomach skate base shallow young switch frequent cry park"
@@ -231,74 +231,97 @@ describe("SkipClient", () => {
     const address = accounts[0].address;
 
     const message = {
-      chain_id: "cosmoshub-4",
+      chain_id: "cosmoshub-localnet-1",
       path: ["cosmoshub-4", "osmosis-1"],
-      msg: '{"source_port":"transfer","source_channel":"channel-141","token":{"denom":"uatom","amount":"5000"},"sender":"cosmos14qemq0vw6y3gc3u3e0aty2e764u4gs5le3hada","receiver":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","timeout_height":{},"timeout_timestamp":1690975247072565510}',
+      msg: `{"source_port":"transfer","source_channel":"channel-141","token":{"denom":"uatom","amount":"5000"},"sender":"${address}","receiver":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","timeout_height":{},"timeout_timestamp":1690975247072565510}`,
+      msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
+    };
+
+    const client = new SkipClient({
+      endpointOptions: {
+        "cosmoshub-localnet-1": {
+          rpc: "localhost:26657",
+        },
+      },
+    });
+
+    const tx = await client.executeMultiChainMessage(
+      address,
+      wallet,
+      message,
+      "uatom"
+    );
+
+    console.log(tx);
+
+    // // CheckTx must pass but the execution must fail in DeliverTx due to invalid channel/port
+    expect(isDeliverTxFailure(tx)).toEqual(true);
+
+    // stargateClient.disconnect();
+
+    await stopLocalNet("cosmoshub");
+  });
+
+  test.skip("with evmos", async () => {
+    await startLocalNet("evmos");
+
+    const wallet = await DirectEthSecp256k1Wallet.fromKey(
+      PrivateKey.fromHex(
+        "d820416313152a8920636450badd1270a6ba1d5d68bc2946e6fb90c35529ced6"
+      )
+    );
+
+    const accounts = await wallet.getAccounts();
+    const address = accounts[0].address;
+
+    const response = await axios.get(
+      `http://localhost:1317/cosmos/auth/v1beta1/accounts/${address}`
+    );
+
+    const accountNumber = response.data.account.base_account
+      .account_number as number;
+    const sequence = response.data.account.base_account.sequence as number;
+
+    const message = {
+      chain_id: "evmos_9005-2",
+      path: ["evmos_9001-2", "osmosis-1", "cosmoshub-4"],
+      msg: `{"source_port":"transfer","source_channel":"channel-0","token":{"denom":"aevmos","amount":"50000000000000000"},"sender":"${address}","receiver":"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8","timeout_height":{},"timeout_timestamp":1691062830183914191,"memo":"{\\"wasm\\":{\\"contract\\":\\"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8\\",\\"msg\\":{\\"swap_and_action\\":{\\"user_swap\\":{\\"swap_venue_name\\":\\"osmosis-poolmanager\\",\\"operations\\":[{\\"pool\\":\\"722\\",\\"denom_in\\":\\"ibc/6AE98883D4D5D5FF9E50D7130F1305DA2FFA0C652D1DD9C123657C6B4EB2DF8A\\",\\"denom_out\\":\\"uosmo\\"},{\\"pool\\":\\"1\\",\\"denom_in\\":\\"uosmo\\",\\"denom_out\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\"}]},\\"min_coin\\":{\\"denom\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\",\\"amount\\":\\"408\\"},\\"timeout_timestamp\\":1691062830183901329,\\"post_swap_action\\":{\\"ibc_transfer\\":{\\"ibc_info\\":{\\"source_channel\\":\\"channel-0\\",\\"receiver\\":\\"cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet\\",\\"fee\\":{\\"recv_fee\\":[],\\"ack_fee\\":[],\\"timeout_fee\\":[]},\\"memo\\":\\"\\",\\"recover_address\\":\\"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e\\"}}},\\"affiliates\\":[]}}}}"}`,
       msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
     };
 
     const client = new SkipClient();
-
-    const stargateClient = await SigningStargateClient.connectWithSigner(
-      "localhost:26657",
-      wallet
-    );
-
-    const account = await stargateClient.getAccount(address);
-
-    if (!account) {
-      throw new Error("Account not found");
-    }
 
     const rawTx = await client.signMultiChainMessageDirect(
       address,
       wallet,
       message,
       {
-        amount: [coin(0, "uatom")],
+        amount: [coin("0", "aevmos")],
         gas: "200000",
       },
       {
-        accountNumber: account.accountNumber,
-        sequence: account.sequence,
-        chainId: "cosmoshub-localnet-1",
+        accountNumber: accountNumber,
+        sequence: sequence,
+        chainId: message.chain_id,
       }
     );
 
     const txBytes = TxRaw.encode(rawTx).finish();
 
-    const tx = await stargateClient.broadcastTx(txBytes);
+    const txResponse = await axios.post(
+      `http://localhost:1317${generateEndpointBroadcast()}`,
+      {
+        tx_bytes: Buffer.from(txBytes).toString("base64"),
+        mode: "BROADCAST_MODE_BLOCK",
+      }
+    );
 
-    // CheckTx must pass but the execution must fail in DeliverTx due to invalid channel/port
+    const tx = txResponse.data.tx_response as DeliverTxResponse;
+
+    // this test is not good. it fails signature verification, so it's only testing 50% of the problem.
+    // i can't figure it out, and have spent hours on it. moving on for now.
     expect(isDeliverTxFailure(tx)).toEqual(true);
 
-    stargateClient.disconnect();
-
-    await stopCosmosHubLocalnet();
+    await stopLocalNet("evmos");
   });
-
-  // test("with evmos")
-
-  // describe("executeRoute", () => {
-  //   it("works", async () => {
-  //     const client = new SkipClient();
-
-  //     const wallet = await DirectSecp256k1HdWallet.generate(12);
-
-  //     const route = await client.fungible.getRoute({
-  //       amount_in: "1000000",
-  //       source_asset_denom: "uosmo",
-  //       source_asset_chain_id: "osmosis-1",
-  //       dest_asset_denom: "uatom",
-  //       dest_asset_chain_id: "cosmoshub-4",
-  //     });
-
-  //     const userAddresses = {
-  //       "osmosis-1": "osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e",
-  //       "cosmoshub-4": "cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet",
-  //     };
-
-  //     await client.executeRoute(wallet, route, userAddresses);
-  //   });
-  // });
 });

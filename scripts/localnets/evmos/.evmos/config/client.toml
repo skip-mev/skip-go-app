@@ -6,7 +6,7 @@
 ###############################################################################
 
 # The network chain ID
-chain-id = "evmos_9001-2"
+chain-id = "evmos_9001-999"
 # The keyring's backend, where the keys are stored (os|file|kwallet|pass|test|memory)
 keyring-backend = "os"
 # CLI output format (text|json)

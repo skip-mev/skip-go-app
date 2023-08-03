@@ -399,6 +399,18 @@ export function getFee(chainID: string) {
   return amountNeeded;
 }
 
+export function getFeeDenom(chainID: string) {
+  const chain = getChainByID(chainID);
+
+  const feeInfo = chain.fees?.fee_tokens[0];
+
+  if (!feeInfo) {
+    throw new Error("No fee info found");
+  }
+
+  return feeInfo.denom;
+}
+
 export async function isLedger(walletClient: WalletClient, chainID: string) {
   if (walletClient instanceof KeplrClient && window.keplr) {
     const key = await window.keplr.getKey(chainID);

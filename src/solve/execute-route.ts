@@ -20,6 +20,8 @@ import { SkipClient, MsgsRequest, RouteResponse } from "./client";
 import Long from "long";
 import { OfflineAminoSigner } from "@keplr-wallet/types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import axios from "axios";
+import { generateEndpointBroadcast } from "@evmos/provider";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -174,20 +176,66 @@ export async function executeRoute(
       }
 
       if (multiHopMsg.chain_id === "evmos_9001-2") {
-        const tx = await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
-          sourcePort: msgJSON.source_port,
-          sourceChannel: msgJSON.source_channel,
-          receiver: msgJSON.receiver,
-          timeoutTimestamp: msgJSON.timeout_timestamp,
-          memo: msgJSON.memo,
-          amount: msg.value.token.amount,
-          denom: msg.value.token.denom,
-          revisionNumber: 0,
-          revisionHeight: 0,
-        });
+        const signer = await getOfflineSigner(
+          walletClient,
+          multiHopMsg.chain_id
+        );
 
-        // @ts-ignore
-        txHash = tx.txhash;
+        const response = await axios.get(
+          `https://rest.bd.evmos.org:1317/cosmos/auth/v1beta1/accounts/${msgJSON.sender}`
+        );
+
+        const accountNumber = response.data.account.base_account
+          .account_number as number;
+        const sequence = response.data.account.base_account.sequence as number;
+
+        const rawTx = await skipClient.signMultiChainMessageDirectEvmos(
+          msgJSON.sender,
+          signer,
+          multiHopMsg,
+          {
+            amount: [coin(0, "aevmos")],
+            gas: "200000",
+          },
+          {
+            accountNumber: accountNumber,
+            sequence: sequence,
+            chainId: multiHopMsg.chain_id,
+          }
+        );
+
+        const txBytes = TxRaw.encode(rawTx).finish();
+
+        // const txResponse = await axios.post(
+        //   `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
+        //   {
+        //     tx_bytes: Buffer.from(txBytes).toString("base64"),
+        //     mode: "BROADCAST_MODE_BLOCK",
+        //   }
+        // );
+
+        // console.log(txResponse.data);
+
+        const tx = await client.broadcastTx(txBytes);
+
+        console.log(tx);
+
+        throw new Error("pause");
+
+        // const tx = await signAndBroadcastEvmos(walletClient, msgJSON.sender, {
+        //   sourcePort: msgJSON.source_port,
+        //   sourceChannel: msgJSON.source_channel,
+        //   receiver: msgJSON.receiver,
+        //   timeoutTimestamp: msgJSON.timeout_timestamp,
+        //   memo: msgJSON.memo,
+        //   amount: msg.value.token.amount,
+        //   denom: msg.value.token.denom,
+        //   revisionNumber: 0,
+        //   revisionHeight: 0,
+        // });
+
+        // // @ts-ignore
+        // txHash = tx.txhash;
       } else if (multiHopMsg.chain_id === "injective-1") {
         const tx = await signAndBroadcastInjective(
           walletClient,
