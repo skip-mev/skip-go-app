@@ -3,17 +3,9 @@ import { setupServer } from "msw/node";
 import { SkipClient } from "../client";
 import { IGNORE_CHAINS } from "../../../config";
 import { DirectSecp256k1HdWallet, coin } from "@cosmjs/proto-signing";
-import {
-  DeliverTxResponse,
-  SigningStargateClient,
-  StargateClient,
-  isDeliverTxFailure,
-} from "@cosmjs/stargate";
-import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { StargateClient, isDeliverTxFailure } from "@cosmjs/stargate";
 import { spawn } from "child_process";
 import path from "path";
-import axios from "axios";
-import { generateEndpointBroadcast } from "@evmos/provider";
 import { DirectEthSecp256k1Wallet, PrivateKey } from "../../../test-utils";
 
 const handlers = [
@@ -153,32 +145,6 @@ const handlers = [
 ];
 
 const server = setupServer(...handlers);
-
-async function startLocalNet(name: string): Promise<void> {
-  const child = spawn(
-    path.resolve(__dirname, `../../../../scripts/localnets/${name}/start.sh`)
-  );
-
-  return new Promise((resolve) => {
-    child.on("close", async (code) => {
-      const client = await StargateClient.connect("localhost:26657");
-
-      resolve();
-    });
-  });
-}
-
-async function stopLocalNet(name: string): Promise<void> {
-  const child = spawn(
-    path.resolve(__dirname, `../../../../scripts/localnets/${name}/stop.sh`)
-  );
-
-  return new Promise((resolve) => {
-    child.on("close", (code) => {
-      resolve();
-    });
-  });
-}
 
 describe("SkipClient", () => {
   // Establish API mocking before all tests.
