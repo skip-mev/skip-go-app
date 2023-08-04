@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 
+export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
+
 export function useSwapWidget() {
   const skipClient = useSkipClient();
 
@@ -155,7 +157,7 @@ function useFormValues() {
   useEffect(() => {
     if (!formValues.sourceChain && chains.length > 0) {
       const chainID =
-        localStorage.getItem("IBC_DOT_FUN__LAST_SOURCE_CHAIN") ?? "cosmoshub-4";
+        localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
       setFormValues((values) => ({
         ...values,
         sourceChain: chains.find((chain) => chain.chain_id === chainID),
@@ -167,7 +169,7 @@ function useFormValues() {
   useEffect(() => {
     if (formValues.sourceChain) {
       localStorage.setItem(
-        "IBC_DOT_FUN__LAST_SOURCE_CHAIN",
+        LAST_SOURCE_CHAIN_KEY,
         formValues.sourceChain.chain_id
       );
     }

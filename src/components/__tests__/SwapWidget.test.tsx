@@ -4,6 +4,7 @@ import { act, render, screen, fireEvent, within, waitFor } from "@/test";
 import { SwapWidget } from "../SwapWidget";
 import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
+import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
 const handlers = [
   rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
@@ -114,9 +115,7 @@ describe("SwapWidget", () => {
     expect(sourceChainButton).toHaveTextContent("Osmosis");
 
     // Source chain is stored in local storage
-    expect(localStorage.getItem("IBC_DOT_FUN__LAST_SOURCE_CHAIN")).toEqual(
-      "osmosis-1"
-    );
+    expect(localStorage.getItem(LAST_SOURCE_CHAIN_KEY)).toEqual("osmosis-1");
 
     // Source asset is now OSMO
     expect(
