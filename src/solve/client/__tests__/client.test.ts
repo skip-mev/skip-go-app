@@ -2,10 +2,12 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { SkipClient } from "../client";
 import { IGNORE_CHAINS } from "../../../config";
-import { DirectSecp256k1HdWallet, coin } from "@cosmjs/proto-signing";
-import { StargateClient, isDeliverTxFailure } from "@cosmjs/stargate";
-import { spawn } from "child_process";
-import path from "path";
+import {
+  DirectSecp256k1HdWallet,
+  DirectSecp256k1Wallet,
+  coin,
+} from "@cosmjs/proto-signing";
+import { isDeliverTxFailure } from "@cosmjs/stargate";
 import { DirectEthSecp256k1Wallet, PrivateKey } from "../../../test-utils";
 
 const handlers = [
@@ -266,7 +268,49 @@ describe("SkipClient", () => {
     });
 
     it("can execute a cosmwasm message", async () => {
-      //
+      const wallet = await DirectSecp256k1Wallet.fromKey(
+        Uint8Array.from(
+          Buffer.from(
+            "d820416313152a8920636450badd1270a6ba1d5d68bc2946e6fb90c35529ced6",
+            "hex"
+          )
+        ),
+        "osmo"
+      );
+
+      const accounts = await wallet.getAccounts();
+      const address = accounts[0].address;
+
+      for (const account of accounts) {
+        console.log(account);
+      }
+
+      // console.log(Buffer.from(accounts[0].pubkey).toString("base64"));
+
+      const message = {
+        chain_id: "osmosis-localnet-1",
+        path: ["osmosis-localnet-1", "cosmoshub-4"],
+        msg: `{"sender":"${address}","contract":"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8","msg":{"swap_and_action":{"user_swap":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"1","denom_in":"uosmo","denom_out":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2"}]},"min_coin":{"denom":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","amount":"511"},"timeout_timestamp":1691170015958938093,"post_swap_action":{"ibc_transfer":{"ibc_info":{"fee":{"ack_fee":[],"recv_fee":[],"timeout_fee":[]},"memo":"","receiver":"cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet","recover_address":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","source_channel":"channel-0"}}},"affiliates":[]}},"funds":[{"denom":"uosmo","amount":"10000"}]}`,
+        msg_type_url: "/cosmwasm.wasm.v1.MsgExecuteContract",
+      };
+
+      const client = new SkipClient({
+        endpointOptions: {
+          "osmosis-localnet-1": {
+            rpc: "localhost:26659",
+          },
+        },
+      });
+
+      const tx = await client.executeMultiChainMessage(
+        address,
+        wallet,
+        message,
+        coin(3000, "uosmo")
+      );
+
+      // CheckTx must pass but the execution must fail in DeliverTx due to skip contract not existing
+      expect(isDeliverTxFailure(tx)).toEqual(true);
     });
   });
 });

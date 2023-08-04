@@ -1,11 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-scripts/localnets/**/data
-
-scripts/localnets/**/config/addrbook.json
-
-!scripts/localnets/**/data/priv_validator_state.json
-
 # dependencies
 /node_modules
 /.pnp

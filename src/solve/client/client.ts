@@ -453,6 +453,7 @@ export class SkipClient {
     const accountFromSigner = accounts.find(
       (account) => account.address === signerAddress
     );
+
     if (!accountFromSigner) {
       throw new Error("Failed to retrieve account from signer");
     }
@@ -717,7 +718,6 @@ export class SkipClient {
         amount: msgJson.token,
         sender: msgJson.sender,
         receiver: msgJson.receiver,
-        // height: msgJson.timeout_height,
         timeout: msgJson.timeout_timestamp,
         memo: msgJson.memo,
       });
