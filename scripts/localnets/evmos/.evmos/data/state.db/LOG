@@ -514,3 +514,40 @@
 15:01:38.917708 version@stat F·[3 1] S·156KiB[24KiB 131KiB] Sc·[0.75 0.00]
 15:01:38.924373 db@janitor F·6 G·0
 15:01:38.924603 db@open done T·11.237708ms
+=============== Aug 3, 2023 (UTC) ===============
+21:05:44.030870 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:05:44.032879 version@stat F·[3 1] S·156KiB[24KiB 131KiB] Sc·[0.75 0.00]
+21:05:44.033045 db@open opening
+21:05:44.033318 journal@recovery F·1
+21:05:44.033590 journal@recovery recovering @118
+21:05:44.035120 version@stat F·[3 1] S·156KiB[24KiB 131KiB] Sc·[0.75 0.00]
+21:05:44.041209 db@janitor F·6 G·0
+21:05:44.041380 db@open done T·8.116875ms
+=============== Aug 3, 2023 (UTC) ===============
+21:06:40.747574 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:06:40.750195 version@stat F·[3 1] S·156KiB[24KiB 131KiB] Sc·[0.75 0.00]
+21:06:40.750408 db@open opening
+21:06:40.750693 journal@recovery F·1
+21:06:40.751186 journal@recovery recovering @120
+21:06:40.757423 memdb@flush created L0@122 N·30 S·4KiB "abc..623,v3123":"val..630,v3150"
+21:06:40.759149 version@stat F·[4 1] S·160KiB[28KiB 131KiB] Sc·[1.00 0.00]
+21:06:40.768061 db@janitor F·7 G·0
+21:06:40.768282 db@open done T·17.654375ms
+21:06:40.768342 table@compaction L0·4 -> L1·1 S·160KiB Q·3153
+21:06:40.862696 table@build created L1@125 N·1890 S·140KiB "abc..y:1,v6":"val..:99,v489"
+21:06:40.863050 version@stat F·[0 1] S·140KiB[0B 140KiB] Sc·[0.00 0.00]
+21:06:40.863844 table@compaction committed F-4 S-19KiB Ke·0 D·86 T·94.311833ms
+21:06:40.864569 table@remove removed @83
+21:06:40.865124 table@remove removed @62
+21:06:40.865744 table@remove removed @49
+21:06:40.866420 table@remove removed @28
+=============== Aug 3, 2023 (UTC) ===============
+21:08:50.453088 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:08:50.455407 version@stat F·[0 1] S·140KiB[0B 140KiB] Sc·[0.00 0.00]
+21:08:50.455599 db@open opening
+21:08:50.455847 journal@recovery F·1
+21:08:50.456267 journal@recovery recovering @123
+21:08:50.461462 version@stat F·[0 1] S·140KiB[0B 140KiB] Sc·[0.00 0.00]
+21:08:50.466286 db@janitor F·4 G·1
+21:08:50.466470 db@janitor removing table-122
+21:08:50.467078 db@open done T·11.286667ms

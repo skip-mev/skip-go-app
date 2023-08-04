@@ -537,3 +537,45 @@
 15:01:38.827515 version@stat F·[1 2] S·3MiB[26KiB 3MiB] Sc·[0.25 0.03]
 15:01:38.833002 db@janitor F·5 G·0
 15:01:38.833228 db@open done T·7.953458ms
+=============== Aug 3, 2023 (UTC) ===============
+21:05:43.954594 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:05:43.957470 version@stat F·[1 2] S·3MiB[26KiB 3MiB] Sc·[0.25 0.03]
+21:05:43.957691 db@open opening
+21:05:43.957985 journal@recovery F·1
+21:05:43.958381 journal@recovery recovering @125
+21:05:43.960099 version@stat F·[1 2] S·3MiB[26KiB 3MiB] Sc·[0.25 0.03]
+21:05:43.965532 db@janitor F·5 G·0
+21:05:43.965745 db@open done T·7.832209ms
+=============== Aug 3, 2023 (UTC) ===============
+21:06:40.658349 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:06:40.664690 version@stat F·[1 2] S·3MiB[26KiB 3MiB] Sc·[0.25 0.03]
+21:06:40.665082 db@open opening
+21:06:40.665608 journal@recovery F·1
+21:06:40.666036 journal@recovery recovering @127
+21:06:40.674530 memdb@flush created L0@129 N·706 S·32KiB "s/623,v71353":"s/p..hts,v71352"
+21:06:40.675498 version@stat F·[2 2] S·3MiB[59KiB 3MiB] Sc·[0.50 0.03]
+21:06:40.680773 db@janitor F·6 G·0
+21:06:40.680968 db@open done T·15.444167ms
+=============== Aug 3, 2023 (UTC) ===============
+21:08:50.376104 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:08:50.379500 version@stat F·[2 2] S·3MiB[59KiB 3MiB] Sc·[0.50 0.03]
+21:08:50.379704 db@open opening
+21:08:50.380040 journal@recovery F·1
+21:08:50.381539 journal@recovery recovering @130
+21:08:50.383412 version@stat F·[2 2] S·3MiB[59KiB 3MiB] Sc·[0.50 0.03]
+21:08:50.388511 db@janitor F·6 G·0
+21:08:50.388783 db@open done T·8.812667ms
+21:08:55.549622 table@compaction L0·2 -> L1·2 S·3MiB Q·71945
+21:08:55.947273 table@build created L1@134 N·35942 S·2MiB "s/1,v454":"s/k..UE\xd8,v13388"
+21:08:56.111075 table@build created L1@135 N·13964 S·1MiB "s/k..\r\xf9@,v26287":"s/p..hts,v71942"
+21:08:56.111292 version@stat F·[0 2] S·3MiB[0B 3MiB] Sc·[0.00 0.03]
+21:08:56.111824 table@compaction committed F-2 S-6KiB Ke·0 D·386 T·561.661459ms
+21:08:56.112526 table@remove removed @129
+21:08:56.113037 table@remove removed @90
+21:08:56.114023 table@remove removed @88
+21:08:56.114778 table@remove removed @89
+21:38:17.283246 memdb@flush N·41305 S·3MiB
+21:38:17.580640 memdb@flush created L0@137 N·41305 S·1MiB "s/629,v72062":"s/p..hts,v72061"
+21:38:17.580929 version@stat F·[1 2] S·5MiB[1MiB 3MiB] Sc·[0.25 0.03]
+21:38:17.582044 memdb@flush committed F·1 T·297.732126ms
+21:38:17.587404 journal@remove removed @132

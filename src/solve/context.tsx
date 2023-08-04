@@ -11,7 +11,13 @@ export const SkipContext = createContext<
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <SkipContext.Provider value={{ skipClient: new SkipClient(IGNORE_CHAINS) }}>
+    <SkipContext.Provider
+      value={{
+        skipClient: new SkipClient({
+          ignoreChains: IGNORE_CHAINS,
+        }),
+      }}
+    >
       {children}
     </SkipContext.Provider>
   );

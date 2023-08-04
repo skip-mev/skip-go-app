@@ -108,8 +108,7 @@ prometheus-retention-time = 0
 #
 # Example:
 # [["chain_id", "cosmoshub-1"]]
-global-labels = [
-]
+global-labels = []
 
 ###############################################################################
 ###                           API Configuration                             ###
@@ -175,7 +174,7 @@ gas-to-suggest = 200000
 
 # DenomToSuggest defines the defult denom for fee suggestion.
 # Price must be in minimum-gas-prices.
-denom-to-suggest = "uatom"
+denom-to-suggest = "aevmos"
 
 ###############################################################################
 ###                           gRPC Configuration                            ###
@@ -237,7 +236,7 @@ streamers = []
 
 [streamers]
 [streamers.file]
-keys = ["*", ]
+keys = ["*"]
 write_dir = ""
 prefix = ""
 

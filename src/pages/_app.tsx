@@ -3,7 +3,6 @@ import "@interchain-ui/react/styles";
 
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { Jost } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
@@ -18,10 +17,6 @@ import { AssetsProvider } from "@/context/assets";
 import { queryClient } from "@/utils/query";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
-
-const jost = Jost({
-  subsets: ["latin"],
-});
 
 export default function App({ Component, pageProps }: AppProps) {
   chains.push({
@@ -180,7 +175,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Interchain transfers and swaps on any Cosmos chain"
         />
       </Head>
-      <main className={jost.className}>
+      <main>
         <SkipProvider>
           <QueryClientProvider client={queryClient}>
             <ChainProvider

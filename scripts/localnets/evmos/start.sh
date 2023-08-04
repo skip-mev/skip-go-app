@@ -12,10 +12,9 @@ docker volume rm -f evmos_data
   
 docker run --rm \
   --detach \
-  -p 26657:26657 \
-  -p 26658:26658 \
-  -p 1317:1317 \
-  -p 9090:9090 \
+  -p 26658:26657 \
+  -p 1318:1317 \
+  -p 9091:9090 \
   --name evmos-localnet \
   --mount type=bind,source="/Users/thal0x/Documents/skip/ibc-dot-fun/scripts/localnets/evmos/.evmos",target=/.evmos \
   --mount type=volume,source=evmos_data,target=/root \

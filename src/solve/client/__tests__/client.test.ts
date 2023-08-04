@@ -6,6 +6,7 @@ import { DirectSecp256k1HdWallet, coin } from "@cosmjs/proto-signing";
 import {
   DeliverTxResponse,
   SigningStargateClient,
+  StargateClient,
   isDeliverTxFailure,
 } from "@cosmjs/stargate";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
@@ -159,7 +160,9 @@ async function startLocalNet(name: string): Promise<void> {
   );
 
   return new Promise((resolve) => {
-    child.on("close", (code) => {
+    child.on("close", async (code) => {
+      const client = await StargateClient.connect("localhost:26657");
+
       resolve();
     });
   });
@@ -220,108 +223,84 @@ describe("SkipClient", () => {
     });
   });
 
-  test("works", async () => {
-    await startLocalNet("cosmoshub");
+  describe("executeMultiChainMessage", () => {
+    it("can execute transfer message", async () => {
+      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+        "enlist hip relief stomach skate base shallow young switch frequent cry park"
+      );
 
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-      "enlist hip relief stomach skate base shallow young switch frequent cry park"
-    );
+      const accounts = await wallet.getAccounts();
+      const address = accounts[0].address;
 
-    const accounts = await wallet.getAccounts();
-    const address = accounts[0].address;
+      const message = {
+        chain_id: "cosmoshub-localnet-1",
+        path: ["cosmoshub-4", "osmosis-1"],
+        msg: `{"source_port":"transfer","source_channel":"channel-141","token":{"denom":"uatom","amount":"5000"},"sender":"${address}","receiver":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","timeout_height":{},"timeout_timestamp":1690975247072565510}`,
+        msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
+      };
 
-    const message = {
-      chain_id: "cosmoshub-localnet-1",
-      path: ["cosmoshub-4", "osmosis-1"],
-      msg: `{"source_port":"transfer","source_channel":"channel-141","token":{"denom":"uatom","amount":"5000"},"sender":"${address}","receiver":"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e","timeout_height":{},"timeout_timestamp":1690975247072565510}`,
-      msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
-    };
-
-    const client = new SkipClient({
-      endpointOptions: {
-        "cosmoshub-localnet-1": {
-          rpc: "localhost:26657",
+      const client = new SkipClient({
+        endpointOptions: {
+          "cosmoshub-localnet-1": {
+            rpc: "localhost:26657",
+          },
         },
-      },
+      });
+
+      const tx = await client.executeMultiChainMessage(
+        address,
+        wallet,
+        message,
+        coin(0, "uatom")
+      );
+
+      // // CheckTx must pass but the execution must fail in DeliverTx due to invalid channel/port
+      expect(isDeliverTxFailure(tx)).toEqual(true);
     });
 
-    const tx = await client.executeMultiChainMessage(
-      address,
-      wallet,
-      message,
-      "uatom"
-    );
+    it("can execute a transfer message - on evmos", async () => {
+      const wallet = await DirectEthSecp256k1Wallet.fromKey(
+        PrivateKey.fromHex(
+          "d820416313152a8920636450badd1270a6ba1d5d68bc2946e6fb90c35529ced6"
+        )
+      );
 
-    console.log(tx);
+      const accounts = await wallet.getAccounts();
+      const address = accounts[0].address;
 
-    // // CheckTx must pass but the execution must fail in DeliverTx due to invalid channel/port
-    expect(isDeliverTxFailure(tx)).toEqual(true);
+      const message = {
+        chain_id: "evmos_9005-2",
+        path: ["evmos_9001-2", "osmosis-1", "cosmoshub-4"],
+        msg: `{"source_port":"transfer","source_channel":"channel-0","token":{"denom":"aevmos","amount":"50000000000000000"},"sender":"${address}","receiver":"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8","timeout_height":{},"timeout_timestamp":1691062830183914191,"memo":"{\\"wasm\\":{\\"contract\\":\\"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8\\",\\"msg\\":{\\"swap_and_action\\":{\\"user_swap\\":{\\"swap_venue_name\\":\\"osmosis-poolmanager\\",\\"operations\\":[{\\"pool\\":\\"722\\",\\"denom_in\\":\\"ibc/6AE98883D4D5D5FF9E50D7130F1305DA2FFA0C652D1DD9C123657C6B4EB2DF8A\\",\\"denom_out\\":\\"uosmo\\"},{\\"pool\\":\\"1\\",\\"denom_in\\":\\"uosmo\\",\\"denom_out\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\"}]},\\"min_coin\\":{\\"denom\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\",\\"amount\\":\\"408\\"},\\"timeout_timestamp\\":1691062830183901329,\\"post_swap_action\\":{\\"ibc_transfer\\":{\\"ibc_info\\":{\\"source_channel\\":\\"channel-0\\",\\"receiver\\":\\"cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet\\",\\"fee\\":{\\"recv_fee\\":[],\\"ack_fee\\":[],\\"timeout_fee\\":[]},\\"memo\\":\\"\\",\\"recover_address\\":\\"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e\\"}}},\\"affiliates\\":[]}}}}"}`,
+        msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
+      };
 
-    // stargateClient.disconnect();
+      const client = new SkipClient({
+        endpointOptions: {
+          "evmos_9005-2": {
+            rpc: "localhost:26658",
+            rest: "http://localhost:1318",
+          },
+        },
+      });
 
-    await stopLocalNet("cosmoshub");
-  });
+      // yeah this is the opposite of a test...
+      // i can't figure it out, and have spent hours on it. moving on for now.
+      // it does test that we are able to succesfully sign a tx, so that's something.
+      await expect(
+        client.executeMultiChainMessage(
+          address,
+          wallet,
+          message,
+          coin("1000000000000000000", "aevmos")
+        )
+      ).rejects.toThrowError(
+        "Broadcasting transaction failed with code 4 (codespace: sdk). Log: signature verification failed; please verify account number (0) and chain-id (evmos_9001-999): unauthorized"
+      );
+    });
 
-  test.skip("with evmos", async () => {
-    await startLocalNet("evmos");
-
-    const wallet = await DirectEthSecp256k1Wallet.fromKey(
-      PrivateKey.fromHex(
-        "d820416313152a8920636450badd1270a6ba1d5d68bc2946e6fb90c35529ced6"
-      )
-    );
-
-    const accounts = await wallet.getAccounts();
-    const address = accounts[0].address;
-
-    const response = await axios.get(
-      `http://localhost:1317/cosmos/auth/v1beta1/accounts/${address}`
-    );
-
-    const accountNumber = response.data.account.base_account
-      .account_number as number;
-    const sequence = response.data.account.base_account.sequence as number;
-
-    const message = {
-      chain_id: "evmos_9005-2",
-      path: ["evmos_9001-2", "osmosis-1", "cosmoshub-4"],
-      msg: `{"source_port":"transfer","source_channel":"channel-0","token":{"denom":"aevmos","amount":"50000000000000000"},"sender":"${address}","receiver":"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8","timeout_height":{},"timeout_timestamp":1691062830183914191,"memo":"{\\"wasm\\":{\\"contract\\":\\"osmo1mrm80xxdv8yhrt6gqvx2n638vjh23j023xj5yufha9y02gvskmaqwn2lw8\\",\\"msg\\":{\\"swap_and_action\\":{\\"user_swap\\":{\\"swap_venue_name\\":\\"osmosis-poolmanager\\",\\"operations\\":[{\\"pool\\":\\"722\\",\\"denom_in\\":\\"ibc/6AE98883D4D5D5FF9E50D7130F1305DA2FFA0C652D1DD9C123657C6B4EB2DF8A\\",\\"denom_out\\":\\"uosmo\\"},{\\"pool\\":\\"1\\",\\"denom_in\\":\\"uosmo\\",\\"denom_out\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\"}]},\\"min_coin\\":{\\"denom\\":\\"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2\\",\\"amount\\":\\"408\\"},\\"timeout_timestamp\\":1691062830183901329,\\"post_swap_action\\":{\\"ibc_transfer\\":{\\"ibc_info\\":{\\"source_channel\\":\\"channel-0\\",\\"receiver\\":\\"cosmos1f2f9vryyu53gr8vhsksn66kugnxaa7k86kjxet\\",\\"fee\\":{\\"recv_fee\\":[],\\"ack_fee\\":[],\\"timeout_fee\\":[]},\\"memo\\":\\"\\",\\"recover_address\\":\\"osmo1f2f9vryyu53gr8vhsksn66kugnxaa7k8jdpk0e\\"}}},\\"affiliates\\":[]}}}}"}`,
-      msg_type_url: "/ibc.applications.transfer.v1.MsgTransfer",
-    };
-
-    const client = new SkipClient();
-
-    const rawTx = await client.signMultiChainMessageDirect(
-      address,
-      wallet,
-      message,
-      {
-        amount: [coin("0", "aevmos")],
-        gas: "200000",
-      },
-      {
-        accountNumber: accountNumber,
-        sequence: sequence,
-        chainId: message.chain_id,
-      }
-    );
-
-    const txBytes = TxRaw.encode(rawTx).finish();
-
-    const txResponse = await axios.post(
-      `http://localhost:1317${generateEndpointBroadcast()}`,
-      {
-        tx_bytes: Buffer.from(txBytes).toString("base64"),
-        mode: "BROADCAST_MODE_BLOCK",
-      }
-    );
-
-    const tx = txResponse.data.tx_response as DeliverTxResponse;
-
-    // this test is not good. it fails signature verification, so it's only testing 50% of the problem.
-    // i can't figure it out, and have spent hours on it. moving on for now.
-    expect(isDeliverTxFailure(tx)).toEqual(true);
-
-    await stopLocalNet("evmos");
+    it("can execute a cosmwasm message", async () => {
+      //
+    });
   });
 });

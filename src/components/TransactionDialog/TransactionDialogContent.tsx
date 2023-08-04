@@ -6,7 +6,6 @@ import RouteDisplay from "../RouteDisplay";
 import { RouteResponse, useSkipClient } from "@/solve";
 import { useToast } from "@/context/toast";
 import { getChainByID } from "@/utils/utils";
-import { executeRoute } from "@/solve/execute-route";
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 
@@ -142,35 +141,16 @@ const TransactionDialogContent: FC<Props> = ({
         }
       }
 
-      await executeRoute(
-        skipClient,
-        walletClient,
-        route,
-        (_, i) => {
-          setTxStatuses((statuses) => {
-            const newStatuses = [...statuses];
-            newStatuses[i] = "SUCCESS";
-            if (i < statuses.length - 1) {
-              newStatuses[i + 1] = "PENDING";
-            }
-            return newStatuses;
-          });
-        },
-        (error: any) => {
-          console.error(error);
-          setTxError(error.message);
-          setIsError(true);
-          setTxStatuses((statuses) => {
-            const newStatuses = [...statuses];
-            return newStatuses.map((status) => {
-              if (status === "PENDING") {
-                return "INIT";
-              }
-              return status;
-            });
-          });
-        }
-      );
+      await skipClient.executeRoute(walletClient, route, (_, i) => {
+        setTxStatuses((statuses) => {
+          const newStatuses = [...statuses];
+          newStatuses[i] = "SUCCESS";
+          if (i < statuses.length - 1) {
+            newStatuses[i + 1] = "PENDING";
+          }
+          return newStatuses;
+        });
+      });
 
       toast(
         "Transaction Successful",

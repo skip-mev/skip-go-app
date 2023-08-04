@@ -1,3 +1,5 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -25,6 +27,9 @@ module.exports = {
         "site-bg": "url('/site-bg.svg')",
         "site-bg-2": "url('/site-bg-2.svg')",
         squiggle: "url('/squiggle.svg')",
+      },
+      fontFamily: {
+        sans: ["Jost", ...defaultTheme.fontFamily.sans],
       },
     },
   },
