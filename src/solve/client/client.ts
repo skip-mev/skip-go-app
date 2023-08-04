@@ -36,6 +36,7 @@ import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import {
   AminoTypes,
+  DeliverTxResponse,
   SignerData,
   SigningStargateClient,
   StargateClient,
@@ -187,16 +188,16 @@ export class SkipClient {
 
       const signerAddress = userAddresses[message.chain_id];
 
-      const txHash = await this.executeMultiChainMessage(
+      const tx = await this.executeMultiChainMessage(
         signerAddress,
         signer,
         message,
         coin(0, feeInfo.denom)
       );
 
-      await this.waitForTransaction(txHash, message.chain_id);
+      await this.waitForTransaction(tx.transactionHash, message.chain_id);
 
-      onTxSuccess(txHash, i);
+      onTxSuccess(tx.transactionHash, i);
     }
   }
 
@@ -266,7 +267,7 @@ export class SkipClient {
     signer: OfflineSigner,
     multiChainMessage: MultiChainMsg,
     feeAmount: Coin
-  ): Promise<string> {
+  ): Promise<DeliverTxResponse> {
     const accounts = await signer.getAccounts();
     const accountFromSigner = accounts.find(
       (account) => account.address === signerAddress
@@ -328,7 +329,16 @@ export class SkipClient {
         mode: "sync",
       });
 
-      return tx.txHash;
+      return {
+        height: tx.height,
+        txIndex: 0,
+        code: tx.code,
+        transactionHash: tx.txHash,
+        events: [],
+        rawLog: tx.rawLog,
+        gasUsed: tx.gasUsed,
+        gasWanted: tx.gasWanted,
+      };
     }
 
     const txBytes = TxRaw.encode(rawTx).finish();
@@ -340,7 +350,7 @@ export class SkipClient {
 
     const tx = await stargateClient.broadcastTx(txBytes);
 
-    return tx.transactionHash;
+    return tx;
   }
 
   async signMultiChainMessageDirect(
