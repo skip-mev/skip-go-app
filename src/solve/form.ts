@@ -363,12 +363,14 @@ export async function executeRoute(
   await enableChains(walletClient, route.rawRoute.chain_ids);
 
   const userAddresses: Record<string, string> = {};
+  const addressList: string[] = [];
 
   // get addresses
   for (const chainID of route.rawRoute.chain_ids) {
     const address = await getAddressForChain(walletClient, chainID);
 
     userAddresses[chainID] = address;
+    addressList.push(address)
   }
 
   const msgRequest: MsgsRequest = {
@@ -379,7 +381,7 @@ export async function executeRoute(
     amount_in: ethers
       .parseUnits(route.amountIn, route.sourceAsset.decimals)
       .toString(),
-    chain_ids_to_addresses: userAddresses,
+    address_list: addressList,
     operations: route.operations,
 
     estimated_amount_out: ethers

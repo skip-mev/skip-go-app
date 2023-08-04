@@ -48,7 +48,7 @@ export interface MsgsRequest {
   dest_asset_denom: string;
   dest_asset_chain_id: string;
   amount_in: string;
-  chain_ids_to_addresses: Record<string, string>;
+  address_list: string[];
   operations: Operation[];
 
   estimated_amount_out?: string;
