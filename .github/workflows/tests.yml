@@ -8,11 +8,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build localnets
-        run: make build-localnets
+      # - name: Build localnets
+      #   run: make build-localnets
 
-      - name: Start localnets
-        run: make start-localnets
+      # - name: Start localnets
+      #   run: make start-localnets
 
       - name: Use Node 18.x
         uses: actions/setup-node@v3
