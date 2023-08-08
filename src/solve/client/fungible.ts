@@ -22,6 +22,7 @@ export interface RouteRequest {
   dest_asset_denom: string;
   dest_asset_chain_id: string;
   amount_in: string;
+  amount_out: string;
 
   cumulative_affiliate_fee_bps?: string;
   swap_venue?: SwapVenue;
@@ -38,7 +39,7 @@ export interface RouteResponse {
   chain_ids: string[];
 
   does_swap: boolean;
-  estimated_amount_out?: string;
+  amount_out: string;
   swap_venue?: SwapVenue;
 }
 
@@ -51,7 +52,7 @@ export interface MsgsRequest {
   chain_ids_to_addresses: Record<string, string>;
   operations: Operation[];
 
-  estimated_amount_out?: string;
+  amount_out: string;
   slippage_tolerance_percent?: string;
   affiliates?: Affiliate[];
 }

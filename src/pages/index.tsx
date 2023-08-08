@@ -54,7 +54,7 @@ export default function Home() {
         ["balances-by-chain", address, chainID],
         balances
       );
-    } catch {}
+    } catch { }
   }
 
   useInterval(() => {
@@ -121,6 +121,12 @@ export default function Home() {
         <AssetInput
           amount={amountOut}
           asset={destinationAsset}
+          onAmountChange={(amount) =>
+            setFormValues({
+              ...formValues,
+              amountOut: amount,
+            })
+          }
           onAssetChange={(asset) => {
             setFormValues({
               ...formValues,

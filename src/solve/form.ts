@@ -65,6 +65,7 @@ export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 
 export interface FormValues {
   amountIn: string;
+  amountOut: string;
   sourceChain?: Chain;
   sourceAsset?: AssetWithMetadata;
   destinationChain?: Chain;
@@ -80,6 +81,7 @@ export function useSolveForm() {
 
   const [formValues, setFormValues] = useState<FormValues>({
     amountIn: "",
+    amountOut: "",
   });
 
   useEffect(() => {
@@ -170,17 +172,35 @@ export function useSolveForm() {
     }
   }, [formValues.sourceChain]);
 
-  const amountInWei = useMemo(() => {
-    if (!formValues.sourceAsset) {
-      return "0";
+  const amountOutWei = useMemo(() => {
+    if (!formValues.destinationAsset) {
+      return "";
     }
 
     try {
-      return ethers
+      let val = ethers
+        .parseUnits(formValues.amountOut, formValues.destinationAsset.decimals)
+        .toString();
+      formValues.amountIn = "";
+      return val;
+    } catch (err) {
+      return "";
+    }
+  }, [formValues.amountOut, formValues.destinationAsset]);
+
+  const amountInWei = useMemo(() => {
+    if (!formValues.sourceAsset) {
+      return "";
+    }
+
+    try {
+      let val = ethers
         .parseUnits(formValues.amountIn, formValues.sourceAsset.decimals)
         .toString();
+      formValues.amountOut = "";
+      return val;
     } catch (err) {
-      return "0";
+      return "";
     }
   }, [formValues.amountIn, formValues.sourceAsset]);
 
@@ -216,6 +236,7 @@ export function useSolveForm() {
   } = useRoute(
     skipClient,
     amountInWei,
+    amountOutWei,
     formValues.sourceAsset?.denom,
     formValues.sourceAsset?.chain_id,
     formValues.destinationAsset?.denom,
@@ -228,20 +249,52 @@ export function useSolveForm() {
   }, [routeFetchStatus]);
 
   const amountOut = useMemo(() => {
-    if (!routeResponse) {
-      return "0.0";
+    if (amountOutWei !== "") {
+      return formValues.amountOut;
     }
 
-    if (routeResponse.does_swap && routeResponse.estimated_amount_out) {
+    if (!routeResponse) {
+      return formValues.amountOut;
+    }
+
+    if (!routeResponse.does_swap) {
+      return formValues.amountIn;
+    }
+
+    if (routeResponse.does_swap && routeResponse.amount_out) {
       return ethers.formatUnits(
-        routeResponse.estimated_amount_out,
+        routeResponse.amount_out,
         formValues.destinationAsset?.decimals ?? 6
+      );
+    }
+
+    return formValues.amountOut;
+  }, [
+    formValues.amountOut,
+
+    routeResponse,
+  ]);
+
+  const amountIn = useMemo(() => {
+    if (amountInWei !== "") {
+      return formValues.amountIn;
+    }
+
+    if (!routeResponse) {
+      return formValues.amountIn;
+    }
+
+    if (routeResponse.does_swap && routeResponse.amount_in) {
+      return ethers.formatUnits(
+        routeResponse.amount_in,
+        formValues.sourceAsset?.decimals ?? 6
       );
     }
 
     return formValues.amountIn;
   }, [
     formValues.amountIn,
+    formValues.sourceAsset?.decimals,
     formValues.destinationAsset?.decimals,
     routeResponse,
   ]);
@@ -268,7 +321,7 @@ export function useSolveForm() {
 
   const route = useMemo(() => {
     if (
-      !formValues.amountIn ||
+      !amountIn ||
       !formValues.sourceAsset ||
       !formValues.destinationAsset ||
       !formValues.sourceChain ||
@@ -280,7 +333,7 @@ export function useSolveForm() {
     }
 
     const _route: Route = {
-      amountIn: formValues.amountIn,
+      amountIn: amountIn,
       amountOut: amountOut,
       sourceAsset: formValues.sourceAsset,
       sourceChain: formValues.sourceChain,
@@ -295,7 +348,7 @@ export function useSolveForm() {
     return _route;
   }, [
     amountOut,
-    formValues.amountIn,
+    amountIn,
     formValues.destinationAsset,
     formValues.destinationChain,
     formValues.sourceAsset,
@@ -340,7 +393,7 @@ export function useSolveForm() {
     sourceAsset: formValues.sourceAsset,
     destinationChain: formValues.destinationChain,
     destinationAsset: formValues.destinationAsset,
-    amountIn: formValues.amountIn,
+    amountIn,
     amountOut,
     setFormValues,
     routeLoading,
@@ -382,7 +435,7 @@ export async function executeRoute(
     chain_ids_to_addresses: userAddresses,
     operations: route.operations,
 
-    estimated_amount_out: ethers
+    amount_out: ethers
       .parseUnits(route.amountOut, route.destinationAsset.decimals)
       .toString(),
     slippage_tolerance_percent: "5.0",

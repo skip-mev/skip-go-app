@@ -25,6 +25,7 @@ export function useSolveChains(client: SkipClient) {
 export function useRoute(
   client: SkipClient,
   amountIn: string,
+  amountOut: string,
   sourceAsset?: string,
   sourceAssetChainID?: string,
   destinationAsset?: string,
@@ -35,6 +36,7 @@ export function useRoute(
     queryKey: [
       "solve-route",
       amountIn,
+      amountOut,
       sourceAsset,
       destinationAsset,
       sourceAssetChainID,
@@ -52,6 +54,7 @@ export function useRoute(
 
       const route = await client.fungible.getRoute({
         amount_in: amountIn,
+        amount_out: amountOut,
         source_asset_denom: sourceAsset,
         source_asset_chain_id: sourceAssetChainID,
         dest_asset_denom: destinationAsset,
