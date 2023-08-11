@@ -60,11 +60,6 @@ import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { Int53 } from "@cosmjs/math";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { fromBase64 } from "@cosmjs/encoding";
-import {
-  Tendermint34Client,
-  Tendermint37Client,
-  TendermintClient,
-} from "@cosmjs/tendermint-rpc";
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -128,21 +123,13 @@ export async function getSigningStargateClientForChainID(
   const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
 
   try {
-    let tmClient: TendermintClient;
-    const tm37Client = await Tendermint37Client.connect(preferredEndpoint);
-    const version = (await tm37Client.status()).nodeInfo.version;
-    if (version.startsWith("0.37.")) {
-      tmClient = tm37Client;
-    } else {
-      tm37Client.disconnect();
-      tmClient = await Tendermint34Client.connect(preferredEndpoint);
-    }
-
-    const client = await SigningStargateClient.createWithSigner(
-      tmClient,
+    const client = await SigningStargateClient.connectWithSigner(
+      preferredEndpoint,
       signer,
       options
     );
+
+    console.log(`Connected to ${preferredEndpoint}`);
 
     return client;
   } catch {}
