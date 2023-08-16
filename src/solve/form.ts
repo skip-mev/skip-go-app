@@ -405,6 +405,10 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
+    // TODO(zrbecker): we should query wallet/node for correct gas amount as this varies
+    // greatly between different chains, and can change depending on on-chain state.
+    // This is just used to warn when user does not have the correct gas token, so should
+    // be fine to leave it in the meantime.
     let gasNeeded = 200000;
     if (
       route.rawRoute.does_swap &&
@@ -453,14 +457,6 @@ export async function executeRoute(
 
     if (!feeInfo) {
       throw new Error("No fee info found");
-    }
-
-    let gasNeeded = 200000;
-    if (
-      route.rawRoute.does_swap &&
-      route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
-    ) {
-      gasNeeded = 1000000;
     }
 
     const msgJSON = JSON.parse(multiHopMsg.msg);
@@ -541,10 +537,9 @@ export async function executeRoute(
             channelId: msgJSON.source_channel,
             timeout: msgJSON.timeout_timestamp,
           }),
-          {
-            amount: [coin(0, feeInfo.denom)],
-            gas: `${gasNeeded}`,
-          }
+          // TODO(zrbecker): This causes the behavior to default to "auto", this interface doesn't
+          // seem to have a mechanism to set a multiple like 1.3.
+          undefined
         );
 
         txHash = tx.txHash;
@@ -582,10 +577,7 @@ export async function executeRoute(
 
           tx = await client.broadcastTx(txBytes, undefined, undefined);
         } else {
-          tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
-            amount: [coin(0, feeInfo.denom)],
-            gas: `${gasNeeded}`,
-          });
+          tx = await client.signAndBroadcast(msgJSON.sender, [msg], 1.3);
         }
         txHash = tx.transactionHash;
       }
@@ -611,10 +603,7 @@ export async function executeRoute(
         }
       );
 
-      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], {
-        amount: [coin(0, feeInfo.denom)],
-        gas: `${gasNeeded}`,
-      });
+      const tx = await client.signAndBroadcast(msgJSON.sender, [msg], 1.3);
 
       txHash = tx.transactionHash;
     }
