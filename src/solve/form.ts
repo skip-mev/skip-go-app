@@ -405,12 +405,12 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    let gasNeeded = 200000;
+    let gasNeeded = 300000;
     if (
       route.rawRoute.does_swap &&
       route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
     ) {
-      gasNeeded = 1000000;
+      gasNeeded = 1500000;
     }
 
     let averageGasPrice = 0;
@@ -455,12 +455,12 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    let gasNeeded = 200000;
+    let gasNeeded = 300000;
     if (
       route.rawRoute.does_swap &&
       route.rawRoute.swap_venue?.chain_id === multiHopMsg.chain_id
     ) {
-      gasNeeded = 1000000;
+      gasNeeded = 1500000;
     }
 
     const msgJSON = JSON.parse(multiHopMsg.msg);
