@@ -297,7 +297,7 @@ export async function signAndBroadcastInjective(
   walletClient: WalletClient,
   signerAddress: string,
   msgs: Msgs | Msgs[],
-  fee: StdFee | undefined
+  fee: StdFee
 ) {
   const chainID = "injective-1";
   const restEndpoint = "https://lcd.injective.network";
