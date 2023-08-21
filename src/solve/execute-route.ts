@@ -71,12 +71,12 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    let gasNeeded = 200000;
+    let gasNeeded = 300000;
     if (
       route.does_swap &&
       route.swap_venue?.chain_id === multiHopMsg.chain_id
     ) {
-      gasNeeded = 1000000;
+      gasNeeded = 1500000;
     }
 
     let averageGasPrice = 0;
@@ -121,12 +121,12 @@ export async function executeRoute(
       throw new Error("No fee info found");
     }
 
-    let gasNeeded = 200000;
+    let gasNeeded = 300000;
     if (
       route.does_swap &&
       route.swap_venue?.chain_id === multiHopMsg.chain_id
     ) {
-      gasNeeded = 1000000;
+      gasNeeded = 1500000;
     }
 
     const msgJSON = JSON.parse(multiHopMsg.msg);
@@ -138,13 +138,20 @@ export async function executeRoute(
     if (
       multiHopMsg.msg_type_url === "/ibc.applications.transfer.v1.MsgTransfer"
     ) {
+      let gasPrice: GasPrice | undefined;
+      try {
+        gasPrice = GasPrice.fromString(
+          `${feeInfo.average_gas_price ?? 0}${feeInfo.denom}`
+        );
+      } catch {
+        // ignore error
+      }
+
       const client = await getSigningStargateClientForChainID(
         multiHopMsg.chain_id,
         signer,
         {
-          gasPrice: GasPrice.fromString(
-            `${feeInfo.average_gas_price ?? 0}${feeInfo.denom}`
-          ),
+          gasPrice,
         }
       );
 
