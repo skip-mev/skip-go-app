@@ -66,7 +66,7 @@ export default function Home() {
   }, 5000);
 
   return (
-    <div className="bg-white max-w-lg mx-auto shadow-xl rounded-3xl p-6 py-6 relative">
+    <div className="bg-white max-w-xl mx-auto shadow-xl rounded-3xl p-6 py-6 relative">
       <div className="space-y-6">
         <div>
           <p className="font-semibold text-2xl">From</p>
