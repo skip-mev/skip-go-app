@@ -1,5 +1,3 @@
-import { Fragment, useMemo } from "react";
-import va from "@vercel/analytics";
 import { useManager } from "@cosmos-kit/react";
 import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/cosmos";

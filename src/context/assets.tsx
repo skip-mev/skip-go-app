@@ -5,8 +5,9 @@ import {
   useContext,
   useMemo,
 } from "react";
-import { useChains } from "./chains";
+import { Chain, useChains } from "./chains";
 import {
+  Asset,
   AssetWithMetadata,
   filterAssetsWithMetadata,
   useSkipClient,
@@ -29,6 +30,26 @@ export const AssetsContext = createContext<AssetsContext>({
   getNativeAssets: () => [],
 });
 
+function getAssetSymbol(
+  asset: AssetWithMetadata,
+  assets: Asset[],
+  chains: Chain[]
+) {
+  const hasDuplicates =
+    (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
+
+  if (hasDuplicates) {
+    const originChain = chains.find(
+      (c) => c.chain_id === asset.origin_chain_id
+    );
+    const originChainName = originChain?.prettyName ?? asset.origin_chain_id;
+
+    return `${originChainName} ${asset.symbol}`;
+  }
+
+  return asset.symbol;
+}
+
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   const skipClient = useSkipClient();
 
@@ -44,10 +65,13 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     return Object.entries(solveAssets).reduce((acc, [chainID, assets]) => {
       return {
         ...acc,
-        [chainID]: filterAssetsWithMetadata(assets),
+        [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
+          ...asset,
+          symbol: getAssetSymbol(asset, assets, chains),
+        })),
       };
     }, {} as Record<string, AssetWithMetadata[]>);
-  }, [solveAssets]);
+  }, [chains, solveAssets]);
 
   function assetsByChainID(chainID: string) {
     return assets[chainID] || [];
