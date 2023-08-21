@@ -1,28 +1,20 @@
 import { FC, Fragment, useState } from "react";
 import TransactionDialogContent from "./TransactionDialogContent";
-import { AssetWithMetadata, Operation, RouteResponse } from "@/solve";
-import { Chain } from "@/context/chains";
-import { ActionType } from "@/solve/form";
+import { RouteResponse } from "@/solve";
 
-export interface Route {
-  amountIn: string;
-  amountOut: string;
-  sourceAsset: AssetWithMetadata;
-  sourceChain: Chain;
-  destinationAsset: AssetWithMetadata;
-  destinationChain: Chain;
-  actionType: ActionType;
-  operations: Operation[];
-  transactionCount: number;
-  rawRoute: RouteResponse;
-}
+export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 
 interface Props {
-  route?: Route;
+  route?: RouteResponse;
+  transactionCount: number;
   insufficientBalance?: boolean;
 }
 
-const TransactionDialog: FC<Props> = ({ route, insufficientBalance }) => {
+const TransactionDialog: FC<Props> = ({
+  route,
+  insufficientBalance,
+  transactionCount,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -42,30 +34,12 @@ const TransactionDialog: FC<Props> = ({ route, insufficientBalance }) => {
                 route={route}
                 onClose={() => setIsOpen(false)}
                 insufficentBalance={insufficientBalance}
+                transactionCount={transactionCount}
               />
             )}
           </div>
         )}
       </div>
-      {/* <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger>
-          <TransactionDialogTrigger disabled={!route} />
-        </DialogTrigger>
-        <DialogContent
-          onInteractOutside={(event) => {
-            event.preventDefault();
-
-            console.log(event.currentTarget);
-          }}
-        >
-          {route && (
-            <TransactionDialogContent
-              route={route}
-              onClose={() => setIsOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog> */}
     </Fragment>
   );
 };

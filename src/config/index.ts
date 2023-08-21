@@ -1,4 +1,4 @@
-export const IGNORE_CHAINS = ["agoric", "8ball", "akashnet-2"];
+export const IGNORE_CHAINS = ["agoric", "8ball"];
 
 export interface ChainConfig {
   id: string;

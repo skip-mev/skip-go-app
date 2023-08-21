@@ -1,11 +1,13 @@
 import { FC, Fragment } from "react";
 import * as RadixToast from "@radix-ui/react-toast";
+import { type } from "os";
 
 interface Props {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   title?: string;
   description?: string;
+  type?: "success" | "error";
 }
 
 const DEFAULT_TITLE = "Uh oh! Something went wrong.";
@@ -16,11 +18,14 @@ const Toast: FC<Props> = ({
   setOpen,
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
+  type = "error",
 }) => {
   return (
     <Fragment>
       <RadixToast.Root
-        className="ToastRoot bg-white rounded-md shadow p-4 border-l-8 border-rose-500 text-sm"
+        className={`ToastRoot bg-white rounded-md shadow p-4 border-l-8 ${
+          type === "success" ? "border-emerald-500" : "border-rose-500"
+        } text-sm`}
         open={open}
         onOpenChange={setOpen}
         duration={5000}
