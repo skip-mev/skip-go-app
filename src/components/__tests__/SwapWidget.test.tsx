@@ -246,12 +246,27 @@ describe("SwapWidget", () => {
 
     // Select destination asset
     fireEvent.click(destinationAssetButton);
-    fireEvent.click(await within(destinationAssetSection).findByText("CMDX"));
+    fireEvent.click(await within(destinationAssetSection).findByText("ATOM"));
 
-    // Destination chain is now Comdex
+    // Destination chain is now Cosmos Hub
     await waitFor(() =>
-      expect(destinationChainButton).toHaveTextContent("Comdex")
+      expect(destinationChainButton).toHaveTextContent("Cosmos Hub")
     );
+
+    // Destination asset is now ATOM
+    await waitFor(() => within(destinationAssetSection).findByText("ATOM"));
+
+    // Select new destination chain
+    fireEvent.click(destinationChainButton);
+    fireEvent.click(
+      await within(destinationAssetSection).findByText("Osmosis")
+    );
+
+    // Destination chain is now Osmosis
+    expect(destinationChainButton).toHaveTextContent("Osmosis");
+
+    // Destination asset should still be ATOM
+    await waitFor(() => within(destinationAssetSection).findByText("ATOM"));
   });
 
   it("can swap source and destination", async () => {

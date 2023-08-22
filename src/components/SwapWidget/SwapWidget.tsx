@@ -7,6 +7,7 @@ import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import { useChain } from "@cosmos-kit/react";
 import { WalletStatus } from "@cosmos-kit/core";
 import TransactionDialog from "../TransactionDialog";
+import { on } from "events";
 
 const RouteLoading = () => (
   <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
@@ -67,6 +68,10 @@ export const SwapWidget: FC = () => {
     numberOfTransactions,
     route,
     insufficientBalance,
+    onSourceChainChange,
+    onSourceAssetChange,
+    onDestinationChainChange,
+    onDestinationAssetChange,
   } = useSwapWidget();
 
   const {
@@ -91,21 +96,9 @@ export const SwapWidget: FC = () => {
               })
             }
             asset={sourceAsset}
-            onAssetChange={(asset) => {
-              setFormValues({
-                ...formValues,
-                sourceAsset: asset,
-              });
-            }}
+            onAssetChange={onSourceAssetChange}
             chain={sourceChain}
-            onChainChange={(chain) =>
-              setFormValues({
-                ...formValues,
-                sourceChain: chain,
-                sourceAsset: undefined,
-                amountIn: "",
-              })
-            }
+            onChainChange={onSourceChainChange}
             showBalance
             chains={chains}
           />
@@ -135,20 +128,9 @@ export const SwapWidget: FC = () => {
           <AssetInput
             amount={amountOut}
             asset={destinationAsset}
-            onAssetChange={(asset) => {
-              setFormValues({
-                ...formValues,
-                destinationAsset: asset,
-              });
-            }}
+            onAssetChange={onDestinationAssetChange}
             chain={destinationChain}
-            onChainChange={(chain) =>
-              setFormValues({
-                ...formValues,
-                destinationChain: chain,
-                destinationAsset: undefined,
-              })
-            }
+            onChainChange={onDestinationChainChange}
             chains={chains}
           />
         </div>

@@ -17,7 +17,14 @@ export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 export function useSwapWidget() {
   const skipClient = useSkipClient();
 
-  const { formValues, setFormValues } = useFormValues();
+  const {
+    formValues,
+    setFormValues,
+    onSourceChainChange,
+    onSourceAssetChange,
+    onDestinationChainChange,
+    onDestinationAssetChange,
+  } = useFormValues();
 
   const amountInWei = useMemo(() => {
     if (!formValues.sourceAsset) {
@@ -130,6 +137,10 @@ export function useSwapWidget() {
     numberOfTransactions: numberOfTransactions ?? 0,
     route: routeResponse,
     insufficientBalance,
+    onSourceChainChange,
+    onSourceAssetChange,
+    onDestinationChainChange,
+    onDestinationAssetChange,
   };
 }
 
@@ -146,6 +157,9 @@ export interface FormValues {
 function useFormValues() {
   const { chains } = useChains();
   const { assetsByChainID, getFeeDenom } = useAssets();
+
+  const [userSelectedDestinationAsset, setUserSelectedDestinationAsset] =
+    useState(false);
 
   const [formValues, setFormValues] = useState<FormValues>({
     amountIn: "",
@@ -204,53 +218,83 @@ function useFormValues() {
     getFeeDenom,
   ]);
 
-  // If destination chain is defined, but no destination asset, select an initial destination asset.
-  // - If fee denom exists for destination chain, use that.
+  const onSourceChainChange = (chain: Chain) => {
+    setFormValues({
+      ...formValues,
+      sourceChain: chain,
+      sourceAsset: undefined,
+      amountIn: "",
+    });
+  };
+
+  const onSourceAssetChange = (asset: AssetWithMetadata) => {
+    setFormValues({
+      ...formValues,
+      sourceAsset: asset,
+    });
+  };
+
+  // When a new destination chain is selected, select a new destination asset:
+  // - If there is a destination asset already selected, try to find the equivalent asset on the new chain.
+  // - Otherwise, if fee denom exists for destination chain, use that.
   // - Otherwise, default to first asset in list.
-  useEffect(() => {
-    if (formValues.destinationChain && !formValues.destinationAsset) {
-      const feeAsset = getFeeDenom(formValues.destinationChain.chain_id);
+  const onDestinationChainChange = (chain: Chain) => {
+    const assets = assetsByChainID(chain.chain_id);
 
-      if (feeAsset) {
-        setFormValues((values) => ({
-          ...values,
-          destinationAsset: feeAsset,
-        }));
-      } else {
-        const assets = assetsByChainID(formValues.destinationChain.chain_id);
-        if (assets.length > 0) {
-          setFormValues((values) => ({
-            ...values,
-            destinationAsset: assets[0],
-          }));
-        }
-      }
-    }
-  }, [
-    assetsByChainID,
-    formValues.destinationAsset,
-    formValues.destinationChain,
-    getFeeDenom,
-  ]);
-
-  // If destination asset is defined, but no destination chain, select chain based off asset.
-  useEffect(() => {
-    if (formValues.destinationAsset && !formValues.destinationChain) {
-      const chain = chains.find(
-        (c) => c.chain_id === formValues.destinationAsset?.chain_id
+    let destinationAsset = getFeeDenom(chain.chain_id) ?? assets[0];
+    if (formValues.destinationAsset && userSelectedDestinationAsset) {
+      const equivalentAsset = findEquivalentAsset(
+        formValues.destinationAsset,
+        assets
       );
 
-      if (chain) {
-        setFormValues((values) => ({
-          ...values,
-          destinationChain: chain,
-        }));
+      if (equivalentAsset) {
+        destinationAsset = equivalentAsset;
       }
     }
-  }, [chains, formValues.destinationAsset, formValues.destinationChain]);
+
+    setFormValues((values) => ({
+      ...values,
+      destinationChain: chain,
+      destinationAsset,
+    }));
+  };
+
+  const onDestinationAssetChange = (asset: AssetWithMetadata) => {
+    // If destination asset is defined, but no destination chain, select chain based off asset.
+    let destinationChain = formValues.destinationChain;
+    if (!destinationChain) {
+      destinationChain = chains.find((c) => c.chain_id === asset.chain_id);
+    }
+
+    // If destination asset is user selected, set flag to true.
+    setUserSelectedDestinationAsset(true);
+
+    setFormValues({
+      ...formValues,
+      destinationAsset: asset,
+      destinationChain,
+    });
+  };
 
   return {
     formValues,
     setFormValues,
+    onSourceAssetChange,
+    onSourceChainChange,
+    onDestinationChainChange,
+    onDestinationAssetChange,
   };
+}
+
+function findEquivalentAsset(
+  asset: AssetWithMetadata,
+  assets: AssetWithMetadata[]
+) {
+  return assets.find((a) => {
+    const isSameOriginChain = a.origin_chain_id === asset.origin_chain_id;
+    const isSameOriginDenom = a.origin_denom === asset.origin_denom;
+
+    return isSameOriginChain && isSameOriginDenom;
+  });
 }
