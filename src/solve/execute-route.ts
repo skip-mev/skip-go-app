@@ -2,6 +2,7 @@ import {
   enableChains,
   getAddressForChain,
   getChainByID,
+  getExplorerLinkForTx,
   getOfflineSigner,
   getOfflineSignerOnlyAmino,
   getSigningCosmWasmClientForChainID,
@@ -23,11 +24,15 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+interface TxInfo {
+  txHash: string | null;
+  explorerLink: string | null;
+}
 export async function executeRoute(
   skipClient: SkipClient,
   walletClient: WalletClient,
   route: RouteResponse,
-  onTxSuccess: (tx: any, index: number) => void,
+  onTxSuccess: (info: TxInfo, index: number) => void,
   onError: (error: any) => void
 ) {
   await enableChains(walletClient, route.chain_ids);
@@ -310,6 +315,14 @@ export async function executeRoute(
       await wait(1000);
     }
 
-    onTxSuccess({}, i);
+    const explorerLink = getExplorerLinkForTx(multiHopMsg.chain_id, txHash);
+
+    onTxSuccess(
+      {
+        explorerLink,
+        txHash,
+      },
+      i
+    );
   }
 }

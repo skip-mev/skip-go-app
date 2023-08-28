@@ -13,7 +13,8 @@ import { Chain, useChains } from "@/context/chains";
 const TransactionSuccessView: FC<{
   route: RouteResponse;
   onClose: () => void;
-}> = ({ route, onClose }) => {
+  transactions: RouteTransaction[];
+}> = ({ route, onClose, transactions }) => {
   const { getAsset } = useAssets();
   const { chains } = useChains();
 
@@ -54,7 +55,7 @@ const TransactionSuccessView: FC<{
           {route.does_swap ? "Swap" : "Transfer"} Successful
         </p>
       </div>
-      <p className="font-medium text-neutral-400 pb-8 flex-1 text-center">
+      <p className="font-medium text-neutral-400 pb-8 text-center">
         {route.does_swap &&
           `Successfully swapped ${
             sourceAsset?.symbol ?? route.source_asset_denom
@@ -64,6 +65,34 @@ const TransactionSuccessView: FC<{
             sourceAsset?.symbol ?? route.source_asset_denom
           } from ${sourceChain.prettyName} to ${destinationChain.prettyName}`}
       </p>
+      <div className="flex-1 space-y-6 w-full">
+        {transactions.map(({ explorerLink, txHash }, i) => (
+          <div key={`tx-${i}`} className="flex items-center gap-4">
+            <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
+            <div className="flex-1">
+              <p className="font-semibold">Transaction {i + 1}</p>
+            </div>
+            <div>
+              {explorerLink && txHash && (
+                <a
+                  className="text-sm font-bold text-[#FF486E] hover:underline"
+                  href={explorerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    <span>
+                      {txHash.slice(0, 6)}
+                      ...
+                      {txHash.slice(-6)}
+                    </span>
+                  </span>
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
       <div className="w-full">
         <button
           className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
@@ -75,6 +104,12 @@ const TransactionSuccessView: FC<{
     </div>
   );
 };
+
+interface RouteTransaction {
+  status: "INIT" | "PENDING" | "SUCCESS";
+  explorerLink: string | null;
+  txHash: string | null;
+}
 
 interface Props {
   route: RouteResponse;
@@ -119,15 +154,28 @@ const TransactionDialogContent: FC<Props> = ({
   const { chainRecords } = useManager();
   const walletClient = chain.chainWallet?.client;
 
-  const [txStatuses, setTxStatuses] = useState(() =>
-    Array.from({ length: transactionCount }, () => "INIT")
+  const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
+    Array.from({ length: transactionCount }, () => {
+      return {
+        status: "INIT",
+        explorerLink: null,
+        txHash: null,
+      };
+    })
   );
 
   const onSubmit = async () => {
     setTransacting(true);
 
     try {
-      setTxStatuses(["PENDING", ...txStatuses.slice(1)]);
+      setTxStatuses([
+        {
+          status: "PENDING",
+          explorerLink: null,
+          txHash: null,
+        },
+        ...txStatuses.slice(1),
+      ]);
 
       if (!walletClient) {
         throw new Error("No wallet client found");
@@ -146,12 +194,21 @@ const TransactionDialogContent: FC<Props> = ({
         skipClient,
         walletClient,
         route,
-        (_, i) => {
+        ({ txHash, explorerLink }, i) => {
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
-            newStatuses[i] = "SUCCESS";
+            newStatuses[i] = {
+              status: "SUCCESS",
+              explorerLink,
+              txHash,
+            };
+
             if (i < statuses.length - 1) {
-              newStatuses[i + 1] = "PENDING";
+              newStatuses[i + 1] = {
+                status: "PENDING",
+                explorerLink: null,
+                txHash: null,
+              };
             }
             return newStatuses;
           });
@@ -163,8 +220,12 @@ const TransactionDialogContent: FC<Props> = ({
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
             return newStatuses.map((status) => {
-              if (status === "PENDING") {
-                return "INIT";
+              if (status.status === "PENDING") {
+                return {
+                  status: "INIT",
+                  explorerLink: null,
+                  txHash: null,
+                };
               }
               return status;
             });
@@ -189,8 +250,12 @@ const TransactionDialogContent: FC<Props> = ({
         const newStatuses = [...statuses];
 
         return newStatuses.map((status) => {
-          if (status === "PENDING") {
-            return "INIT";
+          if (status.status === "PENDING") {
+            return {
+              status: "INIT",
+              explorerLink: null,
+              txHash: null,
+            };
           }
 
           return status;
@@ -202,7 +267,13 @@ const TransactionDialogContent: FC<Props> = ({
   };
 
   if (txComplete) {
-    return <TransactionSuccessView route={route} onClose={onClose} />;
+    return (
+      <TransactionSuccessView
+        route={route}
+        transactions={txStatuses}
+        onClose={onClose}
+      />
+    );
   }
 
   return (
@@ -233,7 +304,7 @@ const TransactionDialogContent: FC<Props> = ({
           </p>
         </div>
         <div className="flex-1 space-y-6">
-          {txStatuses.map((status, i) => (
+          {txStatuses.map(({ status, explorerLink, txHash }, i) => (
             <div key={`tx-${i}`} className="flex items-center gap-4">
               {status === "INIT" && (
                 <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
@@ -263,8 +334,24 @@ const TransactionDialogContent: FC<Props> = ({
               {status === "SUCCESS" && (
                 <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
               )}
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold">Transaction {i + 1}</p>
+              </div>
+              <div>
+                {txHash && explorerLink && (
+                  <a
+                    className="text-sm font-bold text-[#FF486E] hover:underline"
+                    href={explorerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>
+                      {txHash.slice(0, 6)}
+                      ...
+                      {txHash.slice(-6)}
+                    </span>
+                  </a>
+                )}
               </div>
             </div>
           ))}

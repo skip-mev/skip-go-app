@@ -424,6 +424,28 @@ export async function isLedger(walletClient: WalletClient, chainID: string) {
   return false;
 }
 
+export function getExplorerLinkForTx(chainID: string, txHash: string) {
+  const chain = getChainByID(chainID);
+
+  if (!chain) {
+    return null;
+  }
+
+  if (!chain.explorers) {
+    return null;
+  }
+
+  const mintscan = chain.explorers.find(
+    (explorer) => explorer.kind === "mintscan"
+  );
+
+  if (mintscan && mintscan.tx_page) {
+    return mintscan.tx_page.replace("${txHash}", txHash);
+  }
+
+  return chain.explorers[0].tx_page?.replace("${txHash}", txHash) ?? null;
+}
+
 // TODO: planning on refactoring the tx process, where this will find a better home.
 export async function signAmino(
   client: SigningStargateClient,
