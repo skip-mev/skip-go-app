@@ -1,17 +1,28 @@
 import { FC, PropsWithChildren, createContext } from "react";
-import { SkipClient } from "./client";
-import { IGNORE_CHAINS } from "@/config";
+import { SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
 
 export const SkipContext = createContext<
   | {
-      skipClient: SkipClient;
+      skipClient: SkipAPIClient;
     }
   | undefined
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
+  const skipClient = new SkipAPIClient(SKIP_API_URL, {
+    endpointOptions: {
+      getRpcEndpointForChain: async (chainID) => {
+        return `https://ibc.fun/nodes/${chainID}`;
+      },
+    },
+  });
+
   return (
-    <SkipContext.Provider value={{ skipClient: new SkipClient(IGNORE_CHAINS) }}>
+    <SkipContext.Provider
+      value={{
+        skipClient: skipClient,
+      }}
+    >
       {children}
     </SkipContext.Provider>
   );

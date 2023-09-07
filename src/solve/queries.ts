@@ -1,29 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
-import { SkipClient } from "./client";
+import { useSkipClient } from "./hooks";
 
-export function useAssets(client: SkipClient) {
+export function useAssets() {
+  const skipClient = useSkipClient();
+
   return useQuery({
     queryKey: ["solve-assets"],
-    queryFn: async () => {
-      const assets = await client.fungible.getAssets();
-
-      return assets;
+    queryFn: () => {
+      return skipClient.assets();
     },
   });
 }
 
-export function useSolveChains(client: SkipClient) {
+export function useSolveChains() {
+  const skipClient = useSkipClient();
   return useQuery({
     queryKey: ["solve-chains"],
-    queryFn: () => {
-      return client.chains();
+    queryFn: async () => {
+      return skipClient.chains();
     },
     placeholderData: [],
   });
 }
 
 export function useRoute(
-  client: SkipClient,
   amountIn: string,
   sourceAsset?: string,
   sourceAssetChainID?: string,
@@ -31,6 +31,8 @@ export function useRoute(
   destinationAssetChainID?: string,
   enabled?: boolean
 ) {
+  const skipClient = useSkipClient();
+
   return useQuery({
     queryKey: [
       "solve-route",
@@ -50,12 +52,12 @@ export function useRoute(
         return;
       }
 
-      const route = await client.fungible.getRoute({
-        amount_in: amountIn,
-        source_asset_denom: sourceAsset,
-        source_asset_chain_id: sourceAssetChainID,
-        dest_asset_denom: destinationAsset,
-        dest_asset_chain_id: destinationAssetChainID,
+      const route = await skipClient.route({
+        amountIn: amountIn,
+        sourceAssetDenom: sourceAsset,
+        sourceAssetChainID: sourceAssetChainID,
+        destAssetDenom: destinationAsset,
+        destAssetChainID: destinationAssetChainID,
       });
 
       if (!route.operations) {

@@ -252,6 +252,7 @@ export async function signAndBroadcastEvmos(
     bodyBytes: signDirect.body.toBinary(),
     authInfoBytes: signDirect.authInfo.toBinary(),
     chainId: chain.cosmosChainId,
+    // @ts-ignore
     accountNumber: new Long(sender.accountNumber),
   });
   if (!signResponse) {

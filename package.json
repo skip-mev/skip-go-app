@@ -10,6 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@skip-router/core": "1.0.0",
+    "@skip-router/react": "1.0.0",
     "@cosmjs/amino": "^0.31.0",
     "@cosmjs/cosmwasm-stargate": "^0.31.0",
     "@cosmjs/encoding": "^0.31.0",

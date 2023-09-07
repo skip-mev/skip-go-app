@@ -3,7 +3,7 @@ import { FC, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 import AssetSelectContent from "./AssetSelectContent";
-import { AssetWithMetadata } from "@/solve";
+import { AssetWithMetadata } from "@/context/assets";
 
 interface Props {
   asset?: AssetWithMetadata;
@@ -33,7 +33,7 @@ const AssetSelect: FC<Props> = ({
             <img
               alt={asset.symbol}
               className="w-6 h-6 rounded-full"
-              src={asset.logo_uri}
+              src={asset.logoURI}
               onError={(e) =>
                 (e.currentTarget.src =
                   "https://api.dicebear.com/6.x/shapes/svg")
