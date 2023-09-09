@@ -39,6 +39,18 @@ export async function executeRoute(
       getRpcEndpointForChain: async (chainID) => {
         return `https://ibc.fun/nodes/${chainID}`;
       },
+      getRestEndpointForChain: async (chainID) => {
+        console.log(chainID);
+        if (chainID === "injective-1") {
+          return "https://lcd.injective.network";
+        }
+
+        if (chainID === "evmos_9001-2") {
+          return "https://rest.bd.evmos.org:1317";
+        }
+
+        return `https://ibc.fun/nodes/${chainID}`;
+      },
     },
   });
 
