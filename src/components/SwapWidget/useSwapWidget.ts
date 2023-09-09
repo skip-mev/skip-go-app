@@ -7,6 +7,7 @@ import {
   useRoute,
   useSkipClient,
 } from "@/solve";
+import { getChainByID } from "@/utils/utils";
 import { useChain } from "@cosmos-kit/react";
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
@@ -96,7 +97,7 @@ export function useSwapWidget() {
   ]);
 
   const { address } = useChain(
-    formValues.sourceChain?.chain_name ?? "cosmoshub"
+    formValues.sourceChain?.record?.name ?? "cosmoshub"
   );
 
   const { data: balances } = useBalancesByChain(
