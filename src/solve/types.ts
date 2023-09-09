@@ -32,6 +32,20 @@ export interface ModuleVersionInfo {
   sum: string;
 }
 
+export type TransferState =
+  | "TRANSFER_UNKNOWN"
+  | "TRANSFER_PENDING"
+  | "TRANSFER_RECEIVED"
+  | "TRANSFER_SUCCESS"
+  | "TRANSFER_FAILURE";
+
+export interface TransferInfo {
+  src_chain_id: string;
+  dst_chain_id: string;
+  state: TransferState;
+  packet_txs: Packet;
+}
+
 export interface Packet {
   send_tx?: ChainTransaction;
   receive_tx?: ChainTransaction;
@@ -55,7 +69,9 @@ export type StatusState =
   | "STATE_UNKNOWN"
   | "STATE_SUBMITTED"
   | "STATE_PENDING"
-  | "STATE_COMPLETED";
+  | "STATE_RECEIVED"
+  | "STATE_COMPLETED"
+  | "STATE_ABANDONED";
 
 export interface SwapVenue {
   name: string;

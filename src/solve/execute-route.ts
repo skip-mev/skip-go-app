@@ -297,9 +297,9 @@ export async function executeRoute(
           return;
         }
 
-        for (const packet of statusResponse.packets) {
-          if (packet.error) {
-            onError(packet.error);
+        for (const transferInfo of statusResponse.transfer_sequence) {
+          if (transferInfo.packet_txs.error) {
+            onError(transferInfo.packet_txs.error);
             return;
           }
         }

@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosResponse } from "axios";
-import { Packet, StatusError, StatusState } from "../types";
+import { Packet, StatusError, StatusState, TransferInfo } from "../types";
 
 export interface StatusRequest {
   tx_hash: string;
@@ -8,9 +8,7 @@ export interface StatusRequest {
 
 export interface StatusResponse {
   status: StatusState;
-  last_chain_id: string;
-  packets: Packet[];
-
+  transfer_sequence: TransferInfo[];
   error?: StatusError;
 }
 
