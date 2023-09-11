@@ -183,7 +183,9 @@ const TransactionDialogContent: FC<Props> = ({
         if (walletClient.addChain) {
           const record = chainRecords.find((c) => c.chain.chain_id === chainID);
           if (record) {
-            await walletClient.addChain(record);
+            try {
+              await walletClient.addChain(record);
+            } catch (err) {}
           }
         }
       }
