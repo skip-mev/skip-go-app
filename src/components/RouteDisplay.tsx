@@ -230,34 +230,36 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         return;
       }
 
-      const sourceChain = operation.transfer.chainID;
+      if ("transfer" in operation) {
+        const sourceChain = operation.transfer.chainID;
 
-      let destinationChain = "";
-      if (i === route.operations.length - 1) {
-        destinationChain = route.destAssetChainID;
-      } else {
-        const nextOperation = route.operations[i + 1];
-        if ("swap" in nextOperation) {
-          if ("swapIn" in nextOperation.swap) {
-            destinationChain = nextOperation.swap.swapIn.swapVenue.chainID;
-          }
-
-          if ("swapOut" in nextOperation.swap) {
-            destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
-          }
+        let destinationChain = "";
+        if (i === route.operations.length - 1) {
+          destinationChain = route.destAssetChainID;
         } else {
-          destinationChain = nextOperation.transfer.chainID;
+          const nextOperation = route.operations[i + 1];
+          if ("swap" in nextOperation) {
+            if ("swapIn" in nextOperation.swap) {
+              destinationChain = nextOperation.swap.swapIn.swapVenue.chainID;
+            }
+
+            if ("swapOut" in nextOperation.swap) {
+              destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
+            }
+          } else if ("transfer" in nextOperation) {
+            destinationChain = nextOperation.transfer.chainID;
+          }
         }
+
+        _actions.push({
+          type: "TRANSFER",
+          asset,
+          sourceChain,
+          destinationChain,
+        });
+
+        asset = operation.transfer.destDenom;
       }
-
-      _actions.push({
-        type: "TRANSFER",
-        asset,
-        sourceChain,
-        destinationChain,
-      });
-
-      asset = operation.transfer.destDenom;
     });
 
     return _actions;

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import va from "@vercel/analytics";
 import { useSwapWidget } from "./useSwapWidget";
 import AssetInput from "../AssetInput";
@@ -7,7 +7,14 @@ import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import { useChain } from "@cosmos-kit/react";
 import { WalletStatus } from "@cosmos-kit/core";
 import TransactionDialog from "../TransactionDialog";
-import { on } from "events";
+import {
+  ConnectButton,
+  useChainModal,
+  useConnectModal,
+} from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { getChainByID, isEVMChain } from "@/utils/utils";
+import { is } from "immer/dist/internal";
 
 const RouteLoading = () => (
   <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
@@ -52,6 +59,48 @@ const RouteTransactionCountBanner: FC<{
   </div>
 );
 
+const ConnectWalletButtonCosmosKit: FC<{ chainID: string }> = ({ chainID }) => {
+  const chain = getChainByID(chainID);
+  const { connect } = useChain(chain.chain_name);
+  return (
+    <button
+      className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
+      onClick={async () => {
+        await connect();
+
+        va.track("wallet-connect", {
+          chainID: chainID,
+        });
+      }}
+    >
+      Connect Wallet
+    </button>
+  );
+};
+
+const ConnectWalletButtonRainbowKit: FC = () => {
+  const { openConnectModal } = useConnectModal();
+
+  return (
+    <button
+      className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
+      onClick={async () => {
+        openConnectModal?.();
+      }}
+    >
+      Connect Wallet
+    </button>
+  );
+};
+
+const ConnectWalletButton: FC<{ chainID: string }> = ({ chainID }) => {
+  if (isEVMChain(chainID)) {
+    return <ConnectWalletButtonRainbowKit />;
+  }
+
+  return <ConnectWalletButtonCosmosKit chainID={chainID} />;
+};
+
 export const SwapWidget: FC = () => {
   const { chains } = useChains();
 
@@ -79,6 +128,20 @@ export const SwapWidget: FC = () => {
     connect: connectWallet,
     chain,
   } = useChain(sourceChain?.record?.chain.chain_name ?? "cosmoshub");
+
+  const { address, isConnected } = useAccount();
+
+  const isWalletConnected = useMemo(() => {
+    if (!sourceChain) {
+      return false;
+    }
+
+    if (isEVMChain(sourceChain.chainID)) {
+      return isConnected;
+    }
+
+    return walletConnectStatus === WalletStatus.Connected;
+  }, [isConnected, sourceChain, walletConnectStatus]);
 
   return (
     <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
@@ -140,21 +203,10 @@ export const SwapWidget: FC = () => {
             numberOfTransactions={numberOfTransactions}
           />
         )}
-        {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
-          <button
-            className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
-            onClick={async () => {
-              await connectWallet();
-
-              va.track("wallet-connect", {
-                chainID: chain.chain_id,
-              });
-            }}
-          >
-            Connect Wallet
-          </button>
+        {sourceChain && !isWalletConnected && (
+          <ConnectWalletButton chainID={sourceChain.chainID} />
         )}
-        {sourceChain && walletConnectStatus === WalletStatus.Connected && (
+        {sourceChain && isWalletConnected && (
           <div className="space-y-4">
             <TransactionDialog
               route={route}

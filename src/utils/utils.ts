@@ -61,6 +61,25 @@ import { Int53 } from "@cosmjs/math";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { fromBase64 } from "@cosmjs/encoding";
 
+export function isEVMChain(chainID: string) {
+  return [
+    "42161",
+    "43114",
+    "8453",
+    "56",
+    "9790",
+    "42220",
+    "1",
+    "250",
+    "314",
+    "2222",
+    "59144",
+    "1284",
+    "10",
+    "137",
+  ].includes(chainID);
+}
+
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
     (chain) => chain.chain_id === chainID

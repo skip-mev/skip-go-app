@@ -2,6 +2,7 @@ import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
 import { useRoute } from "@/solve";
+import { isEVMChain } from "@/utils/utils";
 import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
@@ -76,9 +77,12 @@ export function useSwapWidget() {
     routeResponse,
   ]);
 
-  const { address } = useChain(
-    formValues.sourceChain?.chainName ?? "cosmoshub"
-  );
+  let sourceChainName = "cosmoshub";
+  if (formValues.sourceChain && !isEVMChain(formValues.sourceChain.chainID)) {
+    sourceChainName = formValues.sourceChain.chainName;
+  }
+
+  const { address } = useChain(sourceChainName);
 
   const { data: balances } = useBalancesByChain(
     address,

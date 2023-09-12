@@ -9,7 +9,7 @@ export const SkipContext = createContext<
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
-  const skipClient = new SkipAPIClient(SKIP_API_URL, {
+  const skipClient = new SkipAPIClient("https://solve-dev.skip.money", {
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
         return `https://ibc.fun/nodes/${chainID}`;
@@ -21,6 +21,9 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
 
         return `https://ibc.fun/nodes/${chainID}`;
       },
+    },
+    getOfflineSigner: async () => {
+      throw new Error("Not implemented");
     },
   });
 

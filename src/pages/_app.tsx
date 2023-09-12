@@ -19,6 +19,31 @@ import { queryClient } from "@/utils/query";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { arbitrum } from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
+
+const { chains: evmChains, publicClient } = configureChains(
+  [arbitrum],
+  [publicProvider()]
+);
+
+export { publicClient };
+
+const { connectors } = getDefaultWallets({
+  appName: "My RainbowKit App",
+  projectId: "YOUR_PROJECT_ID",
+  chains: evmChains,
+});
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient,
+});
+
 const jost = Jost({
   subsets: ["latin"],
 });
@@ -183,26 +208,30 @@ export default function App({ Component, pageProps }: AppProps) {
       <main className={jost.className}>
         <SkipProvider>
           <QueryClientProvider client={queryClient}>
-            <ChainProvider
-              chains={chains}
-              assetLists={assets}
-              wallets={wallets}
-              wrappedWithChakra
-              throwErrors={false}
-            >
-              <ChainsProvider>
-                <AssetsProvider>
-                  <RadixToast.ToastProvider>
-                    <ToastProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                    </ToastProvider>
-                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                  </RadixToast.ToastProvider>
-                </AssetsProvider>
-              </ChainsProvider>
-            </ChainProvider>
+            <WagmiConfig config={wagmiConfig}>
+              <RainbowKitProvider chains={evmChains}>
+                <ChainProvider
+                  chains={chains}
+                  assetLists={assets}
+                  wallets={wallets}
+                  wrappedWithChakra
+                  throwErrors={false}
+                >
+                  <ChainsProvider>
+                    <AssetsProvider>
+                      <RadixToast.ToastProvider>
+                        <ToastProvider>
+                          <MainLayout>
+                            <Component {...pageProps} />
+                          </MainLayout>
+                        </ToastProvider>
+                        <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
+                      </RadixToast.ToastProvider>
+                    </AssetsProvider>
+                  </ChainsProvider>
+                </ChainProvider>
+              </RainbowKitProvider>
+            </WagmiConfig>
           </QueryClientProvider>
         </SkipProvider>
       </main>

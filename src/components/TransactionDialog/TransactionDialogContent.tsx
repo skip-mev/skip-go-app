@@ -4,11 +4,12 @@ import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import Toast from "@/elements/Toast";
 import RouteDisplay from "../RouteDisplay";
 import { useToast } from "@/context/toast";
-import { getChainByID } from "@/utils/utils";
+import { getChainByID, isEVMChain } from "@/utils/utils";
 import { executeRoute } from "@/solve/execute-route";
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 import { RouteResponse } from "@skip-router/core";
+import { useWalletClient } from "wagmi";
 
 const TransactionSuccessView: FC<{
   route: RouteResponse;
@@ -147,7 +148,14 @@ const TransactionDialogContent: FC<Props> = ({
 
   const chainRecord = getChainByID(route.sourceAssetChainID);
 
-  const chain = useChain(chainRecord?.chain_name);
+  let chainName = "cosmoshub";
+  if (chainRecord && !isEVMChain(route.sourceAssetChainID)) {
+    chainName = chainRecord.chain_name;
+  }
+
+  const chain = useChain(chainName);
+
+  const { data: evmWalletClient } = useWalletClient();
 
   const { chainRecords } = useManager();
   const walletClient = chain.chainWallet?.client;
@@ -179,6 +187,10 @@ const TransactionDialogContent: FC<Props> = ({
         throw new Error("No wallet client found");
       }
 
+      if (!evmWalletClient) {
+        throw new Error("No EVM wallet client found");
+      }
+
       for (const chainID of route.chainIDs) {
         if (walletClient.addChain) {
           const record = chainRecords.find((c) => c.chain.chain_id === chainID);
@@ -192,6 +204,7 @@ const TransactionDialogContent: FC<Props> = ({
 
       await executeRoute(
         walletClient,
+        evmWalletClient,
         route,
         ({ txHash, explorerLink }, i) => {
           setTxStatuses((statuses) => {
