@@ -1,3 +1,6 @@
+import { WalletClient } from "@cosmos-kit/core";
+import { RouteResponse, SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
+
 import {
   enableChains,
   getAddressForChain,
@@ -6,8 +9,6 @@ import {
   getOfflineSignerOnlyAmino,
   isLedger,
 } from "@/utils/utils";
-import { WalletClient } from "@cosmos-kit/core";
-import { RouteResponse, SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
 
 interface TxInfo {
   txHash: string | null;
@@ -16,7 +17,8 @@ interface TxInfo {
 export async function executeRoute(
   walletClient: WalletClient,
   route: RouteResponse,
-  onTxSuccess: (info: TxInfo, index: number) => void
+  // eslint-disable-next-line no-unused-vars
+  onTxSuccess: (info: TxInfo, index: number) => void,
 ) {
   await enableChains(walletClient, route.chainIDs);
 
@@ -75,7 +77,7 @@ export async function executeRoute(
           explorerLink,
           txHash: sendTx.txHash,
         },
-        i
+        i,
       );
 
       i++;

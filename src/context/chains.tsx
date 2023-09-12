@@ -1,8 +1,9 @@
-import { FC, PropsWithChildren, createContext, useContext } from "react";
-import { useSolveChains } from "@/solve/queries";
 import { ChainRecord } from "@cosmos-kit/core";
 import { useManager } from "@cosmos-kit/react";
 import { Chain as SkipChain } from "@skip-router/core";
+import { createContext, FC, PropsWithChildren, useContext } from "react";
+
+import { useSolveChains } from "@/solve/queries";
 
 export interface Chain extends SkipChain {
   prettyName: string;

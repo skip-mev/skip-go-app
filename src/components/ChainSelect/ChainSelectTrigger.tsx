@@ -1,5 +1,6 @@
-import { ForwardedRef, forwardRef } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ForwardedRef, forwardRef } from "react";
+
 import { Chain } from "@/context/chains";
 
 interface Props {

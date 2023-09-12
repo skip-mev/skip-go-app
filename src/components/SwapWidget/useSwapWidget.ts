@@ -1,10 +1,11 @@
+import { useChain } from "@cosmos-kit/react";
+import { ethers } from "ethers";
+import { useEffect, useMemo, useState } from "react";
+
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
 import { useRoute } from "@/solve";
-import { useChain } from "@cosmos-kit/react";
-import { ethers } from "ethers";
-import { useEffect, useMemo, useState } from "react";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
@@ -32,17 +33,13 @@ export function useSwapWidget() {
     }
   }, [formValues.amountIn, formValues.sourceAsset]);
 
-  const {
-    data: routeResponse,
-    fetchStatus: routeFetchStatus,
-    isError,
-  } = useRoute(
+  const { data: routeResponse, fetchStatus: routeFetchStatus } = useRoute(
     amountInWei,
     formValues.sourceAsset?.denom,
     formValues.sourceAsset?.chainID,
     formValues.destinationAsset?.denom,
     formValues.destinationAsset?.chainID,
-    true
+    true,
   );
 
   const numberOfTransactions = useMemo(() => {
@@ -65,7 +62,7 @@ export function useSwapWidget() {
     if (routeResponse.doesSwap && routeResponse.estimatedAmountOut) {
       return ethers.formatUnits(
         routeResponse.estimatedAmountOut,
-        formValues.destinationAsset?.decimals ?? 6
+        formValues.destinationAsset?.decimals ?? 6,
       );
     }
 
@@ -77,12 +74,12 @@ export function useSwapWidget() {
   ]);
 
   const { address } = useChain(
-    formValues.sourceChain?.record?.name ?? "cosmoshub"
+    formValues.sourceChain?.record?.name ?? "cosmoshub",
   );
 
   const { data: balances } = useBalancesByChain(
     address,
-    formValues.sourceChain
+    formValues.sourceChain,
   );
 
   const insufficientBalance = useMemo(() => {
@@ -99,7 +96,7 @@ export function useSwapWidget() {
     const balanceStr = balances[formValues.sourceAsset.denom] ?? "0";
 
     const balance = parseFloat(
-      ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals)
+      ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals),
     );
 
     return amountIn > balance;
@@ -165,7 +162,7 @@ function useFormValues() {
     if (formValues.sourceChain) {
       localStorage.setItem(
         LAST_SOURCE_CHAIN_KEY,
-        formValues.sourceChain.chainID
+        formValues.sourceChain.chainID,
       );
     }
   }, [formValues.sourceChain]);
@@ -226,7 +223,7 @@ function useFormValues() {
     if (formValues.destinationAsset && userSelectedDestinationAsset) {
       const equivalentAsset = findEquivalentAsset(
         formValues.destinationAsset,
-        assets
+        assets,
       );
 
       if (equivalentAsset) {
@@ -270,7 +267,7 @@ function useFormValues() {
 
 function findEquivalentAsset(
   asset: AssetWithMetadata,
-  assets: AssetWithMetadata[]
+  assets: AssetWithMetadata[],
 ) {
   return assets.find((a) => {
     const isSameOriginChain = a.originChainID === asset.originChainID;

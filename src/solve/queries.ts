@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { useSkipClient } from "./hooks";
 
 export function useAssets() {

@@ -1,7 +1,8 @@
-import { FC, Fragment, PropsWithChildren, useContext } from "react";
+import { Transition } from "@headlessui/react";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { DialogContentProps } from "@radix-ui/react-dialog";
-import { Transition } from "@headlessui/react";
+import { FC, Fragment, PropsWithChildren, useContext } from "react";
+
 import { DialogContext } from "./context";
 
 interface Props extends PropsWithChildren {

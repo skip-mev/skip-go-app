@@ -1,6 +1,5 @@
-import { FC, Fragment } from "react";
 import * as RadixToast from "@radix-ui/react-toast";
-import { type } from "os";
+import { FC, Fragment } from "react";
 
 interface Props {
   open?: boolean;

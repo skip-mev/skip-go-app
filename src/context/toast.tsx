@@ -1,11 +1,12 @@
-import Toast from "@/elements/Toast";
 import {
+  createContext,
   FC,
   PropsWithChildren,
-  createContext,
   useContext,
   useState,
 } from "react";
+
+import Toast from "@/elements/Toast";
 
 interface ToastContext {
   toast: (title: string, message: string, type: "success" | "error") => void;
