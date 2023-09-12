@@ -17,22 +17,22 @@ import { AssetsProvider } from "@/context/assets";
 const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Fragment>
-      <SkipProvider>
-        <QueryClientProvider client={queryClient}>
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={[...keplrWallets]}
-            throwErrors={false}
-            logLevel="NONE"
-            walletModal={() => <div></div>}
-          >
+      <QueryClientProvider client={queryClient}>
+        <ChainProvider
+          chains={chains}
+          assetLists={assets}
+          wallets={[...keplrWallets]}
+          throwErrors={false}
+          logLevel="NONE"
+          walletModal={() => <div></div>}
+        >
+          <SkipProvider>
             <ChainsProvider>
               <AssetsProvider>{children}</AssetsProvider>
             </ChainsProvider>
-          </ChainProvider>
-        </QueryClientProvider>
-      </SkipProvider>
+          </SkipProvider>
+        </ChainProvider>
+      </QueryClientProvider>
     </Fragment>
   );
 };
@@ -40,7 +40,7 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
 function customRender<
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,
-  BaseElement extends Element | DocumentFragment = Container
+  BaseElement extends Element | DocumentFragment = Container,
 >(
   ui: React.ReactElement,
   options: RenderOptions<Q, Container, BaseElement> = {}

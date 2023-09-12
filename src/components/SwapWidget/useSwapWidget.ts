@@ -137,6 +137,7 @@ export interface FormValues {
 // and handles logic regarding setting initial values based on local storage and other form values.
 function useFormValues() {
   const { chains } = useChains();
+
   const { assetsByChainID, getFeeDenom } = useAssets();
 
   const [userSelectedDestinationAsset, setUserSelectedDestinationAsset] =

@@ -6,6 +6,8 @@ import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const handlers = [
   rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(CHAINS_RESPONSE));
@@ -92,15 +94,13 @@ describe("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
 
     // Source chain should be Cosmos Hub by default
-    const sourceChainButton = await within(sourceAssetSection).findByText(
-      "Cosmos Hub"
-    );
+    const sourceChainButton =
+      await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton = await within(sourceAssetSection).findByText(
-      "ATOM"
-    );
+    const sourceAssetButton =
+      await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     // Update amount in
@@ -134,9 +134,8 @@ describe("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
 
     // Source asset should be ATOM initially
-    const sourceAssetButton = await within(sourceAssetSection).findByText(
-      "ATOM"
-    );
+    const sourceAssetButton =
+      await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     // Select new asset
@@ -278,15 +277,13 @@ describe("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Source chain should be selected
-    const sourceChainButton = await within(sourceAssetSection).findByText(
-      "Cosmos Hub"
-    );
+    const sourceChainButton =
+      await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton = await within(sourceAssetSection).findByText(
-      "ATOM"
-    );
+    const sourceAssetButton =
+      await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     const destinationChainButton = await within(
@@ -332,15 +329,13 @@ describe("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Source chain should be selected
-    const sourceChainButton = await within(sourceAssetSection).findByText(
-      "Cosmos Hub"
-    );
+    const sourceChainButton =
+      await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton = await within(sourceAssetSection).findByText(
-      "ATOM"
-    );
+    const sourceAssetButton =
+      await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     const destinationChainButton = await within(
