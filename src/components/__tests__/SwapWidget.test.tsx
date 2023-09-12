@@ -8,8 +8,6 @@ import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { SwapWidget } from "../SwapWidget";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const handlers = [
   rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(CHAINS_RESPONSE));
