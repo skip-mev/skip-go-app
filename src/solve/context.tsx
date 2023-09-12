@@ -1,6 +1,11 @@
 import { FC, PropsWithChildren, createContext } from "react";
 import { SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
 import { useWalletClient } from "@cosmos-kit/react";
+import {
+  getOfflineSigner,
+  getOfflineSignerOnlyAmino,
+  isLedger,
+} from "@/utils/utils";
 
 export const SkipContext = createContext<
   | {
@@ -10,13 +15,20 @@ export const SkipContext = createContext<
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
-  const walletClient = useWalletClient();
-
-  console.log(walletClient);
+  const { client: walletClient } = useWalletClient();
 
   const skipClient = new SkipAPIClient(SKIP_API_URL, {
-    getOfflineSigner: async () => {
-      throw new Error("No offline signer available");
+    getOfflineSigner: async (chainID) => {
+      if (!walletClient) {
+        throw new Error("No offline signer available");
+      }
+
+      const signerIsLedger = await isLedger(walletClient, chainID);
+
+      if (signerIsLedger) {
+        return getOfflineSignerOnlyAmino(walletClient, chainID);
+      }
+      return getOfflineSigner(walletClient, chainID);
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
