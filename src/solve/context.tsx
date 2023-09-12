@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, createContext } from "react";
 import { SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
+import { useWalletClient } from "@cosmos-kit/react";
 
 export const SkipContext = createContext<
   | {
@@ -9,6 +10,10 @@ export const SkipContext = createContext<
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
+  const walletClient = useWalletClient();
+
+  console.log(walletClient);
+
   const skipClient = new SkipAPIClient(SKIP_API_URL, {
     getOfflineSigner: async () => {
       throw new Error("No offline signer available");

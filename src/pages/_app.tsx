@@ -181,15 +181,15 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <main className={jost.className}>
-        <SkipProvider>
-          <QueryClientProvider client={queryClient}>
-            <ChainProvider
-              chains={chains}
-              assetLists={assets}
-              wallets={wallets}
-              wrappedWithChakra
-              throwErrors={false}
-            >
+        <QueryClientProvider client={queryClient}>
+          <ChainProvider
+            chains={chains}
+            assetLists={assets}
+            wallets={wallets}
+            wrappedWithChakra
+            throwErrors={false}
+          >
+            <SkipProvider>
               <ChainsProvider>
                 <AssetsProvider>
                   <RadixToast.ToastProvider>
@@ -202,9 +202,9 @@ export default function App({ Component, pageProps }: AppProps) {
                   </RadixToast.ToastProvider>
                 </AssetsProvider>
               </ChainsProvider>
-            </ChainProvider>
-          </QueryClientProvider>
-        </SkipProvider>
+            </SkipProvider>
+          </ChainProvider>
+        </QueryClientProvider>
       </main>
       <Analytics />
     </>
