@@ -8,9 +8,8 @@ import { ChainProvider } from "@cosmos-kit/react";
 import * as RadixToast from "@radix-ui/react-toast";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
-import { assets,chains } from "chain-registry";
+import { assets, chains } from "chain-registry";
 import { AppProps } from "next/app";
-import { Jost } from "next/font/google";
 import Head from "next/head";
 
 import MainLayout from "@/components/MainLayout";
@@ -19,10 +18,6 @@ import { ChainsProvider } from "@/context/chains";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
-
-const jost = Jost({
-  subsets: ["latin"],
-});
 
 export default function App({ Component, pageProps }: AppProps) {
   chains.push({
@@ -181,7 +176,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Interchain transfers and swaps on any Cosmos chain"
         />
       </Head>
-      <main className={jost.className}>
+      <main>
         <QueryClientProvider client={queryClient}>
           <ChainProvider
             chains={chains}
