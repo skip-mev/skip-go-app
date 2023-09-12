@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { getContract, zeroAddress } from "viem";
+import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
 
 import { Chain } from "@/context/chains";
-import { getStargateClientForChainID, isEVMChain } from "@/utils/utils";
-import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { useSkipClient } from "@/solve";
-import { getContract, zeroAddress } from "viem";
+import { getStargateClientForChainID, isEVMChain } from "@/utils/utils";
 
 export function chainNameToChainlistURL(chainName: string) {
   const idToNameMap: Record<string, string> = {
@@ -29,12 +29,15 @@ export async function getBalancesByChain(address: string, chainID: string) {
 
   const balances = await client.getAllBalances(address);
 
-  return balances.reduce((acc, balance) => {
-    return {
-      ...acc,
-      [balance.denom]: balance.amount,
-    };
-  }, {} as Record<string, string>);
+  return balances.reduce(
+    (acc, balance) => {
+      return {
+        ...acc,
+        [balance.denom]: balance.amount,
+      };
+    },
+    {} as Record<string, string>,
+  );
 }
 
 const denomsToAddressMap: Record<string, Record<string, `0x${string}`>> = {
@@ -47,7 +50,7 @@ const denomsToAddressMap: Record<string, Record<string, `0x${string}`>> = {
 export function useBalancesByChain(
   address?: string,
   chain?: Chain,
-  enabled: boolean = true
+  enabled: boolean = true,
 ) {
   const { address: evmAddress } = useAccount();
   const skipClient = useSkipClient();

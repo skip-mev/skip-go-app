@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import { FC, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
-import AssetSelectContent from "./AssetSelectContent";
+import { FC, useState } from "react";
+
 import { AssetWithMetadata } from "@/context/assets";
+import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
+
+import AssetSelectContent from "./AssetSelectContent";
 
 interface Props {
   asset?: AssetWithMetadata;

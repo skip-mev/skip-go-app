@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { useSkipClient } from "./hooks";
 
 export function useAssets() {
@@ -16,7 +17,7 @@ export function useSolveChains() {
   const skipClient = useSkipClient();
   return useQuery({
     queryKey: ["solve-chains"],
-    queryFn: async () => {
+    queryFn: () => {
       return skipClient.chains();
     },
     placeholderData: [],

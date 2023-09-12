@@ -1,4 +1,21 @@
 import {
+  AxelarGMPRecoveryAPI,
+  Environment,
+} from "@axelar-network/axelarjs-sdk";
+import { WalletClient } from "@cosmos-kit/core";
+import { RouteResponse, SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
+import {
+  Account,
+  getContract,
+  maxUint256,
+  PublicClient,
+  WalletClient as ViemWalletClient,
+  zeroAddress,
+} from "viem";
+import { erc20ABI } from "wagmi";
+
+import { publicClient } from "@/pages/_app";
+import {
   enableChains,
   getAddressForChain,
   getExplorerLinkForTx,
@@ -7,22 +24,6 @@ import {
   isEVMChain,
   isLedger,
 } from "@/utils/utils";
-import { WalletClient } from "@cosmos-kit/core";
-import { RouteResponse, SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
-import {
-  Account,
-  PublicClient,
-  WalletClient as ViemWalletClient,
-  getContract,
-  maxUint256,
-  zeroAddress,
-} from "viem";
-import {
-  AxelarGMPRecoveryAPI,
-  Environment,
-} from "@axelar-network/axelarjs-sdk";
-import { erc20ABI } from "wagmi";
-import { publicClient } from "@/pages/_app";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -34,7 +35,8 @@ export async function executeRoute(
   walletClient: WalletClient,
   walletClientEVM: ViemWalletClient,
   route: RouteResponse,
-  onTxSuccess: (info: TxInfo, index: number) => void
+  // eslint-disable-next-line no-unused-vars
+  onTxSuccess: (info: TxInfo, index: number) => void,
 ) {
   // await enableChains(walletClient, route.chainIDs);
 

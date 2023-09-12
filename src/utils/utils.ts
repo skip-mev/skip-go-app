@@ -1,65 +1,64 @@
-import { useRef, useEffect } from "react";
-import {
-  EncodeObject,
-  OfflineSigner,
-  TxBodyEncodeObject,
-  encodePubkey,
-  makeAuthInfoBytes,
-} from "@cosmjs/proto-signing";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { encodeSecp256k1Pubkey, makeSignDoc } from "@cosmjs/amino";
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
 } from "@cosmjs/cosmwasm-stargate";
+import { fromBase64 } from "@cosmjs/encoding";
+import { Int53 } from "@cosmjs/math";
+import {
+  EncodeObject,
+  encodePubkey,
+  makeAuthInfoBytes,
+  OfflineSigner,
+  TxBodyEncodeObject,
+} from "@cosmjs/proto-signing";
 import {
   AminoTypes,
+  createDefaultAminoConverters,
   SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
   StargateClient,
   StdFee,
-  createDefaultAminoConverters,
 } from "@cosmjs/stargate";
-import { WalletClient, getFastestEndpoint } from "@cosmos-kit/core";
-import { useChain, useManager } from "@cosmos-kit/react";
-import * as chainRegistry from "chain-registry";
+import { getFastestEndpoint, WalletClient } from "@cosmos-kit/core";
+import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
+import { KeplrClient } from "@cosmos-kit/keplr-extension";
+import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
+import { createTxRaw } from "@evmos/proto";
 import {
   generateEndpointAccount,
-  generatePostBodyBroadcast,
   generateEndpointBroadcast,
+  generatePostBodyBroadcast,
 } from "@evmos/provider";
-import axios from "axios";
 import {
   Chain,
+  createTxIBCMsgTransfer,
   Fee,
   IBCMsgTransferParams,
   Sender,
   TxContext,
-  createTxIBCMsgTransfer,
 } from "@evmos/transactions";
-import { createTxRaw } from "@evmos/proto";
-import Long from "long";
 import {
   BaseAccount,
   ChainRestAuthApi,
   ChainRestTendermintApi,
-  Msgs,
-  TxRestClient,
   createTransaction,
   getTxRawFromTxRawOrDirectSignResponse,
+  Msgs,
+  TxRestClient,
 } from "@injectivelabs/sdk-ts";
 import {
-  DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
+  DEFAULT_BLOCK_TIMEOUT_HEIGHT,
 } from "@injectivelabs/utils";
-import { KeplrClient } from "@cosmos-kit/keplr-extension";
-import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
-import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
 import { OfflineAminoSigner } from "@keplr-wallet/types";
-import { makeSignDoc, encodeSecp256k1Pubkey } from "@cosmjs/amino";
+import axios from "axios";
+import * as chainRegistry from "chain-registry";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
-import { Int53 } from "@cosmjs/math";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { fromBase64 } from "@cosmjs/encoding";
+import Long from "long";
 
 export function isEVMChain(chainID: string) {
   return [
@@ -82,7 +81,7 @@ export function isEVMChain(chainID: string) {
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID
+    (chain) => chain.chain_id === chainID,
   ) as (typeof chainRegistry.chains)[0];
 }
 
@@ -95,7 +94,7 @@ export async function getStargateClientForChainID(chainID: string) {
   }
 
   const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID
+    (chain) => chain.chain_id === chainID,
   );
 
   if (!chain) {
@@ -110,7 +109,9 @@ export async function getStargateClientForChainID(chainID: string) {
     STARGATE_CLIENTS[chainID] = client;
 
     return client;
-  } catch {}
+  } catch {
+    /* empty */
+  }
 
   const rpcEndpoints = chain.apis?.rpc ?? [];
 
@@ -118,7 +119,7 @@ export async function getStargateClientForChainID(chainID: string) {
     rpcEndpoints.reduce((acc, endpoint) => {
       return [...acc, endpoint.address];
     }, [] as string[]),
-    "rpc"
+    "rpc",
   );
 
   const client = await StargateClient.connect(endpoint, {});
@@ -129,10 +130,10 @@ export async function getStargateClientForChainID(chainID: string) {
 export async function getSigningStargateClientForChainID(
   chainID: string,
   signer: OfflineSigner,
-  options?: SigningStargateClientOptions
+  options?: SigningStargateClientOptions,
 ) {
   const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID
+    (chain) => chain.chain_id === chainID,
   );
 
   if (!chain) {
@@ -145,13 +146,15 @@ export async function getSigningStargateClientForChainID(
     const client = await SigningStargateClient.connectWithSigner(
       preferredEndpoint,
       signer,
-      options
+      options,
     );
 
     console.log(`Connected to ${preferredEndpoint}`);
 
     return client;
-  } catch {}
+  } catch {
+    /* empty */
+  }
 
   const rpcEndpoints = chain.apis?.rpc ?? [];
 
@@ -159,13 +162,13 @@ export async function getSigningStargateClientForChainID(
     rpcEndpoints.reduce((acc, endpoint) => {
       return [...acc, endpoint.address];
     }, [] as string[]),
-    "rpc"
+    "rpc",
   );
 
   const client = await SigningStargateClient.connectWithSigner(
     endpoint,
     signer,
-    options
+    options,
   );
 
   return client;
@@ -173,7 +176,7 @@ export async function getSigningStargateClientForChainID(
 
 export async function getAddressForChain(
   walletClient: WalletClient,
-  chainId: string
+  chainId: string,
 ) {
   if (walletClient.getOfflineSigner) {
     const signer = await walletClient.getOfflineSigner(chainId);
@@ -188,10 +191,10 @@ export async function getAddressForChain(
 export async function getSigningCosmWasmClientForChainID(
   chainID: string,
   signer: OfflineSigner,
-  options?: SigningCosmWasmClientOptions
+  options?: SigningCosmWasmClientOptions,
 ) {
   const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID
+    (chain) => chain.chain_id === chainID,
   );
 
   if (!chain) {
@@ -203,11 +206,13 @@ export async function getSigningCosmWasmClientForChainID(
     const client = await SigningCosmWasmClient.connectWithSigner(
       preferredEndpoint,
       signer,
-      options
+      options,
     );
 
     return client;
-  } catch {}
+  } catch {
+    /* empty */
+  }
 
   const rpcEndpoints = chain.apis?.rpc ?? [];
 
@@ -215,13 +220,13 @@ export async function getSigningCosmWasmClientForChainID(
     rpcEndpoints.reduce((acc, endpoint) => {
       return [...acc, endpoint.address];
     }, [] as string[]),
-    "rpc"
+    "rpc",
   );
 
   const client = await SigningCosmWasmClient.connectWithSigner(
     endpoint,
     signer,
-    options
+    options,
   );
 
   return client;
@@ -230,11 +235,11 @@ export async function getSigningCosmWasmClientForChainID(
 export async function signAndBroadcastEvmos(
   walletClient: WalletClient,
   signerAddress: string,
-  params: IBCMsgTransferParams
+  params: IBCMsgTransferParams,
 ) {
   const chainID = "evmos_9001-2";
   const result = await axios.get(
-    `https://rest.bd.evmos.org:1317${generateEndpointAccount(signerAddress)}`
+    `https://rest.bd.evmos.org:1317${generateEndpointAccount(signerAddress)}`,
   );
   const account = await getAccount(walletClient, chainID);
   const pk = Buffer.from(account.pubkey).toString("base64");
@@ -285,11 +290,11 @@ export async function signAndBroadcastEvmos(
   const signedTx = createTxRaw(
     signed.bodyBytes,
     signed.authInfoBytes,
-    signatures
+    signatures,
   );
   const response = await axios.post(
     `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
-    generatePostBodyBroadcast(signedTx, "BROADCAST_MODE_BLOCK")
+    generatePostBodyBroadcast(signedTx, "BROADCAST_MODE_BLOCK"),
   );
   return response.data.tx_response;
 }
@@ -298,16 +303,15 @@ export async function signAndBroadcastInjective(
   walletClient: WalletClient,
   signerAddress: string,
   msgs: Msgs | Msgs[],
-  fee: StdFee
+  fee: StdFee,
 ) {
   const chainID = "injective-1";
   const restEndpoint = "https://lcd.injective.network";
 
   const chainRestAuthApi = new ChainRestAuthApi(restEndpoint);
 
-  const accountDetailsResponse = await chainRestAuthApi.fetchAccount(
-    signerAddress
-  );
+  const accountDetailsResponse =
+    await chainRestAuthApi.fetchAccount(signerAddress);
   const baseAccount = BaseAccount.fromRestApi(accountDetailsResponse);
 
   /** Block Details */
@@ -315,7 +319,7 @@ export async function signAndBroadcastInjective(
   const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
   const latestHeight = latestBlock.header.height;
   const timeoutHeight = new BigNumberInBase(latestHeight).plus(
-    DEFAULT_BLOCK_TIMEOUT_HEIGHT
+    DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   );
 
   const account = await getAccount(walletClient, chainID);
@@ -336,7 +340,7 @@ export async function signAndBroadcastInjective(
   const directSignResponse = await signer.signDirect(
     signerAddress,
     // @ts-ignore
-    signDoc
+    signDoc,
   );
 
   const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
@@ -354,7 +358,7 @@ export async function signAndBroadcastInjective(
 // generic wrapper to support enabling chains on many different wallets
 export async function enableChains(
   walletClient: WalletClient,
-  chains: string[]
+  chains: string[],
 ) {
   if (walletClient.enable) {
     return walletClient.enable(chains);
@@ -379,7 +383,7 @@ export async function getAccount(walletClient: WalletClient, chainId: string) {
 
 export async function getOfflineSigner(
   walletClient: WalletClient,
-  chainId: string
+  chainId: string,
 ) {
   if (walletClient.getOfflineSignerDirect) {
     return walletClient.getOfflineSignerDirect(chainId);
@@ -390,7 +394,7 @@ export async function getOfflineSigner(
 
 export async function getOfflineSignerOnlyAmino(
   walletClient: WalletClient,
-  chainId: string
+  chainId: string,
 ) {
   if (walletClient.getOfflineSignerAmino) {
     const signer = walletClient.getOfflineSignerAmino(chainId);
@@ -456,7 +460,7 @@ export function getExplorerLinkForTx(chainID: string, txHash: string) {
   }
 
   const mintscan = chain.explorers.find(
-    (explorer) => explorer.kind === "mintscan"
+    (explorer) => explorer.kind === "mintscan",
   );
 
   if (mintscan && mintscan.tx_page) {
@@ -474,12 +478,12 @@ export async function signAmino(
   messages: readonly EncodeObject[],
   fee: StdFee,
   memo: string,
-  { accountNumber, sequence, chainId }: SignerData
+  { accountNumber, sequence, chainId }: SignerData,
 ) {
   const aminoTypes = new AminoTypes(createDefaultAminoConverters());
 
   const accountFromSigner = (await signer.getAccounts()).find(
-    (account) => account.address === signerAddress
+    (account) => account.address === signerAddress,
   );
   if (!accountFromSigner) {
     throw new Error("Failed to retrieve account from signer");
@@ -499,7 +503,7 @@ export async function signAmino(
     chainId,
     memo,
     accountNumber,
-    sequence
+    sequence,
   );
 
   const { signature, signed } = await signer.signAmino(signerAddress, signDoc);
@@ -527,7 +531,7 @@ export async function signAmino(
     signedGasLimit,
     signed.fee.granter,
     signed.fee.payer,
-    signMode
+    signMode,
   );
 
   return TxRaw.fromPartial({

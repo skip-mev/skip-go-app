@@ -1,38 +1,39 @@
-import React, { FC, Fragment, PropsWithChildren } from "react";
+import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
+import { ChainProvider } from "@cosmos-kit/react-lite";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
-  render,
   Queries,
   queries,
+  render,
   RenderOptions,
 } from "@testing-library/react";
-import { chains, assets } from "chain-registry";
-import { ChainProvider } from "@cosmos-kit/react-lite";
-import { ChainsProvider } from "@/context/chains";
-import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
-import { SkipProvider } from "@/solve";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/query";
+import { assets,chains } from "chain-registry";
+import React, { FC, Fragment, PropsWithChildren } from "react";
+
 import { AssetsProvider } from "@/context/assets";
+import { ChainsProvider } from "@/context/chains";
+import { SkipProvider } from "@/solve";
+import { queryClient } from "@/utils/query";
 
 const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Fragment>
-      <SkipProvider>
-        <QueryClientProvider client={queryClient}>
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={[...keplrWallets]}
-            throwErrors={false}
-            logLevel="NONE"
-            walletModal={() => <div></div>}
-          >
+      <QueryClientProvider client={queryClient}>
+        <ChainProvider
+          chains={chains}
+          assetLists={assets}
+          wallets={[...keplrWallets]}
+          throwErrors={false}
+          logLevel="NONE"
+          walletModal={() => <div></div>}
+        >
+          <SkipProvider>
             <ChainsProvider>
               <AssetsProvider>{children}</AssetsProvider>
             </ChainsProvider>
-          </ChainProvider>
-        </QueryClientProvider>
-      </SkipProvider>
+          </SkipProvider>
+        </ChainProvider>
+      </QueryClientProvider>
     </Fragment>
   );
 };
@@ -40,7 +41,7 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
 function customRender<
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,
-  BaseElement extends Element | DocumentFragment = Container
+  BaseElement extends Element | DocumentFragment = Container,
 >(
   ui: React.ReactElement,
   options: RenderOptions<Q, Container, BaseElement> = {}

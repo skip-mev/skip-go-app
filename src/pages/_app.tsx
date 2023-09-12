@@ -1,29 +1,28 @@
 import "../styles/globals.css";
 import "@interchain-ui/react/styles";
+import "@rainbow-me/rainbowkit/styles.css";
 
-import { AppProps } from "next/app";
-import Head from "next/head";
-import { Jost } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
-import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
+import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as leapWallets } from "@cosmos-kit/leap-extension";
 import { ChainProvider } from "@cosmos-kit/react";
-import { chains, assets } from "chain-registry";
-import { QueryClientProvider } from "@tanstack/react-query";
 import * as RadixToast from "@radix-ui/react-toast";
-import MainLayout from "@/components/MainLayout";
-import { ChainsProvider } from "@/context/chains";
-import { AssetsProvider } from "@/context/assets";
-import { queryClient } from "@/utils/query";
-import { ToastProvider } from "@/context/toast";
-import { SkipProvider } from "@/solve";
-
-import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
+import { assets, chains } from "chain-registry";
+import { AppProps } from "next/app";
+import Head from "next/head";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { arbitrum } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+
+import MainLayout from "@/components/MainLayout";
+import { AssetsProvider } from "@/context/assets";
+import { ChainsProvider } from "@/context/chains";
+import { ToastProvider } from "@/context/toast";
+import { SkipProvider } from "@/solve";
+import { queryClient } from "@/utils/query";
 
 const { chains: evmChains, publicClient } = configureChains(
   [arbitrum],
@@ -42,10 +41,6 @@ const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
-});
-
-const jost = Jost({
-  subsets: ["latin"],
 });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -205,8 +200,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Interchain transfers and swaps on any Cosmos chain"
         />
       </Head>
-      <main className={jost.className}>
-        <SkipProvider>
+      <main>
           <QueryClientProvider client={queryClient}>
             <WagmiConfig config={wagmiConfig}>
               <RainbowKitProvider chains={evmChains}>
@@ -216,7 +210,8 @@ export default function App({ Component, pageProps }: AppProps) {
                   wallets={wallets}
                   wrappedWithChakra
                   throwErrors={false}
-                >
+                  >
+                  <SkipProvider>
                   <ChainsProvider>
                     <AssetsProvider>
                       <RadixToast.ToastProvider>
@@ -229,11 +224,11 @@ export default function App({ Component, pageProps }: AppProps) {
                       </RadixToast.ToastProvider>
                     </AssetsProvider>
                   </ChainsProvider>
+        </SkipProvider>
                 </ChainProvider>
               </RainbowKitProvider>
             </WagmiConfig>
           </QueryClientProvider>
-        </SkipProvider>
       </main>
       <Analytics />
     </>

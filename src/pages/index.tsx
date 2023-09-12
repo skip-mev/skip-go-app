@@ -1,8 +1,9 @@
 import { useManager } from "@cosmos-kit/react";
-import { queryClient } from "@/utils/query";
+
+import { SwapWidget } from "@/components/SwapWidget";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
-import { SwapWidget } from "@/components/SwapWidget";
+import { queryClient } from "@/utils/query";
 
 export default function Home() {
   const { walletRepos } = useManager();
@@ -13,9 +14,11 @@ export default function Home() {
 
       queryClient.setQueryData(
         ["balances-by-chain", address, chainID],
-        balances
+        balances,
       );
-    } catch {}
+    } catch {
+      /* empty */
+    }
   }
 
   useInterval(() => {

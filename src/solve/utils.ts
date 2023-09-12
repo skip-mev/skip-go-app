@@ -1,6 +1,5 @@
-import { toBech32 } from "@cosmjs/encoding";
-import { getChainByID } from "@/utils/utils";
 import { Asset } from "@skip-router/core";
+
 import { AssetWithMetadata } from "@/context/assets";
 
 export function assetHasMetadata(asset: Asset) {

@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import httpProxy from "http-proxy";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const proxy = httpProxy.createProxyServer();
 

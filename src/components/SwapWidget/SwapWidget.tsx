@@ -1,20 +1,22 @@
-import { FC, useMemo } from "react";
-import va from "@vercel/analytics";
-import { useSwapWidget } from "./useSwapWidget";
-import AssetInput from "../AssetInput";
-import { useChains } from "@/context/chains";
-import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
-import { useChain } from "@cosmos-kit/react";
 import { WalletStatus } from "@cosmos-kit/core";
-import TransactionDialog from "../TransactionDialog";
+import { useChain } from "@cosmos-kit/react";
+import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import {
   ConnectButton,
   useChainModal,
   useConnectModal,
 } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
-import { getChainByID, isEVMChain } from "@/utils/utils";
+import va from "@vercel/analytics";
 import { is } from "immer/dist/internal";
+import { FC, useMemo } from "react";
+import { useAccount } from "wagmi";
+
+import { useChains } from "@/context/chains";
+import { getChainByID, isEVMChain } from "@/utils/utils";
+
+import AssetInput from "../AssetInput";
+import TransactionDialog from "../TransactionDialog";
+import { useSwapWidget } from "./useSwapWidget";
 
 const RouteLoading = () => (
   <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">

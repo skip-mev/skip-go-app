@@ -1,5 +1,12 @@
-import { FC, PropsWithChildren, createContext } from "react";
+import { useWalletClient } from "@cosmos-kit/react";
 import { SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
+import { createContext,FC, PropsWithChildren } from "react";
+
+import {
+  getOfflineSigner,
+  getOfflineSignerOnlyAmino,
+  isLedger,
+} from "@/utils/utils";
 
 export const SkipContext = createContext<
   | {
@@ -9,7 +16,21 @@ export const SkipContext = createContext<
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { client: walletClient } = useWalletClient();
+
   const skipClient = new SkipAPIClient("https://solve-dev.skip.money", {
+    getOfflineSigner: async (chainID) => {
+      if (!walletClient) {
+        throw new Error("No offline signer available");
+      }
+
+      const signerIsLedger = await isLedger(walletClient, chainID);
+
+      if (signerIsLedger) {
+        return getOfflineSignerOnlyAmino(walletClient, chainID);
+      }
+      return getOfflineSigner(walletClient, chainID);
+    },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
         return `https://ibc.fun/nodes/${chainID}`;
@@ -21,9 +42,6 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
 
         return `https://ibc.fun/nodes/${chainID}`;
       },
-    },
-    getOfflineSigner: async () => {
-      throw new Error("Not implemented");
     },
   });
 
