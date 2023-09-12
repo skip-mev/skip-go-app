@@ -17,7 +17,7 @@ export function useSolveChains() {
   const skipClient = useSkipClient();
   return useQuery({
     queryKey: ["solve-chains"],
-    queryFn: async () => {
+    queryFn: () => {
       return skipClient.chains();
     },
     placeholderData: [],
