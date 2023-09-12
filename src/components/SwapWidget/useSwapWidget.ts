@@ -77,7 +77,7 @@ export function useSwapWidget() {
   ]);
 
   const { address } = useChain(
-    formValues.sourceChain?.chainName ?? "cosmoshub"
+    formValues.sourceChain?.record?.name ?? "cosmoshub"
   );
 
   const { data: balances } = useBalancesByChain(
