@@ -10,6 +10,9 @@ export const SkipContext = createContext<
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const skipClient = new SkipAPIClient(SKIP_API_URL, {
+    getOfflineSigner: async () => {
+      throw new Error("No offline signer available");
+    },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
         return `https://ibc.fun/nodes/${chainID}`;
