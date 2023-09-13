@@ -42,9 +42,9 @@ const AssetSelect: FC<Props> = ({
               }
             />
           )}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {!asset && <span>Select Token</span>}
-            {asset && <span>{asset.symbol}</span>}
+            {asset && <div className="truncate">{asset.symbol}</div>}
           </div>
           <div>
             <ChevronDownIcon className="h-4 w-4" />
