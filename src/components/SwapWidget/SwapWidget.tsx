@@ -8,6 +8,7 @@ import { useChains } from "@/context/chains";
 
 import AssetInput from "../AssetInput";
 import TransactionDialog from "../TransactionDialog";
+import WalletModal from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
 
 const RouteLoading = () => (
@@ -84,8 +85,9 @@ export const SwapWidget: FC = () => {
   return (
     <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
       <div className="space-y-6">
-        <div>
+        <div className="flex items-center justify-between">
           <p className="font-semibold text-2xl">From</p>
+          {sourceChain && <WalletModal chainID={sourceChain.chainID} />}
         </div>
         <div data-testid="source">
           <AssetInput

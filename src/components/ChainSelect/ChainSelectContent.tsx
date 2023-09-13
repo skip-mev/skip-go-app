@@ -108,7 +108,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
                     src={`${chainNameToChainlistURL(
-                      chain.chainName
+                      chain.chainName,
                     )}/chainImg/_chainImg.svg`}
                     onError={(e) =>
                       (e.currentTarget.src =
