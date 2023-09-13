@@ -1,6 +1,6 @@
 import { useWalletClient } from "@cosmos-kit/react";
-import { SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
-import { createContext,FC, PropsWithChildren } from "react";
+import { SkipAPIClient } from "@skip-router/core";
+import { createContext, FC, PropsWithChildren } from "react";
 
 import {
   getOfflineSigner,

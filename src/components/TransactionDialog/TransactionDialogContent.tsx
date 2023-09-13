@@ -378,7 +378,7 @@ const TransactionDialogContent: FC<Props> = ({
           <button
             className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
             onClick={onSubmit}
-            disabled={transacting || insufficentBalance}
+            // disabled={transacting || insufficentBalance}
           >
             {transacting ? (
               <svg
