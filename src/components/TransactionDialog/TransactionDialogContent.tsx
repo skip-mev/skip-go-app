@@ -1,14 +1,16 @@
-import { FC, Fragment, useEffect, useRef, useState } from "react";
 import { useChain, useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
-import Toast from "@/elements/Toast";
-import RouteDisplay from "../RouteDisplay";
-import { useToast } from "@/context/toast";
-import { getChainByID } from "@/utils/utils";
-import { executeRoute } from "@/solve/execute-route";
+import { RouteResponse } from "@skip-router/core";
+import { FC, Fragment, useEffect, useRef, useState } from "react";
+
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
-import { RouteResponse } from "@skip-router/core";
+import { useToast } from "@/context/toast";
+import Toast from "@/elements/Toast";
+import { executeRoute } from "@/solve/execute-route";
+import { getChainByID } from "@/utils/utils";
+
+import RouteDisplay from "../RouteDisplay";
 
 const TransactionSuccessView: FC<{
   route: RouteResponse;
@@ -20,18 +22,18 @@ const TransactionSuccessView: FC<{
 
   const sourceAsset = getAsset(
     route.sourceAssetDenom,
-    route.sourceAssetChainID
+    route.sourceAssetChainID,
   );
   const destinationAsset = getAsset(
     route.destAssetDenom,
-    route.destAssetChainID
+    route.destAssetChainID,
   );
 
   const sourceChain = chains.find(
-    (c) => c.chainID === route.sourceAssetChainID
+    (c) => c.chainID === route.sourceAssetChainID,
   ) as Chain;
   const destinationChain = chains.find(
-    (c) => c.chainID === route.destAssetChainID
+    (c) => c.chainID === route.destAssetChainID,
   ) as Chain;
 
   return (
@@ -159,7 +161,7 @@ const TransactionDialogContent: FC<Props> = ({
         explorerLink: null,
         txHash: null,
       };
-    })
+    }),
   );
 
   const onSubmit = async () => {
@@ -185,7 +187,9 @@ const TransactionDialogContent: FC<Props> = ({
           if (record) {
             try {
               await walletClient.addChain(record);
-            } catch (err) {}
+            } catch (err) {
+              /* empty */
+            }
           }
         }
       }
@@ -211,7 +215,7 @@ const TransactionDialogContent: FC<Props> = ({
             }
             return newStatuses;
           });
-        }
+        },
         // (error: any) => {
         //   console.error(error);
         //   setTxError(error.message);
@@ -235,15 +239,17 @@ const TransactionDialogContent: FC<Props> = ({
       toast(
         "Transaction Successful",
         "Your transaction was successful",
-        "success"
+        "success",
       );
 
       setTxComplete(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
 
-      setTxError(err.message);
-      setIsError(true);
+      if (err instanceof Error) {
+        setTxError(err.message);
+        setIsError(true);
+      }
 
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];

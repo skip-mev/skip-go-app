@@ -1,27 +1,23 @@
 import "../styles/globals.css";
 import "@interchain-ui/react/styles";
 
-import { AppProps } from "next/app";
-import Head from "next/head";
-import { Jost } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
-import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extension";
+import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as leapWallets } from "@cosmos-kit/leap-extension";
 import { ChainProvider } from "@cosmos-kit/react";
-import { chains, assets } from "chain-registry";
-import { QueryClientProvider } from "@tanstack/react-query";
 import * as RadixToast from "@radix-ui/react-toast";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
+import { assets, chains } from "chain-registry";
+import { AppProps } from "next/app";
+import Head from "next/head";
+
 import MainLayout from "@/components/MainLayout";
-import { ChainsProvider } from "@/context/chains";
 import { AssetsProvider } from "@/context/assets";
-import { queryClient } from "@/utils/query";
+import { ChainsProvider } from "@/context/chains";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
-
-const jost = Jost({
-  subsets: ["latin"],
-});
+import { queryClient } from "@/utils/query";
 
 export default function App({ Component, pageProps }: AppProps) {
   chains.push({
@@ -180,7 +176,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Interchain transfers and swaps on any Cosmos chain"
         />
       </Head>
-      <main className={jost.className}>
+      <main>
         <QueryClientProvider client={queryClient}>
           <ChainProvider
             chains={chains}

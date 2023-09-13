@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { chainNameToChainlistURL } from "@/cosmos";
-import { Chain } from "@/context/chains";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
+
+import { Chain } from "@/context/chains";
+import { chainNameToChainlistURL } from "@/cosmos";
 
 interface Props {
   chains: Chain[];

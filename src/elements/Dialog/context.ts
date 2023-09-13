@@ -1,4 +1,4 @@
-import { RefObject, createContext } from "react";
+import { createContext,RefObject } from "react";
 
 export interface DialogContext {
   open: boolean;

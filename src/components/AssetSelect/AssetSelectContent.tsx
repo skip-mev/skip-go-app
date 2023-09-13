@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { AssetWithMetadata } from "@/context/assets";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
+
+import { AssetWithMetadata } from "@/context/assets";
 
 interface Props {
   assets?: AssetWithMetadata[];

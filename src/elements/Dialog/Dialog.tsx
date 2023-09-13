@@ -1,5 +1,6 @@
-import { FC, PropsWithChildren, useRef } from "react";
 import * as RadixDialog from "@radix-ui/react-dialog";
+import { FC, PropsWithChildren, useRef } from "react";
+
 import { DialogContext } from "./context";
 
 interface Props extends PropsWithChildren {
