@@ -1,8 +1,10 @@
 import { FC, Fragment, useState } from "react";
+
 import { Chain } from "@/context/chains";
-import { Dialog, DialogTrigger, DialogContent } from "@/elements/Dialog";
-import ChainSelectTrigger from "./ChainSelectTrigger";
+import { Dialog, DialogContent,DialogTrigger } from "@/elements/Dialog";
+
 import ChainSelectContent from "./ChainSelectContent";
+import ChainSelectTrigger from "./ChainSelectTrigger";
 
 interface Props {
   chain?: Chain;

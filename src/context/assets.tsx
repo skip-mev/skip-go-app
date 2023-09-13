@@ -1,18 +1,19 @@
+import { Asset } from "@skip-router/core";
 import {
+  createContext,
   FC,
   PropsWithChildren,
-  createContext,
   useContext,
   useMemo,
 } from "react";
-import { Chain, useChains } from "./chains";
+
 import {
-  Asset,
-  AssetWithMetadata,
   filterAssetsWithMetadata,
-  useSkipClient,
   useAssets as useSolveAssets,
 } from "../solve";
+import { Chain, useChains } from "./chains";
+
+export type AssetWithMetadata = Required<Asset>;
 
 interface AssetsContext {
   assets: Record<string, AssetWithMetadata[]>;
@@ -39,10 +40,8 @@ function getAssetSymbol(
     (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
 
   if (hasDuplicates) {
-    const originChain = chains.find(
-      (c) => c.chain_id === asset.origin_chain_id
-    );
-    const originChainName = originChain?.prettyName ?? asset.origin_chain_id;
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
 
     return `${originChainName} ${asset.symbol}`;
   }
@@ -51,11 +50,9 @@ function getAssetSymbol(
 }
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const skipClient = useSkipClient();
-
   const { chains } = useChains();
 
-  const { data: solveAssets } = useSolveAssets(skipClient);
+  const { data: solveAssets } = useSolveAssets();
 
   const assets = useMemo(() => {
     if (!solveAssets) {
@@ -84,7 +81,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getFeeDenom(chainID: string) {
-    const chain = chains.find((c) => c.chain_id === chainID);
+    const chain = chains.find((c) => c.chainID === chainID);
 
     if (!chain || !chain.record?.chain.fees) {
       return undefined;
@@ -100,7 +97,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
 
     for (const chainAssetList of Object.values(assets)) {
       for (const asset of chainAssetList) {
-        if (asset.chain_id === asset.origin_chain_id) {
+        if (asset.chainID === asset.originChainID) {
           nativeAssets.push(asset);
         }
       }

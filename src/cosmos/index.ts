@@ -26,27 +26,30 @@ export async function getBalancesByChain(address: string, chainID: string) {
 
   const balances = await client.getAllBalances(address);
 
-  return balances.reduce((acc, balance) => {
-    return {
-      ...acc,
-      [balance.denom]: balance.amount,
-    };
-  }, {} as Record<string, string>);
+  return balances.reduce(
+    (acc, balance) => {
+      return {
+        ...acc,
+        [balance.denom]: balance.amount,
+      };
+    },
+    {} as Record<string, string>,
+  );
 }
 
 export function useBalancesByChain(
   address?: string,
   chain?: Chain,
-  enabled: boolean = true
+  enabled: boolean = true,
 ) {
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain?.chain_id],
+    queryKey: ["balances-by-chain", address, chain?.chainID],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
       }
 
-      const balances = await getBalancesByChain(address, chain.chain_id);
+      const balances = await getBalancesByChain(address, chain.chainID);
 
       return balances;
     },

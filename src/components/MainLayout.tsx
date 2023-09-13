@@ -1,9 +1,10 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
+
+import BetaBanner from "./BetaBanner";
 import NavBar from "./NavBar";
 import SkipBanner from "./SkipBanner";
-import BetaBanner from "./BetaBanner";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   return (

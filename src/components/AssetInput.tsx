@@ -1,14 +1,15 @@
+import { useChain } from "@cosmos-kit/react";
+import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
-import ChainSelect from "./ChainSelect";
-import AssetSelect from "./AssetSelect";
+
+import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
 import Toast from "@/elements/Toast";
-import { useChain } from "@cosmos-kit/react";
-import { ethers } from "ethers";
-import { useAssets } from "@/context/assets";
 import { getFee } from "@/utils/utils";
-import { AssetWithMetadata } from "@/solve";
+
+import AssetSelect from "./AssetSelect";
+import ChainSelect from "./ChainSelect";
 
 interface Props {
   amount: string;
@@ -40,7 +41,7 @@ const AssetInput: FC<Props> = ({
       return getNativeAssets();
     }
 
-    return assetsByChainID(chain.chain_id);
+    return assetsByChainID(chain.chainID);
   }, [assetsByChainID, chain, getNativeAssets]);
 
   const showChainInfo = chain ? false : true;
@@ -139,13 +140,13 @@ const AssetInput: FC<Props> = ({
                         return;
                       }
 
-                      const feeDenom = getFeeDenom(chain.chain_id);
+                      const feeDenom = getFeeDenom(chain.chainID);
 
                       let amount = selectedAssetBalance;
 
                       // if selected asset is the fee denom, subtract the fee
                       if (feeDenom && feeDenom.denom === asset.denom) {
-                        const fee = getFee(chain.chain_id);
+                        const fee = getFee(chain.chainID);
 
                         const feeInt = parseFloat(
                           ethers.formatUnits(fee, asset.decimals)

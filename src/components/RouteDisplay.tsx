@@ -1,11 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
+import { RouteResponse } from "@skip-router/core";
+import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
-import { RouteResponse, isSwapOperation } from "@/solve";
-import { Chain, useChains } from "@/context/chains";
-import { chainNameToChainlistURL } from "@/cosmos";
+
 import { SWAP_VENUES } from "@/config";
 import { useAssets } from "@/context/assets";
-import { ethers } from "ethers";
+import { Chain, useChains } from "@/context/chains";
+import { chainNameToChainlistURL } from "@/cosmos";
 
 interface TransferAction {
   type: "TRANSFER";
@@ -49,16 +50,16 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   const { chains } = useChains();
 
   const sourceChain = chains.find(
-    (c) => c.chain_id === action.sourceChain
+    (c) => c.chainID === action.sourceChain
   ) as Chain;
 
   const destinationChain = chains.find(
-    (c) => c.chain_id === action.destinationChain
+    (c) => c.chainID === action.destinationChain
   ) as Chain;
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, sourceChain.chain_id);
+  const asset = getAsset(action.asset, sourceChain.chainID);
 
   if (!asset) {
     console.log(action);
@@ -75,14 +76,14 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           Transfer{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={asset.logo_uri}
+            src={asset.logoURI}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              sourceChain.chain_name
+              sourceChain.chainName
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -93,7 +94,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              destinationChain.chain_name
+              destinationChain.chainName
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -109,13 +110,13 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
   const { chains } = useChains();
 
-  const chain = chains.find((c) => c.chain_id === action.chain) as Chain;
+  const chain = chains.find((c) => c.chainID === action.chain) as Chain;
 
   const { getAsset } = useAssets();
 
-  const assetIn = getAsset(action.sourceAsset, chain.chain_id);
+  const assetIn = getAsset(action.sourceAsset, chain.chainID);
 
-  const assetOut = getAsset(action.destinationAsset, chain.chain_id);
+  const assetOut = getAsset(action.destinationAsset, chain.chainID);
 
   const venue = SWAP_VENUES[action.venue];
 
@@ -133,13 +134,13 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
           Swap{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={assetIn.logo_uri}
+            src={assetIn.logoURI}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{assetIn.symbol}</span> for{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={assetOut.logo_uri}
+            src={assetOut.logoURI}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{assetOut.symbol}</span> on{" "}
@@ -166,87 +167,87 @@ const RouteDisplay: FC<Props> = ({ route }) => {
   const { getAsset } = useAssets();
 
   const sourceAsset = getAsset(
-    route.source_asset_denom,
-    route.source_asset_chain_id
+    route.sourceAssetDenom,
+    route.sourceAssetChainID
   );
 
   const destinationAsset = getAsset(
-    route.dest_asset_denom,
-    route.dest_asset_chain_id
+    route.destAssetDenom,
+    route.destAssetChainID
   );
 
   const sourceChain = chains.find(
-    (c) => c.chain_id === route.source_asset_chain_id
+    (c) => c.chainID === route.sourceAssetChainID
   ) as Chain;
 
   const destinationChain = chains.find(
-    (c) => c.chain_id === route.dest_asset_chain_id
+    (c) => c.chainID === route.destAssetChainID
   ) as Chain;
 
   const amountIn = useMemo(() => {
     try {
-      return ethers.formatUnits(route.amount_in, sourceAsset?.decimals ?? 6);
+      return ethers.formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
-  }, [route.amount_in, sourceAsset?.decimals]);
+  }, [route.amountIn, sourceAsset?.decimals]);
 
   const amountOut = useMemo(() => {
     try {
       return ethers.formatUnits(
-        route.estimated_amount_out ?? 0,
+        route.estimatedAmountOut ?? 0,
         destinationAsset?.decimals ?? 6
       );
     } catch {
       return "0.0";
     }
-  }, [route.estimated_amount_out, destinationAsset?.decimals]);
+  }, [route.estimatedAmountOut, destinationAsset?.decimals]);
 
   const actions = useMemo(() => {
     const _actions: Action[] = [];
 
-    let asset = route.source_asset_denom;
+    let asset = route.sourceAssetDenom;
 
     route.operations.forEach((operation, i) => {
-      if (isSwapOperation(operation)) {
-        if (operation.swap.swap_in) {
+      if ("swap" in operation) {
+        if ("swapIn" in operation.swap) {
           _actions.push({
             type: "SWAP",
-            sourceAsset: operation.swap.swap_in.swap_operations[0].denom_in,
+            sourceAsset: operation.swap.swapIn.swapOperations[0].denomIn,
             destinationAsset:
-              operation.swap.swap_in.swap_operations[
-                operation.swap.swap_in.swap_operations.length - 1
-              ].denom_out,
-            chain: operation.swap.swap_in.swap_venue.chain_id,
-            venue: operation.swap.swap_in.swap_venue.name,
+              operation.swap.swapIn.swapOperations[
+                operation.swap.swapIn.swapOperations.length - 1
+              ].denomOut,
+            chain: operation.swap.swapIn.swapVenue.chainID,
+            venue: operation.swap.swapIn.swapVenue.name,
           });
 
           asset =
-            operation.swap.swap_in.swap_operations[
-              operation.swap.swap_in.swap_operations.length - 1
-            ].denom_out;
+            operation.swap.swapIn.swapOperations[
+              operation.swap.swapIn.swapOperations.length - 1
+            ].denomOut;
         }
 
         return;
       }
 
-      const sourceChain = operation.transfer.chain_id;
+      const sourceChain = operation.transfer.chainID;
 
       let destinationChain = "";
       if (i === route.operations.length - 1) {
-        destinationChain = route.dest_asset_chain_id;
+        destinationChain = route.destAssetChainID;
       } else {
         const nextOperation = route.operations[i + 1];
-        if (isSwapOperation(nextOperation)) {
-          if (nextOperation.swap.swap_in) {
-            destinationChain = nextOperation.swap.swap_in.swap_venue.chain_id;
+        if ("swap" in nextOperation) {
+          if ("swapIn" in nextOperation.swap) {
+            destinationChain = nextOperation.swap.swapIn.swapVenue.chainID;
           }
 
-          if (nextOperation.swap.swap_out) {
-            destinationChain = nextOperation.swap.swap_out.swap_venue.chain_id;
+          if ("swapOut" in nextOperation.swap) {
+            destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
           }
         } else {
-          destinationChain = nextOperation.transfer.chain_id;
+          destinationChain = nextOperation.transfer.chainID;
         }
       }
 
@@ -257,7 +258,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         destinationChain,
       });
 
-      asset = operation.transfer.dest_denom;
+      asset = operation.transfer.destDenom;
     });
 
     return _actions;
@@ -273,7 +274,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           <RouteEnd
             amount={amountIn}
             symbol={sourceAsset?.symbol ?? "UNKNOWN"}
-            logo={sourceAsset?.logo_uri ?? "UNKNOWN"}
+            logo={sourceAsset?.logoURI ?? "UNKNOWN"}
             chain={sourceChain.prettyName}
           />
           {isExpanded && (
@@ -316,7 +317,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         <RouteEnd
           amount={amountOut}
           symbol={destinationAsset?.symbol ?? "UNKNOWN"}
-          logo={destinationAsset?.logo_uri ?? "UNKNOWN"}
+          logo={destinationAsset?.logoURI ?? "UNKNOWN"}
           chain={destinationChain.prettyName}
         />
       </div>

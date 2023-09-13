@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { chainNameToChainlistURL } from "@/cosmos";
-import { Chain } from "@/context/chains";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
+
+import { Chain } from "@/context/chains";
+import { chainNameToChainlistURL } from "@/cosmos";
 
 interface Props {
   chains: Chain[];
@@ -28,15 +29,15 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
     if (!searchValue) return chains;
     return chains.filter((chain) => {
       if (
-        chain.chain_id &&
-        chain.chain_id.toLowerCase().includes(searchValue.toLowerCase())
+        chain.chainID &&
+        chain.chainID.toLowerCase().includes(searchValue.toLowerCase())
       ) {
         return true;
       }
 
       if (
-        chain.chain_name &&
-        chain.chain_name.toLowerCase().includes(searchValue.toLowerCase())
+        chain.chainName &&
+        chain.chainName.toLowerCase().includes(searchValue.toLowerCase())
       ) {
         return true;
       }
@@ -98,7 +99,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
-                  key={chain.chain_id}
+                  key={chain.chainID}
                   onClick={() => {
                     onChange(chain);
                   }}
@@ -107,7 +108,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
                     src={`${chainNameToChainlistURL(
-                      chain.chain_name
+                      chain.chainName
                     )}/chainImg/_chainImg.svg`}
                     onError={(e) =>
                       (e.currentTarget.src =
@@ -116,7 +117,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                   />
                   <div>
                     <p className="font-semibold text-lg">{chain.prettyName}</p>
-                    <p className="text-sm text-neutral-500">{chain.chain_id}</p>
+                    <p className="text-sm text-neutral-500">{chain.chainID}</p>
                   </div>
                 </button>
               );

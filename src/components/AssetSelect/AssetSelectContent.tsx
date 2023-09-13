@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { AssetWithMetadata } from "@/solve";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
+
+import { AssetWithMetadata } from "@/context/assets";
 
 interface Props {
   assets?: AssetWithMetadata[];
@@ -92,7 +93,7 @@ const AssetSelectContent: FC<Props> = ({
           {filteredAssets?.map((asset) => (
             <button
               className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
-              key={`${asset.chain_id}-${asset.denom}`}
+              key={`${asset.chainID}-${asset.denom}`}
               onClick={() => {
                 onClose();
 
@@ -106,7 +107,7 @@ const AssetSelectContent: FC<Props> = ({
               <img
                 alt={asset.symbol}
                 className="w-12 h-12 rounded-full"
-                src={asset.logo_uri}
+                src={asset.logoURI}
                 onError={(e) =>
                   (e.currentTarget.src =
                     "https://api.dicebear.com/6.x/shapes/svg")
@@ -115,7 +116,7 @@ const AssetSelectContent: FC<Props> = ({
               <div className="flex-1">
                 <p className="font-semibold text-lg">{asset.symbol}</p>
                 {showChainInfo && (
-                  <p className="text-sm text-neutral-400">{asset.chain_id}</p>
+                  <p className="text-sm text-neutral-400">{asset.chainID}</p>
                 )}
               </div>
               <div>

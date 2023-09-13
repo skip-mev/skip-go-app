@@ -1,10 +1,11 @@
-import { FC, PropsWithChildren, createContext, useContext } from "react";
-import { useSolveChains } from "@/solve/queries";
-import { Chain as SolveChain, useSkipClient } from "@/solve";
 import { ChainRecord } from "@cosmos-kit/core";
 import { useManager } from "@cosmos-kit/react";
+import { Chain as SkipChain } from "@skip-router/core";
+import { createContext, FC, PropsWithChildren, useContext } from "react";
 
-export interface Chain extends SolveChain {
+import { useSolveChains } from "@/solve/queries";
+
+export interface Chain extends SkipChain {
   prettyName: string;
   record?: ChainRecord;
 }
@@ -18,8 +19,7 @@ export const ChainsContext = createContext<ChainsContext>({
 });
 
 export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const skipClient = useSkipClient();
-  const { data: supportedChains } = useSolveChains(skipClient);
+  const { data: supportedChains } = useSolveChains();
 
   const { chainRecords, walletRepos } = useManager();
 
@@ -27,10 +27,10 @@ export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
     supportedChains
       ? supportedChains.map((c) => {
           const record = chainRecords.find(
-            (record) => record.chain.chain_id === c.chain_id
+            (record) => record.chain.chain_id === c.chainID
           );
 
-          const prettyName = record?.chain.pretty_name ?? c.chain_name;
+          const prettyName = record?.chain.pretty_name ?? c.chainName;
 
           return {
             ...c,
@@ -40,8 +40,8 @@ export const ChainsProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       : []
   ).sort((a, b) => {
-    const repoA = walletRepos.find((repo) => repo.chainName === a.chain_name);
-    const repoB = walletRepos.find((repo) => repo.chainName === b.chain_name);
+    const repoA = walletRepos.find((repo) => repo.chainName === a.chainName);
+    const repoB = walletRepos.find((repo) => repo.chainName === b.chainName);
 
     if (repoA && repoB) {
       if (repoA.current && !repoB.current) {

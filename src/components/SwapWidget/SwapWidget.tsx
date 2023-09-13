@@ -1,13 +1,14 @@
-import { FC } from "react";
-import va from "@vercel/analytics";
-import { useSwapWidget } from "./useSwapWidget";
-import AssetInput from "../AssetInput";
-import { useChains } from "@/context/chains";
-import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
-import { useChain } from "@cosmos-kit/react";
 import { WalletStatus } from "@cosmos-kit/core";
+import { useChain } from "@cosmos-kit/react";
+import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import va from "@vercel/analytics";
+import { FC } from "react";
+
+import { useChains } from "@/context/chains";
+
+import AssetInput from "../AssetInput";
 import TransactionDialog from "../TransactionDialog";
-import { on } from "events";
+import { useSwapWidget } from "./useSwapWidget";
 
 const RouteLoading = () => (
   <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">

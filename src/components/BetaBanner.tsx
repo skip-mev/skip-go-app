@@ -13,6 +13,7 @@ const BetaBanner: FC = () => {
         <p className="font-bold">Important</p>
         <button
           onClick={() => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             localStorage.setItem("IBC_DOT_FUN_SHOW_BETA_BANNER", false);
             setShouldShow(false);

@@ -1,6 +1,7 @@
+import { RouteResponse } from "@skip-router/core";
 import { FC, Fragment, useState } from "react";
+
 import TransactionDialogContent from "./TransactionDialogContent";
-import { RouteResponse } from "@/solve";
 
 export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 

@@ -26,6 +26,9 @@ module.exports = {
         "site-bg-2": "url('/site-bg-2.svg')",
         squiggle: "url('/squiggle.svg')",
       },
+      fontFamily: {
+        sans: ["Jost", "sans-serif"],
+      },
     },
   },
   plugins: [],
