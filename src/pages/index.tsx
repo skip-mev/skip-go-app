@@ -1,6 +1,7 @@
 import { useManager } from "@cosmos-kit/react";
 
 import { SwapWidget } from "@/components/SwapWidget";
+import { WalletModalProvider } from "@/components/WalletModal";
 import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
 import { queryClient } from "@/utils/query";
@@ -31,7 +32,11 @@ export default function Home() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <SwapWidget />
+      <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
+        <WalletModalProvider>
+          <SwapWidget />
+        </WalletModalProvider>
+      </div>
     </div>
   );
 }
