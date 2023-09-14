@@ -7,9 +7,10 @@ import {
   render,
   RenderOptions,
 } from "@testing-library/react";
-import { assets,chains } from "chain-registry";
+import { assets, chains } from "chain-registry";
 import React, { FC, Fragment, PropsWithChildren } from "react";
 
+import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
 import { ChainsProvider } from "@/context/chains";
 import { SkipProvider } from "@/solve";
@@ -28,9 +29,11 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
           walletModal={() => <div></div>}
         >
           <SkipProvider>
-            <ChainsProvider>
-              <AssetsProvider>{children}</AssetsProvider>
-            </ChainsProvider>
+            <WalletModalProvider>
+              <ChainsProvider>
+                <AssetsProvider>{children}</AssetsProvider>
+              </ChainsProvider>
+            </WalletModalProvider>
           </SkipProvider>
         </ChainProvider>
       </QueryClientProvider>
@@ -44,7 +47,7 @@ function customRender<
   BaseElement extends Element | DocumentFragment = Container,
 >(
   ui: React.ReactElement,
-  options: RenderOptions<Q, Container, BaseElement> = {}
+  options: RenderOptions<Q, Container, BaseElement> = {},
 ) {
   return render(ui, { wrapper: AllTheProviders, ...options });
 }

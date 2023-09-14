@@ -1,13 +1,15 @@
 import { WalletStatus } from "@cosmos-kit/core";
 import { useChain } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
-import va from "@vercel/analytics";
-import { FC } from "react";
+import { FC, Fragment } from "react";
 
 import { useChains } from "@/context/chains";
 
 import AssetInput from "../AssetInput";
+import { ConnectedWalletButton } from "../ConnectedWalletButton";
+import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
 import TransactionDialog from "../TransactionDialog";
+import { useWalletModal, WalletModal } from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
 
 const RouteLoading = () => (
@@ -54,6 +56,7 @@ const RouteTransactionCountBanner: FC<{
 );
 
 export const SwapWidget: FC = () => {
+  const { openWalletModal } = useWalletModal();
   const { chains } = useChains();
 
   const {
@@ -77,99 +80,110 @@ export const SwapWidget: FC = () => {
 
   const {
     status: walletConnectStatus,
-    connect: connectWallet,
-    chain,
+    address,
+    wallet,
   } = useChain(sourceChain?.record?.chain.chain_name ?? "cosmoshub");
 
   return (
-    <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
-      <div className="space-y-6">
-        <div>
-          <p className="font-semibold text-2xl">From</p>
-        </div>
-        <div data-testid="source">
-          <AssetInput
-            amount={amountIn}
-            onAmountChange={(amount) =>
-              setFormValues({
-                ...formValues,
-                amountIn: amount,
-              })
-            }
-            asset={sourceAsset}
-            onAssetChange={onSourceAssetChange}
-            chain={sourceChain}
-            onChainChange={onSourceChainChange}
-            showBalance
-            chains={chains}
-          />
-        </div>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <button
-              className="bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform"
-              onClick={() => {
-                setFormValues({
-                  ...formValues,
-                  sourceChain: destinationChain,
-                  sourceAsset: destinationAsset,
-                  destinationChain: sourceChain,
-                  destinationAsset: sourceAsset,
-                  amountIn: "",
-                });
-              }}
-              data-testid="swap-button"
-            >
-              <ArrowsUpDownIcon className="w-4 h-4" />
-            </button>
-          </div>
-          <p className="font-semibold text-2xl">To</p>
-        </div>
-        <div data-testid="destination">
-          <AssetInput
-            amount={amountOut}
-            asset={destinationAsset}
-            onAssetChange={onDestinationAssetChange}
-            chain={destinationChain}
-            onChainChange={onDestinationChainChange}
-            chains={chains}
-          />
-        </div>
-        {routeLoading && <RouteLoading />}
-        {route && !routeLoading && (
-          <RouteTransactionCountBanner
-            numberOfTransactions={numberOfTransactions}
-          />
-        )}
-        {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
-          <button
-            className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
-            onClick={async () => {
-              await connectWallet();
-
-              va.track("wallet-connect", {
-                chainID: chain.chain_id,
-              });
-            }}
-          >
-            Connect Wallet
-          </button>
-        )}
-        {sourceChain && walletConnectStatus === WalletStatus.Connected && (
-          <div className="space-y-4">
-            <TransactionDialog
-              route={route}
-              transactionCount={numberOfTransactions}
-              insufficientBalance={insufficientBalance}
-            />
-            {insufficientBalance && (
-              <p className="text-center font-semibold text-sm text-red-500">
-                Insufficient Balance
-              </p>
+    <Fragment>
+      <div>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <p className="font-semibold text-2xl">From</p>
+            {address &&
+            wallet &&
+            walletConnectStatus === WalletStatus.Connected ? (
+              <ConnectedWalletButton
+                address={address}
+                onClick={openWalletModal}
+                walletName={wallet.prettyName}
+                walletLogo={wallet.logo}
+              />
+            ) : (
+              <ConnectWalletButtonSmall onClick={openWalletModal} />
             )}
           </div>
-        )}
+          <div data-testid="source">
+            <AssetInput
+              amount={amountIn}
+              onAmountChange={(amount) =>
+                setFormValues({
+                  ...formValues,
+                  amountIn: amount,
+                })
+              }
+              asset={sourceAsset}
+              onAssetChange={onSourceAssetChange}
+              chain={sourceChain}
+              onChainChange={onSourceChainChange}
+              showBalance
+              chains={chains}
+            />
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button
+                className="bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform"
+                onClick={() => {
+                  setFormValues({
+                    ...formValues,
+                    sourceChain: destinationChain,
+                    sourceAsset: destinationAsset,
+                    destinationChain: sourceChain,
+                    destinationAsset: sourceAsset,
+                    amountIn: "",
+                  });
+                }}
+                data-testid="swap-button"
+              >
+                <ArrowsUpDownIcon className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="font-semibold text-2xl">To</p>
+          </div>
+          <div data-testid="destination">
+            <AssetInput
+              amount={amountOut}
+              asset={destinationAsset}
+              onAssetChange={onDestinationAssetChange}
+              chain={destinationChain}
+              onChainChange={onDestinationChainChange}
+              chains={chains}
+            />
+          </div>
+          {routeLoading && <RouteLoading />}
+          {route && !routeLoading && (
+            <RouteTransactionCountBanner
+              numberOfTransactions={numberOfTransactions}
+            />
+          )}
+          {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
+            <button
+              className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
+              onClick={async () => {
+                openWalletModal();
+              }}
+            >
+              Connect Wallet
+            </button>
+          )}
+          {sourceChain && walletConnectStatus === WalletStatus.Connected && (
+            <div className="space-y-4">
+              <TransactionDialog
+                route={route}
+                transactionCount={numberOfTransactions}
+                insufficientBalance={insufficientBalance}
+              />
+              {insufficientBalance && (
+                <p className="text-center font-semibold text-sm text-red-500">
+                  Insufficient Balance
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <WalletModal chainID={sourceChain?.chainID ?? "cosmoshub-4"} />
+    </Fragment>
   );
 };
