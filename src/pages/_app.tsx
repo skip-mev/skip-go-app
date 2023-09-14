@@ -191,9 +191,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   <RadixToast.ToastProvider>
                     <ToastProvider>
                       <MainLayout>
-                        {/* <WalletModalProvider> */}
                         <Component {...pageProps} />
-                        {/* </WalletModalProvider> */}
                       </MainLayout>
                     </ToastProvider>
                     <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
