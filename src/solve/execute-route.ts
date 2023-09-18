@@ -1,5 +1,5 @@
 import { WalletClient } from "@cosmos-kit/core";
-import { RouteResponse, SKIP_API_URL, SkipAPIClient } from "@skip-router/core";
+import { RouteResponse, SKIP_API_URL, SkipRouter } from "@skip-router/core";
 
 import {
   enableChains,
@@ -33,7 +33,7 @@ export async function executeRoute(
     addressList.push(address);
   }
 
-  const skipClient = new SkipAPIClient(SKIP_API_URL, {
+  const skipClient = new SkipRouter(SKIP_API_URL, {
     getOfflineSigner: async (chainID) => {
       const signerIsLedger = await isLedger(walletClient, chainID);
 
@@ -47,7 +47,6 @@ export async function executeRoute(
         return `https://ibc.fun/nodes/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
-        console.log(chainID);
         if (chainID === "injective-1") {
           return "https://lcd.injective.network";
         }

@@ -182,6 +182,10 @@ const TransactionDialogContent: FC<Props> = ({
       }
 
       for (const chainID of route.chainIDs) {
+        if ("snapInstalled" in walletClient) {
+          continue;
+        }
+
         if (walletClient.addChain) {
           const record = chainRecords.find((c) => c.chain.chain_id === chainID);
           if (record) {

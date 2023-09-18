@@ -351,6 +351,10 @@ export async function enableChains(
     return walletClient.ikeplr.enable(chains);
   }
 
+  if ("snapInstalled" in walletClient) {
+    return;
+  }
+
   throw new Error("Unsupported wallet");
 }
 
