@@ -97,7 +97,13 @@ export const SwapWidget: FC = () => {
                 address={address}
                 onClick={openWalletModal}
                 walletName={wallet.prettyName}
-                walletLogo={wallet.logo}
+                walletLogo={
+                  wallet.logo
+                    ? typeof wallet.logo === "string"
+                      ? wallet.logo
+                      : wallet.logo.major
+                    : ""
+                }
               />
             ) : (
               <ConnectWalletButtonSmall onClick={openWalletModal} />

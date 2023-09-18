@@ -11,7 +11,7 @@ export interface MinimalWallet {
   walletName: string;
   walletPrettyName: string;
   walletInfo: {
-    logo?: string;
+    logo?: string | { major: string; minor: string };
   };
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
@@ -28,6 +28,8 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
     await wallet.connect();
     onClose();
   }
+
+  console.log(wallets);
 
   return (
     <div>
@@ -56,12 +58,18 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
                 <img
                   alt={wallet.walletPrettyName}
                   className="w-9 h-9"
-                  src={wallet.walletInfo.logo}
+                  src={
+                    typeof wallet.walletInfo.logo === "string"
+                      ? wallet.walletInfo.logo
+                      : wallet.walletInfo.logo.major
+                  }
                   aria-hidden="true"
                 />
               )}
               <p className="font-semibold text-left flex-1">
-                {wallet.walletPrettyName}
+                {wallet.walletPrettyName === "Leap Cosmos MetaMask"
+                  ? "Metamask"
+                  : wallet.walletPrettyName}
               </p>
             </button>
             {wallet.isWalletConnected ? (
