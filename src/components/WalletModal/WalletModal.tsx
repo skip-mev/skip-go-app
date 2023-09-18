@@ -29,8 +29,6 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
     onClose();
   }
 
-  console.log(wallets);
-
   return (
     <div>
       <div className="py-5 px-4 relative">

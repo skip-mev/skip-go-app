@@ -47,7 +47,6 @@ export async function executeRoute(
         return `https://ibc.fun/nodes/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
-        console.log(chainID);
         if (chainID === "injective-1") {
           return "https://lcd.injective.network";
         }
