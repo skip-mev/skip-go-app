@@ -1,13 +1,8 @@
 import { WalletStatus } from "@cosmos-kit/core";
 import { useChain } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
-import {
-  ConnectButton,
-  useChainModal,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import va from "@vercel/analytics";
-import { is } from "immer/dist/internal";
 import { FC, useMemo } from "react";
 import { useAccount } from "wagmi";
 
@@ -125,13 +120,11 @@ export const SwapWidget: FC = () => {
     onDestinationAssetChange,
   } = useSwapWidget();
 
-  const {
-    status: walletConnectStatus,
-    connect: connectWallet,
-    chain,
-  } = useChain(sourceChain?.record?.chain.chain_name ?? "cosmoshub");
+  const { status: walletConnectStatus } = useChain(
+    sourceChain?.record?.chain.chain_name ?? "cosmoshub",
+  );
 
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
 
   const isWalletConnected = useMemo(() => {
     if (!sourceChain) {

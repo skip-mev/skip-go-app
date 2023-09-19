@@ -4,7 +4,6 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
 import { Chain } from "@/context/chains";
-import { chainNameToChainlistURL } from "@/cosmos";
 
 interface Props {
   chains: Chain[];

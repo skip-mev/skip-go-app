@@ -56,16 +56,14 @@ export function useSwapWidget() {
   }, [routeFetchStatus]);
 
   const amountOut = useMemo(() => {
-    if (!routeResponse) {
+    if (!routeResponse || !routeResponse.estimatedAmountOut) {
       return "0.0";
     }
 
-    if (routeResponse.estimatedAmountOut) {
-      return ethers.formatUnits(
-        routeResponse.estimatedAmountOut,
-        formValues.destinationAsset?.decimals ?? 6,
-      );
-    }
+    return ethers.formatUnits(
+      routeResponse.estimatedAmountOut,
+      formValues.destinationAsset?.decimals ?? 6,
+    );
 
     // return formValues.am;
   }, [formValues.destinationAsset?.decimals, routeResponse]);
