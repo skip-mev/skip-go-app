@@ -30,7 +30,7 @@ export function useRoute(
   sourceAssetChainID?: string,
   destinationAsset?: string,
   destinationAssetChainID?: string,
-  enabled?: boolean
+  enabled?: boolean,
 ) {
   const skipClient = useSkipClient();
 
@@ -53,7 +53,7 @@ export function useRoute(
         return;
       }
 
-      const route = await skipClient.route({
+      const route = await skipClient.routeV2({
         amountIn: amountIn,
         sourceAssetDenom: sourceAsset,
         sourceAssetChainID: sourceAssetChainID,

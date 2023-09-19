@@ -14,7 +14,7 @@ import { assets, chains } from "chain-registry";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { arbitrum } from "wagmi/chains";
+import { avalanche } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 import MainLayout from "@/components/MainLayout";
@@ -25,8 +25,8 @@ import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 
 const { chains: evmChains, publicClient } = configureChains(
-  [arbitrum],
-  [publicProvider()]
+  [avalanche],
+  [publicProvider()],
 );
 
 export { publicClient };
@@ -201,17 +201,16 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <main>
-          <QueryClientProvider client={queryClient}>
-            <WagmiConfig config={wagmiConfig}>
-              <RainbowKitProvider chains={evmChains}>
-                <ChainProvider
-                  chains={chains}
-                  assetLists={assets}
-                  wallets={wallets}
-                  wrappedWithChakra
-                  throwErrors={false}
-                  >
-                  <SkipProvider>
+        <QueryClientProvider client={queryClient}>
+          <WagmiConfig config={wagmiConfig}>
+            <RainbowKitProvider chains={evmChains}>
+              <ChainProvider
+                chains={chains}
+                assetLists={assets}
+                wallets={wallets}
+                throwErrors={false}
+              >
+                <SkipProvider>
                   <ChainsProvider>
                     <AssetsProvider>
                       <RadixToast.ToastProvider>
@@ -224,11 +223,11 @@ export default function App({ Component, pageProps }: AppProps) {
                       </RadixToast.ToastProvider>
                     </AssetsProvider>
                   </ChainsProvider>
-        </SkipProvider>
-                </ChainProvider>
-              </RainbowKitProvider>
-            </WagmiConfig>
-          </QueryClientProvider>
+                </SkipProvider>
+              </ChainProvider>
+            </RainbowKitProvider>
+          </WagmiConfig>
+        </QueryClientProvider>
       </main>
       <Analytics />
     </>

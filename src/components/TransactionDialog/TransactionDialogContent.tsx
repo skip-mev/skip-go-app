@@ -159,6 +159,8 @@ const TransactionDialogContent: FC<Props> = ({
 
   const { data: evmWalletClient } = useWalletClient();
 
+  console.log(evmWalletClient);
+
   const { chainRecords } = useManager();
   const walletClient = chain.chainWallet?.client;
 

@@ -48,10 +48,15 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useChain(chain?.record?.name ?? "cosmoshub");
 
+  console.log({
+    chain,
+    address,
+  });
+
   const { data: balances, fetchStatus } = useBalancesByChain(
     address,
     chain,
-    showBalance
+    showBalance,
   );
 
   const selectedAssetBalance = useMemo(() => {
@@ -149,7 +154,7 @@ const AssetInput: FC<Props> = ({
                         const fee = getFee(chain.chainID);
 
                         const feeInt = parseFloat(
-                          ethers.formatUnits(fee, asset.decimals)
+                          ethers.formatUnits(fee, asset.decimals),
                         ).toFixed(asset.decimals);
 
                         amount = (

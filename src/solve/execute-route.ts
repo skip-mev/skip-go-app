@@ -1,31 +1,11 @@
-import {
-  AxelarAssetTransfer,
-  AxelarGMPRecoveryAPI,
-  Environment,
-  QueryTransferStatus,
-} from "@axelar-network/axelarjs-sdk";
-import * as axelar from "@axelar-network/axelarjs-sdk";
+import { QueryTransferStatus } from "@axelar-network/axelarjs-sdk";
 import { coin, OfflineSigner } from "@cosmjs/proto-signing";
 import { WalletClient } from "@cosmos-kit/core";
-import {
-  MultiChainMsg,
-  RouteResponse,
-  SKIP_API_URL,
-  SkipAPIClient,
-} from "@skip-router/core";
-import {
-  Account,
-  getContract,
-  maxUint256,
-  PublicClient,
-  WalletClient as ViemWalletClient,
-  zeroAddress,
-} from "viem";
-import { erc20ABI } from "wagmi";
+import { MultiChainMsg, RouteResponse, SkipRouter } from "@skip-router/core";
+import axios from "axios";
+import { Account, WalletClient as ViemWalletClient } from "viem";
 
-import { publicClient } from "@/pages/_app";
 import {
-  enableChains,
   getAddressForChain,
   getChainByID,
   getExplorerLinkForTx,
@@ -69,7 +49,7 @@ export async function executeRoute(
     addressList.push(address);
   }
 
-  const skipClient = new SkipAPIClient("https://solve-dev.skip.money", {
+  const skipClient = new SkipRouter("https://solve-dev.skip.money", {
     getOfflineSigner: async (chainID) => {
       const signerIsLedger = await isLedger(walletClient, chainID);
 
@@ -128,9 +108,12 @@ export async function executeRoute(
       if (nextMessage && "evmTx" in nextMessage) {
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const status = await getAxelarTransferStatus(tx.transactionHash);
+          const status = await getTransferStatus(tx.transactionHash);
 
-          if (status === QueryTransferStatus.EXECUTED) {
+          if (
+            status.success &&
+            status.data.status === QueryTransferStatus.EXECUTED
+          ) {
             break;
           }
 
@@ -160,9 +143,12 @@ export async function executeRoute(
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        const status = await getAxelarTransferStatus(tx);
+        const status = await getTransferStatus(tx);
 
-        if (status === QueryTransferStatus.EXECUTED) {
+        if (
+          status.success &&
+          status.data.status === QueryTransferStatus.EXECUTED
+        ) {
           break;
         }
 
@@ -228,7 +214,7 @@ export async function executeRoute(
 
 async function executeCosmosMessage(
   signerAddress: string,
-  skipClient: SkipAPIClient,
+  skipClient: SkipRouter,
   walletClient: WalletClient,
   message: MultiChainMsg,
 ) {
@@ -257,29 +243,57 @@ async function executeCosmosMessage(
   );
 }
 
-async function getAxelarTransferStatus(txHash: string) {
-  const sdk = new axelar.AxelarTransferApi({
-    environment: axelar.Environment.MAINNET,
-  });
-
-  const response = await sdk.axelarCrosschainApi
-    .post("/transfers-status", {
+async function getTransferStatus(
+  txHash: string,
+): Promise<
+  | { success: true; data: { status: QueryTransferStatus } }
+  | { success: false; error: string }
+> {
+  const { data } = await axios.post(
+    "https://api.axelarscan.io/cross-chain/transfers-status",
+    {
       txHash,
-    })
-    .catch(() => undefined);
+    },
+  );
 
-  if (!response) {
-    throw new Error("Axelar Transfer API is not available");
+  if (data.length === 0 || data.error) {
+    return {
+      success: false,
+      error: "No transfer found",
+    };
   }
 
-  if (response.length === 0) {
-    throw new Error("No transfer found");
-  }
-
-  const transfer = response[0];
-  if (transfer.status === undefined) {
-    return QueryTransferStatus.ASSET_SENT;
-  }
-
-  return transfer.status as QueryTransferStatus;
+  return {
+    success: true,
+    data: {
+      status: data[0].status as QueryTransferStatus,
+    },
+  };
 }
+
+// async function getAxelarTransferStatus(txHash: string) {
+//   const sdk = new axelar.AxelarTransferApi({
+//     environment: axelar.Environment.MAINNET,
+//   });
+
+//   const response = await sdk.axelarCrosschainApi
+//     .post("/transfers-status", {
+//       txHash,
+//     })
+//     .catch(() => undefined);
+
+//   if (!response) {
+//     throw new Error("Axelar Transfer API is not available");
+//   }
+
+//   // if (response.length === 0) {
+//   //   throw new Error("No transfer found");
+//   // }
+
+//   // const transfer = response[0];
+//   // if (transfer.status === undefined) {
+//   //   return QueryTransferStatus.ASSET_SENT;
+//   // }
+
+//   // return transfer.status as QueryTransferStatus;
+// }

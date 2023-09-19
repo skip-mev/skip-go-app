@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getContract, zeroAddress } from "viem";
-import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { erc20ABI, useAccount, usePublicClient } from "wagmi";
 
 import { Chain } from "@/context/chains";
 import { useSkipClient } from "@/solve";
@@ -45,6 +45,9 @@ const denomsToAddressMap: Record<string, Record<string, `0x${string}`>> = {
     "arb-wei": "0x912CE59144191C1204E64559FE8253a0e49E6548",
     axlusdc: "0xEB466342C4d449BC9f53A865D5Cb90586f405215",
   },
+  "43114": {
+    "wavax-wei": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
+  },
 };
 
 export function useBalancesByChain(
@@ -59,6 +62,7 @@ export function useBalancesByChain(
   return useQuery({
     queryKey: ["balances-by-chain", address, chain?.chainID],
     queryFn: async () => {
+      console.log("balances by chain");
       if (!chain || !address) {
         return {};
       }
@@ -77,6 +81,9 @@ export function useBalancesByChain(
         for (const chainAsset of chainAssets[chain.chainID]) {
           const assetAddress =
             denomsToAddressMap[chain.chainID][chainAsset.denom];
+
+          console.log(chainAsset);
+          console.log(assetAddress);
 
           if (assetAddress === zeroAddress) {
             const balance = await publicClient.getBalance({

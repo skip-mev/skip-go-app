@@ -60,19 +60,15 @@ export function useSwapWidget() {
       return "0.0";
     }
 
-    if (routeResponse.doesSwap && routeResponse.estimatedAmountOut) {
+    if (routeResponse.estimatedAmountOut) {
       return ethers.formatUnits(
         routeResponse.estimatedAmountOut,
         formValues.destinationAsset?.decimals ?? 6,
       );
     }
 
-    return formValues.amountIn;
-  }, [
-    formValues.amountIn,
-    formValues.destinationAsset?.decimals,
-    routeResponse,
-  ]);
+    // return formValues.am;
+  }, [formValues.destinationAsset?.decimals, routeResponse]);
 
   let sourceChainName = "cosmoshub";
   if (formValues.sourceChain && !isEVMChain(formValues.sourceChain.chainID)) {

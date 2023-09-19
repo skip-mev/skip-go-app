@@ -1,5 +1,5 @@
 import { useWalletClient } from "@cosmos-kit/react";
-import { SkipAPIClient } from "@skip-router/core";
+import { SkipRouter } from "@skip-router/core";
 import { createContext, FC, PropsWithChildren } from "react";
 
 import {
@@ -10,7 +10,7 @@ import {
 
 export const SkipContext = createContext<
   | {
-      skipClient: SkipAPIClient;
+      skipClient: SkipRouter;
     }
   | undefined
 >(undefined);
@@ -18,7 +18,7 @@ export const SkipContext = createContext<
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const { client: walletClient } = useWalletClient();
 
-  const skipClient = new SkipAPIClient("https://solve-dev.skip.money", {
+  const skipClient = new SkipRouter("https://solve-dev.skip.money", {
     getOfflineSigner: async (chainID) => {
       if (!walletClient) {
         throw new Error("No offline signer available");
