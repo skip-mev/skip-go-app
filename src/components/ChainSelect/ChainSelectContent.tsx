@@ -4,7 +4,6 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
 import { Chain } from "@/context/chains";
-import { chainNameToChainlistURL } from "@/cosmos";
 
 interface Props {
   chains: Chain[];
@@ -107,12 +106,8 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                   <img
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
-                    src={`${chainNameToChainlistURL(
-                      chain.chainName,
-                    )}/chainImg/_chainImg.svg`}
-                    onError={(e) =>
-                      (e.currentTarget.src =
-                        "https://api.dicebear.com/6.x/shapes/svg")
+                    src={
+                      chain.logoURI || "https://api.dicebear.com/6.x/shapes/svg"
                     }
                   />
                   <div>

@@ -3,9 +3,10 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC } from "react";
 
 import { DialogContent } from "@/elements/Dialog";
-import { getChainByID } from "@/utils/utils";
+import { getChainByID, isEVMChain } from "@/utils/utils";
 
 import { useWalletModal } from "./context";
+import CosmosWalletList from "./CosmosWalletList";
 
 export interface MinimalWallet {
   walletName: string;
@@ -94,18 +95,35 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
 
 const WalletModalWithContext: FC<{ chainID: string }> = ({ chainID }) => {
   const { setIsOpen } = useWalletModal();
-  const chainName = getChainByID(chainID).chain_name;
+  const chainName = isEVMChain(chainID)
+    ? "cosmoshub"
+    : getChainByID(chainID).chain_name;
 
   const { getWalletRepo } = useManager();
 
   const walletRepo = getWalletRepo(chainName);
 
+  const isEVM = isEVMChain(chainID);
+
   return (
     <DialogContent>
-      <WalletModal
-        wallets={walletRepo.wallets}
-        onClose={() => setIsOpen(false)}
-      />
+      <div>
+        <div className="py-5 px-4 relative">
+          <p className="text-center font-bold">Wallets</p>
+          <div className="absolute inset-y-0 flex items-center">
+            <button
+              aria-label="Close wallet modal"
+              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors -ml-2"
+              onClick={() => setIsOpen(false)}
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <div className="px-4 py-2 space-y-2">
+          {isEVM ? <div>EVM</div> : <CosmosWalletList />}
+        </div>
+      </div>
     </DialogContent>
   );
 };
