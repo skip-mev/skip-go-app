@@ -31,7 +31,7 @@ export default function Home() {
   }, 5000);
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-md mx-auto">
       <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
         <WalletModalProvider>
           <SwapWidget />
