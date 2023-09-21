@@ -47,8 +47,6 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  console.log(action);
-
   const { chains } = useChains();
 
   const sourceChain = chains.find(

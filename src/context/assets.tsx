@@ -80,10 +80,6 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   function getAsset(denom: string, chainID: string) {
     const asset = assets[chainID]?.find((asset) => asset.denom === denom);
 
-    if (!asset) {
-      //
-    }
-
     return asset;
   }
 
