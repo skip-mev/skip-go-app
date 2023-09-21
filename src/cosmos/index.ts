@@ -47,6 +47,9 @@ const denomsToAddressMap: Record<string, Record<string, `0x${string}`>> = {
   },
   "43114": {
     "wavax-wei": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
+    avax: zeroAddress,
+    "avax-wei": zeroAddress,
+    axlusdc: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC",
   },
 };
 
@@ -60,9 +63,8 @@ export function useBalancesByChain(
   const publicClient = usePublicClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain?.chainID],
+    queryKey: ["balances-by-chain", address, chain?.chainID, evmAddress],
     queryFn: async () => {
-      console.log("balances by chain");
       if (!chain || !address) {
         return {};
       }
@@ -78,31 +80,30 @@ export function useBalancesByChain(
 
         const balances: Record<string, string> = {};
 
-        for (const chainAsset of chainAssets[chain.chainID]) {
-          const assetAddress =
-            denomsToAddressMap[chain.chainID][chainAsset.denom];
+        const balanceResults = await Promise.all(
+          chainAssets[chain.chainID].map(async (chainAsset) => {
+            const assetAddress =
+              denomsToAddressMap[chain.chainID][chainAsset.denom];
 
-          console.log(chainAsset);
-          console.log(assetAddress);
+            if (assetAddress === zeroAddress) {
+              return publicClient.getBalance({
+                address: evmAddress,
+              });
+            }
 
-          if (assetAddress === zeroAddress) {
-            const balance = await publicClient.getBalance({
-              address: evmAddress,
-            });
-
-            balances[chainAsset.denom] = balance.toString();
-          } else {
             const contract = getContract({
               abi: erc20ABI,
               address: assetAddress,
               publicClient,
             });
 
-            const balance = await contract.read.balanceOf([evmAddress]);
+            return contract.read.balanceOf([evmAddress]);
+          }),
+        );
 
-            balances[chainAsset.denom] = balance.toString();
-          }
-        }
+        chainAssets[chain.chainID].forEach((chainAsset, index) => {
+          balances[chainAsset.denom] = balanceResults[index].toString();
+        });
 
         return balances;
       }

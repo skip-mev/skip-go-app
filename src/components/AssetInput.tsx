@@ -48,11 +48,6 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useChain(chain?.record?.name ?? "cosmoshub");
 
-  console.log({
-    chain,
-    address,
-  });
-
   const { data: balances, fetchStatus } = useBalancesByChain(
     address,
     chain,

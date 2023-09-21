@@ -53,6 +53,13 @@ const AssetSelectContent: FC<Props> = ({
       if (balanceA < balanceB) return 1;
 
       return 0;
+    })
+    .filter((asset) => {
+      if (asset.chainID === "43114" && asset.denom === "avax-wei") {
+        return false;
+      }
+
+      return true;
     });
 
   const filteredAssets = sortedAssets?.filter((asset) => {
@@ -114,7 +121,9 @@ const AssetSelectContent: FC<Props> = ({
                 }
               />
               <div className="flex-1">
-                <p className="font-semibold text-lg">{asset.symbol}</p>
+                <p className="font-semibold text-lg">
+                  {asset.symbol.replace("Avalanche ", "")}
+                </p>
                 {showChainInfo && (
                   <p className="text-sm text-neutral-400">{asset.chainID}</p>
                 )}

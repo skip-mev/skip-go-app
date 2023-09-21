@@ -34,17 +34,17 @@ export const AssetsContext = createContext<AssetsContext>({
 function getAssetSymbol(
   asset: AssetWithMetadata,
   assets: Asset[],
-  chains: Chain[]
+  chains: Chain[],
 ) {
-  const hasDuplicates =
-    (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
+  // const hasDuplicates =
+  // (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
 
-  if (hasDuplicates) {
-    const originChain = chains.find((c) => c.chainID === asset.originChainID);
-    const originChainName = originChain?.prettyName ?? asset.originChainID;
+  // if (hasDuplicates) {
+  //   const originChain = chains.find((c) => c.chainID === asset.originChainID);
+  //   const originChainName = originChain?.prettyName ?? asset.originChainID;
 
-    return `${originChainName} ${asset.symbol}`;
-  }
+  //   return `${originChainName} ${asset.symbol}`;
+  // }
 
   return asset.symbol;
 }
@@ -59,15 +59,18 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       return {};
     }
 
-    return Object.entries(solveAssets).reduce((acc, [chainID, assets]) => {
-      return {
-        ...acc,
-        [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
-          ...asset,
-          symbol: getAssetSymbol(asset, assets, chains),
-        })),
-      };
-    }, {} as Record<string, AssetWithMetadata[]>);
+    return Object.entries(solveAssets).reduce(
+      (acc, [chainID, assets]) => {
+        return {
+          ...acc,
+          [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
+            ...asset,
+            symbol: getAssetSymbol(asset, assets, chains),
+          })),
+        };
+      },
+      {} as Record<string, AssetWithMetadata[]>,
+    );
   }, [chains, solveAssets]);
 
   function assetsByChainID(chainID: string) {

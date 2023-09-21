@@ -18,7 +18,9 @@ export function useSolveChains() {
   return useQuery({
     queryKey: ["solve-chains"],
     queryFn: () => {
-      return skipClient.chains();
+      return skipClient.chains({
+        includeEVM: true,
+      });
     },
     placeholderData: [],
   });
