@@ -139,6 +139,8 @@ export async function executeRoute(
         to: message.evmTx.to as `0x${string}`,
         data: `0x${message.evmTx.data}`,
         chain: walletClientEVM.chain,
+        value:
+          message.evmTx.value === "" ? undefined : BigInt(message.evmTx.value),
       });
 
       // eslint-disable-next-line no-constant-condition
