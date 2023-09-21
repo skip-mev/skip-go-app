@@ -11,7 +11,7 @@ import {
   filterAssetsWithMetadata,
   useAssets as useSolveAssets,
 } from "../solve";
-import { Chain, useChains } from "./chains";
+import { useChains } from "./chains";
 
 export type AssetWithMetadata = Required<Asset>;
 
@@ -31,11 +31,7 @@ export const AssetsContext = createContext<AssetsContext>({
   getNativeAssets: () => [],
 });
 
-function getAssetSymbol(
-  asset: AssetWithMetadata,
-  assets: Asset[],
-  chains: Chain[],
-) {
+function getAssetSymbol(asset: AssetWithMetadata) {
   // const hasDuplicates =
   // (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
 
@@ -65,7 +61,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
           ...acc,
           [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
             ...asset,
-            symbol: getAssetSymbol(asset, assets, chains),
+            symbol: getAssetSymbol(asset),
           })),
         };
       },
