@@ -34,7 +34,7 @@ export const AssetsContext = createContext<AssetsContext>({
 function getAssetSymbol(
   asset: AssetWithMetadata,
   assets: Asset[],
-  chains: Chain[]
+  chains: Chain[],
 ) {
   const hasDuplicates =
     (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
@@ -59,15 +59,18 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       return {};
     }
 
-    return Object.entries(solveAssets).reduce((acc, [chainID, assets]) => {
-      return {
-        ...acc,
-        [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
-          ...asset,
-          symbol: getAssetSymbol(asset, assets, chains),
-        })),
-      };
-    }, {} as Record<string, AssetWithMetadata[]>);
+    return Object.entries(solveAssets).reduce(
+      (acc, [chainID, assets]) => {
+        return {
+          ...acc,
+          [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
+            ...asset,
+            symbol: getAssetSymbol(asset, assets, chains),
+          })),
+        };
+      },
+      {} as Record<string, AssetWithMetadata[]>,
+    );
   }, [chains, solveAssets]);
 
   function assetsByChainID(chainID: string) {
@@ -76,6 +79,10 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
 
   function getAsset(denom: string, chainID: string) {
     const asset = assets[chainID]?.find((asset) => asset.denom === denom);
+
+    if (!asset) {
+      //
+    }
 
     return asset;
   }
