@@ -1,17 +1,18 @@
 import { type BrowserContext, chromium, test as base } from "@playwright/test";
 
-import { prepareKeplr } from "./keplr";
+import { initialSetup } from "./commands/keplr";
+import { prepareKeplr } from "./heplers";
 
 export const test = base.extend<{ context: BrowserContext }>({
   // eslint-disable-next-line no-empty-pattern
   context: async ({}, use) => {
     // download keplr
-    await prepareKeplr();
+    const keplrPath = await prepareKeplr();
 
     // prepare browser args
     const browserArgs = [
-      // `--disable-extensions-except=${metamaskPath}`,
-      // `--load-extension=${metamaskPath}`,
+      `--disable-extensions-except=${keplrPath}`,
+      `--load-extension=${keplrPath}`,
       "--remote-debugging-port=9222",
     ];
 
@@ -28,6 +29,10 @@ export const test = base.extend<{ context: BrowserContext }>({
       headless: false,
       args: browserArgs,
     });
+
+    await context.pages()[0].waitForTimeout(3000);
+
+    await initialSetup(chromium);
 
     await use(context);
 
