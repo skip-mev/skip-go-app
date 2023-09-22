@@ -1,7 +1,7 @@
 import { type BrowserContext, chromium, test as base } from "@playwright/test";
 
 import { initialSetup } from "./commands/keplr";
-import { prepareKeplr } from "./heplers";
+import { prepareKeplr } from "./helpers";
 
 export const test = base.extend<{ context: BrowserContext }>({
   // eslint-disable-next-line no-empty-pattern
