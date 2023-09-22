@@ -25,6 +25,8 @@ jobs:
   "e2e-tests":
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.38.0-jammy
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
