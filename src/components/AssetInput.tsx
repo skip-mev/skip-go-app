@@ -120,7 +120,8 @@ const AssetInput: FC<Props> = ({
         </div>
         {asset && asset.decimals === 0 ? (
           <p className="text-sm font-bold text-red-500">
-            No decimal information for this asset
+            No decimal information for this asset, displaying fixed integer
+            value.
           </p>
         ) : null}
         {showBalance && address && (
