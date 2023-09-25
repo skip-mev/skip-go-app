@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getContract, zeroAddress } from "viem";
+import { getContract } from "viem";
 import { erc20ABI, useAccount, usePublicClient } from "wagmi";
 
 import { Chain } from "@/context/chains";
@@ -40,19 +40,6 @@ export async function getBalancesByChain(address: string, chainID: string) {
   );
 }
 
-const denomsToAddressMap: Record<string, Record<string, `0x${string}`>> = {
-  "42161": {
-    "arb-wei": "0x912CE59144191C1204E64559FE8253a0e49E6548",
-    axlusdc: "0xEB466342C4d449BC9f53A865D5Cb90586f405215",
-  },
-  "43114": {
-    "wavax-wei": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
-    avax: zeroAddress,
-    "avax-wei": zeroAddress,
-    axlusdc: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC",
-  },
-};
-
 export function useBalancesByChain(
   address?: string,
   chain?: Chain,
@@ -82,10 +69,7 @@ export function useBalancesByChain(
 
         const balanceResults = await Promise.all(
           chainAssets[chain.chainID].map(async (chainAsset) => {
-            const assetAddress =
-              denomsToAddressMap[chain.chainID][chainAsset.denom];
-
-            if (assetAddress === zeroAddress) {
+            if (!chainAsset.tokenContract) {
               return publicClient.getBalance({
                 address: evmAddress,
               });
@@ -93,7 +77,7 @@ export function useBalancesByChain(
 
             const contract = getContract({
               abi: erc20ABI,
-              address: assetAddress,
+              address: chainAsset.tokenContract as `0x${string}`,
               publicClient,
             });
 
