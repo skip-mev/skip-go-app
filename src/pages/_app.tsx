@@ -14,7 +14,7 @@ import { assets, chains } from "chain-registry";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { avalanche } from "wagmi/chains";
+import { polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 import MainLayout from "@/components/MainLayout";
@@ -25,7 +25,7 @@ import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 
 const { chains: evmChains, publicClient } = configureChains(
-  [avalanche],
+  [polygonMumbai],
   [publicProvider()],
 );
 
