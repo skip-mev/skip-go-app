@@ -7,10 +7,7 @@ import {
   useMemo,
 } from "react";
 
-import {
-  filterAssetsWithMetadata,
-  useAssets as useSolveAssets,
-} from "../solve";
+import { isAssetWithMetadata, useAssets as useSolveAssets } from "../solve";
 import { useChains } from "./chains";
 
 export type AssetWithMetadata = Required<Asset>;
@@ -56,18 +53,25 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return Object.entries(solveAssets).reduce(
+      // filterAssetsWithMetadata(assets)
       (acc, [chainID, assets]) => {
         return {
           ...acc,
-          [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
-            ...asset,
-            symbol: getAssetSymbol(asset),
-          })),
+          [chainID]: assets.map(
+            (asset) =>
+              ({
+                ...asset,
+                symbol: isAssetWithMetadata(asset)
+                  ? getAssetSymbol(asset)
+                  : asset.denom,
+                decimals: isAssetWithMetadata(asset) ? asset.decimals : 0,
+              }) as AssetWithMetadata,
+          ),
         };
       },
       {} as Record<string, AssetWithMetadata[]>,
     );
-  }, [chains, solveAssets]);
+  }, [solveAssets]);
 
   function assetsByChainID(chainID: string) {
     return assets[chainID] || [];

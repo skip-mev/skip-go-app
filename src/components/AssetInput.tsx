@@ -118,6 +118,11 @@ const AssetInput: FC<Props> = ({
             />
           )}
         </div>
+        {asset && asset.decimals === 0 ? (
+          <p className="text-sm font-bold text-red-500">
+            No decimal information for this asset
+          </p>
+        ) : null}
         {showBalance && address && (
           <div className="flex items-center justify-between">
             {fetchStatus === "fetching" && (
