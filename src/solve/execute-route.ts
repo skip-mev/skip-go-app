@@ -1,9 +1,19 @@
-import { QueryTransferStatus } from "@axelar-network/axelarjs-sdk";
+import {
+  AxelarGMPRecoveryAPI,
+  Environment,
+  QueryTransferStatus,
+} from "@axelar-network/axelarjs-sdk";
 import { coin, OfflineSigner } from "@cosmjs/proto-signing";
 import { WalletClient } from "@cosmos-kit/core";
 import { MultiChainMsg, RouteResponse, SkipRouter } from "@skip-router/core";
 import axios from "axios";
-import { Account, WalletClient as ViemWalletClient } from "viem";
+import {
+  Account,
+  maxUint256,
+  publicActions,
+  WalletClient as ViemWalletClient,
+} from "viem";
+import { erc20ABI } from "wagmi";
 
 import {
   getAddressForChain,
@@ -134,6 +144,41 @@ export async function executeRoute(
         i,
       );
     } else {
+      const extendedClient = walletClientEVM.extend(publicActions);
+
+      for (const requiredApproval of message.evmTx.requiredErc20Approvals) {
+        const allowance = await extendedClient.readContract({
+          address: requiredApproval.tokenContract as `0x${string}`,
+          abi: erc20ABI,
+          functionName: "allowance",
+          args: [
+            walletClientEVM.account?.address as `0x${string}`,
+            requiredApproval.spender as `0x${string}`,
+          ],
+        });
+
+        if (allowance > BigInt(requiredApproval.amount)) {
+          continue;
+        }
+
+        const txHash = await walletClientEVM.writeContract({
+          account: walletClientEVM.account as Account,
+          address: requiredApproval.tokenContract as `0x${string}`,
+          abi: erc20ABI,
+          functionName: "approve",
+          args: [requiredApproval.spender as `0x${string}`, maxUint256],
+          chain: walletClientEVM.chain,
+        });
+
+        const receipt = await extendedClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
+
+        if (receipt.status === "reverted") {
+          throw new Error(`EVM tx reverted: ${receipt.transactionHash}`);
+        }
+      }
+
       const tx = await walletClientEVM.sendTransaction({
         account: walletClientEVM.account as Account,
         to: message.evmTx.to as `0x${string}`,
@@ -143,18 +188,34 @@ export async function executeRoute(
           message.evmTx.value === "" ? undefined : BigInt(message.evmTx.value),
       });
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const status = await getTransferStatus(tx);
+      if (message.evmTx.requiredErc20Approvals.length > 0) {
+        const gmpClient = new AxelarGMPRecoveryAPI({
+          environment: Environment.MAINNET,
+        });
 
-        if (
-          status.success &&
-          status.data.status === QueryTransferStatus.EXECUTED
-        ) {
-          break;
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const status = await gmpClient.queryTransactionStatus(tx);
+          console.log(status.status);
+          if (status.status === "destination_executed") {
+            break;
+          }
+          await wait(1000);
         }
+      } else {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const status = await getTransferStatus(tx);
 
-        await wait(1000);
+          if (
+            status.success &&
+            status.data.status === QueryTransferStatus.EXECUTED
+          ) {
+            break;
+          }
+
+          await wait(1000);
+        }
       }
 
       onTxSuccess(
