@@ -525,10 +525,3 @@ export async function signAmino(
     signatures: [fromBase64(signature.signature)],
   });
 }
-
-// This is error prone and should probably be exposed by the API itself
-export function isEVMChain(chainID: string) {
-  return (
-    chainRegistry.chains.findIndex((chain) => chain.chain_id === chainID) === -1
-  );
-}
