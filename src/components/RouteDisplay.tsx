@@ -50,11 +50,11 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   const { chains } = useChains();
 
   const sourceChain = chains.find(
-    (c) => c.chainID === action.sourceChain
+    (c) => c.chainID === action.sourceChain,
   ) as Chain;
 
   const destinationChain = chains.find(
-    (c) => c.chainID === action.destinationChain
+    (c) => c.chainID === action.destinationChain,
   ) as Chain;
 
   const { getAsset } = useAssets();
@@ -62,8 +62,28 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   const asset = getAsset(action.asset, sourceChain.chainID);
 
   if (!asset) {
-    console.log(action);
-    return null;
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-14 h-14 flex items-center justify-center">
+          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
+        </div>
+        <div>
+          <p className="text-sm text-neutral-500">
+            Transfer to{" "}
+            <img
+              className="inline-block w-4 h-4 -mt-1"
+              src={`${chainNameToChainlistURL(
+                destinationChain.chainName,
+              )}/chainImg/_chainImg.svg`}
+              alt=""
+            />{" "}
+            <span className="font-semibold text-black">
+              {destinationChain.prettyName}
+            </span>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -83,7 +103,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              sourceChain.chainName
+              sourceChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -94,7 +114,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={`${chainNameToChainlistURL(
-              destinationChain.chainName
+              destinationChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
           />{" "}
@@ -119,6 +139,62 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
   const assetOut = getAsset(action.destinationAsset, chain.chainID);
 
   const venue = SWAP_VENUES[action.venue];
+
+  if (!assetIn && assetOut) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-14 h-14 flex items-center justify-center">
+          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
+        </div>
+        <div>
+          <p className="text-sm text-neutral-500">
+            Swap to{" "}
+            <img
+              className="inline-block w-4 h-4 -mt-1"
+              src={assetOut.logoURI}
+              alt=""
+            />{" "}
+            <span className="font-semibold text-black">{assetOut.symbol}</span>{" "}
+            on{" "}
+            <img
+              className="inline-block w-4 h-4 -mt-1"
+              src={venue.imageURL}
+              alt=""
+            />{" "}
+            <span className="font-semibold text-black">{venue.name}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (assetIn && !assetOut) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-14 h-14 flex items-center justify-center">
+          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
+        </div>
+        <div>
+          <p className="text-sm text-neutral-500">
+            Swap{" "}
+            <img
+              className="inline-block w-4 h-4 -mt-1"
+              src={assetIn.logoURI}
+              alt=""
+            />{" "}
+            <span className="font-semibold text-black">{assetIn.symbol}</span>{" "}
+            on{" "}
+            <img
+              className="inline-block w-4 h-4 -mt-1"
+              src={venue.imageURL}
+              alt=""
+            />{" "}
+            <span className="font-semibold text-black">{venue.name}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!assetIn || !assetOut) {
     return null;
@@ -168,20 +244,20 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   const sourceAsset = getAsset(
     route.sourceAssetDenom,
-    route.sourceAssetChainID
+    route.sourceAssetChainID,
   );
 
   const destinationAsset = getAsset(
     route.destAssetDenom,
-    route.destAssetChainID
+    route.destAssetChainID,
   );
 
   const sourceChain = chains.find(
-    (c) => c.chainID === route.sourceAssetChainID
+    (c) => c.chainID === route.sourceAssetChainID,
   ) as Chain;
 
   const destinationChain = chains.find(
-    (c) => c.chainID === route.destAssetChainID
+    (c) => c.chainID === route.destAssetChainID,
   ) as Chain;
 
   const amountIn = useMemo(() => {
@@ -196,7 +272,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     try {
       return ethers.formatUnits(
         route.estimatedAmountOut ?? 0,
-        destinationAsset?.decimals ?? 6
+        destinationAsset?.decimals ?? 6,
       );
     } catch {
       return "0.0";
