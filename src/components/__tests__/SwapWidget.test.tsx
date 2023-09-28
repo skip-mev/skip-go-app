@@ -8,14 +8,16 @@ import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { SwapWidget } from "../SwapWidget";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
+const API_URL = "https://solve-dev.skip.money";
+
 const handlers = [
-  rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
+  rest.get(`${API_URL}/v1/info/chains`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(CHAINS_RESPONSE));
   }),
-  rest.get("https://api.skip.money/v1/fungible/assets", (_, res, ctx) => {
+  rest.get(`${API_URL}/v1/fungible/assets`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(ASSETS_RESPONSE));
   }),
-  rest.post("https://api.skip.money/v1/fungible/route", (_, res, ctx) => {
+  rest.post(`${API_URL}/v1/fungible/route`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({

@@ -9,12 +9,22 @@ import {
 } from "@testing-library/react";
 import { assets, chains } from "chain-registry";
 import React, { FC, Fragment, PropsWithChildren } from "react";
+import { configureChains, createConfig, mainnet, WagmiConfig } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
 import { ChainsProvider } from "@/context/chains";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
+
+const { publicClient } = configureChains([mainnet], [publicProvider()]);
+
+export const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: [],
+  publicClient,
+});
 
 const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -28,13 +38,15 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
           logLevel="NONE"
           walletModal={() => <div></div>}
         >
-          <SkipProvider>
-            <WalletModalProvider>
-              <ChainsProvider>
-                <AssetsProvider>{children}</AssetsProvider>
-              </ChainsProvider>
-            </WalletModalProvider>
-          </SkipProvider>
+          <WagmiConfig config={wagmiConfig}>
+            <SkipProvider>
+              <WalletModalProvider>
+                <ChainsProvider>
+                  <AssetsProvider>{children}</AssetsProvider>
+                </ChainsProvider>
+              </WalletModalProvider>
+            </SkipProvider>
+          </WagmiConfig>
         </ChainProvider>
       </QueryClientProvider>
     </Fragment>
