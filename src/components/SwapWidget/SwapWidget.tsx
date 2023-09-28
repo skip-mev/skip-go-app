@@ -118,6 +118,7 @@ export const SwapWidget: FC = () => {
                   onClick={() =>
                     openWalletModal(destinationChain?.chainID ?? "cosmoshub-4")
                   }
+                  data-testid="destination-wallet-btn"
                 >
                   {destinationChainAddress
                     ? `${destinationChainAddress.slice(

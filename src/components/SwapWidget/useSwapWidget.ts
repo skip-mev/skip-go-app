@@ -124,9 +124,6 @@ export function useSwapWidget() {
     if (currentEvmChain.id !== chainID) {
       switchNetwork(chainID);
     }
-
-    console.log("source chain changed", formValues.sourceChain);
-    console.log(currentEvmChain);
   }, [currentEvmChain, formValues.sourceChain, switchNetwork]);
 
   return {
