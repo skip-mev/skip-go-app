@@ -1,6 +1,7 @@
 import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
@@ -101,6 +102,32 @@ export function useSwapWidget() {
 
     return amountIn > balance;
   }, [balances, formValues.amountIn, formValues.sourceAsset]);
+
+  const { chain: currentEvmChain } = useNetwork();
+
+  const { switchNetwork } = useSwitchNetwork();
+
+  useEffect(() => {
+    if (
+      !formValues.sourceChain ||
+      formValues.sourceChain.chainType === "cosmos"
+    ) {
+      return;
+    }
+
+    if (!currentEvmChain || !switchNetwork) {
+      return;
+    }
+
+    const chainID = parseInt(formValues.sourceChain.chainID);
+
+    if (currentEvmChain.id !== chainID) {
+      switchNetwork(chainID);
+    }
+
+    console.log("source chain changed", formValues.sourceChain);
+    console.log(currentEvmChain);
+  }, [currentEvmChain, formValues.sourceChain, switchNetwork]);
 
   return {
     amountIn: formValues.amountIn,

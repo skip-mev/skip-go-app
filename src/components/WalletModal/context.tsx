@@ -9,9 +9,10 @@ import {
 import { Dialog } from "@/elements/Dialog";
 
 interface WalletModalContext {
+  chainID: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  openWalletModal: () => void;
+  openWalletModal: (chainID: string) => void;
 }
 
 const WalletModalContext = createContext<WalletModalContext | undefined>(
@@ -28,10 +29,19 @@ export function useWalletModal() {
 
 export const WalletModalProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [chainID, setChainID] = useState("cosmoshub-4");
 
   return (
     <WalletModalContext.Provider
-      value={{ isOpen, openWalletModal: () => setIsOpen(true), setIsOpen }}
+      value={{
+        chainID,
+        isOpen,
+        openWalletModal: (_chainID) => {
+          setIsOpen(true);
+          setChainID(_chainID);
+        },
+        setIsOpen,
+      }}
     >
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         {children}

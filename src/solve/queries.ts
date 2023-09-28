@@ -18,7 +18,9 @@ export function useSolveChains() {
   return useQuery({
     queryKey: ["solve-chains"],
     queryFn: () => {
-      return skipClient.chains();
+      return skipClient.chains({
+        includeEVM: true,
+      });
     },
     placeholderData: [],
   });
@@ -30,7 +32,7 @@ export function useRoute(
   sourceAssetChainID?: string,
   destinationAsset?: string,
   destinationAssetChainID?: string,
-  enabled?: boolean
+  enabled?: boolean,
 ) {
   const skipClient = useSkipClient();
 
