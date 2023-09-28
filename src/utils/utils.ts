@@ -60,6 +60,7 @@ export function isEVMChain(chainID: string) {
     "1284",
     "10",
     "137",
+    "80001"
   ].includes(chainID);
 }
 
