@@ -72,6 +72,9 @@ export function useSwapWidget() {
   if (formValues.sourceChain && !isEVMChain(formValues.sourceChain.chainID)) {
     sourceChainName = formValues.sourceChain.chainName;
   }
+  if (sourceChainName.includes("-testnet")) {
+    sourceChainName = sourceChainName.replace("-testnet", "");
+  }
 
   const { address } = useChain(sourceChainName);
 
