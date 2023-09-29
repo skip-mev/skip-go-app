@@ -4,12 +4,16 @@ import { setupServer } from "msw/node";
 import { act, fireEvent, render, screen, waitFor, within } from "@/test";
 
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
+import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { SwapWidget } from "../SwapWidget";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
 const API_URL = "https://solve-dev.skip.money";
 
 const handlers = [
+  rest.get(`${API_URL}/v1/info/chains`, (_, res, ctx) => {
+    return res(ctx.status(200), ctx.json(CHAINS_RESPONSE));
+  }),
   rest.get(`${API_URL}/v1/fungible/assets`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(ASSETS_RESPONSE));
   }),
@@ -367,7 +371,7 @@ describe("SwapWidget", () => {
     );
   });
 
-  it("displays the connect destination wallet button if the source chain and destination chain are not the same chain type", async () => {
+  it("does not show the connect destination wallet button if the source chain and destination chain are the same chain type", async () => {
     await act(async () => {
       render(<SwapWidget />);
     });
@@ -404,6 +408,22 @@ describe("SwapWidget", () => {
     expect(
       screen.queryByTestId("destination-wallet-btn"),
     ).not.toBeInTheDocument();
+  });
+
+  it("displays the connect destination wallet button if the source chain and destination chain are not the same chain type", async () => {
+    await act(async () => {
+      render(<SwapWidget />);
+    });
+
+    const sourceAssetSection = await screen.findByTestId("source");
+    const destinationAssetSection = await screen.findByTestId("destination");
+
+    const sourceChainButton =
+      within(sourceAssetSection).getByText("Cosmos Hub");
+
+    const destinationChainButton = within(destinationAssetSection).getByText(
+      "Select Chain",
+    );
 
     // select Arbitrum and Osmosis
     await act(() => {
