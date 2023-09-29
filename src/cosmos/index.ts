@@ -63,6 +63,7 @@ export function useBalancesByChain(
 
         const chainAssets = await skipClient.assets({
           chainID: chain.chainID,
+          includeEvmAssets: true,
         });
 
         const balances: Record<string, string> = {};
