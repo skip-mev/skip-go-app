@@ -307,6 +307,11 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         return;
       }
 
+      if ("axelarTransfer" in operation) {
+        // TODO: Implement
+        return;
+      }
+
       const sourceChain = operation.transfer.chainID;
 
       let destinationChain = "";
@@ -322,6 +327,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           if ("swapOut" in nextOperation.swap) {
             destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
           }
+        } else if ("axelarTransfer" in nextOperation) {
+          destinationChain = nextOperation.axelarTransfer.toChain;
         } else {
           destinationChain = nextOperation.transfer.chainID;
         }
