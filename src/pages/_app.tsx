@@ -13,8 +13,22 @@ import { assets, chains } from "chain-registry";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { WagmiConfig } from "wagmi";
-import { configureChains, createConfig } from "wagmi";
-import { arbitrum, base, mainnet, optimism, polygon, zora } from "wagmi/chains";
+import { Chain, configureChains, createConfig } from "wagmi";
+import {
+  arbitrum,
+  avalanche,
+  base,
+  bsc,
+  celo,
+  fantom,
+  filecoin,
+  linea,
+  mainnet,
+  moonbeam,
+  optimism,
+  polygon,
+  polygonMumbai,
+} from "wagmi/chains";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -25,8 +39,48 @@ import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 
+const kava = {
+  id: 2222,
+  name: "Kava",
+  network: "kava",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Kava",
+    symbol: "KAVA",
+  },
+  rpcUrls: {
+    public: { http: ["https://evm.kava.io"] },
+    default: { http: ["https://evm.kava.io"] },
+  },
+  blockExplorers: {
+    etherscan: { name: "KavaScan", url: "https://kavascan.com" },
+    default: { name: "KavaScan", url: "https://kavascan.com" },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xca11bde05977b3631167028862be2a173976ca11",
+      blockCreated: 3661165,
+    },
+  },
+} as const satisfies Chain;
+
 const { publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, base, zora],
+  [
+    arbitrum,
+    mainnet,
+    base,
+    filecoin,
+    polygonMumbai,
+    polygon,
+    linea,
+    moonbeam,
+    avalanche,
+    celo,
+    bsc,
+    optimism,
+    fantom,
+    kava,
+  ],
   [publicProvider()],
 );
 
