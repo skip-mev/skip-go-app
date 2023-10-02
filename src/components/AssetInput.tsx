@@ -1,4 +1,3 @@
-import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
@@ -6,6 +5,7 @@ import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
 import Toast from "@/elements/Toast";
+import { useAccount } from "@/hooks/useAccount";
 import { getFee } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
@@ -46,12 +46,12 @@ const AssetInput: FC<Props> = ({
 
   const showChainInfo = chain ? false : true;
 
-  const { address } = useChain(chain?.record?.name ?? "cosmoshub");
+  const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
   const { data: balances, fetchStatus } = useBalancesByChain(
     address,
     chain,
-    showBalance
+    showBalance,
   );
 
   const selectedAssetBalance = useMemo(() => {
@@ -65,7 +65,9 @@ const AssetInput: FC<Props> = ({
       return "0.0";
     }
 
-    return ethers.formatUnits(balanceWei, asset.decimals);
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 6,
+    }).format(parseFloat(ethers.formatUnits(balanceWei, asset.decimals)));
   }, [asset, balances]);
 
   const maxButtonDisabled = useMemo(() => {
@@ -149,7 +151,7 @@ const AssetInput: FC<Props> = ({
                         const fee = getFee(chain.chainID);
 
                         const feeInt = parseFloat(
-                          ethers.formatUnits(fee, asset.decimals)
+                          ethers.formatUnits(fee, asset.decimals),
                         ).toFixed(asset.decimals);
 
                         amount = (

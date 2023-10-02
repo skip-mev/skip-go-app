@@ -8,7 +8,9 @@ export function useAssets() {
   return useQuery({
     queryKey: ["solve-assets"],
     queryFn: () => {
-      return skipClient.assets();
+      return skipClient.assets({
+        includeEvmAssets: true,
+      });
     },
   });
 }

@@ -122,7 +122,16 @@ const AssetSelectContent: FC<Props> = ({
               <div>
                 {balances[asset.denom] && (
                   <p className="font-medium text-sm text-neutral-400">
-                    {ethers.formatUnits(balances[asset.denom], asset.decimals)}
+                    {new Intl.NumberFormat("en-US", {
+                      maximumFractionDigits: 6,
+                    }).format(
+                      parseFloat(
+                        ethers.formatUnits(
+                          balances[asset.denom],
+                          asset.decimals,
+                        ),
+                      ),
+                    )}
                   </p>
                 )}
               </div>
