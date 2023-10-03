@@ -1,14 +1,16 @@
-import { useChain, useManager } from "@cosmos-kit/react";
+import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { FC, Fragment, useEffect, useRef, useState } from "react";
+import { useAccount } from "wagmi";
 
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 import { useToast } from "@/context/toast";
 import Toast from "@/elements/Toast";
+import { useSkipClient } from "@/solve";
 import { executeRoute } from "@/solve/execute-route";
-import { getChainByID } from "@/utils/utils";
+import { enableChains, getAddressForCosmosChain } from "@/utils/utils";
 
 import RouteDisplay from "../RouteDisplay";
 
@@ -126,13 +128,19 @@ const TransactionDialogContent: FC<Props> = ({
   insufficentBalance,
   transactionCount,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { toast } = useToast();
+  const { chains } = useChains();
+
+  const skipRouter = useSkipClient();
+  const { address: evmAddress } = useAccount();
 
   const [transacting, setTransacting] = useState(false);
 
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [txComplete, setTxComplete] = useState(false);
 
   const [warningOpen, setWarningOpen] = useState(false);
@@ -147,12 +155,12 @@ const TransactionDialogContent: FC<Props> = ({
     }
   }, [warningOpen]);
 
-  const chainRecord = getChainByID(route.sourceAssetChainID);
+  // const chainRecord = getChainByID(route.sourceAssetChainID);
 
-  const chain = useChain(chainRecord?.chain_name);
+  // const chain = useChain(chainRecord?.chain_name);
 
-  const { chainRecords } = useManager();
-  const walletClient = chain.chainWallet?.client;
+  const { getWalletRepo } = useManager();
+  // const walletClient = chain.chainWallet?.client;
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => {
@@ -164,10 +172,57 @@ const TransactionDialogContent: FC<Props> = ({
     }),
   );
 
+  async function getCosmosKitWalletClient(chain: Chain) {
+    const walletRepo = await getWalletRepo(chain.record?.name ?? "");
+
+    const currentCosmosKitWallet = localStorage.getItem(
+      "cosmos-kit@2:core//current-wallet",
+    );
+
+    if (!currentCosmosKitWallet) {
+      throw new Error("No CosmosKit wallet found");
+    }
+
+    const wallet = walletRepo.getWallet(currentCosmosKitWallet);
+    if (!wallet) {
+      throw new Error("No wallet found");
+    }
+
+    return wallet.client;
+  }
+
   const onSubmit = async () => {
     setTransacting(true);
 
     try {
+      const userAddresses: Record<string, string> = {};
+      const addressList = [];
+
+      // get addresses
+      for (const chainID of route.chainIDs) {
+        const chain = chains.find((c) => c.chainID === chainID);
+        if (!chain) {
+          throw new Error(`No chain found for chainID ${chainID}`);
+        }
+
+        if (chain.chainType === "cosmos") {
+          const walletClient = await getCosmosKitWalletClient(chain);
+          await enableChains(walletClient, [chainID]);
+          const address = await getAddressForCosmosChain(walletClient, chainID);
+          userAddresses[chainID] = address;
+          addressList.push(address);
+        }
+
+        if (chain.chainType === "evm") {
+          if (!evmAddress) {
+            throw new Error(`EVM wallet not connected`);
+          }
+
+          userAddresses[chainID] = evmAddress;
+          addressList.push(evmAddress);
+        }
+      }
+
       setTxStatuses([
         {
           status: "PENDING",
@@ -177,30 +232,30 @@ const TransactionDialogContent: FC<Props> = ({
         ...txStatuses.slice(1),
       ]);
 
-      if (!walletClient) {
-        throw new Error("No wallet client found");
-      }
-
-      for (const chainID of route.chainIDs) {
-        if ("snapInstalled" in walletClient) {
-          continue;
-        }
-
-        if (walletClient.addChain) {
-          const record = chainRecords.find((c) => c.chain.chain_id === chainID);
-          if (record) {
-            try {
-              await walletClient.addChain(record);
-            } catch (err) {
-              /* empty */
-            }
-          }
-        }
-      }
+      //   if (!walletClient) {
+      //     throw new Error("No wallet client found");
+      //   }
+      //   for (const chainID of route.chainIDs) {
+      //     if ("snapInstalled" in walletClient) {
+      //       continue;
+      //     }
+      //     if (walletClient.addChain) {
+      //       const record = chainRecords.find((c) => c.chain.chain_id === chainID);
+      //       if (record) {
+      //         try {
+      //           await walletClient.addChain(record);
+      //         } catch (err) {
+      //           /* empty */
+      //         }
+      //       }
+      //     }
+      //   }
 
       await executeRoute(
-        walletClient,
+        skipRouter,
         route,
+        userAddresses,
+        addressList,
         ({ txHash, explorerLink }, i) => {
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
@@ -209,7 +264,6 @@ const TransactionDialogContent: FC<Props> = ({
               explorerLink,
               txHash,
             };
-
             if (i < statuses.length - 1) {
               newStatuses[i + 1] = {
                 status: "PENDING",
@@ -220,44 +274,46 @@ const TransactionDialogContent: FC<Props> = ({
             return newStatuses;
           });
         },
-        // (error: any) => {
-        //   console.error(error);
-        //   setTxError(error.message);
-        //   setIsError(true);
-        //   setTxStatuses((statuses) => {
-        //     const newStatuses = [...statuses];
-        //     return newStatuses.map((status) => {
-        //       if (status.status === "PENDING") {
-        //         return {
-        //           status: "INIT",
-        //           explorerLink: null,
-        //           txHash: null,
-        //         };
-        //       }
-        //       return status;
-        //     });
-        //   });
-        // }
       );
 
-      toast(
-        "Transaction Successful",
-        "Your transaction was successful",
-        "success",
-      );
+      //   await executeRoute(
+      //     skipRouter,
+      //     walletClient,
+      //     route,
 
-      setTxComplete(true);
+      //     // (error: any) => {
+      //     //   console.error(error);
+      //     //   setTxError(error.message);
+      //     //   setIsError(true);
+      //     //   setTxStatuses((statuses) => {
+      //     //     const newStatuses = [...statuses];
+      //     //     return newStatuses.map((status) => {
+      //     //       if (status.status === "PENDING") {
+      //     //         return {
+      //     //           status: "INIT",
+      //     //           explorerLink: null,
+      //     //           txHash: null,
+      //     //         };
+      //     //       }
+      //     //       return status;
+      //     //     });
+      //     //   });
+      //     // }
+      //   );
+      //   toast(
+      //     "Transaction Successful",
+      //     "Your transaction was successful",
+      //     "success",
+      //   );
+      //   setTxComplete(true);
     } catch (err: unknown) {
       console.error(err);
-
       if (err instanceof Error) {
         setTxError(err.message);
         setIsError(true);
       }
-
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
-
         return newStatuses.map((status) => {
           if (status.status === "PENDING") {
             return {
@@ -266,7 +322,6 @@ const TransactionDialogContent: FC<Props> = ({
               txHash: null,
             };
           }
-
           return status;
         });
       });

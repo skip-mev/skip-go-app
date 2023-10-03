@@ -35,6 +35,14 @@ const AssetSelectContent: FC<Props> = ({
 
   const sortedAssets = assets
     ?.sort((a, b) => {
+      if (!a.symbol) {
+        return 1;
+      }
+
+      if (!b.symbol) {
+        return -1;
+      }
+
       if (a.symbol > b.symbol) {
         return 1;
       }
@@ -58,7 +66,7 @@ const AssetSelectContent: FC<Props> = ({
   const filteredAssets = sortedAssets?.filter((asset) => {
     if (!searchValue) return true;
 
-    if (asset.symbol.toLowerCase().includes(searchValue.toLowerCase())) {
+    if (asset.symbol?.toLowerCase().includes(searchValue.toLowerCase())) {
       return true;
     }
 

@@ -1,4 +1,3 @@
-import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
@@ -6,6 +5,7 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
+import { useAccount } from "@/hooks/useAccount";
 import { useRoute } from "@/solve";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
@@ -60,22 +60,14 @@ export function useSwapWidget() {
       return "0.0";
     }
 
-    if (routeResponse.doesSwap && routeResponse.estimatedAmountOut) {
-      return ethers.formatUnits(
-        routeResponse.estimatedAmountOut,
-        formValues.destinationAsset?.decimals ?? 6,
-      );
-    }
+    return ethers.formatUnits(
+      routeResponse.amountOut,
+      formValues.destinationAsset?.decimals ?? 6,
+    );
+  }, [formValues.destinationAsset?.decimals, routeResponse]);
 
-    return formValues.amountIn;
-  }, [
-    formValues.amountIn,
-    formValues.destinationAsset?.decimals,
-    routeResponse,
-  ]);
-
-  const { address } = useChain(
-    formValues.sourceChain?.record?.name ?? "cosmoshub",
+  const { address } = useAccount(
+    formValues.sourceChain?.chainID ?? "cosmoshub-4",
   );
 
   const { data: balances } = useBalancesByChain(

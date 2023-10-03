@@ -1,9 +1,10 @@
 import { SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import { multicall3Abi } from "viem";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
+import { multicall3ABI } from "@/constants/abis";
 import { Chain } from "@/context/chains";
+import { useSkipClient } from "@/solve";
 import { getStargateClientForChainID } from "@/utils/utils";
 
 export function chainNameToChainlistURL(chainName: string) {
@@ -49,6 +50,8 @@ export function useBalancesByChain(
     chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
   });
 
+  const skipRouter = useSkipClient();
+
   return useQuery({
     queryKey: ["balances-by-chain", address, chain?.chainID],
     queryFn: async () => {
@@ -57,7 +60,12 @@ export function useBalancesByChain(
       }
 
       if (chain.chainType === "evm") {
-        return getEvmChainBalances(publicClient, address, chain.chainID);
+        return getEvmChainBalances(
+          skipRouter,
+          publicClient,
+          address,
+          chain.chainID,
+        );
       }
 
       return getBalancesByChain(address, chain.chainID);
@@ -72,12 +80,11 @@ export function useBalancesByChain(
 }
 
 async function getEvmChainBalances(
+  skipClient: SkipRouter,
   publicClient: PublicClient,
   address: string,
   chainID: string,
 ) {
-  const skipClient = new SkipRouter("https://solve-dev.skip.money");
-
   const assets = await skipClient.assets({
     chainID,
     includeEvmAssets: true,
@@ -85,29 +92,12 @@ async function getEvmChainBalances(
 
   const chainAssets = assets[chainID];
 
-  // const erc20Assets = chainAssets.filter(
-  //   (asset) => typeof asset.tokenContract !== "undefined",
-  // );
-
-  // const erc20Balances = await publicClient.multicall({
-  //   contracts: erc20Assets.map((asset) => ({
-  //     address: asset.tokenContract as `0x${string}`,
-  //     abi: erc20ABI,
-  //     functionName: "balanceOf",
-  //     args: [address as `0x${string}`],
-  //   })),
-  // });
-
-  // console.log(erc20Balances);
-
-  console.log(publicClient);
-
   const balances = await publicClient.multicall({
     contracts: chainAssets.map((asset) => {
       if (!asset.tokenContract) {
         return {
           address: "0xcA11bde05977b3631167028862bE2a173976CA11",
-          abi: multicall3Abi,
+          abi: multicall3ABI,
           functionName: "getEthBalance",
           args: [address as `0x${string}`],
         };
@@ -122,6 +112,8 @@ async function getEvmChainBalances(
     }),
   });
 
+  console.log(balances);
+
   return chainAssets.reduce(
     (acc, asset, index) => {
       return {
@@ -131,20 +123,4 @@ async function getEvmChainBalances(
     },
     {} as Record<string, string>,
   );
-
-  // for (const asset of chainAssets) {
-  //   if (asset.tokenContract) {
-  //     const response = await publicClient.readContract({
-  //       address: asset.tokenContract as `0x${string}`,
-  //       abi: erc20ABI,
-  //       functionName: "balanceOf",
-  //       args: [address as `0x${string}`],
-  //     });
-
-  //     console.log(response);
-  //   }
-  //   // publicClient.multicall({
-  //   //   contracts
-  //   // })
-  // }
 }

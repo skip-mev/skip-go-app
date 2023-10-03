@@ -3,6 +3,7 @@ import { FC, Fragment } from "react";
 
 import { useChains } from "@/context/chains";
 import { useAccount } from "@/hooks/useAccount";
+import { getExplorerLinkForTx } from "@/utils/utils";
 
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
@@ -48,6 +49,8 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
+
+  getExplorerLinkForTx("42161", "0x0000");
 
   return (
     <Fragment>
