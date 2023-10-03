@@ -56,9 +56,9 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
         const testnets: Record<string, string> = {
-          "osmo-test-5": "osmosis-testnet-grpc.polkachu.com:12590",
-          "pion-1": "neutron-testnet-grpc.polkachu.com:19190",
-          "axelar-testnet-lisbon-3": "axelar-testnet-grpc.polkachu.com:15190",
+          "osmo-test-5": "https://osmosis-testnet-rpc.polkachu.com",
+          "pion-1": "https://neutron-testnet-rpc.polkachu.com",
+          "axelar-testnet-lisbon-3": "https://axelar-testnet-rpc.polkachu.com",
         };
 
         if (testnets[chainID]) {
