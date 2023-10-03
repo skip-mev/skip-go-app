@@ -21,12 +21,9 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const { client: walletClient } = useWalletClient();
   const { chains } = useNetwork();
 
-  console.log({ walletClient });
-
   const skipClient = new SkipRouter({
     apiURL: "https://solve-dev.skip.money",
     getCosmosSigner: async (chainID) => {
-      console.log(chainID);
       if (!walletClient) {
         throw new Error("No offline signer available");
       }
@@ -58,6 +55,16 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
+        const testnets: Record<string, string> = {
+          "osmo-test-5": "osmosis-testnet-grpc.polkachu.com:12590",
+          "pion-1": "neutron-testnet-grpc.polkachu.com:19190",
+          "axelar-testnet-lisbon-3": "axelar-testnet-grpc.polkachu.com:15190",
+        };
+
+        if (testnets[chainID]) {
+          return testnets[chainID];
+        }
+
         return `https://ibc.fun/nodes/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
