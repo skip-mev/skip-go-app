@@ -34,10 +34,10 @@ import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
-import { EVM_CHAINS } from "@/constants/constants";
-import { multicall3ABI } from "@/constants/abis";
-import { useSkipClient } from "@/solve";
 import { Chain } from "@/api/queries";
+import { multicall3ABI } from "@/constants/abis";
+import { EVM_CHAINS } from "@/constants/constants";
+import { useSkipClient } from "@/solve";
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(
@@ -416,7 +416,7 @@ export function useBalancesByChain(
   const skipRouter = useSkipClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain?.chainID],
+    queryKey: ["balances-by-chain", address, chain],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
