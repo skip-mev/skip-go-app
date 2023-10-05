@@ -9,8 +9,14 @@ import { Chain, useChains } from "@/context/chains";
 import { useToast } from "@/context/toast";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
-import { executeRoute } from "@/solve/execute-route";
-import { enableChains, getAddressForCosmosChain } from "@/utils/utils";
+import {
+  enableChains,
+  getAddressForCosmosChain,
+  getExplorerLinkForTx,
+  getOfflineSigner,
+  getOfflineSignerOnlyAmino,
+  isLedger,
+} from "@/utils/utils";
 
 import RouteDisplay from "../RouteDisplay";
 
@@ -232,49 +238,81 @@ const TransactionDialogContent: FC<Props> = ({
         ...txStatuses.slice(1),
       ]);
 
-      //   if (!walletClient) {
-      //     throw new Error("No wallet client found");
+      // await executeRoute(
+      //   skipRouter,
+      //   route,
+      //   userAddresses,
+      //   addressList,
+      //   ({ txHash, explorerLink }, i) => {
+      // setTxStatuses((statuses) => {
+      //   const newStatuses = [...statuses];
+      //   newStatuses[i] = {
+      //     status: "SUCCESS",
+      //     explorerLink,
+      //     txHash,
+      //   };
+      //   if (i < statuses.length - 1) {
+      //     newStatuses[i + 1] = {
+      //       status: "PENDING",
+      //       explorerLink: null,
+      //       txHash: null,
+      //     };
       //   }
-      //   for (const chainID of route.chainIDs) {
-      //     if ("snapInstalled" in walletClient) {
-      //       continue;
-      //     }
-      //     if (walletClient.addChain) {
-      //       const record = chainRecords.find((c) => c.chain.chain_id === chainID);
-      //       if (record) {
-      //         try {
-      //           await walletClient.addChain(record);
-      //         } catch (err) {
-      //           /* empty */
-      //         }
-      //       }
-      //     }
-      //   }
+      //   return newStatuses;
+      // });
+      //   },
+      // );
 
-      await executeRoute(
-        skipRouter,
+      await skipRouter.executeRoute({
         route,
         userAddresses,
-        addressList,
-        ({ txHash, explorerLink }, i) => {
+        getCosmosSigner: async (chainID) => {
+          const chain = chains.find((c) => c.chainID === chainID);
+          if (!chain) {
+            throw new Error(`No chain found for chainID ${chainID}`);
+          }
+
+          const walletClient = await getCosmosKitWalletClient(chain);
+
+          const signerIsLedger = await isLedger(walletClient, chainID);
+
+          if (signerIsLedger) {
+            return getOfflineSignerOnlyAmino(walletClient, chainID);
+          }
+
+          return getOfflineSigner(walletClient, chainID);
+        },
+        onTransactionSuccess: async (txStatus) => {
+          const explorerLink = getExplorerLinkForTx(
+            txStatus.chainID,
+            txStatus.txHash,
+          );
+
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
-            newStatuses[i] = {
+
+            const pendingIndex = newStatuses.findIndex(
+              (status) => status.status === "PENDING",
+            );
+
+            newStatuses[pendingIndex] = {
               status: "SUCCESS",
               explorerLink,
-              txHash,
+              txHash: txStatus.txHash,
             };
-            if (i < statuses.length - 1) {
-              newStatuses[i + 1] = {
+
+            if (pendingIndex < statuses.length - 1) {
+              newStatuses[pendingIndex + 1] = {
                 status: "PENDING",
                 explorerLink: null,
                 txHash: null,
               };
             }
+
             return newStatuses;
           });
         },
-      );
+      });
 
       //   await executeRoute(
       //     skipRouter,

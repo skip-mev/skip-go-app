@@ -63,12 +63,12 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 
   if (!asset) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-14 h-14 flex items-center justify-center">
+      <div className="flex items-center gap-2 justify-between">
+        <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
           <div className="w-2 h-2 bg-neutral-200 rounded-full" />
         </div>
-        <div>
-          <p className="text-sm text-neutral-500">
+        <div className="flex-1">
+          <p className="text-sm text-neutral-500 break-all max-w-full">
             Transfer to{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
@@ -88,7 +88,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-14 h-14 flex items-center justify-center">
+      <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
         <div className="w-2 h-2 bg-neutral-200 rounded-full" />
       </div>
       <div>
@@ -101,22 +101,28 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           />{" "}
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="inline-block w-4 h-4 -mt-1 rounded-full"
             src={`${chainNameToChainlistURL(
               sourceChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
+            onError={(e) =>
+              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
+            }
           />{" "}
           <span className="font-semibold text-black">
             {sourceChain.prettyName}
           </span>{" "}
           to{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="inline-block w-4 h-4 -mt-1 rounded-full"
             src={`${chainNameToChainlistURL(
               destinationChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
+            onError={(e) =>
+              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
+            }
           />{" "}
           <span className="font-semibold text-black">
             {destinationChain.prettyName}
@@ -150,16 +156,24 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
           <p className="text-sm text-neutral-500">
             Swap to{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
-              src={assetOut.logoURI}
               alt=""
+              className="inline-block w-4 h-4 -mt-1"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://api.dicebear.com/6.x/shapes/svg")
+              }
+              src={assetOut.logoURI}
             />{" "}
             <span className="font-semibold text-black">{assetOut.symbol}</span>{" "}
             on{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
-              src={venue.imageURL}
               alt=""
+              className="inline-block w-4 h-4 -mt-1"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://api.dicebear.com/6.x/shapes/svg")
+              }
+              src={venue.imageURL}
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
@@ -308,7 +322,15 @@ const RouteDisplay: FC<Props> = ({ route }) => {
       }
 
       if ("axelarTransfer" in operation) {
-        // TODO: Implement
+        _actions.push({
+          type: "TRANSFER",
+          asset,
+          sourceChain: operation.axelarTransfer.fromChainID,
+          destinationChain: operation.axelarTransfer.toChainID,
+        });
+
+        asset = operation.axelarTransfer.asset;
+
         return;
       }
 
