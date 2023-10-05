@@ -4,9 +4,9 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { useBalancesByChain } from "@/cosmos";
 import { useAccount } from "@/hooks/useAccount";
 import { useRoute } from "@/solve";
+import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 

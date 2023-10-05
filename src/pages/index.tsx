@@ -2,9 +2,9 @@ import { useManager } from "@cosmos-kit/react";
 
 import { SwapWidget } from "@/components/SwapWidget";
 import { WalletModalProvider } from "@/components/WalletModal";
-import { getBalancesByChain } from "@/cosmos";
 import { useInterval } from "@/utils/hooks";
 import { queryClient } from "@/utils/query";
+import { getBalancesByChain } from "@/utils/utils";
 
 export default function Home() {
   const { walletRepos } = useManager();

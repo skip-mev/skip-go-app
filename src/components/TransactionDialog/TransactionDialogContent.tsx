@@ -67,12 +67,7 @@ const TransactionDialogContent: FC<Props> = ({
     }
   }, [warningOpen]);
 
-  // const chainRecord = getChainByID(route.sourceAssetChainID);
-
-  // const chain = useChain(chainRecord?.chain_name);
-
   const { getWalletRepo } = useManager();
-  // const walletClient = chain.chainWallet?.client;
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => {
@@ -144,31 +139,6 @@ const TransactionDialogContent: FC<Props> = ({
         ...txStatuses.slice(1),
       ]);
 
-      // await executeRoute(
-      //   skipRouter,
-      //   route,
-      //   userAddresses,
-      //   addressList,
-      //   ({ txHash, explorerLink }, i) => {
-      // setTxStatuses((statuses) => {
-      //   const newStatuses = [...statuses];
-      //   newStatuses[i] = {
-      //     status: "SUCCESS",
-      //     explorerLink,
-      //     txHash,
-      //   };
-      //   if (i < statuses.length - 1) {
-      //     newStatuses[i + 1] = {
-      //       status: "PENDING",
-      //       explorerLink: null,
-      //       txHash: null,
-      //     };
-      //   }
-      //   return newStatuses;
-      // });
-      //   },
-      // );
-
       await skipRouter.executeRoute({
         route,
         userAddresses,
@@ -219,37 +189,6 @@ const TransactionDialogContent: FC<Props> = ({
           });
         },
       });
-
-      //   await executeRoute(
-      //     skipRouter,
-      //     walletClient,
-      //     route,
-
-      //     // (error: any) => {
-      //     //   console.error(error);
-      //     //   setTxError(error.message);
-      //     //   setIsError(true);
-      //     //   setTxStatuses((statuses) => {
-      //     //     const newStatuses = [...statuses];
-      //     //     return newStatuses.map((status) => {
-      //     //       if (status.status === "PENDING") {
-      //     //         return {
-      //     //           status: "INIT",
-      //     //           explorerLink: null,
-      //     //           txHash: null,
-      //     //         };
-      //     //       }
-      //     //       return status;
-      //     //     });
-      //     //   });
-      //     // }
-      //   );
-      //   toast(
-      //     "Transaction Successful",
-      //     "Your transaction was successful",
-      //     "success",
-      //   );
-      //   setTxComplete(true);
     } catch (err: unknown) {
       console.error(err);
       if (err instanceof Error) {

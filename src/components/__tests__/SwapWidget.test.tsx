@@ -17,7 +17,7 @@ const handlers = [
   rest.get(`${API_URL}/v1/fungible/assets`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(ASSETS_RESPONSE));
   }),
-  rest.post(`${API_URL}/v1/fungible/route`, (_, res, ctx) => {
+  rest.post(`${API_URL}/v2/fungible/route`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -62,6 +62,7 @@ const handlers = [
         chain_ids: ["cosmoshub-4", "neutron-1"],
         does_swap: true,
         estimated_amount_out: "25329854",
+        amount_out: "25329854",
         swap_venue: {
           name: "neutron-astroport",
           chain_id: "neutron-1",

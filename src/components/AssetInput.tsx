@@ -3,10 +3,9 @@ import { FC, Fragment, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { useBalancesByChain } from "@/cosmos";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
-import { getFee } from "@/utils/utils";
+import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
