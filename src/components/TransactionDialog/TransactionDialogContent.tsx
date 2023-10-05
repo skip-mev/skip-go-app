@@ -1,10 +1,14 @@
+import { coin, OfflineSigner } from "@cosmjs/proto-signing";
 import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
-import { RouteResponse } from "@skip-router/core";
+import { Msg, RouteResponse } from "@skip-router/core";
+import { useQuery } from "@tanstack/react-query";
+import { getWalletClient } from "@wagmi/core";
 import { FC, Fragment, useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
+import { useAssets } from "@/context/assets";
 import { useToast } from "@/context/toast";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
@@ -43,13 +47,16 @@ const TransactionDialogContent: FC<Props> = ({
   const { chains: skipChains } = useChains();
 
   const chains = skipChains ?? [];
+  const { getFeeDenom } = useAssets();
 
   const skipRouter = useSkipClient();
   const { address: evmAddress } = useAccount();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [transacting, setTransacting] = useState(false);
 
   const [isError, setIsError] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [txError, setTxError] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -98,10 +105,9 @@ const TransactionDialogContent: FC<Props> = ({
     return wallet.client;
   }
 
-  const onSubmit = async () => {
-    setTransacting(true);
-
-    try {
+  const { data: messages, isLoading } = useQuery({
+    queryKey: ["route-messages", route],
+    queryFn: async () => {
       const userAddresses: Record<string, string> = {};
       const addressList = [];
 
@@ -130,86 +136,148 @@ const TransactionDialogContent: FC<Props> = ({
         }
       }
 
-      setTxStatuses([
-        {
-          status: "PENDING",
-          explorerLink: null,
-          txHash: null,
-        },
-        ...txStatuses.slice(1),
-      ]);
-
-      await skipRouter.executeRoute({
-        route,
-        userAddresses,
-        getCosmosSigner: async (chainID) => {
-          const chain = chains.find((c) => c.chainID === chainID);
-          if (!chain) {
-            throw new Error(`No chain found for chainID ${chainID}`);
-          }
-
-          const walletClient = await getCosmosKitWalletClient(chain);
-
-          const signerIsLedger = await isLedger(walletClient, chainID);
-
-          if (signerIsLedger) {
-            return getOfflineSignerOnlyAmino(walletClient, chainID);
-          }
-
-          return getOfflineSigner(walletClient, chainID);
-        },
-        onTransactionSuccess: async (txStatus) => {
-          const explorerLink = getExplorerLinkForTx(
-            txStatus.chainID,
-            txStatus.txHash,
-          );
-
-          setTxStatuses((statuses) => {
-            const newStatuses = [...statuses];
-
-            const pendingIndex = newStatuses.findIndex(
-              (status) => status.status === "PENDING",
-            );
-
-            newStatuses[pendingIndex] = {
-              status: "SUCCESS",
-              explorerLink,
-              txHash: txStatus.txHash,
-            };
-
-            if (pendingIndex < statuses.length - 1) {
-              newStatuses[pendingIndex + 1] = {
-                status: "PENDING",
-                explorerLink: null,
-                txHash: null,
-              };
-            }
-
-            return newStatuses;
-          });
-        },
+      return skipRouter.messages({
+        sourceAssetDenom: route.sourceAssetDenom,
+        sourceAssetChainID: route.sourceAssetChainID,
+        destAssetDenom: route.destAssetDenom,
+        destAssetChainID: route.destAssetChainID,
+        amountIn: route.amountIn,
+        amountOut: route.estimatedAmountOut ?? "0",
+        addressList: route.chainIDs.map((chainID) => userAddresses[chainID]),
+        operations: route.operations,
       });
-    } catch (err: unknown) {
-      console.error(err);
-      if (err instanceof Error) {
-        setTxError(err.message);
-        setIsError(true);
+      // skipRouter
+    },
+  });
+
+  const { chains: evmChains } = useNetwork();
+
+  const getEVMSigner = async (chainID: string) => {
+    const result = await getWalletClient({
+      chainId: parseInt(chainID),
+    });
+
+    if (!result) {
+      throw new Error("No offline signer available");
+    }
+
+    const chain = evmChains.find((c) => c.id === parseInt(chainID));
+    if (!chain) {
+      throw new Error("No chain found");
+    }
+    result.chain = chain;
+
+    return result;
+  };
+
+  const handleMessage = async (message: Msg, i: number) => {
+    setTxStatuses((statuses) => {
+      const newStatuses = [...statuses];
+
+      newStatuses[i] = {
+        status: "PENDING",
+        explorerLink: null,
+        txHash: null,
+      };
+
+      return newStatuses;
+    });
+
+    if ("multiChainMsg" in message) {
+      const { multiChainMsg } = message;
+
+      const feeDenom = getFeeDenom(multiChainMsg.chainID);
+
+      const chain = chains.find((c) => c.chainID === multiChainMsg.chainID);
+      if (!chain) {
+        throw new Error(`No chain found for chainID ${multiChainMsg.chainID}`);
       }
+
+      const walletClient = await getCosmosKitWalletClient(chain);
+
+      const signerIsLedger = await isLedger(
+        walletClient,
+        multiChainMsg.chainID,
+      );
+
+      let signer: OfflineSigner;
+      if (signerIsLedger) {
+        signer = await getOfflineSignerOnlyAmino(
+          walletClient,
+          multiChainMsg.chainID,
+        );
+      } else {
+        signer = await getOfflineSigner(walletClient, multiChainMsg.chainID);
+      }
+
+      const accounts = await signer.getAccounts();
+      const account = accounts[0];
+
+      const tx = await skipRouter.executeMultiChainMessage({
+        signerAddress: account.address,
+        signer,
+        message: multiChainMsg,
+        feeAmount: coin(0, feeDenom?.symbol ?? "uatom"),
+      });
+
+      if (tx.code !== 0) {
+        console.error(tx);
+        throw new Error(
+          `Transaction ${tx.transactionHash} failed, check console for logs`,
+        );
+      }
+
+      const explorerLink = getExplorerLinkForTx(
+        multiChainMsg.chainID,
+        tx.transactionHash,
+      );
+
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
-        return newStatuses.map((status) => {
-          if (status.status === "PENDING") {
-            return {
-              status: "INIT",
-              explorerLink: null,
-              txHash: null,
-            };
-          }
-          return status;
-        });
+
+        newStatuses[i] = {
+          status: "SUCCESS",
+          explorerLink,
+          txHash: tx.transactionHash,
+        };
+
+        return newStatuses;
       });
-    } finally {
-      setTransacting(false);
+    }
+
+    if ("evmTx" in message) {
+      const { evmTx } = message;
+
+      const evmSigner = await getEVMSigner(evmTx.chainID);
+
+      const txReceipt = await skipRouter.executeEVMTransaction({
+        message: evmTx,
+        signer: evmSigner,
+      });
+
+      if (txReceipt.status !== "success") {
+        console.error(txReceipt);
+        throw new Error(
+          `Transaction ${txReceipt.transactionHash} failed, check console for logs`,
+        );
+      }
+
+      const explorerLink = getExplorerLinkForTx(
+        evmTx.chainID,
+        txReceipt.transactionHash,
+      );
+
+      setTxStatuses((statuses) => {
+        const newStatuses = [...statuses];
+
+        newStatuses[i] = {
+          status: "SUCCESS",
+          explorerLink,
+          txHash: txReceipt.transactionHash,
+        };
+
+        return newStatuses;
+      });
     }
   };
 
@@ -241,7 +309,65 @@ const TransactionDialogContent: FC<Props> = ({
           </p>
         </div>
         <div className="flex-1 space-y-6">
-          {txStatuses.map(({ status, explorerLink, txHash }, i) => (
+          {isLoading && <div>Loading...</div>}
+          {messages &&
+            messages.map((message, i) => (
+              <div key={`tx-${i}`} className="flex items-center gap-4">
+                {txStatuses[i].status === "INIT" && (
+                  <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
+                )}
+                {txStatuses[i].status === "PENDING" && (
+                  <svg
+                    className="animate-spin h-7 w-7 inline-block text-neutral-300"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                )}
+                {txStatuses[i].status === "SUCCESS" && (
+                  <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
+                )}
+                <div className="flex-1">
+                  <p className="font-semibold">
+                    Transaction {i + 1}{" "}
+                    {typeof txStatuses[i].explorerLink === "string" ? (
+                      <a
+                        className="text-sm font-bold text-[#FF486E] hover:underline"
+                        href={txStatuses[i].explorerLink ?? ""}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Explorer
+                      </a>
+                    ) : null}
+                  </p>
+                </div>
+                <div></div>
+                <div>
+                  <button
+                    className="bg-[#FF486E]/20 hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 flex items-center gap-1 transition-colors focus:outline-none"
+                    onClick={() => handleMessage(message, i)}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            ))}
+          {/* {txStatuses.map(({ status, explorerLink, txHash }, i) => (
             <div key={`tx-${i}`} className="flex items-center gap-4">
               {status === "INIT" && (
                 <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
@@ -291,10 +417,10 @@ const TransactionDialogContent: FC<Props> = ({
                 )}
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
         <div className="space-y-4">
-          <button
+          {/* <button
             className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
             onClick={onSubmit}
             disabled={transacting || insufficentBalance}
@@ -323,7 +449,7 @@ const TransactionDialogContent: FC<Props> = ({
             ) : (
               <span>Submit</span>
             )}
-          </button>
+          </button> */}
           {insufficentBalance && !transacting && !txComplete && (
             <p className="text-center font-semibold text-sm text-red-500">
               Insufficient Balance
