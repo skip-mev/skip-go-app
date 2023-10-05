@@ -1,8 +1,6 @@
 import { Chain as SkipChain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import * as chainRegistry from "chain-registry";
-
-// import type { Chain as RegistryChain } from "chain-registry";
 import { useSkipClient } from "@/solve";
 
 export type Chain = {
@@ -51,7 +49,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   };
 }
 
-export function useChainByChainID(chainID: string) {
+export function useChainByID(chainID: string) {
   const { chains, ...queryResult } = useChains({
     select: (chains) => (chains ?? []).find((c) => c.chainID === chainID),
   });

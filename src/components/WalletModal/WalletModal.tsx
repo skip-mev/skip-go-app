@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
-import { useChainByChainID } from "@/api/queries";
+import { useChainByID } from "@/api/queries";
 import { EVM_WALLET_LOGOS } from "@/constants/constants";
 import { DialogContent } from "@/elements/Dialog";
 import { getChainByID } from "@/utils/utils";
@@ -102,7 +102,7 @@ const WalletModalWithContext: FC = () => {
 
   const { setIsOpen } = useWalletModal();
 
-  const { chain } = useChainByChainID(chainID);
+  const { chain } = useChainByID(chainID);
 
   if (!chain) {
     return null;

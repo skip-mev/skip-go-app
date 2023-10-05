@@ -3,7 +3,7 @@ import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { useChainByChainID } from "@/api/queries";
+import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
 import { chainNameToChainlistURL } from "@/cosmos";
 
@@ -63,10 +63,8 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  const { chain: sourceChain } = useChainByChainID(action.sourceChain);
-  const { chain: destinationChain } = useChainByChainID(
-    action.destinationChain,
-  );
+  const { chain: sourceChain } = useChainByID(action.sourceChain);
+  const { chain: destinationChain } = useChainByID(action.destinationChain);
 
   const { getAsset } = useAssets();
 
@@ -278,8 +276,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     route.destAssetChainID,
   );
 
-  const { chain: sourceChain } = useChainByChainID(route.sourceAssetChainID);
-  const { chain: destinationChain } = useChainByChainID(route.destAssetChainID);
+  const { chain: sourceChain } = useChainByID(route.sourceAssetChainID);
+  const { chain: destinationChain } = useChainByID(route.destAssetChainID);
 
   const amountIn = useMemo(() => {
     try {
