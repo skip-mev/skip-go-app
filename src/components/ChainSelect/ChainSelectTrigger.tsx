@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ForwardedRef, forwardRef } from "react";
 
-import { Chain } from "@/context/chains";
+import { Chain } from "@/api/queries";
 
 interface Props {
   chain?: Chain;
@@ -9,7 +9,7 @@ interface Props {
 
 const ChainSelectTrigger = forwardRef(function ChainSelectTrigger(
   { chain, ...props }: Props,
-  ref: ForwardedRef<HTMLButtonElement>
+  ref: ForwardedRef<HTMLButtonElement>,
 ) {
   return (
     <button

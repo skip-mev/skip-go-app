@@ -31,7 +31,7 @@ import * as chainRegistry from "chain-registry";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
-import { EVM_CHAINS } from "@/constants";
+import { EVM_CHAINS } from "@/constants/constants";
 
 export function getChainByID(chainID: string) {
   return chainRegistry.chains.find(

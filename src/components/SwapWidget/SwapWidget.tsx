@@ -1,7 +1,7 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import { FC, Fragment } from "react";
 
-import { useChains } from "@/context/chains";
+import { useChains as useSkipChains } from "@/api/queries";
 import { useAccount } from "@/hooks/useAccount";
 import { getExplorerLinkForTx } from "@/utils/utils";
 
@@ -16,7 +16,9 @@ import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
-  const { chains } = useChains();
+  // const { chains } = useChains();
+
+  const { chains } = useSkipChains();
 
   const {
     amountIn,
@@ -91,7 +93,7 @@ export const SwapWidget: FC = () => {
               chain={sourceChain}
               onChainChange={onSourceChainChange}
               showBalance
-              chains={chains}
+              chains={chains ?? []}
             />
           </div>
           <div className="relative">
@@ -140,7 +142,7 @@ export const SwapWidget: FC = () => {
               onAssetChange={onDestinationAssetChange}
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
-              chains={chains}
+              chains={chains ?? []}
             />
           </div>
           {routeLoading && <RouteLoadingBanner />}

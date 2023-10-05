@@ -1,15 +1,13 @@
 import { useChain } from "@cosmos-kit/react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { EVM_WALLET_LOGOS } from "@/constants";
-import { useChains } from "@/context/chains";
+import { useChainByChainID } from "@/api/queries";
+import { EVM_WALLET_LOGOS } from "@/constants/constants";
 
 export function useAccount(chainID: string) {
-  const { chains } = useChains();
+  const { chain } = useChainByChainID(chainID);
 
-  const chain = chains.find((c) => c.chainID === chainID);
-
-  const cosmosChain = useChain(chain?.record?.name ?? "cosmoshub");
+  const cosmosChain = useChain(chain?.record?.chain_name ?? "cosmoshub");
 
   const wagmiAccount = useWagmiAccount();
 

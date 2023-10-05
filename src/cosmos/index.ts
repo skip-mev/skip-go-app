@@ -1,9 +1,8 @@
-import { SkipRouter } from "@skip-router/core";
+import { Chain, SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
 import { multicall3ABI } from "@/constants/abis";
-import { Chain } from "@/context/chains";
 import { useSkipClient } from "@/solve";
 import { getStargateClientForChainID } from "@/utils/utils";
 
@@ -53,7 +52,7 @@ export function useBalancesByChain(
   const skipRouter = useSkipClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain?.chainID],
+    queryKey: ["balances-by-chain", address, chain],
     queryFn: async () => {
       if (!chain || !address) {
         return {};

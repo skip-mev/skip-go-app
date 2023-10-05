@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
+import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { Chain } from "@/context/chains";
 import { useBalancesByChain } from "@/cosmos";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
@@ -173,7 +173,7 @@ const AssetInput: FC<Props> = ({
       <Toast
         open={isError}
         setOpen={setIsError}
-        description={`There was an error loading assets for ${chain?.prettyName}. Please try again.`}
+        description={`There was an error loading assets for ${chain?.chainName}. Please try again.`}
       />
     </Fragment>
   );

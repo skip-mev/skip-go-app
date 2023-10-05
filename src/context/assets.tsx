@@ -7,11 +7,12 @@ import {
   useMemo,
 } from "react";
 
+import { Chain, useChains } from "@/api/queries";
+
 import {
   filterAssetsWithMetadata,
   useAssets as useSolveAssets,
 } from "../solve";
-import { Chain, useChains } from "./chains";
 
 export type AssetWithMetadata = Required<Asset>;
 
@@ -55,7 +56,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data: solveAssets } = useSolveAssets();
 
   const assets = useMemo(() => {
-    if (!solveAssets) {
+    if (!solveAssets || !chains) {
       return {};
     }
 
@@ -84,15 +85,13 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getFeeDenom(chainID: string) {
-    const chain = chains.find((c) => c.chainID === chainID);
+    const chain = (chains ?? []).find((c) => c.chainID === chainID);
 
-    if (!chain || !chain.record?.chain.fees) {
+    if (!chain || !chain.feeAssets) {
       return undefined;
     }
 
-    const feeDenom = chain.record.chain.fees.fee_tokens[0].denom;
-
-    return getAsset(feeDenom, chainID);
+    return getAsset(chain.feeAssets[0].denom, chainID);
   }
 
   function getNativeAssets() {
