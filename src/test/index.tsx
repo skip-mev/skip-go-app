@@ -25,7 +25,7 @@ export const wagmiConfig = createConfig({
   publicClient,
 });
 
-const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
+export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Fragment>
       <QueryClientProvider client={queryClient}>
