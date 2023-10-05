@@ -31,6 +31,7 @@ const nextConfig = {
           "@wagmi/connectors",
           "viem",
           "abitype",
+          "uuid",
         ]
       : [],
 };
