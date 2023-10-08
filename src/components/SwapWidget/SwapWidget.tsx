@@ -3,7 +3,6 @@ import { FC, Fragment } from "react";
 
 import { useChains } from "@/context/chains";
 import { useAccount } from "@/hooks/useAccount";
-import { getExplorerLinkForTx } from "@/utils/utils";
 
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
@@ -35,6 +34,7 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    noRouteFound,
   } = useSwapWidget();
 
   const { address, isWalletConnected, wallet } = useAccount(
@@ -49,8 +49,6 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
-
-  getExplorerLinkForTx("42161", "0x0000");
 
   return (
     <Fragment>
@@ -148,6 +146,11 @@ export const SwapWidget: FC = () => {
             <RouteTransactionCountBanner
               numberOfTransactions={numberOfTransactions}
             />
+          )}
+          {noRouteFound && (
+            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+              <p className="flex-1">No route found</p>
+            </div>
           )}
           {sourceChain && !isWalletConnected && (
             <button
