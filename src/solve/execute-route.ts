@@ -33,7 +33,8 @@ export async function executeRoute(
     addressList.push(address);
   }
 
-  const skipClient = new SkipRouter(SKIP_API_URL, {
+  const skipClient = new SkipRouter({
+    apiURL: SKIP_API_URL,
     getOfflineSigner: async (chainID) => {
       const signerIsLedger = await isLedger(walletClient, chainID);
 
@@ -62,19 +63,16 @@ export async function executeRoute(
 
   let i = 0;
 
-  await skipClient.executeRoute(route, userAddresses, {
-    onTransactionSuccess: async (txStatus) => {
-      const { sendTx } = txStatus.transferSequence[0].packetTXs;
-      if (!sendTx) {
-        return;
-      }
-
-      const explorerLink = getExplorerLinkForTx(sendTx.chainID, sendTx.txHash);
+  await skipClient.executeRoute({
+    route,
+    userAddresses,
+    onTransactionSuccess: async (txHash, chainID) => {
+      const explorerLink = getExplorerLinkForTx(chainID, txHash);
 
       onTxSuccess(
         {
           explorerLink,
-          txHash: sendTx.txHash,
+          txHash,
         },
         i,
       );
