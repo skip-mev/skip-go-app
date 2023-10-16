@@ -18,7 +18,8 @@ export const SkipContext = createContext<
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const { client: walletClient } = useWalletClient();
 
-  const skipClient = new SkipRouter(SKIP_API_URL, {
+  const skipClient = new SkipRouter({
+    apiURL: SKIP_API_URL,
     getOfflineSigner: async (chainID) => {
       if (!walletClient) {
         throw new Error("No offline signer available");
