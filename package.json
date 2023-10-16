@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "node ./scripts/generate.js",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
