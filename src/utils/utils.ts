@@ -29,20 +29,18 @@ import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
 import { OfflineAminoSigner } from "@keplr-wallet/types";
 import { SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import * as chainRegistry from "chain-registry";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
+import chainRecord from "@/chains/chainRecord";
 import { EVM_CHAINS } from "@/constants";
 import { multicall3ABI } from "@/constants/abis";
 import { Chain } from "@/context/chains";
 import { useSkipClient } from "@/solve";
 
 export function getChainByID(chainID: string) {
-  return chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  ) as (typeof chainRegistry.chains)[0];
+  return chainRecord[chainID];
 }
 
 // cache clients to reuse later
@@ -53,9 +51,7 @@ export async function getStargateClientForChainID(chainID: string) {
     return STARGATE_CLIENTS[chainID];
   }
 
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
@@ -92,9 +88,7 @@ export async function getSigningStargateClientForChainID(
   signer: OfflineSigner,
   options?: SigningStargateClientOptions,
 ) {
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
@@ -153,9 +147,7 @@ export async function getSigningCosmWasmClientForChainID(
   signer: OfflineSigner,
   options?: SigningCosmWasmClientOptions,
 ) {
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
