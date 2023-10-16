@@ -34,6 +34,12 @@ const nextConfig = {
           "uuid",
         ]
       : [],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      require("./scripts/generate");
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
