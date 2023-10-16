@@ -33,20 +33,21 @@ import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
+import { ChainId } from "@/chains/chainIds";
 import chainRecord from "@/chains/chainRecord";
 import { EVM_CHAINS } from "@/constants";
 import { multicall3ABI } from "@/constants/abis";
 import { Chain } from "@/context/chains";
 import { useSkipClient } from "@/solve";
 
-export function getChainByID(chainID: string) {
+export function getChainByID(chainID: ChainId) {
   return chainRecord[chainID];
 }
 
 // cache clients to reuse later
 const STARGATE_CLIENTS: Record<string, StargateClient> = {};
 
-export async function getStargateClientForChainID(chainID: string) {
+export async function getStargateClientForChainID(chainID: ChainId) {
   if (STARGATE_CLIENTS[chainID]) {
     return STARGATE_CLIENTS[chainID];
   }
@@ -84,7 +85,7 @@ export async function getStargateClientForChainID(chainID: string) {
 }
 
 export async function getSigningStargateClientForChainID(
-  chainID: string,
+  chainID: ChainId,
   signer: OfflineSigner,
   options?: SigningStargateClientOptions,
 ) {
@@ -130,7 +131,7 @@ export async function getSigningStargateClientForChainID(
 
 export async function getAddressForCosmosChain(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSigner) {
     const signer = await walletClient.getOfflineSigner(chainId);
@@ -143,7 +144,7 @@ export async function getAddressForCosmosChain(
 }
 
 export async function getSigningCosmWasmClientForChainID(
-  chainID: string,
+  chainID: ChainId,
   signer: OfflineSigner,
   options?: SigningCosmWasmClientOptions,
 ) {
@@ -206,7 +207,7 @@ export async function enableChains(
   throw new Error("Unsupported wallet");
 }
 
-export async function getAccount(walletClient: WalletClient, chainId: string) {
+export async function getAccount(walletClient: WalletClient, chainId: ChainId) {
   if (walletClient.getAccount) {
     return walletClient.getAccount(chainId);
   }
@@ -216,7 +217,7 @@ export async function getAccount(walletClient: WalletClient, chainId: string) {
 
 export async function getOfflineSigner(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSignerDirect) {
     return walletClient.getOfflineSignerDirect(chainId);
@@ -227,7 +228,7 @@ export async function getOfflineSigner(
 
 export async function getOfflineSignerOnlyAmino(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSignerAmino) {
     const signer = walletClient.getOfflineSignerAmino(chainId);
@@ -237,7 +238,7 @@ export async function getOfflineSignerOnlyAmino(
   throw new Error("unsupported wallet");
 }
 
-export function getFee(chainID: string) {
+export function getFee(chainID: ChainId) {
   const chain = getChainByID(chainID);
 
   const feeInfo = chain.fees?.fee_tokens[0];
@@ -256,7 +257,7 @@ export function getFee(chainID: string) {
   return amountNeeded;
 }
 
-export async function isLedger(walletClient: WalletClient, chainID: string) {
+export async function isLedger(walletClient: WalletClient, chainID: ChainId) {
   if (walletClient instanceof KeplrClient && window.keplr) {
     const key = await window.keplr.getKey(chainID);
     return key.isNanoLedger;
@@ -281,7 +282,7 @@ export async function isLedger(walletClient: WalletClient, chainID: string) {
   return false;
 }
 
-export function getExplorerLinkForTx(chainID: string, txHash: string) {
+export function getExplorerLinkForTx(chainID: ChainId, txHash: string) {
   const evmChain = EVM_CHAINS.find((c) => c.id === parseInt(chainID));
 
   if (evmChain) {
@@ -380,7 +381,7 @@ export async function signAmino(
   });
 }
 
-export async function getBalancesByChain(address: string, chainID: string) {
+export async function getBalancesByChain(address: string, chainID: ChainId) {
   const client = await getStargateClientForChainID(chainID);
 
   const balances = await client.getAllBalances(address);
@@ -438,7 +439,7 @@ async function getEvmChainBalances(
   skipClient: SkipRouter,
   publicClient: PublicClient,
   address: string,
-  chainID: string,
+  chainID: ChainId,
 ) {
   const assets = await skipClient.assets({
     chainID,
