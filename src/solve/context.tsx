@@ -12,8 +12,8 @@ import {
 
 export const SkipContext = createContext<
   | {
-      skipClient: SkipRouter;
-    }
+    skipClient: SkipRouter;
+  }
   | undefined
 >(undefined);
 
@@ -22,7 +22,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const { chains } = useNetwork();
 
   const skipClient = new SkipRouter({
-    apiURL: "https://solve-dev.skip.money",
+    apiURL: "https://solve.skip.money",
     getCosmosSigner: async (chainID) => {
       if (!walletClient) {
         throw new Error("No offline signer available");
