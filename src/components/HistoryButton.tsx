@@ -1,6 +1,8 @@
 import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
+import { disclosure } from "@/context/disclosures";
+
 import { HistoryIcon } from "./HistoryIcon";
 
 export const HistoryButton = ({
@@ -14,6 +16,7 @@ export const HistoryButton = ({
         "focus:outline-none transition-colors",
         className,
       )}
+      onClick={() => disclosure.open("historyDialog")}
       role="group"
       {...props}
     >
