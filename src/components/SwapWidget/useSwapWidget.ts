@@ -34,7 +34,11 @@ export function useSwapWidget() {
     }
   }, [formValues.amountIn, formValues.sourceAsset]);
 
-  const { data: routeResponse, fetchStatus: routeFetchStatus } = useRoute(
+  const {
+    data: routeResponse,
+    fetchStatus: routeFetchStatus,
+    isError: routeQueryIsError,
+  } = useRoute(
     amountInWei,
     formValues.sourceAsset?.denom,
     formValues.sourceAsset?.chainID,
@@ -135,6 +139,7 @@ export function useSwapWidget() {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    noRouteFound: routeQueryIsError,
   };
 }
 

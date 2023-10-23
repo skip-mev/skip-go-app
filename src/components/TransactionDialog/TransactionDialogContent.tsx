@@ -142,6 +142,7 @@ const TransactionDialogContent: FC<Props> = ({
       await skipRouter.executeRoute({
         route,
         userAddresses,
+        validateGasBalance: true,
         getCosmosSigner: async (chainID) => {
           const chain = chains.find((c) => c.chainID === chainID);
           if (!chain) {
