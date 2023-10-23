@@ -18,9 +18,8 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
 import MainLayout from "@/components/MainLayout";
-import { EVM_CHAINS } from "@/constants";
+import { EVM_CHAINS } from "@/constants/constants";
 import { AssetsProvider } from "@/context/assets";
-import { ChainsProvider } from "@/context/chains";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
@@ -69,18 +68,16 @@ export default function App({ Component, pageProps }: AppProps) {
           >
             <WagmiConfig config={wagmiConfig}>
               <SkipProvider>
-                <ChainsProvider>
-                  <AssetsProvider>
-                    <RadixToast.ToastProvider>
-                      <ToastProvider>
-                        <MainLayout>
-                          <Component {...pageProps} />
-                        </MainLayout>
-                      </ToastProvider>
-                      <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                    </RadixToast.ToastProvider>
-                  </AssetsProvider>
-                </ChainsProvider>
+                <AssetsProvider>
+                  <RadixToast.ToastProvider>
+                    <ToastProvider>
+                      <MainLayout>
+                        <Component {...pageProps} />
+                      </MainLayout>
+                    </ToastProvider>
+                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
+                  </RadixToast.ToastProvider>
+                </AssetsProvider>
               </SkipProvider>
             </WagmiConfig>
           </ChainProvider>

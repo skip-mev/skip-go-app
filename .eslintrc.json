@@ -3,7 +3,8 @@
     "next/core-web-vitals",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "prettier",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
   ],
   "plugins": ["@typescript-eslint", "prettier", "simple-import-sort"],
   "parser": "@typescript-eslint/parser",

@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
-import { Chain } from "@/context/chains";
+import { Chain } from "@/api/queries";
 import { chainNameToChainlistURL } from "@/cosmos";
 
 interface Props {
@@ -42,7 +42,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
         return true;
       }
 
-      return chain.prettyName.toLowerCase().includes(searchValue.toLowerCase());
+      return chain.chainName.toLowerCase().includes(searchValue.toLowerCase());
     });
   }, [chains, searchValue]);
 

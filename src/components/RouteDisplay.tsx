@@ -3,10 +3,26 @@ import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { SWAP_VENUES } from "@/config";
+import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
-import { Chain, useChains } from "@/context/chains";
 import { chainNameToChainlistURL } from "@/cosmos";
+
+export interface SwapVenueConfig {
+  name: string;
+  imageURL: string;
+}
+
+export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
+  "neutron-astroport": {
+    name: "Astroport",
+    imageURL: "https://avatars.githubusercontent.com/u/87135340",
+  },
+  "osmosis-poolmanager": {
+    name: "Osmosis",
+    imageURL:
+      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
+  },
+};
 
 interface TransferAction {
   type: "TRANSFER";
@@ -47,19 +63,17 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  const { chains } = useChains();
-
-  const sourceChain = chains.find(
-    (c) => c.chainID === action.sourceChain,
-  ) as Chain;
-
-  const destinationChain = chains.find(
-    (c) => c.chainID === action.destinationChain,
-  ) as Chain;
+  const { chain: sourceChain } = useChainByID(action.sourceChain);
+  const { chain: destinationChain } = useChainByID(action.destinationChain);
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, sourceChain.chainID);
+  const asset = getAsset(action.asset, action.sourceChain);
+
+  if (!sourceChain || !destinationChain) {
+    // this should be unreachable
+    return null;
+  }
 
   if (!asset) {
     return (
@@ -134,15 +148,11 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 };
 
 const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
-  const { chains } = useChains();
-
-  const chain = chains.find((c) => c.chainID === action.chain) as Chain;
-
   const { getAsset } = useAssets();
 
-  const assetIn = getAsset(action.sourceAsset, chain.chainID);
+  const assetIn = getAsset(action.sourceAsset, action.chain);
 
-  const assetOut = getAsset(action.destinationAsset, chain.chainID);
+  const assetOut = getAsset(action.destinationAsset, action.chain);
 
   const venue = SWAP_VENUES[action.venue];
 
@@ -253,7 +263,6 @@ interface Props {
 const RouteDisplay: FC<Props> = ({ route }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { chains } = useChains();
   const { getAsset } = useAssets();
 
   const sourceAsset = getAsset(
@@ -266,13 +275,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     route.destAssetChainID,
   );
 
-  const sourceChain = chains.find(
-    (c) => c.chainID === route.sourceAssetChainID,
-  ) as Chain;
-
-  const destinationChain = chains.find(
-    (c) => c.chainID === route.destAssetChainID,
-  ) as Chain;
+  const { chain: sourceChain } = useChainByID(route.sourceAssetChainID);
+  const { chain: destinationChain } = useChainByID(route.destAssetChainID);
 
   const amountIn = useMemo(() => {
     try {
@@ -380,7 +384,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             amount={amountIn}
             symbol={sourceAsset?.symbol ?? "UNKNOWN"}
             logo={sourceAsset?.logoURI ?? "UNKNOWN"}
-            chain={sourceChain.prettyName}
+            chain={sourceChain?.prettyName ?? ""}
           />
           {isExpanded && (
             <button
@@ -423,7 +427,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           amount={amountOut}
           symbol={destinationAsset?.symbol ?? "UNKNOWN"}
           logo={destinationAsset?.logoURI ?? "UNKNOWN"}
-          chain={destinationChain.prettyName}
+          chain={destinationChain?.prettyName ?? ""}
         />
       </div>
     </div>
