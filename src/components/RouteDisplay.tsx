@@ -263,7 +263,6 @@ interface Props {
 const RouteDisplay: FC<Props> = ({ route }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // const { chains } = useChains();
   const { getAsset } = useAssets();
 
   const sourceAsset = getAsset(

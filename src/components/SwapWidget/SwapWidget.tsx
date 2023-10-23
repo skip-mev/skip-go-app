@@ -16,7 +16,6 @@ import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
-  // const { chains } = useChains();
 
   const { chains } = useSkipChains();
 
@@ -51,8 +50,6 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
-
-  getExplorerLinkForTx("42161", "0x0000");
 
   return (
     <Fragment>
