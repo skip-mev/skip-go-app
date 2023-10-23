@@ -1,7 +1,7 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import { FC, Fragment } from "react";
 
-import { useChains } from "@/context/chains";
+import { useChains as useSkipChains } from "@/api/queries";
 import { useAccount } from "@/hooks/useAccount";
 
 import AssetInput from "../AssetInput";
@@ -15,7 +15,8 @@ import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
-  const { chains } = useChains();
+
+  const { chains } = useSkipChains();
 
   const {
     amountIn,
@@ -34,6 +35,7 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    noRouteFound,
   } = useSwapWidget();
 
   const { address, isWalletConnected, wallet } = useAccount(
@@ -88,7 +90,7 @@ export const SwapWidget: FC = () => {
               chain={sourceChain}
               onChainChange={onSourceChainChange}
               showBalance
-              chains={chains}
+              chains={chains ?? []}
             />
           </div>
           <div className="relative">
@@ -137,7 +139,7 @@ export const SwapWidget: FC = () => {
               onAssetChange={onDestinationAssetChange}
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
-              chains={chains}
+              chains={chains ?? []}
             />
           </div>
           {routeLoading && <RouteLoadingBanner />}
@@ -145,6 +147,11 @@ export const SwapWidget: FC = () => {
             <RouteTransactionCountBanner
               numberOfTransactions={numberOfTransactions}
             />
+          )}
+          {noRouteFound && (
+            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+              <p className="flex-1">No route found</p>
+            </div>
           )}
           {sourceChain && !isWalletConnected && (
             <button

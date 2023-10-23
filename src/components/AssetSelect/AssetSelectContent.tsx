@@ -35,6 +35,14 @@ const AssetSelectContent: FC<Props> = ({
 
   const sortedAssets = assets
     ?.sort((a, b) => {
+      if (!a.symbol) {
+        return 1;
+      }
+
+      if (!b.symbol) {
+        return -1;
+      }
+
       if (a.symbol > b.symbol) {
         return 1;
       }
@@ -58,7 +66,7 @@ const AssetSelectContent: FC<Props> = ({
   const filteredAssets = sortedAssets?.filter((asset) => {
     if (!searchValue) return true;
 
-    if (asset.symbol.toLowerCase().includes(searchValue.toLowerCase())) {
+    if (asset.symbol?.toLowerCase().includes(searchValue.toLowerCase())) {
       return true;
     }
 
@@ -122,7 +130,16 @@ const AssetSelectContent: FC<Props> = ({
               <div>
                 {balances[asset.denom] && (
                   <p className="font-medium text-sm text-neutral-400">
-                    {ethers.formatUnits(balances[asset.denom], asset.decimals)}
+                    {new Intl.NumberFormat("en-US", {
+                      maximumFractionDigits: 6,
+                    }).format(
+                      parseFloat(
+                        ethers.formatUnits(
+                          balances[asset.denom],
+                          asset.decimals,
+                        ),
+                      ),
+                    )}
                   </p>
                 )}
               </div>

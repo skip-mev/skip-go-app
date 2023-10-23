@@ -3,8 +3,8 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
-import { EVM_WALLET_LOGOS } from "@/constants";
-import { useChains } from "@/context/chains";
+import { useChainByID } from "@/api/queries";
+import { EVM_WALLET_LOGOS } from "@/constants/constants";
 import { DialogContent } from "@/elements/Dialog";
 import { getChainByID } from "@/utils/utils";
 
@@ -96,14 +96,13 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
 const WalletModalWithContext: FC = () => {
   const { connector: currentConnector } = useAccount();
   const { chainID } = useWalletModal();
-  const { chains } = useChains();
   const { disconnect } = useDisconnect();
   const { connectors, connect } = useConnect();
   const { getWalletRepo } = useManager();
 
   const { setIsOpen } = useWalletModal();
 
-  const chain = chains.find((chain) => chain.chainID === chainID);
+  const { chain } = useChainByID(chainID);
 
   if (!chain) {
     return null;

@@ -14,7 +14,6 @@ import { publicProvider } from "wagmi/providers/public";
 
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
-import { ChainsProvider } from "@/context/chains";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 
@@ -26,7 +25,7 @@ export const wagmiConfig = createConfig({
   publicClient,
 });
 
-const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
+export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Fragment>
       <QueryClientProvider client={queryClient}>
@@ -41,9 +40,7 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
           <WagmiConfig config={wagmiConfig}>
             <SkipProvider>
               <WalletModalProvider>
-                <ChainsProvider>
-                  <AssetsProvider>{children}</AssetsProvider>
-                </ChainsProvider>
+                <AssetsProvider>{children}</AssetsProvider>
               </WalletModalProvider>
             </SkipProvider>
           </WagmiConfig>

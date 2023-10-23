@@ -1,12 +1,12 @@
-import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
+import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { Chain, useChains } from "@/context/chains";
-import { useBalancesByChain } from "@/cosmos";
+import { useAccount } from "@/hooks/useAccount";
 import { useRoute } from "@/solve";
+import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
@@ -34,7 +34,11 @@ export function useSwapWidget() {
     }
   }, [formValues.amountIn, formValues.sourceAsset]);
 
-  const { data: routeResponse, fetchStatus: routeFetchStatus } = useRoute(
+  const {
+    data: routeResponse,
+    fetchStatus: routeFetchStatus,
+    isError: routeQueryIsError,
+  } = useRoute(
     amountInWei,
     formValues.sourceAsset?.denom,
     formValues.sourceAsset?.chainID,
@@ -60,22 +64,14 @@ export function useSwapWidget() {
       return "0.0";
     }
 
-    if (routeResponse.doesSwap && routeResponse.estimatedAmountOut) {
-      return ethers.formatUnits(
-        routeResponse.estimatedAmountOut,
-        formValues.destinationAsset?.decimals ?? 6,
-      );
-    }
+    return ethers.formatUnits(
+      routeResponse.amountOut,
+      formValues.destinationAsset?.decimals ?? 6,
+    );
+  }, [formValues.destinationAsset?.decimals, routeResponse]);
 
-    return formValues.amountIn;
-  }, [
-    formValues.amountIn,
-    formValues.destinationAsset?.decimals,
-    routeResponse,
-  ]);
-
-  const { address } = useChain(
-    formValues.sourceChain?.record?.name ?? "cosmoshub",
+  const { address } = useAccount(
+    formValues.sourceChain?.chainID ?? "cosmoshub-4",
   );
 
   const { data: balances } = useBalancesByChain(
@@ -143,6 +139,7 @@ export function useSwapWidget() {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    noRouteFound: routeQueryIsError,
   };
 }
 
@@ -172,12 +169,12 @@ function useFormValues() {
   // - If chainID exists in local storage, use that.
   // - Otherwise, default to cosmoshub-4.
   useEffect(() => {
-    if (!formValues.sourceChain && chains.length > 0) {
+    if (!formValues.sourceChain && (chains ?? []).length > 0) {
       const chainID =
         localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
       setFormValues((values) => ({
         ...values,
-        sourceChain: chains.find((chain) => chain.chainID === chainID),
+        sourceChain: (chains ?? []).find((chain) => chain.chainID === chainID),
       }));
     }
   }, [chains, formValues.sourceChain]);
@@ -267,7 +264,9 @@ function useFormValues() {
     // If destination asset is defined, but no destination chain, select chain based off asset.
     let destinationChain = formValues.destinationChain;
     if (!destinationChain) {
-      destinationChain = chains.find((c) => c.chainID === asset.chainID);
+      destinationChain = (chains ?? []).find(
+        (c) => c.chainID === asset.chainID,
+      );
     }
 
     // If destination asset is user selected, set flag to true.

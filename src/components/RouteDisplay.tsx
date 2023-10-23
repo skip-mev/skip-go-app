@@ -3,10 +3,26 @@ import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { SWAP_VENUES } from "@/config";
+import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
-import { Chain, useChains } from "@/context/chains";
 import { chainNameToChainlistURL } from "@/cosmos";
+
+export interface SwapVenueConfig {
+  name: string;
+  imageURL: string;
+}
+
+export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
+  "neutron-astroport": {
+    name: "Astroport",
+    imageURL: "https://avatars.githubusercontent.com/u/87135340",
+  },
+  "osmosis-poolmanager": {
+    name: "Osmosis",
+    imageURL:
+      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
+  },
+};
 
 interface TransferAction {
   type: "TRANSFER";
@@ -47,28 +63,26 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  const { chains } = useChains();
-
-  const sourceChain = chains.find(
-    (c) => c.chainID === action.sourceChain,
-  ) as Chain;
-
-  const destinationChain = chains.find(
-    (c) => c.chainID === action.destinationChain,
-  ) as Chain;
+  const { chain: sourceChain } = useChainByID(action.sourceChain);
+  const { chain: destinationChain } = useChainByID(action.destinationChain);
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, sourceChain.chainID);
+  const asset = getAsset(action.asset, action.sourceChain);
+
+  if (!sourceChain || !destinationChain) {
+    // this should be unreachable
+    return null;
+  }
 
   if (!asset) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-14 h-14 flex items-center justify-center">
+      <div className="flex items-center gap-2 justify-between">
+        <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
           <div className="w-2 h-2 bg-neutral-200 rounded-full" />
         </div>
-        <div>
-          <p className="text-sm text-neutral-500">
+        <div className="flex-1">
+          <p className="text-sm text-neutral-500 break-all max-w-full">
             Transfer to{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
@@ -88,7 +102,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-14 h-14 flex items-center justify-center">
+      <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
         <div className="w-2 h-2 bg-neutral-200 rounded-full" />
       </div>
       <div>
@@ -101,22 +115,28 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           />{" "}
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="inline-block w-4 h-4 -mt-1 rounded-full"
             src={`${chainNameToChainlistURL(
               sourceChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
+            onError={(e) =>
+              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
+            }
           />{" "}
           <span className="font-semibold text-black">
             {sourceChain.prettyName}
           </span>{" "}
           to{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="inline-block w-4 h-4 -mt-1 rounded-full"
             src={`${chainNameToChainlistURL(
               destinationChain.chainName,
             )}/chainImg/_chainImg.svg`}
             alt=""
+            onError={(e) =>
+              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
+            }
           />{" "}
           <span className="font-semibold text-black">
             {destinationChain.prettyName}
@@ -128,15 +148,11 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 };
 
 const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
-  const { chains } = useChains();
-
-  const chain = chains.find((c) => c.chainID === action.chain) as Chain;
-
   const { getAsset } = useAssets();
 
-  const assetIn = getAsset(action.sourceAsset, chain.chainID);
+  const assetIn = getAsset(action.sourceAsset, action.chain);
 
-  const assetOut = getAsset(action.destinationAsset, chain.chainID);
+  const assetOut = getAsset(action.destinationAsset, action.chain);
 
   const venue = SWAP_VENUES[action.venue];
 
@@ -150,16 +166,24 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
           <p className="text-sm text-neutral-500">
             Swap to{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
-              src={assetOut.logoURI}
               alt=""
+              className="inline-block w-4 h-4 -mt-1"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://api.dicebear.com/6.x/shapes/svg")
+              }
+              src={assetOut.logoURI}
             />{" "}
             <span className="font-semibold text-black">{assetOut.symbol}</span>{" "}
             on{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
-              src={venue.imageURL}
               alt=""
+              className="inline-block w-4 h-4 -mt-1"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://api.dicebear.com/6.x/shapes/svg")
+              }
+              src={venue.imageURL}
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
@@ -239,7 +263,6 @@ interface Props {
 const RouteDisplay: FC<Props> = ({ route }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { chains } = useChains();
   const { getAsset } = useAssets();
 
   const sourceAsset = getAsset(
@@ -252,13 +275,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     route.destAssetChainID,
   );
 
-  const sourceChain = chains.find(
-    (c) => c.chainID === route.sourceAssetChainID,
-  ) as Chain;
-
-  const destinationChain = chains.find(
-    (c) => c.chainID === route.destAssetChainID,
-  ) as Chain;
+  const { chain: sourceChain } = useChainByID(route.sourceAssetChainID);
+  const { chain: destinationChain } = useChainByID(route.destAssetChainID);
 
   const amountIn = useMemo(() => {
     try {
@@ -308,7 +326,15 @@ const RouteDisplay: FC<Props> = ({ route }) => {
       }
 
       if ("axelarTransfer" in operation) {
-        // TODO: Implement
+        _actions.push({
+          type: "TRANSFER",
+          asset,
+          sourceChain: operation.axelarTransfer.fromChainID,
+          destinationChain: operation.axelarTransfer.toChainID,
+        });
+
+        asset = operation.axelarTransfer.asset;
+
         return;
       }
 
@@ -358,7 +384,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             amount={amountIn}
             symbol={sourceAsset?.symbol ?? "UNKNOWN"}
             logo={sourceAsset?.logoURI ?? "UNKNOWN"}
-            chain={sourceChain.prettyName}
+            chain={sourceChain?.prettyName ?? ""}
           />
           {isExpanded && (
             <button
@@ -401,7 +427,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           amount={amountOut}
           symbol={destinationAsset?.symbol ?? "UNKNOWN"}
           logo={destinationAsset?.logoURI ?? "UNKNOWN"}
-          chain={destinationChain.prettyName}
+          chain={destinationChain?.prettyName ?? ""}
         />
       </div>
     </div>
