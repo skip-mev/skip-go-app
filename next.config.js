@@ -21,6 +21,17 @@ const nextConfig = {
           "@buf/cosmos_cosmos-sdk.bufbuild_es",
           "@buf/evmos_evmos.bufbuild_es",
           "@buf/cosmos_ibc.bufbuild_es",
+          "wagmi",
+          "@tanstack/query-sync-storage-persister",
+          "@tanstack/react-query",
+          "@tanstack/query-core",
+          "@tanstack/react-query-persist-client",
+          "@tanstack/query-persist-client-core",
+          "@wagmi/core",
+          "@wagmi/connectors",
+          "viem",
+          "abitype",
+          "uuid",
         ]
       : [],
 };

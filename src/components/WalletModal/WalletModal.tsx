@@ -1,7 +1,10 @@
 import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC } from "react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
+import { useChainByID } from "@/api/queries";
+import { EVM_WALLET_LOGOS } from "@/constants/constants";
 import { DialogContent } from "@/elements/Dialog";
 import { getChainByID } from "@/utils/utils";
 
@@ -31,18 +34,16 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
 
   return (
     <div>
-      <div className="py-5 px-4 relative">
-        <div className="py-5 px-4 relative">
-          <p className="text-center font-bold">Wallets</p>
-          <div className="absolute inset-y-0 flex items-center">
-            <button
-              aria-label="Close wallet modal"
-              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-              onClick={onClose}
-            >
-              <ArrowLeftIcon className="w-5 h-5" />
-            </button>
-          </div>
+      <div className="py-6 px-4 relative">
+        <p className="text-center font-bold">Wallets</p>
+        <div className="absolute inset-y-0 flex items-center">
+          <button
+            aria-label="Close wallet modal"
+            className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            onClick={onClose}
+          >
+            <ArrowLeftIcon className="w-5 h-5" />
+          </button>
         </div>
       </div>
       <div className="px-4 py-2 space-y-2">
@@ -92,20 +93,64 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
   );
 };
 
-const WalletModalWithContext: FC<{ chainID: string }> = ({ chainID }) => {
-  const { setIsOpen } = useWalletModal();
-  const chainName = getChainByID(chainID).chain_name;
-
+const WalletModalWithContext: FC = () => {
+  const { connector: currentConnector } = useAccount();
+  const { chainID } = useWalletModal();
+  const { disconnect } = useDisconnect();
+  const { connectors, connect } = useConnect();
   const { getWalletRepo } = useManager();
 
-  const walletRepo = getWalletRepo(chainName);
+  const { setIsOpen } = useWalletModal();
+
+  const { chain } = useChainByID(chainID);
+
+  if (!chain) {
+    return null;
+  }
+
+  const { chainType } = chain;
+
+  let wallets: MinimalWallet[] = [];
+
+  if (chainType === "cosmos") {
+    const chainName = getChainByID(chainID).chain_name;
+
+    const walletRepo = getWalletRepo(chainName);
+
+    wallets = walletRepo.wallets;
+  }
+
+  if (chainType === "evm") {
+    for (const connector of connectors) {
+      if (
+        wallets.findIndex((wallet) => wallet.walletName === connector.id) !== -1
+      ) {
+        continue;
+      }
+
+      const minimalWallet: MinimalWallet = {
+        walletName: connector.id,
+        walletPrettyName:
+          connector.id === "injected" ? "Browser Wallet" : connector.name,
+        walletInfo: {
+          logo: EVM_WALLET_LOGOS[connector.id],
+        },
+        connect: async () => {
+          await connect({ connector });
+        },
+        disconnect: async () => {
+          await disconnect();
+        },
+        isWalletConnected: connector.id === currentConnector?.id,
+      };
+
+      wallets.push(minimalWallet);
+    }
+  }
 
   return (
     <DialogContent>
-      <WalletModal
-        wallets={walletRepo.wallets}
-        onClose={() => setIsOpen(false)}
-      />
+      <WalletModal wallets={wallets} onClose={() => setIsOpen(false)} />
     </DialogContent>
   );
 };

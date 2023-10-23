@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "node ./scripts/generate.js",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
@@ -39,7 +40,7 @@
     "@radix-ui/react-dialog": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.4",
     "@radix-ui/react-tooltip": "^1.0.6",
-    "@skip-router/core": "^0.0.7",
+    "@skip-router/core": "^0.1.0-rc13",
     "@tanstack/react-query": "^4.29.5",
     "@types/node": "20.1.2",
     "@types/react": "18.2.6",
@@ -63,10 +64,13 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwindcss": "3.3.2",
-    "usehooks-ts": "^2.9.1"
+    "usehooks-ts": "^2.9.1",
+    "viem": "^1.14.0",
+    "wagmi": "^1.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.38.0",
+    "@tanstack/eslint-plugin-query": "^4.36.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
