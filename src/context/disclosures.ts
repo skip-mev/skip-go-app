@@ -9,10 +9,14 @@ const defaultValues = {
   // txDialog: false,
 };
 
-export type DisclosureStore = typeof defaultValues;
-export type DisclosureKey = keyof DisclosureStore;
+export type DisclosureStore = typeof defaultValues & {
+  json?: { title?: string; data: unknown };
+};
+export type DisclosureKey = keyof typeof defaultValues;
 
-const disclosureStore = create(() => ({ ...defaultValues }));
+const disclosureStore = create<DisclosureStore>(() => ({
+  ...defaultValues,
+}));
 
 export const disclosure = {
   open: (key: DisclosureKey, { closeAll = false } = {}) => {
@@ -21,8 +25,14 @@ export const disclosure = {
       [key]: true,
     });
   },
+  openJson: (json: NonNullable<DisclosureStore["json"]>) => {
+    disclosureStore.setState({ json });
+  },
   close: (key: DisclosureKey) => {
     disclosureStore.setState({ [key]: false });
+  },
+  closeJson: () => {
+    disclosureStore.setState({ json: undefined });
   },
   toggle: (key: DisclosureKey) => {
     disclosureStore.setState((state) => ({ [key]: !state[key] }));
@@ -38,6 +48,19 @@ export const useDisclosureKey = (key: DisclosureKey) => {
     open: ({ closeAll = false } = {}) => disclosure.open(key, { closeAll }),
     close: () => disclosure.close(key),
     toggle: () => disclosure.toggle(key),
+  };
+  return [state, actions] as const;
+};
+
+export const useJsonDisclosure = () => {
+  const state = disclosureStore((state) => state.json);
+  const actions = {
+    open: (json: NonNullable<DisclosureStore["json"]>) => {
+      disclosureStore.setState({ json });
+    },
+    close: () => {
+      disclosureStore.setState({ json: undefined });
+    },
   };
   return [state, actions] as const;
 };
