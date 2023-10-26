@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import { forwardRef } from "react";
+import { forwardRef, Fragment } from "react";
 
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
@@ -45,7 +45,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
     return (
       <Accordion.Item
         className={clsx(
-          "px-4 py-2",
+          "p-1",
           "border border-neutral-200 rounded-lg",
           className,
         )}
@@ -53,13 +53,18 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
         {...rest}
         ref={ref}
       >
-        <Accordion.Header className="flex flex-col items-stretch space-y-2 relative">
+        <Accordion.Header
+          className={clsx(
+            "flex flex-col items-stretch space-y-2 relative",
+            "rounded-md hover:bg-gray-100 p-2 transition-colors",
+          )}
+        >
           <div className="flex items-center space-x-4 text-start">
             <time className="uppercase text-center text-sm opacity-60 tabular-nums">
               <RenderDate date={data.timestamp} />
             </time>
             <div className="flex-grow">
-              <div className="font-medium flex items-center space-x-1">
+              <div className="font-medium text-sm flex items-center space-x-1">
                 <ChainSymbol chainId={data.route.sourceAssetChainID} />
                 <ArrowRightIcon className="w-4 h-4" />
                 <ChainSymbol chainId={data.route.destAssetChainID} />
@@ -93,25 +98,47 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
 
           <Accordion.Trigger
             className={clsx(
-              "flex items-center text-xs text-black/60 justify-center self-center outline-none",
-              "hover:underline",
-              "HistoryListTrigger",
+              "flex items-center text-xs text-black/60 justify-center self-center outline-none group",
+              "HistoryListTrigger hover:underline",
+              "before:absolute before:content-[''] before:inset-0",
             )}
           >
             <span className="HistoryListTriggerText" />
-            <ChevronDownIcon className="w-4 h-4" />
+            <ChevronDownIcon
+              className={clsx(
+                "w-4 h-4",
+                "transition-transform group-data-[state=open]:rotate-180",
+              )}
+              aria-hidden
+            />
           </Accordion.Trigger>
         </Accordion.Header>
 
-        <Accordion.Content className="overflow-hidden space-y-2">
+        <Accordion.Content
+          className={clsx(
+            "overflow-hidden space-y-2",
+            "data-[state=open]:animate-accordion-open",
+            "data-[state=closed]:animate-accordion-closed",
+          )}
+        >
           <DescriptionList.Root className="pt-2">
+            <DescriptionList.Row>
+              <DescriptionList.Dt>Chain Route</DescriptionList.Dt>
+              <DescriptionList.Dd className="flex flex-wrap items-center space-x-1">
+                {data.route.chainIDs.map((chainId, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && <ArrowRightIcon className="w-4 h-4" />}
+                    <ChainSymbol chainId={chainId} />
+                  </Fragment>
+                ))}
+              </DescriptionList.Dd>
+            </DescriptionList.Row>
             {data.txStatus.map((stat, i) => (
               <DescriptionList.Row key={i}>
                 <DescriptionList.Dt className="tabular-nums">
                   Transaction {i + 1}
                 </DescriptionList.Dt>
                 <DescriptionList.Dd>
-                  <ChainSymbol chainId={stat.chainId} />
                   <a
                     href={stat.explorerLink}
                     target="_blank"

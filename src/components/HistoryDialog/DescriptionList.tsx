@@ -8,9 +8,7 @@ export const Root = ({ className, ...props }: ComponentProps<"dl">) => {
 };
 
 export const Row = ({ className, ...props }: ComponentProps<"div">) => {
-  return (
-    <div className={clsx("grid grid-cols-4 py-1", className)} {...props} />
-  );
+  return <div className={clsx("grid grid-cols-4 p-2", className)} {...props} />;
 };
 
 export const Dt = ({ className, ...props }: ComponentProps<"dt">) => {
