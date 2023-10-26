@@ -1,5 +1,7 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { useMemo } from "react";
 
+import { useAssets } from "@/context/assets";
 import { useDisclosureKey } from "@/context/disclosures";
 import { useTxHistory } from "@/context/tx-history";
 
@@ -10,6 +12,11 @@ export const HistoryDialog = () => {
   const [isOpen, { close }] = useDisclosureKey("historyDialog");
 
   const history = useTxHistory();
+  const { isReady } = useAssets();
+
+  const entries = useMemo(() => {
+    return isReady ? Object.entries(history) : undefined;
+  }, [history, isReady]);
 
   if (!isOpen) return null;
 
@@ -28,14 +35,19 @@ export const HistoryDialog = () => {
           <HistoryClearButton />
         </div>
         <HistoryList.Root>
-          {Object.entries(history).length < 1 && (
+          {entries && entries.length < 1 && (
             <span className="text-center text-sm opacity-60 p-2">
               No recent transactions.
             </span>
           )}
-          {Object.entries(history).map(([id, data]) => (
+          {entries?.map(([id, data]) => (
             <HistoryList.Item key={id} id={id} data={data} />
           ))}
+          {!isReady && (
+            <div className="text-center p-4 opacity-60">
+              Loading transaction history...
+            </div>
+          )}
         </HistoryList.Root>
       </div>
     </div>
