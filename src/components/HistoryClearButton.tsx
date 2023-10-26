@@ -3,9 +3,15 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
+import { clearTxHistory, useTxHistory } from "@/context/tx-history";
+
 type Props = ComponentProps<"button">;
 
 export const HistoryClearButton = ({ className, ...props }: Props) => {
+  const hasHistory = useTxHistory((state) => Object.keys(state).length > 0);
+
+  if (!hasHistory) return null;
+
   return (
     <Tooltip.Provider delayDuration={0}>
       <Tooltip.Root>
@@ -19,6 +25,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
               "transition-colors focus:outline-none",
               className,
             )}
+            onClick={() => clearTxHistory()}
             {...props}
           >
             <TrashIcon className="w-4 h-4" />
