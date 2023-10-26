@@ -7,6 +7,7 @@ import { useAccount } from "@/hooks/useAccount";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
 import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
+import { HistoryButton } from "../HistoryButton";
 import { JsonDialog } from "../JsonDialog";
 import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
@@ -56,8 +57,10 @@ export const SwapWidget: FC = () => {
     <Fragment>
       <div>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <p className="font-semibold text-2xl">From</p>
+            <div className="flex-grow" />
+            <HistoryButton />
             {address && wallet && isWalletConnected ? (
               <ConnectedWalletButton
                 address={address}
