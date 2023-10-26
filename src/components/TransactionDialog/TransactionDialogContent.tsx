@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
 import { useToast } from "@/context/toast";
+import { addTxHistory, addTxStatus, failTxHistory } from "@/context/tx-history";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
 import {
@@ -101,6 +102,8 @@ const TransactionDialogContent: FC<Props> = ({
   const onSubmit = async () => {
     setTransacting(true);
 
+    const [historyId] = addTxHistory({ route });
+
     try {
       const userAddresses: Record<string, string> = {};
       const addressList = [];
@@ -165,6 +168,12 @@ const TransactionDialogContent: FC<Props> = ({
             txStatus.txHash,
           );
 
+          addTxStatus(historyId, {
+            chainId: txStatus.chainID,
+            txHash: txStatus.txHash,
+            explorerLink: explorerLink || "#",
+          });
+
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
 
@@ -196,6 +205,7 @@ const TransactionDialogContent: FC<Props> = ({
         setTxError(err.message);
         setIsError(true);
       }
+      failTxHistory(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
