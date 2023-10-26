@@ -19,6 +19,7 @@ import { ChainsProvider } from "@/context/chains";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
+import { dydxChainRegistryEntry } from "@/utils/utils";
 
 export default function App({ Component, pageProps }: AppProps) {
   chains.push({
@@ -170,6 +171,8 @@ export default function App({ Component, pageProps }: AppProps) {
     ...leapWallets,
     ...metamaskWallets,
   ];
+
+  chains.push(JSON.parse(dydxChainRegistryEntry));
 
   return (
     <>
