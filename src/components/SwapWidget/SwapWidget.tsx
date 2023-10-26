@@ -7,6 +7,7 @@ import { useAccount } from "@/hooks/useAccount";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
 import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
+import { JsonDialog } from "../JsonDialog";
 import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
 import TransactionDialog from "../TransactionDialog";
@@ -178,6 +179,7 @@ export const SwapWidget: FC = () => {
             </div>
           )}
         </div>
+        <JsonDialog />
       </div>
       <WalletModal />
     </Fragment>
