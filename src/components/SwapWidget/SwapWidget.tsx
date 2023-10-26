@@ -183,7 +183,7 @@ export const SwapWidget: FC = () => {
             </div>
           )}
         </div>
-        <HistoryDialog route={route} />
+        <HistoryDialog />
         <JsonDialog />
       </div>
       <WalletModal />
