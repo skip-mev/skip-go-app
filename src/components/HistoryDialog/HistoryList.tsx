@@ -114,6 +114,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
                   <ChainSymbol chainId={stat.chainId} />
                   <a
                     href={stat.explorerLink}
+                    target="_blank"
                     className="flex items-center space-x-1 hover:underline"
                   >
                     <span className="truncate tabular-nums">{stat.txHash}</span>
