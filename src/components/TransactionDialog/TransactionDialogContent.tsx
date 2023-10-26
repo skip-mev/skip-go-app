@@ -6,7 +6,11 @@ import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
 import { useToast } from "@/context/toast";
-import { addTxHistory, addTxStatus, failTxHistory } from "@/context/tx-history";
+import {
+  addTxHistory,
+  addTxStatus,
+  removeTxHistory,
+} from "@/context/tx-history";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
 import {
@@ -205,7 +209,7 @@ const TransactionDialogContent: FC<Props> = ({
         setTxError(err.message);
         setIsError(true);
       }
-      failTxHistory(historyId);
+      removeTxHistory(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
