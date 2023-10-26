@@ -8,6 +8,7 @@ import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
 import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
 import { HistoryButton } from "../HistoryButton";
+import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
 import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
@@ -182,6 +183,7 @@ export const SwapWidget: FC = () => {
             </div>
           )}
         </div>
+        <HistoryDialog route={route} />
         <JsonDialog />
       </div>
       <WalletModal />
