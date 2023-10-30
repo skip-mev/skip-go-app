@@ -21,6 +21,10 @@ function proxyHandler(req: NextApiRequest, res: NextApiResponse) {
 
     proxy.once("error", reject);
 
+    proxy.on("proxyRes", (proxyRes) => {
+      proxyRes.headers["access-control-allow-origin"] = "*";
+    });
+
     proxy.web(req, res, {
       target: rpcURL,
       autoRewrite: false,
