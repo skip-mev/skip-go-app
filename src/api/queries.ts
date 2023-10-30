@@ -1,4 +1,3 @@
-import { Chain as ChainType } from "@graz-sh/types";
 import { Chain as SkipChain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 
@@ -7,7 +6,7 @@ import { useSkipClient } from "@/solve";
 
 export type Chain = {
   prettyName: string;
-  record?: ChainType;
+  record?: (typeof chainRecord)[string];
 } & SkipChain;
 
 export type UseChainsQueryArgs<T = Chain[]> = {
