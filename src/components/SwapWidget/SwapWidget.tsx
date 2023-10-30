@@ -163,6 +163,23 @@ export const SwapWidget: FC = () => {
               numberOfTransactions={numberOfTransactions}
             />
           )}
+          {destinationChain?.chainID === "dydx-mainnet-1" ? (
+            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+              <p className="flex-1">
+                This transaction will let you transfer and stake tokens on dydx,
+                it will not allow you to trade. Follow the{" "}
+                <a
+                  href="https://dydx.exchange/"
+                  className="underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  dydx frontend
+                </a>{" "}
+                directions to set up a trading account
+              </p>
+            </div>
+          ) : null}
           {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
