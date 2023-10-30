@@ -7,7 +7,7 @@ import {
   render,
   RenderOptions,
 } from "@testing-library/react";
-import React, { FC, Fragment, PropsWithChildren } from "react";
+import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
 import { configureChains, createConfig, mainnet, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -25,8 +25,10 @@ export const wagmiConfig = createConfig({
   publicClient,
 });
 
-const assets = getAssetLists();
-const chains = getChains();
+type ChainProviderProps = ComponentProps<typeof ChainProvider>;
+
+const assets = getAssetLists() as ChainProviderProps["assetLists"];
+const chains = getChains() as ChainProviderProps["chains"];
 
 export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
