@@ -47,9 +47,7 @@ const TransactionDialogContent: FC<Props> = ({
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { toast } = useToast();
-  const { chains: skipChains } = useChains();
-
-  const chains = skipChains ?? [];
+  const { chains = [] } = useChains();
 
   const skipRouter = useSkipClient();
   const { address: evmAddress } = useAccount();
