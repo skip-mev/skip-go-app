@@ -2,7 +2,7 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
@@ -218,6 +218,12 @@ const TransactionDialogContent: FC<Props> = ({
     }
   };
 
+  const isSourceEvm = useMemo(() => {
+    const [sourceChainID] = route.chainIDs;
+    const chain = chains.find(({ chainID }) => chainID === sourceChainID);
+    return chain?.chainType === "evm";
+  }, [chains, route.chainIDs]);
+
   return (
     <Fragment>
       <div className="flex flex-col h-full px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
@@ -340,35 +346,24 @@ const TransactionDialogContent: FC<Props> = ({
             </p>
           )}
         </div>
-        {route.chainIDs.length > 1 && (
-          <AlertCollapse.Root>
+        {isSourceEvm && (
+          <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
-              Execution Time Depends on IBC Relaying
+              EVM Bridging Finality Time ~30 Minutes
             </AlertCollapse.Trigger>
             <AlertCollapse.Content>
-              <p>This swap contains at least one IBC transfer.</p>
               <p>
-                IBC transfers usually take 10-30 seconds, depending on block
-                times + how quickly relayers ferry packets. But relayers
-                frequently crash or fail to relay packets for hours or days on
-                some chains (especially chains with low IBC volume).
-              </p>
-              <p>
-                At this time, the Skip API does not relay packets itself, so
-                your swap/transfer may hang in an incomplete state. If this
-                happens, your funds are stuck, not lost. They will be returned
-                to you once a relayer comes back online and informs the source
-                chain that the packet has timed out. Timeouts are set to 5
-                minutes but relayers may take longer to come online and process
-                the timeout.
-              </p>
-              <p>
-                In the medium term, we are working to rectify this by adding
-                packet tracking + relaying into the API. In the long term,
-                we&apos;re working to build better incentives for relaying, so
-                relayers don&apos;t need to run as charities. (Relayers do not
-                receive fees or payment of any kind today and subsidize gas for
-                users cross-chain)
+                This swap contains at least one EVM chain, so it might take
+                longer. Read more about{" "}
+                <a
+                  href={HREF_COMMON_FINALITY_TIMES}
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  common finality times
+                </a>
+                .
               </p>
             </AlertCollapse.Content>
           </AlertCollapse.Root>
@@ -378,5 +373,7 @@ const TransactionDialogContent: FC<Props> = ({
     </Fragment>
   );
 };
+
+const HREF_COMMON_FINALITY_TIMES = `https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions`;
 
 export default TransactionDialogContent;
