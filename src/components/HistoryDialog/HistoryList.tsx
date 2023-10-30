@@ -7,8 +7,9 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import { forwardRef, Fragment } from "react";
+import { forwardRef, Fragment, useMemo } from "react";
 
+import { useChains } from "@/api/queries";
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
 
@@ -41,6 +42,14 @@ type ItemProps = Omit<Accordion.AccordionItemProps, "value"> & {
 export const Item = forwardRef<HTMLDivElement, ItemProps>(
   function Item(props, ref) {
     const { id, data, className, ...rest } = props;
+
+    const { chains = [] } = useChains();
+
+    const isSourceEvm = useMemo(() => {
+      const [sourceChainID] = data.route.chainIDs;
+      const chain = chains.find(({ chainID }) => chainID === sourceChainID);
+      return chain?.chainType === "evm";
+    }, [chains, data.route.chainIDs]);
 
     return (
       <Accordion.Item
@@ -154,6 +163,12 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
                 </DescriptionList.Dd>
               </DescriptionList.Row>
             ))}
+            <DescriptionList.Row>
+              <DescriptionList.Dt>Completion Time</DescriptionList.Dt>
+              <DescriptionList.Dd>
+                ~{isSourceEvm ? 30 : 2} minutes
+              </DescriptionList.Dd>
+            </DescriptionList.Row>
           </DescriptionList.Root>
           <div className="flex space-x-1">
             <button
