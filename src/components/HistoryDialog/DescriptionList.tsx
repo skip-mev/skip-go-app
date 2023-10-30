@@ -8,7 +8,7 @@ export const Root = ({ className, ...props }: ComponentProps<"dl">) => {
 };
 
 export const Row = ({ className, ...props }: ComponentProps<"div">) => {
-  return <div className={clsx("grid grid-cols-4 p-2", className)} {...props} />;
+  return <div className={clsx("grid grid-cols-3 p-2", className)} {...props} />;
 };
 
 export const Dt = ({ className, ...props }: ComponentProps<"dt">) => {
@@ -21,5 +21,5 @@ export const Dt = ({ className, ...props }: ComponentProps<"dt">) => {
 };
 
 export const Dd = ({ className, ...props }: ComponentProps<"dd">) => {
-  return <dd className={clsx("col-span-3", className)} {...props} />;
+  return <dd className={clsx("col-span-2", className)} {...props} />;
 };
