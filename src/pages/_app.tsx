@@ -11,6 +11,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
 import Head from "next/head";
+import { ComponentProps } from "react";
 import { WagmiConfig } from "wagmi";
 import { configureChains, createConfig } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
@@ -45,8 +46,10 @@ const wallets = [
   ...metamaskWallets,
 ];
 
-const assets = getAssetLists();
-const chains = getChains();
+type ChainProviderProps = ComponentProps<typeof ChainProvider>;
+
+const assets = getAssetLists() as ChainProviderProps["assetLists"];
+const chains = getChains() as ChainProviderProps["chains"];
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
