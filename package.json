@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postinstall": "node ./scripts/generate.js",
+    "postinstall": "tsx ./src/scripts/codegen.ts",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
@@ -51,7 +51,6 @@
     "@web3modal/ui": "^2.7.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
-    "chain-registry": "^1.18.0",
     "classnames": "^2.3.2",
     "clsx": "^2.0.0",
     "cosmjs-types": "^0.7.2",

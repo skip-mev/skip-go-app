@@ -9,7 +9,6 @@ import { ChainProvider } from "@cosmos-kit/react";
 import * as RadixToast from "@radix-ui/react-toast";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
-import { assets, chains } from "chain-registry";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { WagmiConfig } from "wagmi";
@@ -17,6 +16,7 @@ import { configureChains, createConfig } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
+import { getAssetLists, getChains } from "@/chains";
 import MainLayout from "@/components/MainLayout";
 import { EVM_CHAINS } from "@/constants/constants";
 import { AssetsProvider } from "@/context/assets";
@@ -28,7 +28,7 @@ const { publicClient, chains: evmChains } = configureChains(EVM_CHAINS, [
   publicProvider(),
 ]);
 
-export const wagmiConfig = createConfig({
+const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({
@@ -38,14 +38,17 @@ export const wagmiConfig = createConfig({
   publicClient,
 });
 
-export default function App({ Component, pageProps }: AppProps) {
-  const wallets = [
-    ...keplrWallets,
-    ...cosmostationWallets,
-    ...leapWallets,
-    ...metamaskWallets,
-  ];
+const wallets = [
+  ...keplrWallets,
+  ...cosmostationWallets,
+  ...leapWallets,
+  ...metamaskWallets,
+];
 
+const assets = getAssetLists();
+const chains = getChains();
+
+export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>

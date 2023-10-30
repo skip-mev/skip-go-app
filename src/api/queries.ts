@@ -1,12 +1,13 @@
+import { Chain as ChainType } from "@graz-sh/types";
 import { Chain as SkipChain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import * as chainRegistry from "chain-registry";
 
+import { chainRecord } from "@/chains";
 import { useSkipClient } from "@/solve";
 
 export type Chain = {
   prettyName: string;
-  record?: (typeof chainRegistry.chains)[number];
+  record?: ChainType;
 } & SkipChain;
 
 export type UseChainsQueryArgs<T = Chain[]> = {
@@ -26,11 +27,8 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
       });
 
       return chains
-        .map((chain) => {
-          const record = chainRegistry.chains.find(
-            (c) => c.chain_id === chain.chainID,
-          );
-
+        .map((chain): Chain => {
+          const record = chainRecord[chain.chainID];
           return {
             ...chain,
             prettyName: record?.pretty_name ?? chain.chainName,
