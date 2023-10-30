@@ -7,11 +7,11 @@ import {
   render,
   RenderOptions,
 } from "@testing-library/react";
-import { assets, chains } from "chain-registry";
-import React, { FC, Fragment, PropsWithChildren } from "react";
+import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
 import { configureChains, createConfig, mainnet, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 
+import { getAssetLists, getChains } from "@/chains";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
 import { SkipProvider } from "@/solve";
@@ -24,6 +24,11 @@ export const wagmiConfig = createConfig({
   connectors: [],
   publicClient,
 });
+
+type ChainProviderProps = ComponentProps<typeof ChainProvider>;
+
+const assets = getAssetLists() as ChainProviderProps["assetLists"];
+const chains = getChains() as ChainProviderProps["chains"];
 
 export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
