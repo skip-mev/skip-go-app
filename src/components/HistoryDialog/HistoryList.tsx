@@ -46,7 +46,9 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
       <Accordion.Item
         className={clsx(
           "p-1",
-          "border border-neutral-200 rounded-lg",
+          "border border-neutral-200 rounded-lg transition-all",
+          "data-[state=open]:shadow-md",
+          "data-[state=open]:p-2 data-[state=open]:-mx-1",
           className,
         )}
         value={id}
@@ -142,10 +144,12 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
                   <a
                     href={stat.explorerLink}
                     target="_blank"
-                    className="flex items-center space-x-1 hover:underline"
+                    className="flex items-center space-x-px hover:underline"
                   >
-                    <span className="truncate tabular-nums">{stat.txHash}</span>
-                    <ArrowTopRightOnSquareIcon className="w-6 h-6" />
+                    <span className="truncate tabular-nums max-w-[24ch]">
+                      {stat.txHash}
+                    </span>
+                    <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                   </a>
                 </DescriptionList.Dd>
               </DescriptionList.Row>
