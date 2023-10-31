@@ -34,14 +34,13 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
 import { Chain } from "@/api/queries";
-import { ChainId } from "@/chains/chainIds";
-import chainRecord from "@/chains/chainRecord";
+import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
 import { EVM_CHAINS } from "@/constants/constants";
 import { useSkipClient } from "@/solve";
 
 export function getChainByID(chainID: ChainId) {
-  return chainRecord[chainID];
+  return getChain(chainID);
 }
 
 // cache clients to reuse later

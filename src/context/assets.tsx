@@ -22,6 +22,7 @@ interface AssetsContext {
   getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
   getFeeDenom(chainID: string): AssetWithMetadata | undefined;
   getNativeAssets(): AssetWithMetadata[];
+  isReady: boolean;
 }
 
 export const AssetsContext = createContext<AssetsContext>({
@@ -30,6 +31,7 @@ export const AssetsContext = createContext<AssetsContext>({
   getAsset: () => undefined,
   getFeeDenom: () => undefined,
   getNativeAssets: () => [],
+  isReady: false,
 });
 
 function getAssetSymbol(
@@ -108,6 +110,8 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     return nativeAssets;
   }
 
+  const isReady = useMemo(() => Object.keys(assets).length > 0, [assets]);
+
   return (
     <AssetsContext.Provider
       value={{
@@ -116,6 +120,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
         getAsset,
         getFeeDenom,
         getNativeAssets,
+        isReady,
       }}
     >
       {children}

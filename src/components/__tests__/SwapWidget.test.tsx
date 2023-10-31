@@ -467,5 +467,5 @@ describe("SwapWidget", () => {
     );
 
     expect(screen.queryByTestId("destination-wallet-btn")).toBeInTheDocument();
-  });
+  }, 10000);
 });

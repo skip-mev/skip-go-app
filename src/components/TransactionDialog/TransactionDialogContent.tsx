@@ -1,11 +1,17 @@
 import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
-import { FC, Fragment, useEffect, useRef, useState } from "react";
+import { clsx } from "clsx";
+import { FC, Fragment, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
 import { useToast } from "@/context/toast";
+import {
+  addTxHistory,
+  addTxStatus,
+  removeTxHistory,
+} from "@/context/tx-history";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
 import {
@@ -18,6 +24,7 @@ import {
 } from "@/utils/utils";
 
 import RouteDisplay from "../RouteDisplay";
+import * as AlertCollapse from "./AlertCollapse";
 
 interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
@@ -40,9 +47,7 @@ const TransactionDialogContent: FC<Props> = ({
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { toast } = useToast();
-  const { chains: skipChains } = useChains();
-
-  const chains = skipChains ?? [];
+  const { chains = [] } = useChains();
 
   const skipRouter = useSkipClient();
   const { address: evmAddress } = useAccount();
@@ -54,18 +59,6 @@ const TransactionDialogContent: FC<Props> = ({
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [txComplete, setTxComplete] = useState(false);
-
-  const [warningOpen, setWarningOpen] = useState(false);
-
-  const warningEl = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (warningOpen) {
-      warningEl.current?.scrollIntoView({
-        behavior: "instant",
-      });
-    }
-  }, [warningOpen]);
 
   const { getWalletRepo } = useManager();
 
@@ -100,6 +93,8 @@ const TransactionDialogContent: FC<Props> = ({
 
   const onSubmit = async () => {
     setTransacting(true);
+
+    const [historyId] = addTxHistory({ route });
 
     try {
       const userAddresses: Record<string, string> = {};
@@ -165,6 +160,12 @@ const TransactionDialogContent: FC<Props> = ({
             txStatus.txHash,
           );
 
+          addTxStatus(historyId, {
+            chainId: txStatus.chainID,
+            txHash: txStatus.txHash,
+            explorerLink: explorerLink || "#",
+          });
+
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
 
@@ -196,6 +197,7 @@ const TransactionDialogContent: FC<Props> = ({
         setTxError(err.message);
         setIsError(true);
       }
+      removeTxHistory(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
@@ -213,6 +215,12 @@ const TransactionDialogContent: FC<Props> = ({
       setTransacting(false);
     }
   };
+
+  const isSourceEvm = useMemo(() => {
+    const [sourceChainID] = route.chainIDs;
+    const chain = chains.find(({ chainID }) => chainID === sourceChainID);
+    return chain?.chainType === "evm";
+  }, [chains, route.chainIDs]);
 
   return (
     <Fragment>
@@ -296,7 +304,12 @@ const TransactionDialogContent: FC<Props> = ({
         </div>
         <div className="space-y-4">
           <button
-            className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+            className={clsx(
+              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
+              "transition-transform outline-none",
+              "enabled:hover:scale-105 enabled:hover:rotate-1",
+              "disabled:cursor-not-allowed disabled:opacity-75",
+            )}
             onClick={onSubmit}
             disabled={transacting || insufficentBalance}
           >
@@ -309,17 +322,17 @@ const TransactionDialogContent: FC<Props> = ({
               >
                 <circle
                   className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
+                  cx={12}
+                  cy={12}
+                  r={10}
                   stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
+                  strokeWidth={4}
+                />
                 <path
                   className="opacity-75"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                />
               </svg>
             ) : (
               <span>Submit</span>
@@ -331,91 +344,34 @@ const TransactionDialogContent: FC<Props> = ({
             </p>
           )}
         </div>
-        {route.chainIDs.length > 1 && (
-          <div className="bg-red-50 text-red-400 rounded-md">
-            <button
-              className="bg-red-50 text-red-400 font-medium uppercase text-xs p-3 flex items-center gap-2 w-full text-left"
-              onClick={() => setWarningOpen(!warningOpen)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="flex-1">
-                Execution Time Depends on IBC Relaying
-              </span>
-              {!warningOpen && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="w-5 h-5"
+        {isSourceEvm && (
+          <AlertCollapse.Root type="info">
+            <AlertCollapse.Trigger>
+              EVM Bridging Finality Time ~30 Minutes
+            </AlertCollapse.Trigger>
+            <AlertCollapse.Content>
+              <p>
+                This swap contains at least one EVM chain, so it might take
+                longer. Read more about{" "}
+                <a
+                  href={HREF_COMMON_FINALITY_TIMES}
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-              {warningOpen && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </button>
-            {warningOpen && (
-              <div className="px-4 pb-4 space-y-1 text-sm">
-                <p>This swap contains at least one IBC transfer.</p>
-                <p>
-                  IBC transfers usually take 10-30 seconds, depending on block
-                  times + how quickly relayers ferry packets. But relayers
-                  frequently crash or fail to relay packets for hours or days on
-                  some chains (especially chains with low IBC volume).
-                </p>
-                <p>
-                  At this time, the Skip API does not relay packets itself, so
-                  your swap/transfer may hang in an incomplete state. If this
-                  happens, your funds are stuck, not lost. They will be returned
-                  to you once a relayer comes back online and informs the source
-                  chain that the packet has timed out. Timeouts are set to 5
-                  minutes but relayers may take longer to come online and
-                  process the timeout.
-                </p>
-                <p>
-                  In the medium term, we are working to rectify this by adding
-                  packet tracking + relaying into the API. In the long term,
-                  we&apos;re working to build better incentives for relaying, so
-                  relayers don&apos;t need to run as charities. (Relayers do not
-                  receive fees or payment of any kind today and subsidize gas
-                  for users cross-chain)
-                </p>
-                <div ref={warningEl}></div>
-              </div>
-            )}
-          </div>
+                  common finality times
+                </a>
+                .
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
         )}
       </div>
       <Toast open={isError} setOpen={setIsError} description={txError ?? ""} />
     </Fragment>
   );
 };
+
+const HREF_COMMON_FINALITY_TIMES = `https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions`;
 
 export default TransactionDialogContent;
