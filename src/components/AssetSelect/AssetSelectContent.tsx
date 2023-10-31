@@ -53,6 +53,15 @@ const AssetSelectContent: FC<Props> = ({
 
       return 0;
     })
+    .filter((asset) => {
+      if (
+        asset.originChainID === "sifchain-1" &&
+        asset.originDenom !== "rowan"
+      ) {
+        return false;
+      }
+      return true;
+    })
     .sort((a, b) => {
       const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
       const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
