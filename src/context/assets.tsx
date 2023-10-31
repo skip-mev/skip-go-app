@@ -90,6 +90,20 @@ function getAssetSymbol(
     )}`;
   }
 
+  if (asset.originChainID === "sifchain-1") {
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    if (asset.originDenom === "rowan") {
+      return asset.symbol;
+    }
+
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
+  }
+
   // this just handles a weird EVM token edge case
   if (asset.symbol?.startsWith("axl")) {
     return `${asset.symbol.replace("axl", "")}.axl`;
