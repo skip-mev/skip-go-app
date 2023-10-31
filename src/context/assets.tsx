@@ -62,12 +62,37 @@ function getAssetSymbol(
   assets: Asset[],
   chains: Chain[],
 ) {
-  if (asset.symbol === "axlUSDC") {
-    return "USDC.axl";
+  if (asset.originChainID === "axelar-dojo-1") {
+    if (asset.originDenom === "uaxl") {
+      return asset.symbol;
+    }
+
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
   }
 
-  if (asset.symbol === "axlUSDT") {
-    return "USDT.axl";
+  if (asset.originChainID === "gravity-bridge-3") {
+    if (asset.originDenom === "ugraviton") {
+      return asset.symbol;
+    }
+
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
+  }
+
+  // this just handles a weird EVM token edge case
+  if (asset.symbol?.startsWith("axl")) {
+    return `${asset.symbol.replace("axl", "")}.axl`;
   }
 
   const hasDuplicates =
