@@ -75,6 +75,8 @@ const AssetSelectContent: FC<Props> = ({
     return asset.denom.toLowerCase().includes(searchValue.toLowerCase());
   });
 
+  console.log(filteredAssets);
+
   return (
     <div className="flex flex-col h-full px-4 py-6 space-y-6">
       <div>
