@@ -49,11 +49,11 @@ export const SwapWidget: FC = () => {
 
   const {
     address: destinationChainAddress,
-    isWalletConnected: isDestinationWalletconnected,
+    isWalletConnected: isDestinationWalletConnected,
   } = useAccount(destinationChain?.chainID ?? "cosmoshub-4");
 
   const isWalletConnected =
-    isSourceWalletConnected && isDestinationWalletconnected;
+    isSourceWalletConnected && isDestinationWalletConnected;
 
   const shouldShowDestinationWalletButton =
     !!sourceChain &&
@@ -190,7 +190,7 @@ export const SwapWidget: FC = () => {
                   return;
                 }
 
-                if (destinationChain && !isDestinationWalletconnected) {
+                if (destinationChain && !isDestinationWalletConnected) {
                   openWalletModal(destinationChain.chainID);
                   return;
                 }
