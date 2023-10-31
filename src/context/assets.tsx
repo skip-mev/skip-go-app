@@ -62,6 +62,14 @@ function getAssetSymbol(
   assets: Asset[],
   chains: Chain[],
 ) {
+  if (asset.symbol === "axlUSDC") {
+    return "USDC.axl";
+  }
+
+  if (asset.symbol === "axlUSDT") {
+    return "USDT.axl";
+  }
+
   const hasDuplicates =
     (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
 
