@@ -4,7 +4,7 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
 import { Chain } from "@/context/chains";
-import { chainNameToChainlistURL } from "@/cosmos";
+import { getChainLogo } from "@/cosmos";
 
 interface Props {
   chains: Chain[];
@@ -96,17 +96,6 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
         ) : (
           <div className="h-full overflow-y-auto scrollbar-hide">
             {filteredChains.map((chain) => {
-              let chainLogo = `${chainNameToChainlistURL(
-                chain.chainName,
-              )}/chainImg/_chainImg.svg`;
-              if (chain.chainID === "dydx-mainnet-1") {
-                chainLogo =
-                  "https://raw.githubusercontent.com/cosmos/chain-registry/master/dydx/images/dydx.png";
-              }
-              if (chain.chainID === "celestia") {
-                chainLogo =
-                  "https://raw.githubusercontent.com/cosmos/chain-registry/f1d526b2ec1e03f5555b0484ac5942aa12d884ef/celestia/images/celestia.svg";
-              }
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
@@ -118,7 +107,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                   <img
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
-                    src={chainLogo}
+                    src={getChainLogo(chain)}
                     onError={(e) =>
                       (e.currentTarget.src =
                         "https://api.dicebear.com/6.x/shapes/svg")

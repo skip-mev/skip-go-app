@@ -6,7 +6,7 @@ import { FC, Fragment, useMemo, useState } from "react";
 import { SWAP_VENUES } from "@/config";
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/context/chains";
-import { chainNameToChainlistURL } from "@/cosmos";
+import { getChainLogo } from "@/cosmos";
 
 interface TransferAction {
   type: "TRANSFER";
@@ -72,9 +72,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
             Transfer to{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
-              src={`${chainNameToChainlistURL(
-                destinationChain.chainName,
-              )}/chainImg/_chainImg.svg`}
+              src={getChainLogo(destinationChain)}
               alt=""
             />{" "}
             <span className="font-semibold text-black">
@@ -102,9 +100,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={`${chainNameToChainlistURL(
-              sourceChain.chainName,
-            )}/chainImg/_chainImg.svg`}
+            src={getChainLogo(sourceChain)}
             alt=""
           />{" "}
           <span className="font-semibold text-black">
@@ -113,9 +109,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           to{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
-            src={`${chainNameToChainlistURL(
-              destinationChain.chainName,
-            )}/chainImg/_chainImg.svg`}
+            src={getChainLogo(destinationChain)}
             alt=""
           />{" "}
           <span className="font-semibold text-black">

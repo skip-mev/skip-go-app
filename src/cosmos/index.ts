@@ -3,6 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Chain } from "@/context/chains";
 import { getStargateClientForChainID } from "@/utils/utils";
 
+export function getChainLogo(chain: Chain) {
+  if (chain.chainID === "dydx-mainnet-1") {
+    return "https://raw.githubusercontent.com/cosmos/chain-registry/master/dydx/images/dydx.png";
+  }
+
+  if (chain.chainID === "celestia") {
+    return "https://raw.githubusercontent.com/cosmos/chain-registry/f1d526b2ec1e03f5555b0484ac5942aa12d884ef/celestia/images/celestia.svg";
+  }
+
+  return `${chainNameToChainlistURL(chain.chainName)}/chainImg/_chainImg.svg`;
+}
+
 export function chainNameToChainlistURL(chainName: string) {
   const idToNameMap: Record<string, string> = {
     kichain: "ki-chain",
