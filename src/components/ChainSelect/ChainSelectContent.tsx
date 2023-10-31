@@ -103,6 +103,10 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                 chainLogo =
                   "https://raw.githubusercontent.com/cosmos/chain-registry/master/dydx/images/dydx.png";
               }
+              if (chain.chainID === "celestia") {
+                chainLogo =
+                  "https://raw.githubusercontent.com/cosmos/chain-registry/f1d526b2ec1e03f5555b0484ac5942aa12d884ef/celestia/images/celestia.svg";
+              }
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
