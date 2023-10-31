@@ -139,6 +139,10 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
           [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
             ...asset,
             symbol: getAssetSymbol(asset, assets, chains),
+            logoURI:
+              asset.originDenom === "utia"
+                ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
+                : asset.logoURI,
           })),
         };
       },
