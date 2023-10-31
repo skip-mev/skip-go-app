@@ -1,6 +1,8 @@
 import {
+  CheckCircleIcon,
   ChevronRightIcon,
   ExclamationTriangleIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import {
@@ -8,19 +10,50 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 
-const Context = createContext({ isOpen: false, toggle: () => {} });
+interface ContextType {
+  type: "error" | "warning" | "info" | "success";
+  isOpen: boolean;
+  toggle: () => void;
+}
 
-export const Root = ({ className, ...props }: ComponentProps<"div">) => {
+const iconMap = {
+  error: ExclamationTriangleIcon,
+  warning: ExclamationTriangleIcon,
+  info: InformationCircleIcon,
+  success: CheckCircleIcon,
+};
+
+const Context = createContext<ContextType>({
+  type: "info",
+  isOpen: false,
+  toggle: () => {},
+});
+
+export const Root = ({
+  className,
+  type = "info",
+  ...props
+}: ComponentProps<"div"> & { type?: ContextType["type"] }) => {
   const [isOpen, setIsOpen] = useState(() => false);
   const toggle = () => setIsOpen((state) => !state);
   return (
-    <Context.Provider value={{ isOpen, toggle }}>
+    <Context.Provider value={{ type, isOpen, toggle }}>
       <div
-        className={clsx("bg-red-50 text-red-400 rounded-md", className)}
+        className={clsx(
+          "rounded-md",
+          {
+            "bg-red-50 text-red-400": type === "error",
+            "bg-yellow-50 text-yellow-600": type === "warning",
+            "bg-blue-50 text-blue-500": type === "info",
+            "bg-green-50 text-green-400": type === "success",
+          },
+          className,
+        )}
         {...props}
       />
     </Context.Provider>
@@ -33,7 +66,8 @@ export const Trigger = ({
   onClick,
   ...props
 }: ComponentProps<"button">) => {
-  const { isOpen, toggle } = useContext(Context);
+  const { type, isOpen, toggle } = useContext(Context);
+  const Icon = useMemo(() => iconMap[type], [type]);
   return (
     <button
       className={clsx(
@@ -44,7 +78,7 @@ export const Trigger = ({
       onClick={(event) => [toggle(), onClick?.(event)]}
       {...props}
     >
-      <ExclamationTriangleIcon className="w-5 h-5" />
+      <Icon className="w-5 h-5" />
       <span className="flex-1">{children}</span>
       <ChevronRightIcon className={clsx("w-5 h-5", { "rotate-90": isOpen })} />
     </button>
