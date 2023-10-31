@@ -1,13 +1,16 @@
 import {
+  ArrowPathIcon,
   ArrowRightIcon,
   ArrowTopRightOnSquareIcon,
+  CheckCircleIcon,
   ChevronDownIcon,
   EyeIcon,
   TrashIcon,
+  XCircleIcon,
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import { forwardRef, Fragment, useMemo } from "react";
+import { ComponentPropsWithoutRef, forwardRef, Fragment, useMemo } from "react";
 
 import { useChains } from "@/api/queries";
 import { disclosure } from "@/context/disclosures";
@@ -33,6 +36,21 @@ export const Root = forwardRef<HTMLDivElement, RootProps>(
     );
   },
 );
+
+const iconMap = {
+  success: CheckCircleIcon,
+  pending: ArrowPathIcon,
+  failed: XCircleIcon,
+};
+
+type StatusIconProps = ComponentPropsWithoutRef<"svg"> & {
+  status: TxHistoryItem["status"];
+};
+
+export const StatusIcon = ({ status, ...props }: StatusIconProps) => {
+  const Icon = useMemo(() => iconMap[status], [status]);
+  return <Icon {...props} />;
+};
 
 type ItemProps = Omit<Accordion.AccordionItemProps, "value"> & {
   id: string;
@@ -95,15 +113,14 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
               </div>
             </div>
             <div
-              className={clsx("text-sm", {
+              className={clsx("text-sm flex items-center space-x-1", {
                 "text-green-600": data.status === "success",
                 "text-gray-600": data.status === "pending",
                 "text-red-600": data.status === "failed",
               })}
             >
-              {data.status === "success" && "Done ✅"}
-              {data.status === "pending" && "Pending ⏳"}
-              {data.status === "failed" && "Failed ❌"}
+              <span className="capitalize">{data.status}</span>
+              <StatusIcon status={data.status} className="w-4 h-4" />
             </div>
           </div>
 

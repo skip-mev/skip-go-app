@@ -18,9 +18,16 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
     return getAsset(denom, chainId) || raise(`No asset found for ${denom}`);
   }, [chainId, denom, getAsset]);
 
+  const formattedValue = useMemo(() => {
+    const v = formatUnits(value, decimals);
+    const w = 9;
+    if (v.length > w) return v.slice(0, w) + "…";
+    return v;
+  }, [decimals, value]);
+
   return (
     <span className="tabular-nums">
-      {formatUnits(value, decimals)} {symbol}
+      {formattedValue} {symbol}
     </span>
   );
 };
