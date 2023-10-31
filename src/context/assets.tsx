@@ -34,6 +34,29 @@ export const AssetsContext = createContext<AssetsContext>({
   isReady: false,
 });
 
+function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
+  switch (originChainName) {
+    case "Axelar":
+      if (originDenom.includes("polygon-")) {
+        return ".axl (Polygon)";
+      }
+
+      if (originDenom.includes("avalanche-")) {
+        return ".axl (Avalanche)";
+      }
+
+      return ".axl";
+    case "Sifchain":
+      return ".sif";
+    case "Gravity Bridge":
+      return ".grv";
+    case "Noble":
+      return "";
+    default:
+      return ` ${originChainName}`;
+  }
+}
+
 function getAssetSymbol(
   asset: AssetWithMetadata,
   assets: Asset[],
@@ -46,7 +69,10 @@ function getAssetSymbol(
     const originChain = chains.find((c) => c.chainID === asset.originChainID);
     const originChainName = originChain?.prettyName ?? asset.originChainID;
 
-    return `${originChainName} ${asset.symbol}`;
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
   }
 
   return asset.symbol;
