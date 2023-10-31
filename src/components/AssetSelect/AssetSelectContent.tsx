@@ -109,7 +109,11 @@ const AssetSelectContent: FC<Props> = ({
               <img
                 alt={asset.symbol}
                 className="w-12 h-12 rounded-full"
-                src={asset.logoURI}
+                src={
+                  asset.originDenom === "utia"
+                    ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
+                    : asset.logoURI
+                }
                 onError={(e) =>
                   (e.currentTarget.src =
                     "https://api.dicebear.com/6.x/shapes/svg")

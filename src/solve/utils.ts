@@ -15,9 +15,9 @@ export function assetHasMetadata(asset: Asset) {
     return false;
   }
 
-  if (!asset.logoURI) {
-    return false;
-  }
+  // if (!asset.logoURI) {
+  //   return false;
+  // }
 
   return true;
 }
