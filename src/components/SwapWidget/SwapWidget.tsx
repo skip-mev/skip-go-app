@@ -41,13 +41,19 @@ export const SwapWidget: FC = () => {
     noRouteFound,
   } = useSwapWidget();
 
-  const { address, isWalletConnected, wallet } = useAccount(
-    sourceChain?.chainID ?? "cosmoshub-4",
-  );
+  const {
+    address,
+    isWalletConnected: isSourceWalletConnected,
+    wallet,
+  } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
 
-  const { address: destinationChainAddress } = useAccount(
-    destinationChain?.chainID ?? "cosmoshub-4",
-  );
+  const {
+    address: destinationChainAddress,
+    isWalletConnected: isDestinationWalletconnected,
+  } = useAccount(destinationChain?.chainID ?? "cosmoshub-4");
+
+  const isWalletConnected =
+    isSourceWalletConnected && isDestinationWalletconnected;
 
   const shouldShowDestinationWalletButton =
     !!sourceChain &&
@@ -62,7 +68,7 @@ export const SwapWidget: FC = () => {
             <p className="font-semibold text-2xl">From</p>
             <div className="flex-grow" />
             <HistoryButton />
-            {address && wallet && isWalletConnected ? (
+            {address && wallet && isSourceWalletConnected ? (
               <ConnectedWalletButton
                 address={address}
                 onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
@@ -179,7 +185,15 @@ export const SwapWidget: FC = () => {
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
               onClick={() => {
-                openWalletModal(sourceChain.chainID);
+                if (!isSourceWalletConnected) {
+                  openWalletModal(sourceChain.chainID);
+                  return;
+                }
+
+                if (destinationChain && !isDestinationWalletconnected) {
+                  openWalletModal(destinationChain.chainID);
+                  return;
+                }
               }}
             >
               Connect Wallet
