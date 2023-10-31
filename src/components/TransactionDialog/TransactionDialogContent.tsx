@@ -392,7 +392,7 @@ const TransactionDialogContent: FC<Props> = ({
           )}
         </div>
         {route.chainIDs.length > 1 && (
-          <AlertCollapse.Root>
+          <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
               Execution Time Depends on IBC Relaying
             </AlertCollapse.Trigger>
