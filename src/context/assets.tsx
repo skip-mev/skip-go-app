@@ -90,6 +90,7 @@ function getAssetSymbol(
     )}`;
   }
 
+  // this just handles a weird EVM token edge case
   if (asset.symbol?.startsWith("axl")) {
     return `${asset.symbol.replace("axl", "")}.axl`;
   }
