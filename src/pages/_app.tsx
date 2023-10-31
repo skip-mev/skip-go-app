@@ -14,7 +14,7 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 
 import MainLayout from "@/components/MainLayout";
-import { DYDX_CHAIN } from "@/constants/chains";
+import { CELESTIA_CHAIN, DYDX_CHAIN } from "@/constants/chains";
 import { AssetsProvider } from "@/context/assets";
 import { ChainsProvider } from "@/context/chains";
 import { ToastProvider } from "@/context/toast";
@@ -167,6 +167,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
   if (chains.findIndex((c) => c.chain_id === "dydx-mainnet-1") === -1) {
     chains.push(DYDX_CHAIN);
+  }
+
+  if (chains.findIndex((c) => c.chain_id === "celestia") === -1) {
+    chains.push(CELESTIA_CHAIN);
   }
 
   const wallets = [

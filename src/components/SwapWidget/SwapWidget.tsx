@@ -76,6 +76,7 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    noRouteFound,
   } = useSwapWidget();
 
   const {
@@ -162,6 +163,11 @@ export const SwapWidget: FC = () => {
             <RouteTransactionCountBanner
               numberOfTransactions={numberOfTransactions}
             />
+          )}
+          {noRouteFound && (
+            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+              <p className="flex-1">No route found</p>
+            </div>
           )}
           {destinationChain?.chainID === "dydx-mainnet-1" ? (
             <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
