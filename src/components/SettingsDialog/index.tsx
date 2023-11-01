@@ -2,6 +2,8 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
+import { SlippageSetting } from "./SlippageSetting";
+
 export const SettingsDialog = () => {
   const [isOpen, { close }] = useDisclosureKey("settingsDialog");
 
@@ -19,7 +21,11 @@ export const SettingsDialog = () => {
           </button>
           <h3 className="font-bold text-xl">Swap Settings</h3>
         </div>
-        {/* TODO */}
+        <SlippageSetting />
+        <p className="p-2 text-sm text-neutral-500">
+          Slippage is how much price movement you can tolerate between the time
+          you send out a transaction and the time it&apos;s executed.
+        </p>
       </div>
     </div>
   );
