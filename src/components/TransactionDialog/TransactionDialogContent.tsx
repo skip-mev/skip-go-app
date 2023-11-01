@@ -6,6 +6,7 @@ import { FC, Fragment, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
+import { useSettingsStore } from "@/context/settings";
 import { useToast } from "@/context/toast";
 import {
   addTxHistory,
@@ -139,6 +140,7 @@ const TransactionDialogContent: FC<Props> = ({
         route,
         userAddresses,
         validateGasBalance: true,
+        slippageTolerancePercent: useSettingsStore.getState().slippage,
         getCosmosSigner: async (chainID) => {
           const chain = chains.find((c) => c.chainID === chainID);
           if (!chain) {
