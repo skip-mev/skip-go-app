@@ -1,4 +1,5 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { FC, Fragment } from "react";
 
 import { useChains as useSkipChains } from "@/api/queries";
@@ -62,7 +63,7 @@ export const SwapWidget: FC = () => {
 
   return (
     <Fragment>
-      <div>
+      <Tooltip.Provider>
         <div className="space-y-6">
           <div className="flex items-center">
             <p className="font-semibold text-2xl">From</p>
@@ -216,7 +217,7 @@ export const SwapWidget: FC = () => {
         </div>
         <HistoryDialog />
         <JsonDialog />
-      </div>
+      </Tooltip.Provider>
       <WalletModal />
     </Fragment>
   );
