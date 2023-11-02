@@ -13,6 +13,8 @@ import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
 import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
+import { SettingsButton } from "../SettingsButton";
+import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
@@ -69,6 +71,8 @@ export const SwapWidget: FC = () => {
             <p className="font-semibold text-2xl">From</p>
             <div className="flex-grow" />
             <HistoryButton />
+            <SettingsButton />
+            <div className="w-2" />
             {address && wallet && isSourceWalletConnected ? (
               <ConnectedWalletButton
                 address={address}
@@ -216,6 +220,7 @@ export const SwapWidget: FC = () => {
           )}
         </div>
         <HistoryDialog />
+        <SettingsDialog />
         <JsonDialog />
       </Tooltip.Provider>
       <WalletModal />
