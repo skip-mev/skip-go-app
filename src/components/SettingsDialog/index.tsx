@@ -2,7 +2,6 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
-import { ResetButton } from "./ResetButton";
 import { SlippageSetting } from "./SlippageSetting";
 
 export const SettingsDialog = () => {
@@ -22,7 +21,6 @@ export const SettingsDialog = () => {
           </button>
           <h3 className="font-bold text-xl">Swap Settings</h3>
           <div className="flex-grow" />
-          <ResetButton />
         </div>
         <SlippageSetting />
         <p className="p-2 text-sm text-neutral-500">
