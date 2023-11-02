@@ -15,7 +15,7 @@ export const HistoryDialog = () => {
   const { isReady } = useAssets();
 
   const entries = useMemo(() => {
-    return isReady ? [...Object.entries(history)].reverse() : undefined;
+    return isReady ? Object.entries(history).reverse() : undefined;
   }, [history, isReady]);
 
   if (!isOpen) return null;
