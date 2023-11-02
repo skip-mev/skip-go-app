@@ -46,6 +46,20 @@ export const addTxHistory = (input: TxHistoryItemInput) => {
   return [id, newItem] as const;
 };
 
+export const successTxHistory = (id: string) => {
+  useTxHistory.setState((state) => {
+    const current = state[id];
+    if (!current) return state;
+
+    const latest: TxHistoryItem = {
+      ...current,
+      status: "success",
+    };
+
+    return { ...state, [id]: latest };
+  });
+};
+
 export const failTxHistory = (id: string) => {
   useTxHistory.setState((state) => {
     const current = state[id];
@@ -78,8 +92,6 @@ export const addTxStatus = (id: string, txStatus: TxStatus) => {
     const latest: TxHistoryItem = {
       ...current,
       txStatus: newTxStatus,
-      status:
-        newTxStatus.length >= current.route.txsRequired ? "success" : "pending",
     };
 
     return { ...state, [id]: latest };

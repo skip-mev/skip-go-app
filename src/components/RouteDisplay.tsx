@@ -5,7 +5,7 @@ import { FC, Fragment, useMemo, useState } from "react";
 
 import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
-import { chainNameToChainlistURL } from "@/cosmos";
+import { getChainLogo } from "@/cosmos";
 
 export interface SwapVenueConfig {
   name: string;
@@ -86,9 +86,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
             Transfer to{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
-              src={`${chainNameToChainlistURL(
-                destinationChain.chainName,
-              )}/chainImg/_chainImg.svg`}
+              src={getChainLogo(destinationChain)}
               alt=""
             />{" "}
             <span className="font-semibold text-black">
@@ -116,9 +114,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
           <img
             className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={`${chainNameToChainlistURL(
-              sourceChain.chainName,
-            )}/chainImg/_chainImg.svg`}
+            src={getChainLogo(sourceChain)}
             alt=""
             onError={(e) =>
               (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
@@ -130,9 +126,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           to{" "}
           <img
             className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={`${chainNameToChainlistURL(
-              destinationChain.chainName,
-            )}/chainImg/_chainImg.svg`}
+            src={getChainLogo(destinationChain)}
             alt=""
             onError={(e) =>
               (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")

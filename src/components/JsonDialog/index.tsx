@@ -1,14 +1,50 @@
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowLeftIcon,
+  ClipboardDocumentIcon,
+  CheckIcon,
+} from "@heroicons/react/20/solid";
+import { clsx } from "clsx";
 
 import { useJsonDisclosure } from "@/context/disclosures";
+import { useMemo, useState } from "react";
 
 export const JsonDialog = () => {
   const [state, { close }] = useJsonDisclosure();
 
+  const [copied, setCopied] = useState(() => false);
+
+  const onCopy = async () => {
+    if (!state) return;
+    const timeout = 1000;
+    await navigator.clipboard.writeText(JSON.stringify(state.data, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), timeout);
+  };
+
+  const ClipboardIcon = useMemo(() => {
+    return copied ? CheckIcon : ClipboardDocumentIcon;
+  }, [copied]);
+
   if (!state) return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+    <div className="absolute inset-0 bg-white rounded-3xl z-[999] overflow-hidden">
+      <button
+        className={clsx(
+          "absolute top-5 right-4",
+          "text-sm px-2 py-1 border rounded-lg transition-colors",
+          "flex items-center justify-center space-x-1 flex-grow",
+          {
+            "bg-gray-100 hover:bg-gray-200": !copied,
+            "bg-green-100 hover:bg-green-200": copied,
+            "border-green-400 text-green-900": copied,
+          },
+        )}
+        onClick={onCopy}
+      >
+        <span>Copy to clipboard</span>
+        <ClipboardIcon className="w-4 h-4" />
+      </button>
       <div className="h-full px-4 py-6 overflow-y-auto scrollbar-hide">
         <div className="flex items-center gap-4 pb-2">
           <button
