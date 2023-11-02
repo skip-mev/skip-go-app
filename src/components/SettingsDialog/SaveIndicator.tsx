@@ -19,7 +19,7 @@ export const SaveIndicator = () => {
   return (
     <div
       className={clsx(
-        "text-green-500 text-sm font-medium flex items-center space-x-1 transition",
+        "text-green-500 text-sm font-medium flex items-center space-x-1 transition pointer-events-none",
         show ? "opacity-100" : "opacity-0",
       )}
     >
