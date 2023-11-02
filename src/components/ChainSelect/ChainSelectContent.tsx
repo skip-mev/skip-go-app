@@ -4,7 +4,7 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
 import { Chain } from "@/api/queries";
-import { chainNameToChainlistURL } from "@/cosmos";
+import { getChainLogo } from "@/cosmos";
 
 interface Props {
   chains: Chain[];
@@ -96,13 +96,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
         ) : (
           <div className="h-full overflow-y-auto scrollbar-hide">
             {filteredChains.map((chain) => {
-              let chainLogo = `${chainNameToChainlistURL(
-                chain.chainName,
-              )}/chainImg/_chainImg.svg`;
-              if (chain.chainID === "dydx-mainnet-1") {
-                chainLogo =
-                  "https://raw.githubusercontent.com/cosmos/chain-registry/master/dydx/images/dydx.png";
-              }
+              const chainLogo = getChainLogo(chain);
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
