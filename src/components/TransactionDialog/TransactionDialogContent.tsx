@@ -11,6 +11,7 @@ import {
   addTxHistory,
   addTxStatus,
   removeTxHistory,
+  successTxHistory,
 } from "@/context/tx-history";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
@@ -154,6 +155,18 @@ const TransactionDialogContent: FC<Props> = ({
 
           return getOfflineSigner(walletClient, chainID);
         },
+        onTransactionBroadcast: async (txStatus) => {
+          const explorerLink = getExplorerLinkForTx(
+            txStatus.chainID,
+            txStatus.txHash,
+          );
+
+          addTxStatus(historyId, {
+            chainId: txStatus.chainID,
+            txHash: txStatus.txHash,
+            explorerLink: explorerLink || "#",
+          });
+        },
         onTransactionSuccess: async (txStatus) => {
           const explorerLink = getExplorerLinkForTx(
             txStatus.chainID,
@@ -212,6 +225,7 @@ const TransactionDialogContent: FC<Props> = ({
         });
       });
     } finally {
+      successTxHistory(historyId);
       setTransacting(false);
     }
   };
