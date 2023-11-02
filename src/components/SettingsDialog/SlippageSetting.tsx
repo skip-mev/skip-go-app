@@ -1,88 +1,50 @@
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { clsx } from "clsx";
-import { ComponentProps, useEffect, useRef, useState } from "react";
 
-import { defaultValues, useSettingsStore } from "@/context/settings";
+import { useSettingsStore } from "@/context/settings";
 
 const OPTION_VALUES = ["1", "3", "5"];
 
-export const SlippageSetting = ({
-  className,
-  ...props
-}: ComponentProps<"div">) => {
+export const SlippageSetting = () => {
   const currentValue = useSettingsStore((state) => state.slippage);
 
-  const [custom, setCustom] = useState(() => false);
-
-  const toggleCustom = () =>
-    setCustom((prev) => {
-      const latest = !prev;
-      if (!latest) {
-        useSettingsStore.setState({ slippage: defaultValues.slippage });
-      }
-      return latest;
-    });
-
-  const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (custom) ref.current?.focus();
-  }, [custom]);
-
   return (
-    <div
-      className={clsx("flex items-center p-2 space-x-2", className)}
-      {...props}
-    >
+    <div className="flex items-center p-2 space-x-2">
       <h3>Slippage</h3>
       <div className="flex-grow" />
-      {custom ? (
-        <input
-          className="border rounded-lg px-2 py-1 tabular-nums text-sm transition"
-          type="number"
-          value={currentValue}
-          min={0}
-          max={100}
-          onChange={(event) => {
-            useSettingsStore.setState({ slippage: event.target.value });
-          }}
-          ref={ref}
-        />
-      ) : (
-        <ToggleGroup.Root
-          className="flex items-center space-x-1"
-          type="single"
-          value={currentValue}
-          aria-label="slippage"
-        >
+      <div className="flex flex-col items-stretch space-y-1">
+        <div className="relative text-sm">
+          <input
+            className={clsx(
+              "border rounded-lg px-2 py-1 tabular-nums transition text-end",
+              "number-input-arrows-hide pe-5 w-full",
+            )}
+            type="number"
+            value={currentValue}
+            min={0}
+            max={100}
+            onChange={(event) => {
+              useSettingsStore.setState({ slippage: event.target.value });
+            }}
+          />
+          <div className="absolute right-2 inset-y-0 flex items-center pointer-events-none">
+            %
+          </div>
+        </div>
+        <div className="flex items-center space-x-1">
           {OPTION_VALUES.map((value, i) => (
-            <ToggleGroup.Item
+            <button
               key={i}
-              value={value}
-              aria-label={`${value}%`}
               className={clsx(
-                "border rounded-lg px-2 py-1 tabular-nums text-sm transition",
-                "hover:bg-gray-100",
-                "data-[state=on]:border-blue-400 data-[state=on]:bg-blue-50",
-                "data-[state=on]:ring-1 ring-inset ring-blue-400",
+                "border rounded-lg px-2 py-px tabular-nums text-xs transition",
+                "text-neutral-600 hover:bg-neutral-100",
               )}
               onClick={() => useSettingsStore.setState({ slippage: value })}
             >
               {value}%
-            </ToggleGroup.Item>
+            </button>
           ))}
-        </ToggleGroup.Root>
-      )}
-      <button
-        className={clsx(
-          "border rounded-lg px-2 py-1 tabular-nums text-sm transition scrol",
-          "hover:bg-gray-100",
-          "data-[state=on]:border-blue-400 data-[state=on]:bg-blue-50",
-          "data-[state=on]:ring-1 ring-inset ring-blue-400",
-        )}
-        onClick={toggleCustom}
-      >
-        {custom ? "Revert" : "Custom"}
-      </button>
+        </div>
+      </div>
     </div>
   );
 };
