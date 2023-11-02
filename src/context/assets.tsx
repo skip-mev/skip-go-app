@@ -34,11 +34,81 @@ export const AssetsContext = createContext<AssetsContext>({
   isReady: false,
 });
 
+function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
+  switch (originChainName) {
+    case "Axelar":
+      if (originDenom.includes("polygon-")) {
+        return ".axl (Polygon)";
+      }
+
+      if (originDenom.includes("avalanche-")) {
+        return ".axl (Avalanche)";
+      }
+
+      return ".axl";
+    case "Sifchain":
+      return ".sif";
+    case "Gravity Bridge":
+      return ".grv";
+    case "Noble":
+      return "";
+    default:
+      return ` ${originChainName}`;
+  }
+}
+
 function getAssetSymbol(
   asset: AssetWithMetadata,
   assets: Asset[],
   chains: Chain[],
 ) {
+  if (asset.originChainID === "axelar-dojo-1") {
+    if (asset.originDenom === "uaxl") {
+      return asset.symbol;
+    }
+
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
+  }
+
+  if (asset.originChainID === "gravity-bridge-3") {
+    if (asset.originDenom === "ugraviton") {
+      return asset.symbol;
+    }
+
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
+  }
+
+  if (asset.originChainID === "sifchain-1") {
+    const originChain = chains.find((c) => c.chainID === asset.originChainID);
+    const originChainName = originChain?.prettyName ?? asset.originChainID;
+
+    if (asset.originDenom === "rowan") {
+      return asset.symbol;
+    }
+
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
+  }
+
+  // this just handles a weird EVM token edge case
+  if (asset.symbol?.startsWith("axl")) {
+    return `${asset.symbol.replace("axl", "")}.axl`;
+  }
+
   const hasDuplicates =
     (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
 
@@ -46,7 +116,10 @@ function getAssetSymbol(
     const originChain = chains.find((c) => c.chainID === asset.originChainID);
     const originChainName = originChain?.prettyName ?? asset.originChainID;
 
-    return `${originChainName} ${asset.symbol}`;
+    return `${asset.symbol}${getAssetSymbolSuffix(
+      asset.originDenom,
+      originChainName,
+    )}`;
   }
 
   return asset.symbol;

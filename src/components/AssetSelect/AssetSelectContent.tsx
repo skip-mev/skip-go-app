@@ -4,6 +4,7 @@ import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
+import { filterSifAssets } from "@/assets/filters";
 import { AssetWithMetadata } from "@/context/assets";
 
 interface Props {
@@ -53,6 +54,7 @@ const AssetSelectContent: FC<Props> = ({
 
       return 0;
     })
+    .filter(filterSifAssets)
     .sort((a, b) => {
       const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
       const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
@@ -72,6 +74,8 @@ const AssetSelectContent: FC<Props> = ({
 
     return asset.denom.toLowerCase().includes(searchValue.toLowerCase());
   });
+
+  console.log(filteredAssets);
 
   return (
     <div className="flex flex-col h-full px-4 py-6 space-y-6">
