@@ -5,7 +5,7 @@ import { useAssets } from "@/context/assets";
 import { useDisclosureKey } from "@/context/disclosures";
 import { useTxHistory } from "@/context/tx-history";
 
-import { HistoryClearButton } from "../HistoryClearButton";
+import { HistoryClearButton } from "./HistoryClearButton";
 import * as HistoryList from "./HistoryList";
 
 export const HistoryDialog = () => {

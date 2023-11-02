@@ -2,19 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+.number-input-arrows-hide::-webkit-outer-spin-button,
+.number-input-arrows-hide::-webkit-inner-spin-button,
+.number-input-arrows-hide {
+  -webkit-appearance: none;
+  margin: 0;
+  -moz-appearance: textfield !important;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
 /* For IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
-.DialogContent[data-state='open'] {
+.DialogContent[data-state="open"] {
   animation: fadeIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-
 }
 
 .TooltipContent {
@@ -22,32 +29,31 @@
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.TooltipContent[data-side='top'] {
+.TooltipContent[data-side="top"] {
   animation-name: slideUp;
 }
-.TooltipContent[data-side='bottom'] {
+.TooltipContent[data-side="bottom"] {
   animation-name: slideDown;
 }
 
-.ToastRoot[data-state='open'] {
+.ToastRoot[data-state="open"] {
   animation: slideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.ToastRoot[data-state='closed'] {
+.ToastRoot[data-state="closed"] {
   animation: swipeOut 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    scale: 0.90;
+    scale: 0.9;
   }
   to {
     scale: 1;
     opacity: 1;
   }
 }
-
 
 @keyframes slideDown {
   from {

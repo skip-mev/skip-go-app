@@ -13,7 +13,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
   if (!hasHistory) return null;
 
   return (
-    <Tooltip.Provider delayDuration={0}>
+    <>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <button
@@ -44,6 +44,6 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>
-    </Tooltip.Provider>
+    </>
   );
 };

@@ -1,12 +1,11 @@
+import { Cog6ToothIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
 import { disclosure } from "@/context/disclosures";
 
-import { HistoryIcon } from "./HistoryIcon";
-
-export const HistoryButton = ({
+export const SettingsButton = ({
   className,
   ...props
 }: ComponentProps<"button">) => {
@@ -19,11 +18,11 @@ export const HistoryButton = ({
             "focus:outline-none transition-colors",
             className,
           )}
-          onClick={() => disclosure.open("historyDialog")}
+          onClick={() => disclosure.open("settingsDialog")}
           role="group"
           {...props}
         >
-          <HistoryIcon className="w-4 h-4" />
+          <Cog6ToothIcon className="w-4 h-4" />
         </button>
       </Tooltip.Trigger>
       <Tooltip.Portal>
@@ -34,7 +33,7 @@ export const HistoryButton = ({
             "text-sm",
           )}
         >
-          Transaction History
+          Swap Settings
           <Tooltip.Arrow className="fill-white" />
         </Tooltip.Content>
       </Tooltip.Portal>

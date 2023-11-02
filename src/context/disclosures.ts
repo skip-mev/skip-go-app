@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 const defaultValues = {
   historyDialog: false,
+  settingsDialog: false,
 
   // TODO: port dialogs to new system
   // assetSelect: false,

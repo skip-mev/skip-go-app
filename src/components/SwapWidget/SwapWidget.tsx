@@ -1,4 +1,5 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { FC, Fragment } from "react";
 
 import { useChains as useSkipChains } from "@/api/queries";
@@ -12,6 +13,8 @@ import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
 import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
+import { SettingsButton } from "../SettingsButton";
+import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
@@ -62,12 +65,14 @@ export const SwapWidget: FC = () => {
 
   return (
     <Fragment>
-      <div>
+      <Tooltip.Provider>
         <div className="space-y-6">
           <div className="flex items-center">
             <p className="font-semibold text-2xl">From</p>
             <div className="flex-grow" />
             <HistoryButton />
+            <SettingsButton />
+            <div className="w-2" />
             {address && wallet && isSourceWalletConnected ? (
               <ConnectedWalletButton
                 address={address}
@@ -215,8 +220,9 @@ export const SwapWidget: FC = () => {
           )}
         </div>
         <HistoryDialog />
+        <SettingsDialog />
         <JsonDialog />
-      </div>
+      </Tooltip.Provider>
       <WalletModal />
     </Fragment>
   );
