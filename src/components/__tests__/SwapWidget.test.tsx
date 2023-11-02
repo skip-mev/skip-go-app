@@ -1,15 +1,13 @@
-import { SKIP_API_URL } from "@skip-router/core";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
+import { API_URL } from "@/constants/api";
 import { act, fireEvent, render, screen, waitFor, within } from "@/test";
 
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
 import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { SwapWidget } from "../SwapWidget";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
-
-const API_URL = SKIP_API_URL;
 
 const handlers = [
   rest.get(`${API_URL}/v1/info/chains`, (_, res, ctx) => {
