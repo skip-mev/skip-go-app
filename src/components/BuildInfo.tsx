@@ -7,7 +7,7 @@ const githubUrl = "https://github.com/skip-mev/ibc-dot-fun";
 
 const buildInfo: [string, ReactNode][] = [
   ["node env", process.env.NODE_ENV],
-  ["vercel", process.env.VERCEL ? "true" : "false"],
+  ["vercel env", process.env.NEXT_PUBLIC_VERCEL_ENV ? "true" : "false"],
   ["api url", API_URL],
   [
     "commit",
