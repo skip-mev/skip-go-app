@@ -8,6 +8,8 @@ import {
   isLedger,
 } from "@/utils/utils";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || SKIP_API_URL;
+
 export const SkipContext = createContext<
   | {
       skipClient: SkipRouter;
@@ -19,7 +21,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   const { client: walletClient } = useWalletClient();
 
   const skipClient = new SkipRouter({
-    apiURL: SKIP_API_URL,
+    apiURL: API_URL,
     getOfflineSigner: async (chainID) => {
       if (!walletClient) {
         throw new Error("No offline signer available");

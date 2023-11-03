@@ -10,7 +10,7 @@ on:
   pull_request:
 
 jobs:
-  Deploy-Production:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,5 +21,10 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt -e NEXT_PUBLIC_API_URL=${{ secrets.SKIP_DEV_API }} --token=${{ secrets.VERCEL_TOKEN }}
-
+        run: vercel deploy --prebuilt -e NEXT_PUBLIC_API_URL=${{ secrets.SKIP_DEV_API }} --token=${{ secrets.VERCEL_TOKEN }} | tee output.txt
+      - name: Get deployment URL
+        run: |
+          DEPLOYMENT_URL=$(tail -n 1 output.txt)
+          echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+      - name: Create an alias
+        run: vercel alias $DEPLOYMENT_URL dev.ibc.fun
