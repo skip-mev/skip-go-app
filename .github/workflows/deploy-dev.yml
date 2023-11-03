@@ -27,4 +27,4 @@ jobs:
           DEPLOYMENT_URL=$(tail -n 1 output.txt)
           echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
       - name: Create an alias
-        run: vercel alias --token=${{ secrets.VERCEL_TOKEN }} $DEPLOYMENT_URL dev.ibc.fun
+        run: vercel alias -S skip-protocol --token=${{ secrets.VERCEL_TOKEN }} $DEPLOYMENT_URL dev.ibc.fun
