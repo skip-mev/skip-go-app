@@ -9,6 +9,8 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { useSettingsStore } from "@/context/settings";
+import { disclosure } from "@/context/disclosures";
 
 interface Props {
   amount: string;
@@ -77,6 +79,8 @@ const AssetInput: FC<Props> = ({
     return selectedAssetBalance === "0.0";
   }, [selectedAssetBalance]);
 
+  const { slippage } = useSettingsStore();
+
   return (
     <Fragment>
       <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">
@@ -108,6 +112,14 @@ const AssetInput: FC<Props> = ({
             >
               {amount}
             </p>
+          )}
+          {!onAmountChange && amount !== "0.0" && (
+            <button
+              className="text-neutral-400 text-sm hover:underline"
+              onClick={() => disclosure.open("settingsDialog")}
+            >
+              Max Slippage: {slippage}%
+            </button>
           )}
           {onAmountChange && (
             <input
