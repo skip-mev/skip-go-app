@@ -23,7 +23,7 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt -b NEXT_PUBLIC_API_URL=${{ secrets.SKIP_DEV_API }} -e NEXT_PUBLIC_API_URL=${{ secrets.SKIP_DEV_API }} --token=${{ secrets.VERCEL_TOKEN }} | tee output.txt
+        run: vercel deploy --prebuilt -b NEXT_PUBLIC_API_URL=https://solve-dev.skip.money/v1 -e NEXT_PUBLIC_API_URL=https://solve-dev.skip.money/v1 --token=${{ secrets.VERCEL_TOKEN }} | tee output.txt
       - name: Get deployment URL
         run: |
           DEPLOYMENT_URL=$(tail -n 1 output.txt)
