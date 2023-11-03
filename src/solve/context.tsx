@@ -1,14 +1,13 @@
 import { useWalletClient } from "@cosmos-kit/react";
-import { SKIP_API_URL, SkipRouter } from "@skip-router/core";
+import { SkipRouter } from "@skip-router/core";
 import { createContext, FC, PropsWithChildren } from "react";
+import { API_URL } from "./env";
 
 import {
   getOfflineSigner,
   getOfflineSignerOnlyAmino,
   isLedger,
 } from "@/utils/utils";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || SKIP_API_URL;
 
 export const SkipContext = createContext<
   | {

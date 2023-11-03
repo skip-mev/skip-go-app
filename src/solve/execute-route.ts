@@ -1,5 +1,6 @@
 import { WalletClient } from "@cosmos-kit/core";
-import { RouteResponse, SKIP_API_URL, SkipRouter } from "@skip-router/core";
+import { RouteResponse, SkipRouter } from "@skip-router/core";
+import { API_URL } from "./env";
 
 import {
   enableChains,
@@ -34,7 +35,7 @@ export async function executeRoute(
   }
 
   const skipClient = new SkipRouter({
-    apiURL: SKIP_API_URL,
+    apiURL: API_URL,
     getOfflineSigner: async (chainID) => {
       const signerIsLedger = await isLedger(walletClient, chainID);
 
