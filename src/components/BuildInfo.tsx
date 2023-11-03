@@ -3,15 +3,22 @@ import { ReactNode, useEffect, useState } from "react";
 
 import { API_URL } from "@/constants/api";
 
+const githubUrl = "https://github.com/skip-mev/ibc-dot-fun";
+
 const buildInfo: [string, ReactNode][] = [
   ["node env", process.env.NODE_ENV],
   ["vercel", process.env.VERCEL ? "true" : "false"],
   ["api url", API_URL],
-  ["commit", process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA],
+  [
+    "commit",
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+      ? `${githubUrl}/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`
+      : null,
+  ],
   [
     "pull request",
     process.env.NEXT_PUBLIC_GIT_PULL_REQUEST_ID
-      ? `https://github.com/skip-mev/ibc-dot-fun/pull/${process.env.NEXT_PUBLIC_GIT_PULL_REQUEST_ID}`
+      ? `${githubUrl}/pull/${process.env.NEXT_PUBLIC_GIT_PULL_REQUEST_ID}`
       : null,
   ],
 ];
