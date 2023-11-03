@@ -18,6 +18,7 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
 import { getAssetLists, getChains } from "@/chains";
+import { BuildInfo } from "@/components/BuildInfo";
 import MainLayout from "@/components/MainLayout";
 import { EVM_CHAINS } from "@/constants/constants";
 import { AssetsProvider } from "@/context/assets";
@@ -90,6 +91,7 @@ export default function App({ Component, pageProps }: AppProps) {
         </QueryClientProvider>
       </main>
       <Analytics />
+      <BuildInfo />
     </>
   );
 }
