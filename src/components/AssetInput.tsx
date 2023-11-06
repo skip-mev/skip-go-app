@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -80,6 +80,13 @@ const AssetInput: FC<Props> = ({
   }, [selectedAssetBalance]);
 
   const { slippage } = useSettingsStore();
+
+  // hotfix side effect to prevent negative amounts
+  useEffect(() => {
+    if (parseFloat(amount) < 0) {
+      onAmountChange?.("0.0");
+    }
+  }, [amount, onAmountChange]);
 
   return (
     <Fragment>
