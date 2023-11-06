@@ -152,6 +152,11 @@ const AssetInput: FC<Props> = ({
 
                 onAmountChange?.(latest);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  onAmountChange?.("0.0");
+                }
+              }}
             />
           )}
         </div>
