@@ -3,14 +3,14 @@ import { FC, Fragment, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { disclosure } from "@/context/disclosures";
+import { useSettingsStore } from "@/context/settings";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
 import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
-import { useSettingsStore } from "@/context/settings";
-import { disclosure } from "@/context/disclosures";
 
 interface Props {
   amount: string;
