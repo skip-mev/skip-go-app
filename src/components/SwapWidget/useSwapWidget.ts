@@ -162,7 +162,7 @@ function useFormValues() {
     useState(false);
 
   const [formValues, setFormValues] = useState<FormValues>({
-    amountIn: "",
+    amountIn: "0.0",
   });
 
   // Select initial source chain.

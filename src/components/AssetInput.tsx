@@ -1,16 +1,16 @@
 import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { disclosure } from "@/context/disclosures";
+import { useSettingsStore } from "@/context/settings";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
 import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
-import { useSettingsStore } from "@/context/settings";
-import { disclosure } from "@/context/disclosures";
 
 interface Props {
   amount: string;
@@ -81,6 +81,13 @@ const AssetInput: FC<Props> = ({
 
   const { slippage } = useSettingsStore();
 
+  // hotfix side effect to prevent negative amounts
+  useEffect(() => {
+    if (parseFloat(amount) < 0) {
+      onAmountChange?.("0.0");
+    }
+  }, [amount, onAmountChange]);
+
   return (
     <Fragment>
       <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">
@@ -105,7 +112,7 @@ const AssetInput: FC<Props> = ({
         <div>
           {!onAmountChange && (
             <p
-              className={`w-full text-3xl font-medium ${
+              className={`w-full text-3xl font-medium h-10 ${
                 amount === "0.0" ? "text-neutral-300" : "text-black"
               }`}
               data-testid="amount"
@@ -123,11 +130,33 @@ const AssetInput: FC<Props> = ({
           )}
           {onAmountChange && (
             <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300"
+              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10"
               type="text"
               placeholder="0.0"
               value={amount}
-              onChange={(e) => onAmountChange?.(e.target.value)}
+              inputMode="numeric"
+              onChange={(e) => {
+                let latest = e.target.value;
+
+                // replace first comma with period
+                latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
+
+                // prevent entering anything except numbers, commas, and periods
+                if (latest.match(/[^0-9.,]/gi)) return;
+
+                // if there is more than one period or comma,
+                // remove all periods except the first one for decimals
+                if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
+                  latest = latest.replace(/([,.].*)[,.]/g, "$1");
+                }
+
+                onAmountChange?.(latest);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  onAmountChange?.("0.0");
+                }
+              }}
             />
           )}
         </div>
