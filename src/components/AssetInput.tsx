@@ -112,7 +112,7 @@ const AssetInput: FC<Props> = ({
         <div>
           {!onAmountChange && (
             <p
-              className={`w-full text-3xl font-medium ${
+              className={`w-full text-3xl font-medium h-10 ${
                 amount === "0.0" ? "text-neutral-300" : "text-black"
               }`}
               data-testid="amount"
@@ -130,7 +130,7 @@ const AssetInput: FC<Props> = ({
           )}
           {onAmountChange && (
             <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300"
+              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10"
               type="text"
               placeholder="0.0"
               value={amount}
