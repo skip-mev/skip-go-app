@@ -370,7 +370,7 @@ const TransactionDialogContent: FC<Props> = ({
         {isSourceEvm && (
           <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
-              EVM Bridging Finality Time {evmSourceFinalityTime}
+              EVM bridging finality time is {evmSourceFinalityTime}
             </AlertCollapse.Trigger>
             <AlertCollapse.Content>
               <p>
