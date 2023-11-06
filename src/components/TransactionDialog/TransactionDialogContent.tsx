@@ -27,6 +27,7 @@ import {
 
 import RouteDisplay from "../RouteDisplay";
 import * as AlertCollapse from "./AlertCollapse";
+import { getFinalityTime } from "@/constants/finality";
 
 interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
@@ -238,6 +239,12 @@ const TransactionDialogContent: FC<Props> = ({
     return chain?.chainType === "evm";
   }, [chains, route.chainIDs]);
 
+  const evmSourceFinalityTime = useMemo(() => {
+    if (!isSourceEvm) return "";
+    const [sourceChainID] = route.chainIDs;
+    return getFinalityTime(sourceChainID);
+  }, [isSourceEvm, route.chainIDs]);
+
   return (
     <Fragment>
       <div className="flex flex-col h-full px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
@@ -363,7 +370,7 @@ const TransactionDialogContent: FC<Props> = ({
         {isSourceEvm && (
           <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
-              EVM Bridging Finality Time ~30 Minutes
+              EVM Bridging Finality Time {evmSourceFinalityTime}
             </AlertCollapse.Trigger>
             <AlertCollapse.Content>
               <p>
