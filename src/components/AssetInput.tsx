@@ -134,7 +134,24 @@ const AssetInput: FC<Props> = ({
               type="text"
               placeholder="0.0"
               value={amount}
-              onChange={(e) => onAmountChange?.(e.target.value)}
+              inputMode="numeric"
+              onChange={(e) => {
+                let latest = e.target.value;
+
+                // replace first comma with period
+                latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
+
+                // prevent entering anything except numbers, commas, and periods
+                if (latest.match(/[^0-9.,]/gi)) return;
+
+                // if there is more than one period or comma,
+                // remove all periods except the first one for decimals
+                if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
+                  latest = latest.replace(/([,.].*)[,.]/g, "$1");
+                }
+
+                onAmountChange?.(latest);
+              }}
             />
           )}
         </div>
