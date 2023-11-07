@@ -73,6 +73,10 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
           return "https://lcd.injective.network";
         }
 
+        if (chainID === "evmos_9001-2") {
+          return "https://evmos-api.polkachu.com";
+        }
+
         return `https://ibc.fun/nodes/${chainID}`;
       },
     },

@@ -425,7 +425,7 @@ export function useBalancesByChain(
 
       return getBalancesByChain(address, chain.chainID);
     },
-    refetchInterval: false,
+    refetchInterval: 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

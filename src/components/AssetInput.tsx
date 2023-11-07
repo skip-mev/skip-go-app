@@ -51,7 +51,7 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances, fetchStatus } = useBalancesByChain(
+  const { data: balances, isInitialLoading } = useBalancesByChain(
     address,
     chain,
     showBalance,
@@ -156,7 +156,7 @@ const AssetInput: FC<Props> = ({
               }}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
-                  onAmountChange?.("0.0");
+                  onAmountChange?.("");
                 }
               }}
             />
@@ -164,10 +164,10 @@ const AssetInput: FC<Props> = ({
         </div>
         {showBalance && address && (
           <div className="flex items-center justify-between">
-            {fetchStatus === "fetching" && (
+            {isInitialLoading && (
               <div className="w-[100px] h-[20.5px] bg-neutral-100 animate-pulse" />
             )}
-            {fetchStatus !== "fetching" && selectedAssetBalance && (
+            {!isInitialLoading && selectedAssetBalance && (
               <Fragment>
                 <p className="text-sm font-medium text-neutral-400">
                   AVAILABLE:{" "}
@@ -193,7 +193,7 @@ const AssetInput: FC<Props> = ({
                         const fee = getFee(chain.chainID);
 
                         const feeInt = parseFloat(
-                          ethers.formatUnits(fee, asset.decimals),
+                          ethers.formatUnits(fee.toString(), asset.decimals),
                         ).toFixed(asset.decimals);
 
                         amount = (
