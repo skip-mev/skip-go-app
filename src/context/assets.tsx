@@ -170,7 +170,20 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       return undefined;
     }
 
-    return getAsset(chain.feeAssets[0].denom, chainID);
+    // prioritize non-ibc assets
+    const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
+      if (a.denom.includes("ibc/")) {
+        return 1;
+      }
+
+      if (b.denom.includes("ibc/")) {
+        return -1;
+      }
+
+      return 0;
+    });
+
+    return getAsset(sortedFeeDenoms[0].denom, chainID);
   }
 
   function getNativeAssets() {
