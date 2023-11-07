@@ -28,7 +28,7 @@ const finalityTimeMap: Record<string, string> = {
   [`${filecoin.id}`]: "52 minutes",
   [`${moonbeam.id}`]: "25 seconds",
   [`${celo.id}`]: "12 seconds",
-  [`${arbitrum.id}`]: "19:06 minutes",
+  [`${arbitrum.id}`]: "~20 minutes",
   [`${base.id}`]: "24 minutes",
 };
 
