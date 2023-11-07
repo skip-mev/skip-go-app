@@ -21,6 +21,7 @@ interface Props {
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
+  showSlippage?: boolean;
 }
 
 const AssetInput: FC<Props> = ({
@@ -32,6 +33,7 @@ const AssetInput: FC<Props> = ({
   chains,
   onChainChange,
   showBalance,
+  showSlippage,
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -120,7 +122,7 @@ const AssetInput: FC<Props> = ({
               {amount}
             </p>
           )}
-          {!onAmountChange && amount !== "0.0" && (
+          {showSlippage && !onAmountChange && amount !== "0.0" && (
             <button
               className="text-neutral-400 text-sm hover:underline"
               onClick={() => disclosure.open("settingsDialog")}
