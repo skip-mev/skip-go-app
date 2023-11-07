@@ -68,6 +68,7 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
+  console.log("destination chain id", action.destinationChain);
   const { chain: sourceChain } = useChainByID(action.sourceChain);
   const { chain: destinationChain } = useChainByID(action.destinationChain);
 
@@ -353,7 +354,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
           }
         } else if ("axelarTransfer" in nextOperation) {
-          destinationChain = nextOperation.axelarTransfer.toChain;
+          destinationChain = nextOperation.axelarTransfer.toChainID;
         } else {
           destinationChain = nextOperation.transfer.chainID;
         }
