@@ -26,10 +26,11 @@ import {
 } from "@/utils/utils";
 
 import RouteDisplay from "../RouteDisplay";
+import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
 import { getFinalityTime } from "@/constants/finality";
 
-interface RouteTransaction {
+export interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
   explorerLink: string | null;
   txHash: string | null;
@@ -60,8 +61,9 @@ const TransactionDialogContent: FC<Props> = ({
   const [isError, setIsError] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [txComplete, setTxComplete] = useState(false);
+  const [numberOfBroadcastedTransactions, setNumberOfBroadcastedTransactions] =
+    useState(0);
 
   const { getWalletRepo } = useManager();
 
@@ -169,18 +171,17 @@ const TransactionDialogContent: FC<Props> = ({
             txHash: txStatus.txHash,
             explorerLink: explorerLink || "#",
           });
+
+          setNumberOfBroadcastedTransactions(
+            (numberOfBroadcastedTransactions) =>
+              numberOfBroadcastedTransactions + 1,
+          );
         },
         onTransactionSuccess: async (txStatus) => {
           const explorerLink = getExplorerLinkForTx(
             txStatus.chainID,
             txStatus.txHash,
           );
-
-          addTxStatus(historyId, {
-            chainId: txStatus.chainID,
-            txHash: txStatus.txHash,
-            explorerLink: explorerLink || "#",
-          });
 
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
@@ -207,6 +208,14 @@ const TransactionDialogContent: FC<Props> = ({
           });
         },
       });
+
+      toast(
+        "Transaction Successful",
+        "Your transaction was successful",
+        "success",
+      );
+
+      setTxComplete(true);
     } catch (err: unknown) {
       console.error(err);
       if (err instanceof Error) {
@@ -230,6 +239,7 @@ const TransactionDialogContent: FC<Props> = ({
     } finally {
       successTxHistory(historyId);
       setTransacting(false);
+      setNumberOfBroadcastedTransactions(0);
     }
   };
 
@@ -244,6 +254,16 @@ const TransactionDialogContent: FC<Props> = ({
     const [sourceChainID] = route.chainIDs;
     return getFinalityTime(sourceChainID);
   }, [isSourceEvm, route.chainIDs]);
+
+  if (txComplete) {
+    return (
+      <TransactionSuccessView
+        route={route}
+        transactions={txStatuses}
+        onClose={onClose}
+      />
+    );
+  }
 
   return (
     <Fragment>
@@ -326,41 +346,56 @@ const TransactionDialogContent: FC<Props> = ({
           ))}
         </div>
         <div className="space-y-4">
-          <button
-            className={clsx(
-              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
-              "transition-transform outline-none",
-              "enabled:hover:scale-105 enabled:hover:rotate-1",
-              "disabled:cursor-not-allowed disabled:opacity-75",
-            )}
-            onClick={onSubmit}
-            disabled={transacting || insufficentBalance}
-          >
-            {transacting ? (
-              <svg
-                className="animate-spin h-4 w-4 inline-block text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx={12}
-                  cy={12}
-                  r={10}
-                  stroke="currentColor"
-                  strokeWidth={4}
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            ) : (
-              <span>Submit</span>
-            )}
-          </button>
+          {transacting ? (
+            <button
+              className={clsx(
+                "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
+                "transition-transform outline-none",
+                "enabled:hover:scale-105 enabled:hover:rotate-1",
+                "disabled:cursor-not-allowed disabled:opacity-75",
+              )}
+              onClick={onClose}
+              disabled={route.txsRequired !== numberOfBroadcastedTransactions}
+            >
+              {route.txsRequired !== numberOfBroadcastedTransactions ? (
+                <svg
+                  className="animate-spin h-4 w-4 inline-block text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx={12}
+                    cy={12}
+                    r={10}
+                    stroke="currentColor"
+                    strokeWidth={4}
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                <span>{route.doesSwap ? "Swap" : "Transfer"} Again</span>
+              )}
+            </button>
+          ) : (
+            <button
+              className={clsx(
+                "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
+                "transition-transform outline-none",
+                "enabled:hover:scale-105 enabled:hover:rotate-1",
+                "disabled:cursor-not-allowed disabled:opacity-75",
+              )}
+              onClick={onSubmit}
+              disabled={transacting || insufficentBalance}
+            >
+              Submit
+            </button>
+          )}
           {insufficentBalance && !transacting && !txComplete && (
             <p className="text-center font-semibold text-sm text-red-500">
               Insufficient Balance

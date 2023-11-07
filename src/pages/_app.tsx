@@ -40,19 +40,19 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-const wallets = [
-  ...keplrWallets,
-  ...cosmostationWallets,
-  ...leapWallets,
-  ...metamaskWallets,
-];
-
 type ChainProviderProps = ComponentProps<typeof ChainProvider>;
 
 const assets = getAssetLists() as ChainProviderProps["assetLists"];
 const chains = getChains() as ChainProviderProps["chains"];
 
 export default function App({ Component, pageProps }: AppProps) {
+  const wallets = [
+    ...keplrWallets,
+    ...cosmostationWallets,
+    ...leapWallets,
+    ...metamaskWallets,
+  ];
+
   return (
     <>
       <Head>

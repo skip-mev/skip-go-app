@@ -41,17 +41,21 @@ export default function Home() {
           continue;
         }
 
-        const status = await skipRouter.transactionStatus({
-          chainID: firstTx.chainId,
-          txHash: firstTx.txHash,
-        });
+        try {
+          const status = await skipRouter.transactionStatus({
+            chainID: firstTx.chainId,
+            txHash: firstTx.txHash,
+          });
 
-        if (status.state === "STATE_COMPLETED_SUCCESS") {
-          successTxHistory(id);
-        }
+          if (status.state === "STATE_COMPLETED_SUCCESS") {
+            successTxHistory(id);
+          }
 
-        if (status.state === "STATE_COMPLETED_ERROR") {
-          failTxHistory(id);
+          if (status.state === "STATE_COMPLETED_ERROR") {
+            failTxHistory(id);
+          }
+        } catch {
+          // Sometimes this is called before the API knows about the transaction. We can probably safely ignore errors.
         }
       }
     }

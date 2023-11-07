@@ -67,7 +67,7 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
               )}
               <p className="font-semibold text-left flex-1">
                 {wallet.walletPrettyName === "Leap Cosmos MetaMask"
-                  ? "Metamask"
+                  ? "Metamask (Leap Snap)"
                   : wallet.walletPrettyName}
               </p>
             </button>

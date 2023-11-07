@@ -156,6 +156,7 @@ export const SwapWidget: FC = () => {
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
               chains={chains ?? []}
+              showSlippage={route?.doesSwap}
             />
           </div>
           {routeLoading && <RouteLoadingBanner />}

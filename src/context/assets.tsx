@@ -64,7 +64,7 @@ function getAssetSymbol(
 ) {
   if (asset.originChainID === "axelar-dojo-1") {
     if (asset.originDenom === "uaxl") {
-      return asset.symbol;
+      return asset.symbol ?? asset.denom;
     }
 
     const originChain = chains.find((c) => c.chainID === asset.originChainID);
@@ -73,12 +73,12 @@ function getAssetSymbol(
     return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
       asset.originDenom,
       originChainName,
-    )}`;
+    )}`.replace("..", ".");
   }
 
   if (asset.originChainID === "gravity-bridge-3") {
     if (asset.originDenom === "ugraviton") {
-      return asset.symbol;
+      return asset.symbol ?? asset.denom;
     }
 
     const originChain = chains.find((c) => c.chainID === asset.originChainID);
@@ -95,7 +95,7 @@ function getAssetSymbol(
     const originChainName = originChain?.prettyName ?? asset.originChainID;
 
     if (asset.originDenom === "rowan") {
-      return asset.symbol;
+      return asset.symbol ?? asset.denom;
     }
 
     return `${asset.symbol}${getAssetSymbolSuffix(
@@ -122,7 +122,7 @@ function getAssetSymbol(
     )}`;
   }
 
-  return asset.symbol;
+  return asset.symbol ?? asset.denom;
 }
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -142,6 +142,10 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
           [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
             ...asset,
             symbol: getAssetSymbol(asset, assets, chains),
+            logoURI:
+              asset.originDenom === "utia"
+                ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
+                : asset.logoURI,
           })),
         };
       },
@@ -166,7 +170,20 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       return undefined;
     }
 
-    return getAsset(chain.feeAssets[0].denom, chainID);
+    // prioritize non-ibc assets
+    const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
+      if (a.denom.includes("ibc/")) {
+        return 1;
+      }
+
+      if (b.denom.includes("ibc/")) {
+        return -1;
+      }
+
+      return 0;
+    });
+
+    return getAsset(sortedFeeDenoms[0].denom, chainID);
   }
 
   function getNativeAssets() {
