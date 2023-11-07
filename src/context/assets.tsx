@@ -73,7 +73,7 @@ function getAssetSymbol(
     return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
       asset.originDenom,
       originChainName,
-    )}`;
+    )}`.replace("..", ".");
   }
 
   if (asset.originChainID === "gravity-bridge-3") {
