@@ -19,7 +19,7 @@ import { kava } from "./constants";
 const finalityTimeMap: Record<string, string> = {
   [`${ethereum.id}`]: "16 minutes",
   [`${avalanche.id}`]: "3 seconds",
-  [`${polygon.id}`]: "4:42 minutes",
+  [`${polygon.id}`]: "~5 minutes",
   [`${opBNB.id}`]: "46 seconds",
   [`${fantom.id}`]: "3 seconds",
   [`${kava.id}`]: "45 seconds",
