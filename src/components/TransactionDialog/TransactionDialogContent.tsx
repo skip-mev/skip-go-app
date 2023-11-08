@@ -6,6 +6,7 @@ import { FC, Fragment, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
+import { getFinalityTime } from "@/constants/finality";
 import { useSettingsStore } from "@/context/settings";
 import { useToast } from "@/context/toast";
 import {
@@ -28,7 +29,6 @@ import {
 import RouteDisplay from "../RouteDisplay";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
-import { getFinalityTime } from "@/constants/finality";
 
 export interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";

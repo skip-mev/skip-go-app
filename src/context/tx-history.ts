@@ -8,6 +8,7 @@ export interface TxStatus {
   chainId: string;
   txHash: string;
   explorerLink: string;
+  axelarscanLink?: string;
 }
 
 export interface TxHistoryItem {
@@ -88,6 +89,27 @@ export const addTxStatus = (id: string, txStatus: TxStatus) => {
     if (!current) return state;
 
     const newTxStatus = current.txStatus.concat(txStatus);
+
+    const latest: TxHistoryItem = {
+      ...current,
+      txStatus: newTxStatus,
+    };
+
+    return { ...state, [id]: latest };
+  });
+};
+
+export const updateTxStatus = (id: string, txStatus: TxStatus) => {
+  useTxHistory.setState((state) => {
+    const current = state[id];
+    if (!current) return state;
+
+    const newTxStatus = current.txStatus.map((item) => {
+      if (item.txHash === txStatus.txHash) {
+        return txStatus;
+      }
+      return item;
+    });
 
     const latest: TxHistoryItem = {
       ...current,
