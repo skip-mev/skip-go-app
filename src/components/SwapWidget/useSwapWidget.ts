@@ -48,12 +48,6 @@ export function useSwapWidget() {
     true,
   );
 
-  // if (routeQueryError) {
-  //   // get error message
-  //   // @ts-expect-error TODO: fix this
-  //   console.log(routeQueryError.message);
-  // }
-
   const errorMessage = useMemo(() => {
     if (!routeQueryError) {
       return "";
