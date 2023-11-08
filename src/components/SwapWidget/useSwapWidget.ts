@@ -38,6 +38,7 @@ export function useSwapWidget() {
     data: routeResponse,
     fetchStatus: routeFetchStatus,
     isError: routeQueryIsError,
+    error: routeQueryError,
   } = useRoute(
     amountInWei,
     formValues.sourceAsset?.denom,
@@ -46,6 +47,34 @@ export function useSwapWidget() {
     formValues.destinationAsset?.chainID,
     true,
   );
+
+  const errorMessage = useMemo(() => {
+    if (!routeQueryError) {
+      return "";
+    }
+
+    if (routeQueryError instanceof Error) {
+      if (
+        routeQueryError.message.includes(
+          "no swap route found after axelar fee of",
+        )
+      ) {
+        return "Amount is too low to cover Axelar fees";
+      }
+
+      if (
+        routeQueryError.message.includes(
+          "evm native destination tokens are currently not supported",
+        )
+      ) {
+        return "EVM native destination tokens are currently not supported";
+      }
+
+      return "Route not found";
+    }
+
+    return String(routeQueryError);
+  }, [routeQueryError]);
 
   const numberOfTransactions = useMemo(() => {
     if (!routeResponse) {
@@ -140,6 +169,7 @@ export function useSwapWidget() {
     onDestinationChainChange,
     onDestinationAssetChange,
     noRouteFound: routeQueryIsError,
+    routeError: errorMessage,
   };
 }
 
