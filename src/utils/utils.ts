@@ -478,3 +478,6 @@ async function getEvmChainBalances(
     {} as Record<string, string>,
   );
 }
+
+export const wait = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

@@ -6,6 +6,7 @@ import { FC, Fragment, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
+import { getFinalityTime } from "@/constants/finality";
 import { useSettingsStore } from "@/context/settings";
 import { useToast } from "@/context/toast";
 import {
@@ -28,7 +29,6 @@ import {
 import RouteDisplay from "../RouteDisplay";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
-import { getFinalityTime } from "@/constants/finality";
 
 export interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
@@ -182,6 +182,32 @@ const TransactionDialogContent: FC<Props> = ({
             txStatus.chainID,
             txStatus.txHash,
           );
+
+          // const statusDetails = await skipRouter.transactionStatus({
+          //   chainID: txStatus.chainID,
+          //   txHash: txStatus.txHash,
+          // });
+
+          // let axelarScanLink: string | undefined;
+
+          // for (const seqEvent of statusDetails.transferSequence) {
+          //   if ("axelarTransfer" in seqEvent) {
+          //     if ("contractCallWithTokenTxs" in seqEvent.axelarTransfer.txs) {
+          //       axelarScanLink = seqEvent.axelarTransfer.txs
+          //         .contractCallWithTokenTxs.sendTx
+          //         ? `https://axelarscan.io/gmp/${seqEvent.axelarTransfer.txs.contractCallWithTokenTxs.sendTx.txHash}`
+          //         : undefined;
+          //     }
+
+          //     if ("sendTokenTxs" in seqEvent.axelarTransfer.txs) {
+          //       axelarScanLink = seqEvent.axelarTransfer.txs.sendTokenTxs.sendTx
+          //         ? `https://axelarscan.io/gmp/${seqEvent.axelarTransfer.txs.sendTokenTxs.sendTx.txHash}`
+          //         : undefined;
+          //     }
+          //   }
+          // }
+
+          // console.log("axelarScanLink", axelarScanLink);
 
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];

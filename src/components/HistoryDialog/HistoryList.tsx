@@ -166,7 +166,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
                 <DescriptionList.Dt className="tabular-nums">
                   Transaction {i + 1}
                 </DescriptionList.Dt>
-                <DescriptionList.Dd>
+                <DescriptionList.Dd className="space-y-1">
                   <a
                     href={stat.explorerLink}
                     target="_blank"
@@ -177,6 +177,18 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
                     </span>
                     <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                   </a>
+                  {stat.axelarscanLink ? (
+                    <a
+                      href={stat.axelarscanLink}
+                      target="_blank"
+                      className="flex items-center space-x-px hover:underline"
+                    >
+                      <span className="truncate tabular-nums max-w-[24ch]">
+                        Axelarscan
+                      </span>
+                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                    </a>
+                  ) : null}
                 </DescriptionList.Dd>
               </DescriptionList.Row>
             ))}
