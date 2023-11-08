@@ -41,7 +41,7 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
-    noRouteFound,
+    routeError,
   } = useSwapWidget();
 
   const {
@@ -165,9 +165,9 @@ export const SwapWidget: FC = () => {
               numberOfTransactions={numberOfTransactions}
             />
           )}
-          {noRouteFound && (
+          {routeError !== "" && (
             <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-              <p className="flex-1">No route found</p>
+              <p className="flex-1">{routeError}</p>
             </div>
           )}
           {destinationChain?.chainID === "dydx-mainnet-1" ? (
