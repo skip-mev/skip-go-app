@@ -264,12 +264,6 @@ const TransactionDialogContent: FC<Props> = ({
     return "";
   }, [chains, route.operations]);
 
-  // const evmSourceFinalityTime = useMemo(() => {
-  //   if (!includesEvmChain) return "";
-  //   const [sourceChainID] = route.chainIDs;
-  //   return getFinalityTime(sourceChainID);
-  // }, [includesEvmChain, route.chainIDs]);
-
   if (txComplete) {
     return (
       <TransactionSuccessView
