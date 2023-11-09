@@ -243,17 +243,32 @@ const TransactionDialogContent: FC<Props> = ({
     }
   };
 
-  const isSourceEvm = useMemo(() => {
-    const [sourceChainID] = route.chainIDs;
-    const chain = chains.find(({ chainID }) => chainID === sourceChainID);
-    return chain?.chainType === "evm";
-  }, [chains, route.chainIDs]);
+  const estimatedFinalityTime = useMemo(() => {
+    for (const operation of route.operations) {
+      if ("axelarTransfer" in operation) {
+        const sourceChain = chains.find(
+          ({ chainID }) => chainID === operation.axelarTransfer.fromChainID,
+        );
+        if (sourceChain?.chainType === "evm") {
+          return getFinalityTime(sourceChain.chainID);
+        }
 
-  const evmSourceFinalityTime = useMemo(() => {
-    if (!isSourceEvm) return "";
-    const [sourceChainID] = route.chainIDs;
-    return getFinalityTime(sourceChainID);
-  }, [isSourceEvm, route.chainIDs]);
+        const destinationChain = chains.find(
+          ({ chainID }) => chainID === operation.axelarTransfer.toChainID,
+        );
+        if (destinationChain?.chainType === "evm") {
+          return getFinalityTime(destinationChain.chainID);
+        }
+      }
+    }
+    return "";
+  }, [chains, route.operations]);
+
+  // const evmSourceFinalityTime = useMemo(() => {
+  //   if (!includesEvmChain) return "";
+  //   const [sourceChainID] = route.chainIDs;
+  //   return getFinalityTime(sourceChainID);
+  // }, [includesEvmChain, route.chainIDs]);
 
   if (txComplete) {
     return (
@@ -402,10 +417,10 @@ const TransactionDialogContent: FC<Props> = ({
             </p>
           )}
         </div>
-        {isSourceEvm && (
+        {estimatedFinalityTime !== "" && (
           <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
-              EVM bridging finality time is {evmSourceFinalityTime}
+              EVM bridging finality time is {estimatedFinalityTime}
             </AlertCollapse.Trigger>
             <AlertCollapse.Content>
               <p>
