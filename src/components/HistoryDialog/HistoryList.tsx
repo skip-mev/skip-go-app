@@ -12,9 +12,9 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
 import { ComponentPropsWithoutRef, forwardRef, Fragment, useMemo } from "react";
 
-import { useChains } from "@/api/queries";
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
+import { useFinalityTimeEstimate } from "@/utils/hooks";
 
 import { AssetValue } from "../AssetValue";
 import { ChainSymbol } from "../ChainSymbol";
@@ -61,13 +61,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
   function Item(props, ref) {
     const { id, data, className, ...rest } = props;
 
-    const { chains = [] } = useChains();
-
-    const isSourceEvm = useMemo(() => {
-      const [sourceChainID] = data.route.chainIDs;
-      const chain = chains.find(({ chainID }) => chainID === sourceChainID);
-      return chain?.chainType === "evm";
-    }, [chains, data.route.chainIDs]);
+    const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
 
     return (
       <Accordion.Item
@@ -195,7 +189,9 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
             <DescriptionList.Row>
               <DescriptionList.Dt>Completion Time</DescriptionList.Dt>
               <DescriptionList.Dd>
-                ~{isSourceEvm ? 30 : 2} minutes
+                {estimatedFinalityTime === ""
+                  ? "2 minutes"
+                  : estimatedFinalityTime}
               </DescriptionList.Dd>
             </DescriptionList.Row>
           </DescriptionList.Root>

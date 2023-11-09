@@ -2,11 +2,10 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { FC, Fragment, useMemo, useState } from "react";
+import { FC, Fragment, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Chain, useChains } from "@/api/queries";
-import { getFinalityTime } from "@/constants/finality";
 import { useSettingsStore } from "@/context/settings";
 import { useToast } from "@/context/toast";
 import {
@@ -17,6 +16,7 @@ import {
 } from "@/context/tx-history";
 import Toast from "@/elements/Toast";
 import { useSkipClient } from "@/solve";
+import { useFinalityTimeEstimate } from "@/utils/hooks";
 import {
   enableChains,
   getAddressForCosmosChain,
@@ -243,26 +243,7 @@ const TransactionDialogContent: FC<Props> = ({
     }
   };
 
-  const estimatedFinalityTime = useMemo(() => {
-    for (const operation of route.operations) {
-      if ("axelarTransfer" in operation) {
-        const sourceChain = chains.find(
-          ({ chainID }) => chainID === operation.axelarTransfer.fromChainID,
-        );
-        if (sourceChain?.chainType === "evm") {
-          return getFinalityTime(sourceChain.chainID);
-        }
-
-        const destinationChain = chains.find(
-          ({ chainID }) => chainID === operation.axelarTransfer.toChainID,
-        );
-        if (destinationChain?.chainType === "evm") {
-          return getFinalityTime(destinationChain.chainID);
-        }
-      }
-    }
-    return "";
-  }, [chains, route.operations]);
+  const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
   if (txComplete) {
     return (
