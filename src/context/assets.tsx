@@ -7,11 +7,12 @@ import {
   useMemo,
 } from "react";
 
+import { Chain, useChains } from "@/api/queries";
+
 import {
   filterAssetsWithMetadata,
   useAssets as useSolveAssets,
 } from "../solve";
-import { Chain, useChains } from "./chains";
 
 export type AssetWithMetadata = Required<Asset>;
 
@@ -21,6 +22,7 @@ interface AssetsContext {
   getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
   getFeeDenom(chainID: string): AssetWithMetadata | undefined;
   getNativeAssets(): AssetWithMetadata[];
+  isReady: boolean;
 }
 
 export const AssetsContext = createContext<AssetsContext>({
@@ -29,6 +31,7 @@ export const AssetsContext = createContext<AssetsContext>({
   getAsset: () => undefined,
   getFeeDenom: () => undefined,
   getNativeAssets: () => [],
+  isReady: false,
 });
 
 function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
@@ -70,7 +73,7 @@ function getAssetSymbol(
     return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
       asset.originDenom,
       originChainName,
-    )}`;
+    )}`.replace("..", ".");
   }
 
   if (asset.originChainID === "gravity-bridge-3") {
@@ -128,7 +131,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data: solveAssets } = useSolveAssets();
 
   const assets = useMemo(() => {
-    if (!solveAssets) {
+    if (!solveAssets || !chains) {
       return {};
     }
 
@@ -161,15 +164,26 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   function getFeeDenom(chainID: string) {
-    const chain = chains.find((c) => c.chainID === chainID);
+    const chain = (chains ?? []).find((c) => c.chainID === chainID);
 
-    if (!chain || !chain.record?.chain.fees) {
+    if (!chain || chain.feeAssets.length === 0) {
       return undefined;
     }
 
-    const feeDenom = chain.record.chain.fees.fee_tokens[0].denom;
+    // prioritize non-ibc assets
+    const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
+      if (a.denom.includes("ibc/")) {
+        return 1;
+      }
 
-    return getAsset(feeDenom, chainID);
+      if (b.denom.includes("ibc/")) {
+        return -1;
+      }
+
+      return 0;
+    });
+
+    return getAsset(sortedFeeDenoms[0].denom, chainID);
   }
 
   function getNativeAssets() {
@@ -186,6 +200,8 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     return nativeAssets;
   }
 
+  const isReady = useMemo(() => Object.keys(assets).length > 0, [assets]);
+
   return (
     <AssetsContext.Provider
       value={{
@@ -194,6 +210,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
         getAsset,
         getFeeDenom,
         getNativeAssets,
+        isReady,
       }}
     >
       {children}

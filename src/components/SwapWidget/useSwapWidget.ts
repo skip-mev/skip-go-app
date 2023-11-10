@@ -1,11 +1,12 @@
-import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 
+import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { Chain, useChains } from "@/context/chains";
-import { useBalancesByChain } from "@/cosmos";
+import { useAccount } from "@/hooks/useAccount";
 import { useRoute } from "@/solve";
+import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
@@ -37,6 +38,7 @@ export function useSwapWidget() {
     data: routeResponse,
     fetchStatus: routeFetchStatus,
     isError: routeQueryIsError,
+    error: routeQueryError,
   } = useRoute(
     amountInWei,
     formValues.sourceAsset?.denom,
@@ -45,6 +47,34 @@ export function useSwapWidget() {
     formValues.destinationAsset?.chainID,
     true,
   );
+
+  const errorMessage = useMemo(() => {
+    if (!routeQueryError) {
+      return "";
+    }
+
+    if (routeQueryError instanceof Error) {
+      if (
+        routeQueryError.message.includes(
+          "no swap route found after axelar fee of",
+        )
+      ) {
+        return "Amount is too low to cover Axelar fees";
+      }
+
+      if (
+        routeQueryError.message.includes(
+          "evm native destination tokens are currently not supported",
+        )
+      ) {
+        return "EVM native destination tokens are currently not supported";
+      }
+
+      return "Route not found";
+    }
+
+    return String(routeQueryError);
+  }, [routeQueryError]);
 
   const numberOfTransactions = useMemo(() => {
     if (!routeResponse) {
@@ -63,22 +93,14 @@ export function useSwapWidget() {
       return "0.0";
     }
 
-    if (routeResponse.doesSwap && routeResponse.estimatedAmountOut) {
-      return ethers.formatUnits(
-        routeResponse.estimatedAmountOut,
-        formValues.destinationAsset?.decimals ?? 6,
-      );
-    }
+    return ethers.formatUnits(
+      routeResponse.amountOut,
+      formValues.destinationAsset?.decimals ?? 6,
+    );
+  }, [formValues.destinationAsset?.decimals, routeResponse]);
 
-    return formValues.amountIn;
-  }, [
-    formValues.amountIn,
-    formValues.destinationAsset?.decimals,
-    routeResponse,
-  ]);
-
-  const { address } = useChain(
-    formValues.sourceChain?.record?.name ?? "cosmoshub",
+  const { address } = useAccount(
+    formValues.sourceChain?.chainID ?? "cosmoshub-4",
   );
 
   const { data: balances } = useBalancesByChain(
@@ -106,6 +128,29 @@ export function useSwapWidget() {
     return amountIn > balance;
   }, [balances, formValues.amountIn, formValues.sourceAsset]);
 
+  const { chain: currentEvmChain } = useNetwork();
+
+  const { switchNetwork } = useSwitchNetwork();
+
+  useEffect(() => {
+    if (
+      !formValues.sourceChain ||
+      formValues.sourceChain.chainType === "cosmos"
+    ) {
+      return;
+    }
+
+    if (!currentEvmChain || !switchNetwork) {
+      return;
+    }
+
+    const chainID = parseInt(formValues.sourceChain.chainID);
+
+    if (currentEvmChain.id !== chainID) {
+      switchNetwork(chainID);
+    }
+  }, [currentEvmChain, formValues.sourceChain, switchNetwork]);
+
   return {
     amountIn: formValues.amountIn,
     amountOut,
@@ -124,6 +169,7 @@ export function useSwapWidget() {
     onDestinationChainChange,
     onDestinationAssetChange,
     noRouteFound: routeQueryIsError,
+    routeError: errorMessage,
   };
 }
 
@@ -153,12 +199,12 @@ function useFormValues() {
   // - If chainID exists in local storage, use that.
   // - Otherwise, default to cosmoshub-4.
   useEffect(() => {
-    if (!formValues.sourceChain && chains.length > 0) {
+    if (!formValues.sourceChain && (chains ?? []).length > 0) {
       const chainID =
         localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
       setFormValues((values) => ({
         ...values,
-        sourceChain: chains.find((chain) => chain.chainID === chainID),
+        sourceChain: (chains ?? []).find((chain) => chain.chainID === chainID),
       }));
     }
   }, [chains, formValues.sourceChain]);
@@ -248,7 +294,9 @@ function useFormValues() {
     // If destination asset is defined, but no destination chain, select chain based off asset.
     let destinationChain = formValues.destinationChain;
     if (!destinationChain) {
-      destinationChain = chains.find((c) => c.chainID === asset.chainID);
+      destinationChain = (chains ?? []).find(
+        (c) => c.chainID === asset.chainID,
+      );
     }
 
     // If destination asset is user selected, set flag to true.

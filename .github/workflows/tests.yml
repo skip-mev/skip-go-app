@@ -7,6 +7,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Use Node 18.x
         uses: actions/setup-node@v3
@@ -28,7 +30,11 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.38.0-jammy
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - run: git config --system --add safe.directory /__w/ibc-dot-fun/ibc-dot-fun
       - uses: actions/setup-node@v3
         with:
           node-version: 18

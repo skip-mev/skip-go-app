@@ -1,12 +1,13 @@
-import { useChain } from "@cosmos-kit/react";
 import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useState } from "react";
 
+import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { Chain } from "@/context/chains";
-import { useBalancesByChain } from "@/cosmos";
+import { disclosure } from "@/context/disclosures";
+import { useSettingsStore } from "@/context/settings";
 import Toast from "@/elements/Toast";
-import { getFee } from "@/utils/utils";
+import { useAccount } from "@/hooks/useAccount";
+import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -20,6 +21,7 @@ interface Props {
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
+  showSlippage?: boolean;
 }
 
 const AssetInput: FC<Props> = ({
@@ -31,6 +33,7 @@ const AssetInput: FC<Props> = ({
   chains,
   onChainChange,
   showBalance,
+  showSlippage,
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -46,12 +49,12 @@ const AssetInput: FC<Props> = ({
 
   const showChainInfo = chain ? false : true;
 
-  const { address } = useChain(chain?.record?.name ?? "cosmoshub");
+  const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances, fetchStatus } = useBalancesByChain(
+  const { data: balances, isInitialLoading } = useBalancesByChain(
     address,
     chain,
-    showBalance
+    showBalance,
   );
 
   const selectedAssetBalance = useMemo(() => {
@@ -65,7 +68,9 @@ const AssetInput: FC<Props> = ({
       return "0.0";
     }
 
-    return ethers.formatUnits(balanceWei, asset.decimals);
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 6,
+    }).format(parseFloat(ethers.formatUnits(balanceWei, asset.decimals)));
   }, [asset, balances]);
 
   const maxButtonDisabled = useMemo(() => {
@@ -75,6 +80,15 @@ const AssetInput: FC<Props> = ({
 
     return selectedAssetBalance === "0.0";
   }, [selectedAssetBalance]);
+
+  const { slippage } = useSettingsStore();
+
+  // hotfix side effect to prevent negative amounts
+  useEffect(() => {
+    if (parseFloat(amount) < 0) {
+      onAmountChange?.("0.0");
+    }
+  }, [amount, onAmountChange]);
 
   return (
     <Fragment>
@@ -100,7 +114,7 @@ const AssetInput: FC<Props> = ({
         <div>
           {!onAmountChange && (
             <p
-              className={`w-full text-3xl font-medium ${
+              className={`w-full text-3xl font-medium h-10 ${
                 amount === "0.0" ? "text-neutral-300" : "text-black"
               }`}
               data-testid="amount"
@@ -108,22 +122,52 @@ const AssetInput: FC<Props> = ({
               {amount}
             </p>
           )}
+          {showSlippage && !onAmountChange && amount !== "0.0" && (
+            <button
+              className="text-neutral-400 text-sm hover:underline"
+              onClick={() => disclosure.open("settingsDialog")}
+            >
+              Max Slippage: {slippage}%
+            </button>
+          )}
           {onAmountChange && (
             <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300"
+              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10"
               type="text"
               placeholder="0.0"
               value={amount}
-              onChange={(e) => onAmountChange?.(e.target.value)}
+              inputMode="numeric"
+              onChange={(e) => {
+                let latest = e.target.value;
+
+                // replace first comma with period
+                latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
+
+                // prevent entering anything except numbers, commas, and periods
+                if (latest.match(/[^0-9.,]/gi)) return;
+
+                // if there is more than one period or comma,
+                // remove all periods except the first one for decimals
+                if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
+                  latest = latest.replace(/([,.].*)[,.]/g, "$1");
+                }
+
+                onAmountChange?.(latest);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  onAmountChange?.("");
+                }
+              }}
             />
           )}
         </div>
         {showBalance && address && (
           <div className="flex items-center justify-between">
-            {fetchStatus === "fetching" && (
+            {isInitialLoading && (
               <div className="w-[100px] h-[20.5px] bg-neutral-100 animate-pulse" />
             )}
-            {fetchStatus !== "fetching" && selectedAssetBalance && (
+            {!isInitialLoading && selectedAssetBalance && (
               <Fragment>
                 <p className="text-sm font-medium text-neutral-400">
                   AVAILABLE:{" "}
@@ -149,7 +193,7 @@ const AssetInput: FC<Props> = ({
                         const fee = getFee(chain.chainID);
 
                         const feeInt = parseFloat(
-                          ethers.formatUnits(fee, asset.decimals)
+                          ethers.formatUnits(fee.toString(), asset.decimals),
                         ).toFixed(asset.decimals);
 
                         amount = (
@@ -171,7 +215,7 @@ const AssetInput: FC<Props> = ({
       <Toast
         open={isError}
         setOpen={setIsError}
-        description={`There was an error loading assets for ${chain?.prettyName}. Please try again.`}
+        description={`There was an error loading assets for ${chain?.chainName}. Please try again.`}
       />
     </Fragment>
   );

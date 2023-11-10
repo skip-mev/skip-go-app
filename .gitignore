@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+.env*
+!.env.example
+
+src/chains/
 tests/downloads/
 
 # dependencies
@@ -38,3 +42,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Sentry Config File
+.sentryclirc

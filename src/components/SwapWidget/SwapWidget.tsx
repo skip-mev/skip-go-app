@@ -1,63 +1,28 @@
-import { WalletStatus } from "@cosmos-kit/core";
-import { useChain } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { FC, Fragment } from "react";
 
-import { useChains } from "@/context/chains";
+import { useChains as useSkipChains } from "@/api/queries";
+import { useAccount } from "@/hooks/useAccount";
 
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
 import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
+import { HistoryButton } from "../HistoryButton";
+import { HistoryDialog } from "../HistoryDialog";
+import { JsonDialog } from "../JsonDialog";
+import RouteLoadingBanner from "../RouteLoadingBanner";
+import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
+import { SettingsButton } from "../SettingsButton";
+import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
 
-const RouteLoading = () => (
-  <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-    <p className="flex-1">Finding best route...</p>
-    <svg
-      className="animate-spin h-4 w-4 inline-block text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      ></path>
-    </svg>
-  </div>
-);
-
-const RouteTransactionCountBanner: FC<{
-  numberOfTransactions: number;
-}> = ({ numberOfTransactions }) => (
-  <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-    <p className="flex-1">
-      This route requires{" "}
-      {numberOfTransactions === 1 && (
-        <span className="text-white">1 Transaction</span>
-      )}
-      {numberOfTransactions > 1 && (
-        <span className="text-white">{numberOfTransactions} Transactions</span>
-      )}{" "}
-      to complete
-    </p>
-  </div>
-);
-
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
-  const { chains } = useChains();
+
+  const { chains } = useSkipChains();
 
   const {
     amountIn,
@@ -76,38 +41,55 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
-    noRouteFound,
+    routeError,
   } = useSwapWidget();
 
   const {
-    status: walletConnectStatus,
     address,
+    isWalletConnected: isSourceWalletConnected,
     wallet,
-  } = useChain(sourceChain?.record?.chain.chain_name ?? "cosmoshub");
+  } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
+
+  const {
+    address: destinationChainAddress,
+    isWalletConnected: isDestinationWalletConnected,
+  } = useAccount(destinationChain?.chainID ?? "cosmoshub-4");
+
+  const isWalletConnected =
+    isSourceWalletConnected && isDestinationWalletConnected;
+
+  const shouldShowDestinationWalletButton =
+    !!sourceChain &&
+    !!destinationChain &&
+    sourceChain.chainType !== destinationChain.chainType;
 
   return (
     <Fragment>
-      <div>
+      <Tooltip.Provider>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <p className="font-semibold text-2xl">From</p>
-            {address &&
-            wallet &&
-            walletConnectStatus === WalletStatus.Connected ? (
+            <div className="flex-grow" />
+            <HistoryButton />
+            <SettingsButton />
+            <div className="w-2" />
+            {address && wallet && isSourceWalletConnected ? (
               <ConnectedWalletButton
                 address={address}
-                onClick={openWalletModal}
-                walletName={wallet.prettyName}
+                onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
+                walletName={wallet.walletPrettyName}
                 walletLogo={
-                  wallet.logo
-                    ? typeof wallet.logo === "string"
-                      ? wallet.logo
-                      : wallet.logo.major
+                  wallet.walletInfo.logo
+                    ? typeof wallet.walletInfo.logo === "string"
+                      ? wallet.walletInfo.logo
+                      : wallet.walletInfo.logo.major
                     : ""
                 }
               />
             ) : (
-              <ConnectWalletButtonSmall onClick={openWalletModal} />
+              <ConnectWalletButtonSmall
+                onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
+              />
             )}
           </div>
           <div data-testid="source">
@@ -124,7 +106,7 @@ export const SwapWidget: FC = () => {
               chain={sourceChain}
               onChainChange={onSourceChainChange}
               showBalance
-              chains={chains}
+              chains={chains ?? []}
             />
           </div>
           <div className="relative">
@@ -147,6 +129,24 @@ export const SwapWidget: FC = () => {
               </button>
             </div>
             <p className="font-semibold text-2xl">To</p>
+            {shouldShowDestinationWalletButton ? (
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <button
+                  className="bg-[#FF486E]/20 hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 flex items-center gap-1 transition-colors focus:outline-none"
+                  onClick={() =>
+                    openWalletModal(destinationChain?.chainID ?? "cosmoshub-4")
+                  }
+                  data-testid="destination-wallet-btn"
+                >
+                  {destinationChainAddress
+                    ? `${destinationChainAddress.slice(
+                        0,
+                        8,
+                      )}...${destinationChainAddress.slice(-5)}`
+                    : "Connect Wallet"}
+                </button>
+              </div>
+            ) : null}
           </div>
           <div data-testid="destination">
             <AssetInput
@@ -155,18 +155,19 @@ export const SwapWidget: FC = () => {
               onAssetChange={onDestinationAssetChange}
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
-              chains={chains}
+              chains={chains ?? []}
+              showSlippage={route?.doesSwap}
             />
           </div>
-          {routeLoading && <RouteLoading />}
+          {routeLoading && <RouteLoadingBanner />}
           {route && !routeLoading && (
             <RouteTransactionCountBanner
               numberOfTransactions={numberOfTransactions}
             />
           )}
-          {noRouteFound && (
+          {routeError !== "" && (
             <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-              <p className="flex-1">No route found</p>
+              <p className="flex-1">{routeError}</p>
             </div>
           )}
           {destinationChain?.chainID === "dydx-mainnet-1" ? (
@@ -186,17 +187,25 @@ export const SwapWidget: FC = () => {
               </p>
             </div>
           ) : null}
-          {sourceChain && walletConnectStatus !== WalletStatus.Connected && (
+          {sourceChain && !isWalletConnected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
-              onClick={async () => {
-                openWalletModal();
+              onClick={() => {
+                if (!isSourceWalletConnected) {
+                  openWalletModal(sourceChain.chainID);
+                  return;
+                }
+
+                if (destinationChain && !isDestinationWalletConnected) {
+                  openWalletModal(destinationChain.chainID);
+                  return;
+                }
               }}
             >
               Connect Wallet
             </button>
           )}
-          {sourceChain && walletConnectStatus === WalletStatus.Connected && (
+          {sourceChain && isWalletConnected && (
             <div className="space-y-4">
               <TransactionDialog
                 route={route}
@@ -211,8 +220,11 @@ export const SwapWidget: FC = () => {
             </div>
           )}
         </div>
-      </div>
-      <WalletModal chainID={sourceChain?.chainID ?? "cosmoshub-4"} />
+        <HistoryDialog />
+        <SettingsDialog />
+        <JsonDialog />
+      </Tooltip.Provider>
+      <WalletModal />
     </Fragment>
   );
 };

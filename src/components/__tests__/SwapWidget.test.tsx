@@ -1,6 +1,7 @@
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
+import { API_URL } from "@/constants/api";
 import { act, fireEvent, render, screen, waitFor, within } from "@/test";
 
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
@@ -9,13 +10,13 @@ import { SwapWidget } from "../SwapWidget";
 import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
 const handlers = [
-  rest.get("https://api.skip.money/v1/info/chains", (_, res, ctx) => {
+  rest.get(`${API_URL}/v1/info/chains`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(CHAINS_RESPONSE));
   }),
-  rest.get("https://api.skip.money/v1/fungible/assets", (_, res, ctx) => {
+  rest.get(`${API_URL}/v1/fungible/assets`, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(ASSETS_RESPONSE));
   }),
-  rest.post("https://api.skip.money/v1/fungible/route", (_, res, ctx) => {
+  rest.post(`${API_URL}/v2/fungible/route`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -60,6 +61,7 @@ const handlers = [
         chain_ids: ["cosmoshub-4", "neutron-1"],
         does_swap: true,
         estimated_amount_out: "25329854",
+        amount_out: "25329854",
         swap_venue: {
           name: "neutron-astroport",
           chain_id: "neutron-1",
@@ -368,4 +370,101 @@ describe("SwapWidget", () => {
       expect(outputAmountElement).toHaveTextContent("25.329854"),
     );
   });
+
+  it("does not show the connect destination wallet button if the source chain and destination chain are the same chain type", async () => {
+    await act(async () => {
+      render(<SwapWidget />);
+    });
+
+    const sourceAssetSection = await screen.findByTestId("source");
+    const destinationAssetSection = await screen.findByTestId("destination");
+
+    const sourceChainButton =
+      within(sourceAssetSection).getByText("Cosmos Hub");
+
+    const destinationChainButton = within(destinationAssetSection).getByText(
+      "Select Chain",
+    );
+
+    // select Cosmos Hub and Neutron
+    await act(() => {
+      fireEvent.click(sourceChainButton);
+    });
+    fireEvent.click(
+      await within(sourceAssetSection).findByRole("button", {
+        name: /cosmos hub/i,
+      }),
+    );
+
+    await act(() => {
+      fireEvent.click(destinationChainButton);
+    });
+    fireEvent.click(
+      await within(destinationAssetSection).findByRole("button", {
+        name: /neutron/i,
+      }),
+    );
+
+    expect(
+      screen.queryByTestId("destination-wallet-btn"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("displays the connect destination wallet button if the source chain and destination chain are not the same chain type", async () => {
+    await act(async () => {
+      render(<SwapWidget />);
+    });
+
+    const sourceAssetSection = await screen.findByTestId("source");
+    const destinationAssetSection = await screen.findByTestId("destination");
+
+    const sourceChainButton =
+      within(sourceAssetSection).getByText("Cosmos Hub");
+
+    const destinationChainButton = within(destinationAssetSection).getByText(
+      "Select Chain",
+    );
+
+    // select Arbitrum and Osmosis
+    await act(() => {
+      fireEvent.click(sourceChainButton);
+    });
+    fireEvent.click(
+      await within(sourceAssetSection).findByRole("button", {
+        name: /arbitrum/i,
+      }),
+    );
+
+    await act(() => {
+      fireEvent.click(destinationChainButton);
+    });
+    fireEvent.click(
+      await within(destinationAssetSection).findByRole("button", {
+        name: /osmosis/i,
+      }),
+    );
+
+    expect(screen.queryByTestId("destination-wallet-btn")).toBeInTheDocument();
+
+    // select Osmosis and Polygon
+    await act(() => {
+      fireEvent.click(sourceChainButton);
+    });
+    fireEvent.click(
+      await within(sourceAssetSection).findByRole("button", {
+        name: /osmosis/i,
+      }),
+    );
+
+    await act(() => {
+      fireEvent.click(destinationChainButton);
+    });
+    fireEvent.click(
+      await within(destinationAssetSection).findByRole("button", {
+        name: /polygon/i,
+      }),
+    );
+
+    expect(screen.queryByTestId("destination-wallet-btn")).toBeInTheDocument();
+  }, 10000);
 });

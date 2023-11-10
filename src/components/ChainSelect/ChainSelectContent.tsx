@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
-import { Chain } from "@/context/chains";
+import { Chain } from "@/api/queries";
 import { getChainLogo } from "@/cosmos";
 
 interface Props {
@@ -42,7 +42,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
         return true;
       }
 
-      return chain.prettyName.toLowerCase().includes(searchValue.toLowerCase());
+      return chain.chainName.toLowerCase().includes(searchValue.toLowerCase());
     });
   }, [chains, searchValue]);
 
@@ -96,6 +96,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
         ) : (
           <div className="h-full overflow-y-auto scrollbar-hide">
             {filteredChains.map((chain) => {
+              const chainLogo = getChainLogo(chain);
               return (
                 <button
                   className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
@@ -107,7 +108,7 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
                   <img
                     alt={chain.prettyName}
                     className="w-12 h-12 rounded-full"
-                    src={getChainLogo(chain)}
+                    src={chainLogo}
                     onError={(e) =>
                       (e.currentTarget.src =
                         "https://api.dicebear.com/6.x/shapes/svg")

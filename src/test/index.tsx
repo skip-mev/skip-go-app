@@ -7,16 +7,30 @@ import {
   render,
   RenderOptions,
 } from "@testing-library/react";
-import { assets, chains } from "chain-registry";
-import React, { FC, Fragment, PropsWithChildren } from "react";
+import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
+import { configureChains, createConfig, mainnet, WagmiConfig } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
+import { getAssetLists, getChains } from "@/chains";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
-import { ChainsProvider } from "@/context/chains";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 
-const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
+const { publicClient } = configureChains([mainnet], [publicProvider()]);
+
+export const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: [],
+  publicClient,
+});
+
+type ChainProviderProps = ComponentProps<typeof ChainProvider>;
+
+const assets = getAssetLists() as ChainProviderProps["assetLists"];
+const chains = getChains() as ChainProviderProps["chains"];
+
+export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Fragment>
       <QueryClientProvider client={queryClient}>
@@ -28,13 +42,13 @@ const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
           logLevel="NONE"
           walletModal={() => <div></div>}
         >
-          <SkipProvider>
-            <WalletModalProvider>
-              <ChainsProvider>
+          <WagmiConfig config={wagmiConfig}>
+            <SkipProvider>
+              <WalletModalProvider>
                 <AssetsProvider>{children}</AssetsProvider>
-              </ChainsProvider>
-            </WalletModalProvider>
-          </SkipProvider>
+              </WalletModalProvider>
+            </SkipProvider>
+          </WagmiConfig>
         </ChainProvider>
       </QueryClientProvider>
     </Fragment>

@@ -1,4 +1,8 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { RouteResponse } from "@skip-router/core";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+
+import { useChains } from "@/api/queries";
+import { getFinalityTime } from "@/constants/finality";
 
 export const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -23,4 +27,30 @@ export function useInterval(callback: () => void, delay: number | null) {
 
     return () => clearInterval(id);
   }, [delay]);
+}
+
+export function useFinalityTimeEstimate(route: RouteResponse) {
+  const { chains = [] } = useChains();
+
+  return useMemo(() => {
+    for (const operation of route.operations) {
+      if ("axelarTransfer" in operation) {
+        const sourceChain = chains.find(
+          ({ chainID }) => chainID === operation.axelarTransfer.fromChainID,
+        );
+        if (sourceChain?.chainType === "evm") {
+          return getFinalityTime(sourceChain.chainID);
+        }
+
+        const destinationChain = chains.find(
+          ({ chainID }) => chainID === operation.axelarTransfer.toChainID,
+        );
+        if (destinationChain?.chainType === "evm") {
+          return getFinalityTime(destinationChain.chainID);
+        }
+      }
+    }
+
+    return "";
+  }, [chains, route.operations]);
 }
