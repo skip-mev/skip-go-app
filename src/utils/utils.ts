@@ -26,57 +26,32 @@ import { getFastestEndpoint, WalletClient } from "@cosmos-kit/core";
 import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
 import { KeplrClient } from "@cosmos-kit/keplr-extension";
 import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
-import { createTxRaw } from "@evmos/proto";
-import {
-  generateEndpointAccount,
-  generateEndpointBroadcast,
-  generatePostBodyBroadcast,
-} from "@evmos/provider";
-import {
-  Chain,
-  createTxIBCMsgTransfer,
-  Fee,
-  IBCMsgTransferParams,
-  Sender,
-  TxContext,
-} from "@evmos/transactions";
-import {
-  BaseAccount,
-  ChainRestAuthApi,
-  ChainRestTendermintApi,
-  createTransaction,
-  getTxRawFromTxRawOrDirectSignResponse,
-  Msgs,
-  TxRestClient,
-} from "@injectivelabs/sdk-ts";
-import {
-  BigNumberInBase,
-  DEFAULT_BLOCK_TIMEOUT_HEIGHT,
-} from "@injectivelabs/utils";
 import { OfflineAminoSigner } from "@keplr-wallet/types";
-import axios from "axios";
-import * as chainRegistry from "chain-registry";
+import { SkipRouter } from "@skip-router/core";
+import { useQuery } from "@tanstack/react-query";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import Long from "long";
+import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
-export function getChainByID(chainID: string) {
-  return chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  ) as (typeof chainRegistry.chains)[0];
+import { Chain } from "@/api/queries";
+import { ChainId, getChain } from "@/chains";
+import { multicall3ABI } from "@/constants/abis";
+import { EVM_CHAINS } from "@/constants/constants";
+import { useSkipClient } from "@/solve";
+
+export function getChainByID(chainID: ChainId) {
+  return getChain(chainID);
 }
 
 // cache clients to reuse later
 const STARGATE_CLIENTS: Record<string, StargateClient> = {};
 
-export async function getStargateClientForChainID(chainID: string) {
+export async function getStargateClientForChainID(chainID: ChainId) {
   if (STARGATE_CLIENTS[chainID]) {
     return STARGATE_CLIENTS[chainID];
   }
 
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
@@ -109,13 +84,11 @@ export async function getStargateClientForChainID(chainID: string) {
 }
 
 export async function getSigningStargateClientForChainID(
-  chainID: string,
+  chainID: ChainId,
   signer: OfflineSigner,
   options?: SigningStargateClientOptions,
 ) {
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
@@ -155,9 +128,9 @@ export async function getSigningStargateClientForChainID(
   return client;
 }
 
-export async function getAddressForChain(
+export async function getAddressForCosmosChain(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSigner) {
     const signer = await walletClient.getOfflineSigner(chainId);
@@ -170,13 +143,11 @@ export async function getAddressForChain(
 }
 
 export async function getSigningCosmWasmClientForChainID(
-  chainID: string,
+  chainID: ChainId,
   signer: OfflineSigner,
   options?: SigningCosmWasmClientOptions,
 ) {
-  const chain = chainRegistry.chains.find(
-    (chain) => chain.chain_id === chainID,
-  );
+  const chain = getChainByID(chainID);
 
   if (!chain) {
     throw new Error(`Chain with ID ${chainID} not found`);
@@ -213,129 +184,6 @@ export async function getSigningCosmWasmClientForChainID(
   return client;
 }
 
-export async function signAndBroadcastEvmos(
-  walletClient: WalletClient,
-  signerAddress: string,
-  params: IBCMsgTransferParams,
-) {
-  const chainID = "evmos_9001-2";
-  const result = await axios.get(
-    `https://rest.bd.evmos.org:1317${generateEndpointAccount(signerAddress)}`,
-  );
-  const account = await getAccount(walletClient, chainID);
-  const pk = Buffer.from(account.pubkey).toString("base64");
-  const chain: Chain = {
-    chainId: 9001,
-    cosmosChainId: "evmos_9001-2",
-  };
-  // Populate the transaction sender parameters using the
-  // query API.
-  const sender: Sender = {
-    accountAddress: signerAddress,
-    sequence: result.data.account.base_account.sequence,
-    accountNumber: result.data.account.base_account.account_number,
-    // Use the public key from the account query, or retrieve
-    // the public key from the code snippet above.
-    pubkey: pk,
-  };
-  const fee: Fee = {
-    amount: "4000000000000000",
-    denom: "aevmos",
-    gas: "200000",
-  };
-  const memo = "";
-  const context: TxContext = {
-    chain,
-    sender,
-    fee,
-    memo,
-  };
-  const tx = createTxIBCMsgTransfer(context, params);
-  const { signDirect } = tx;
-  const signer = await getOfflineSigner(walletClient, chainID);
-  const signResponse = await signer.signDirect(sender.accountAddress, {
-    bodyBytes: signDirect.body.toBinary(),
-    authInfoBytes: signDirect.authInfo.toBinary(),
-    chainId: chain.cosmosChainId,
-    // @ts-ignore
-    accountNumber: new Long(sender.accountNumber),
-  });
-  if (!signResponse) {
-    // Handle signature failure here.
-    throw new Error("Signature failed");
-  }
-  const signatures = [
-    new Uint8Array(Buffer.from(signResponse.signature.signature, "base64")),
-  ];
-  const { signed } = signResponse;
-  const signedTx = createTxRaw(
-    signed.bodyBytes,
-    signed.authInfoBytes,
-    signatures,
-  );
-  const response = await axios.post(
-    `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
-    generatePostBodyBroadcast(signedTx, "BROADCAST_MODE_BLOCK"),
-  );
-  return response.data.tx_response;
-}
-
-export async function signAndBroadcastInjective(
-  walletClient: WalletClient,
-  signerAddress: string,
-  msgs: Msgs | Msgs[],
-  fee: StdFee,
-) {
-  const chainID = "injective-1";
-  const restEndpoint = "https://lcd.injective.network";
-
-  const chainRestAuthApi = new ChainRestAuthApi(restEndpoint);
-
-  const accountDetailsResponse =
-    await chainRestAuthApi.fetchAccount(signerAddress);
-  const baseAccount = BaseAccount.fromRestApi(accountDetailsResponse);
-
-  /** Block Details */
-  const chainRestTendermintApi = new ChainRestTendermintApi(restEndpoint);
-  const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
-  const latestHeight = latestBlock.header.height;
-  const timeoutHeight = new BigNumberInBase(latestHeight).plus(
-    DEFAULT_BLOCK_TIMEOUT_HEIGHT,
-  );
-
-  const account = await getAccount(walletClient, chainID);
-  const pk = Buffer.from(account.pubkey).toString("base64");
-
-  const { signDoc } = createTransaction({
-    pubKey: pk,
-    chainId: chainID,
-    message: msgs,
-    sequence: baseAccount.sequence,
-    accountNumber: baseAccount.accountNumber,
-    timeoutHeight: timeoutHeight.toNumber(),
-    fee,
-  });
-
-  const signer = await getOfflineSigner(walletClient, chainID);
-
-  const directSignResponse = await signer.signDirect(
-    signerAddress,
-    // @ts-ignore
-    signDoc,
-  );
-
-  const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
-
-  const txRestClient = new TxRestClient(restEndpoint);
-
-  const tx = await txRestClient.broadcast(txRaw, {
-    // @ts-ignore
-    mode: "sync",
-  });
-
-  return tx;
-}
-
 // generic wrapper to support enabling chains on many different wallets
 export async function enableChains(
   walletClient: WalletClient,
@@ -358,7 +206,7 @@ export async function enableChains(
   throw new Error("Unsupported wallet");
 }
 
-export async function getAccount(walletClient: WalletClient, chainId: string) {
+export async function getAccount(walletClient: WalletClient, chainId: ChainId) {
   if (walletClient.getAccount) {
     return walletClient.getAccount(chainId);
   }
@@ -368,7 +216,7 @@ export async function getAccount(walletClient: WalletClient, chainId: string) {
 
 export async function getOfflineSigner(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSignerDirect) {
     return walletClient.getOfflineSignerDirect(chainId);
@@ -379,7 +227,7 @@ export async function getOfflineSigner(
 
 export async function getOfflineSignerOnlyAmino(
   walletClient: WalletClient,
-  chainId: string,
+  chainId: ChainId,
 ) {
   if (walletClient.getOfflineSignerAmino) {
     const signer = walletClient.getOfflineSignerAmino(chainId);
@@ -389,7 +237,7 @@ export async function getOfflineSignerOnlyAmino(
   throw new Error("unsupported wallet");
 }
 
-export function getFee(chainID: string) {
+export function getFee(chainID: ChainId) {
   const chain = getChainByID(chainID);
 
   const feeInfo = chain.fees?.fee_tokens[0];
@@ -408,7 +256,7 @@ export function getFee(chainID: string) {
   return amountNeeded;
 }
 
-export async function isLedger(walletClient: WalletClient, chainID: string) {
+export async function isLedger(walletClient: WalletClient, chainID: ChainId) {
   if (walletClient instanceof KeplrClient && window.keplr) {
     const key = await window.keplr.getKey(chainID);
     return key.isNanoLedger;
@@ -433,7 +281,13 @@ export async function isLedger(walletClient: WalletClient, chainID: string) {
   return false;
 }
 
-export function getExplorerLinkForTx(chainID: string, txHash: string) {
+export function getExplorerLinkForTx(chainID: ChainId, txHash: string) {
+  const evmChain = EVM_CHAINS.find((c) => c.id === parseInt(chainID));
+
+  if (evmChain) {
+    return `${evmChain.blockExplorers.default.url}/tx/${txHash}`;
+  }
+
   const chain = getChainByID(chainID);
 
   if (!chain) {
@@ -525,3 +379,105 @@ export async function signAmino(
     signatures: [fromBase64(signature.signature)],
   });
 }
+
+export async function getBalancesByChain(address: string, chainID: ChainId) {
+  const client = await getStargateClientForChainID(chainID);
+
+  const balances = await client.getAllBalances(address);
+
+  return balances.reduce(
+    (acc, balance) => {
+      return {
+        ...acc,
+        [balance.denom]: balance.amount,
+      };
+    },
+    {} as Record<string, string>,
+  );
+}
+
+export function useBalancesByChain(
+  address?: string,
+  chain?: Chain,
+  enabled: boolean = true,
+) {
+  const publicClient = usePublicClient({
+    chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
+  });
+
+  const skipRouter = useSkipClient();
+
+  return useQuery({
+    queryKey: ["balances-by-chain", address, chain],
+    queryFn: async () => {
+      if (!chain || !address) {
+        return {};
+      }
+
+      if (chain.chainType === "evm") {
+        return getEvmChainBalances(
+          skipRouter,
+          publicClient,
+          address,
+          chain.chainID,
+        );
+      }
+
+      return getBalancesByChain(address, chain.chainID);
+    },
+    refetchInterval: 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    keepPreviousData: true,
+    enabled: !!chain && !!address && enabled,
+  });
+}
+
+async function getEvmChainBalances(
+  skipClient: SkipRouter,
+  publicClient: PublicClient,
+  address: string,
+  chainID: ChainId,
+) {
+  const assets = await skipClient.assets({
+    chainID,
+    includeEvmAssets: true,
+  });
+
+  const chainAssets = assets[chainID];
+
+  const balances = await publicClient.multicall({
+    multicallAddress: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    contracts: chainAssets.map((asset) => {
+      if (!asset.tokenContract) {
+        return {
+          address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+          abi: multicall3ABI,
+          functionName: "getEthBalance",
+          args: [address as `0x${string}`],
+        };
+      }
+
+      return {
+        address: asset.tokenContract as `0x${string}`,
+        abi: erc20ABI,
+        functionName: "balanceOf",
+        args: [address as `0x${string}`],
+      };
+    }),
+  });
+
+  return chainAssets.reduce(
+    (acc, asset, index) => {
+      return {
+        ...acc,
+        [asset.denom]: balances[index].result?.toString() || "0",
+      };
+    },
+    {} as Record<string, string>,
+  );
+}
+
+export const wait = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
