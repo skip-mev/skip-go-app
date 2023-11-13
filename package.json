@@ -25,6 +25,7 @@
     "@cosmos-kit/keplr-extension": "^2.0.3",
     "@cosmos-kit/leap-extension": "^2.0.3",
     "@cosmos-kit/leap-metamask-cosmos-snap": "^0.2.2",
+    "@cosmos-kit/okxwallet": "^2.3.8",
     "@cosmos-kit/react": "^2.0.3",
     "@cosmos-kit/react-lite": "^2.1.4",
     "@cosmos-kit/web3auth": "^2.0.3",

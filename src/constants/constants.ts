@@ -26,6 +26,10 @@ export const EVM_WALLET_LOGOS: Record<string, string> = {
     "https://raw.githubusercontent.com/rainbow-me/rainbowkit/6b460fcba954e155828e03f46228ee88a171a83b/packages/rainbowkit/src/wallets/walletConnectors/injectedWallet/injectedWallet.svg",
 };
 
+export const INJECTED_EVM_WALLET_LOGOS: Record<string, string> = {
+  "OKX Wallet": "https://raw.githubusercontent.com/rainbow-me/rainbowkit/6b460fcba954e155828e03f46228ee88a171a83b/packages/rainbowkit/src/wallets/walletConnectors/okxWallet/okxWallet.svg",
+}
+
 export const kava = {
   id: 2222,
   name: "Kava",
