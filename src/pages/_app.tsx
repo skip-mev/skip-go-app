@@ -15,7 +15,6 @@ import Head from "next/head";
 import { ComponentProps } from "react";
 import { WagmiConfig } from "wagmi";
 import { configureChains, createConfig } from "wagmi";
-import { InjectedConnector } from "@wagmi/core";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -28,7 +27,6 @@ import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
 import { OKXConnector } from "@/wallets/OKXConnector";
-import { WALLET_CONNECT_ID } from "@/constants/api";
 
 const { publicClient, chains: evmChains } = configureChains(EVM_CHAINS, [
   publicProvider(),
