@@ -9,6 +9,7 @@ export const OKXConnector = new InjectedConnector({
 
             if (typeof window.okexchain === 'undefined') return
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const isOkxWallet = (ethereum?: any) => !!ethereum?.isOkxWallet
 
             if (isOkxWallet(window.okexchain.ethereum)) return window.okexchain.ethereum
