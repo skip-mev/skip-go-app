@@ -222,6 +222,10 @@ export async function getOfflineSigner(
     return walletClient.getOfflineSignerDirect(chainId);
   }
 
+  if (walletClient.getOfflineSigner) {
+    return walletClient.getOfflineSigner(chainId, "direct");
+  }
+
   throw new Error("unsupported wallet");
 }
 
