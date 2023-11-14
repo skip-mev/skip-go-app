@@ -128,7 +128,7 @@ const WalletModalWithContext: FC = () => {
         continue;
       }
 
-      var logoUrl
+      let logoUrl
 
       if (connector.id === "injected" && connector.name in INJECTED_EVM_WALLET_LOGOS) {
         logoUrl = INJECTED_EVM_WALLET_LOGOS[connector.name]
