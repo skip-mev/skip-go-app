@@ -4,5 +4,6 @@ declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window extends KeplrWindow {
     okexchain?: any
+    ethereum?: any
   }
 }
