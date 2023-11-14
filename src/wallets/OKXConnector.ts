@@ -9,7 +9,7 @@ export const OKXConnector = new InjectedConnector({
 
             if (typeof window.okexchain === 'undefined') return
 
-            const isOkxWallet = (ethereum) => !!ethereum?.isOkxWallet
+            const isOkxWallet = (ethereum?: any) => !!ethereum?.isOkxWallet
 
             if (isOkxWallet(window.okexchain.ethereum)) return window.okexchain.ethereum
 
