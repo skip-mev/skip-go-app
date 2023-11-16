@@ -1,6 +1,6 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { FC, Fragment } from "react";
+import { FC } from "react";
 
 import { useChains as useSkipChains } from "@/api/queries";
 import { useAccount } from "@/hooks/useAccount";
@@ -16,6 +16,7 @@ import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
 import { SettingsButton } from "../SettingsButton";
 import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
+import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { useSwapWidget } from "./useSwapWidget";
 
@@ -64,7 +65,7 @@ export const SwapWidget: FC = () => {
     sourceChain.chainType !== destinationChain.chainType;
 
   return (
-    <Fragment>
+    <UsdDiff.Provider>
       <Tooltip.Provider>
         <div className="space-y-6">
           <div className="flex items-center">
@@ -225,6 +226,6 @@ export const SwapWidget: FC = () => {
         <JsonDialog />
       </Tooltip.Provider>
       <WalletModal />
-    </Fragment>
+    </UsdDiff.Provider>
   );
 };
