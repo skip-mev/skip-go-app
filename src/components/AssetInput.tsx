@@ -12,7 +12,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
-import { UsdValue } from "./UsdValue";
+import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
 interface Props {
   amount: string;
@@ -85,12 +85,14 @@ const AssetInput: FC<Props> = ({
 
   const { slippage } = useSettingsStore();
 
-  // hotfix side effect to prevent negative amounts
+  const reset = useUsdDiffReset();
   useEffect(() => {
-    if (parseFloat(amount) < 0) {
-      onAmountChange?.("0.0");
-    }
-  }, [amount, onAmountChange]);
+    const parsed = parseFloat(amount);
+
+    // hotfix side effect to prevent negative amounts
+    if (parsed < 0) onAmountChange?.("0.0");
+    if (parsed == 0) reset();
+  }, [amount, onAmountChange, reset]);
 
   return (
     <Fragment>
