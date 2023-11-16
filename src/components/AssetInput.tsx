@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { ethers } from "ethers";
-import { FC, Fragment, useEffect, useMemo, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -53,11 +53,7 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances, isInitialLoading } = useBalancesByChain(
-    address,
-    chain,
-    showBalance,
-  );
+  const { data: balances } = useBalancesByChain(address, chain, showBalance);
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) {
@@ -93,6 +89,9 @@ const AssetInput: FC<Props> = ({
     if (parsed < 0) onAmountChange?.("0.0");
     if (parsed == 0) reset();
   }, [amount, onAmountChange, reset]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => inputRef.current?.focus(), []);
 
   return (
     <Fragment>
@@ -156,22 +155,74 @@ const AssetInput: FC<Props> = ({
                   onAmountChange?.("");
                 }
               }}
+              ref={inputRef}
             />
           )}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 tabular-nums">
             {asset && parseFloat(amount) > 0 && (
-              <div
-                className="text-neutral-400 text-sm tabular-nums"
-                data-testid="fiat-value-swap-currency-input"
-              >
+              <div className="text-neutral-400 text-sm">
                 <UsdValue
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
                   value={amount}
+                  context={onAmountChange ? "src" : "dest"}
                 />
               </div>
             )}
+            {!onAmountChange && (
+              <UsdDiff.Value>
+                {({ isLoading, percentage }) => (
+                  <div
+                    className={clsx(
+                      "text-sm",
+                      isLoading && "hidden",
+                      percentage > 0 ? "text-green-500" : "text-red-500",
+                    )}
+                  >
+                    ({percentage.toFixed(2)}%)
+                  </div>
+                )}
+              </UsdDiff.Value>
+            )}
             <div className="flex-grow" />
+            {showBalance && address && selectedAssetBalance && (
+              <div className="text-neutral-400 text-sm flex items-center space-x-2">
+                <div className="max-w-[16ch] truncate">
+                  Balance: {selectedAssetBalance}
+                </div>
+                <button
+                  className={clsx(
+                    "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] text-white",
+                    "transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
+                  )}
+                  disabled={maxButtonDisabled}
+                  onClick={() => {
+                    if (!selectedAssetBalance || !chain || !asset) return;
+
+                    const feeDenom = getFeeDenom(chain.chainID);
+
+                    let amount = selectedAssetBalance;
+
+                    // if selected asset is the fee denom, subtract the fee
+                    if (feeDenom && feeDenom.denom === asset.denom) {
+                      const fee = getFee(chain.chainID);
+
+                      const feeInt = parseFloat(
+                        ethers.formatUnits(fee.toString(), asset.decimals),
+                      ).toFixed(asset.decimals);
+
+                      amount = (
+                        parseFloat(selectedAssetBalance) - parseFloat(feeInt)
+                      ).toFixed(asset.decimals);
+                    }
+
+                    onAmountChange?.(amount);
+                  }}
+                >
+                  Max
+                </button>
+              </div>
+            )}
             {showSlippage && !onAmountChange && amount !== "0.0" && (
               <button
                 className="text-neutral-400 text-sm hover:underline"
@@ -182,55 +233,6 @@ const AssetInput: FC<Props> = ({
             )}
           </div>
         </div>
-        {showBalance && address && (
-          <div className="flex items-center justify-between">
-            {isInitialLoading && (
-              <div className="w-[100px] h-[20.5px] bg-neutral-100 animate-pulse" />
-            )}
-            {!isInitialLoading && selectedAssetBalance && (
-              <Fragment>
-                <p className="text-sm font-medium text-neutral-400">
-                  AVAILABLE:{" "}
-                  <span className="text-neutral-700">
-                    {selectedAssetBalance} {asset?.symbol}
-                  </span>
-                </p>
-                <div>
-                  <button
-                    className="font-extrabold text-xs bg-neutral-400 text-white px-3 py-1 rounded-md transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed"
-                    disabled={maxButtonDisabled}
-                    onClick={() => {
-                      if (!selectedAssetBalance || !chain || !asset) {
-                        return;
-                      }
-
-                      const feeDenom = getFeeDenom(chain.chainID);
-
-                      let amount = selectedAssetBalance;
-
-                      // if selected asset is the fee denom, subtract the fee
-                      if (feeDenom && feeDenom.denom === asset.denom) {
-                        const fee = getFee(chain.chainID);
-
-                        const feeInt = parseFloat(
-                          ethers.formatUnits(fee.toString(), asset.decimals),
-                        ).toFixed(asset.decimals);
-
-                        amount = (
-                          parseFloat(selectedAssetBalance) - parseFloat(feeInt)
-                        ).toFixed(asset.decimals);
-                      }
-
-                      onAmountChange?.(amount);
-                    }}
-                  >
-                    MAX
-                  </button>
-                </div>
-              </Fragment>
-            )}
-          </div>
-        )}
       </div>
       <Toast
         open={isError}
