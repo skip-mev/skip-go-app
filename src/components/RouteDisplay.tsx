@@ -27,6 +27,10 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
     imageURL:
       "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
   },
+  "neutron-lido-satellite": {
+    name: "Neutron Lido Satellite",
+    imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
+  },
 };
 
 interface TransferAction {
