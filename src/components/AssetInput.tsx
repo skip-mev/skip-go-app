@@ -12,6 +12,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { UsdValue } from "./UsdValue";
 
 interface Props {
   amount: string;
@@ -156,6 +157,18 @@ const AssetInput: FC<Props> = ({
             />
           )}
           <div className="flex items-center space-x-2">
+            {asset && parseFloat(amount) > 0 && (
+              <div
+                className="text-neutral-400 text-sm tabular-nums"
+                data-testid="fiat-value-swap-currency-input"
+              >
+                <UsdValue
+                  chainId={asset.originChainID}
+                  denom={asset.originDenom}
+                  value={amount}
+                />
+              </div>
+            )}
             <div className="flex-grow" />
             {showSlippage && !onAmountChange && amount !== "0.0" && (
               <button
