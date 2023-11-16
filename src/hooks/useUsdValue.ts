@@ -16,21 +16,32 @@ export function useUsdValue({ chainId, denom, value }: Args) {
     () => ["USE_USD_VALUE", chainId, denom, value] as const,
     [chainId, denom, value],
   );
+
+  const enabled = useMemo(() => {
+    const parsed = parseFloat(value);
+    return !isNaN(parsed) && parsed > 0;
+  }, [value]);
+
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, chainId, denom, value] }) => {
+      return getUsdValue({ chainId, denom, value });
+    },
+    staleTime: 1000 * 60, // 1 minute
+    enabled,
+  });
+}
+
+async function getUsdValue({ chainId, denom, value }: Args) {
       const assets = getAssets(chainId);
       const asset =
         assets.find((asset) => asset.base === denom) ||
-        raise(`useUsdValue error: ${denom} not found in ${chainId}`);
+    raise(`getUsdValue error: ${denom} not found in ${chainId}`);
       const coingeckoId =
         asset.coingecko_id ||
         raise(
-          `useUsdValue error: ${denom} does not have a 'coingecko_id' in ${chainId}`,
+      `getUsdValue error: ${denom} does not have a 'coingecko_id' in ${chainId}`,
         );
       const usd = await getUsdPrice({ coingeckoId });
       return parseFloat(value) * usd;
-    },
-    staleTime: 1000 * 60, // 1 minute
-  });
 }
