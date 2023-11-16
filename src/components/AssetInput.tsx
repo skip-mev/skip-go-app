@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useEffect, useMemo, useState } from "react";
 
@@ -114,21 +115,14 @@ const AssetInput: FC<Props> = ({
         <div>
           {!onAmountChange && (
             <p
-              className={`w-full text-3xl font-medium h-10 ${
-                amount === "0.0" ? "text-neutral-300" : "text-black"
-              }`}
+              className={clsx(
+                "w-full text-3xl font-medium h-10",
+                amount === "0.0" ? "text-neutral-300" : "text-black",
+              )}
               data-testid="amount"
             >
               {amount}
             </p>
-          )}
-          {showSlippage && !onAmountChange && amount !== "0.0" && (
-            <button
-              className="text-neutral-400 text-sm hover:underline"
-              onClick={() => disclosure.open("settingsDialog")}
-            >
-              Max Slippage: {slippage}%
-            </button>
           )}
           {onAmountChange && (
             <input
@@ -161,6 +155,17 @@ const AssetInput: FC<Props> = ({
               }}
             />
           )}
+          <div className="flex items-center space-x-2">
+            <div className="flex-grow" />
+            {showSlippage && !onAmountChange && amount !== "0.0" && (
+              <button
+                className="text-neutral-400 text-sm hover:underline"
+                onClick={() => disclosure.open("settingsDialog")}
+              >
+                Max Slippage: {slippage}%
+              </button>
+            )}
+          </div>
         </div>
         {showBalance && address && (
           <div className="flex items-center justify-between">
