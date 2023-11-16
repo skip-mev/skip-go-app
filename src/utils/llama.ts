@@ -4,15 +4,22 @@ interface Args {
   coingeckoId: string;
 }
 
+const cache = new Map<string, number>();
+
 export async function getUsdPrice({ coingeckoId }: Args) {
+  const cached = cache.get(coingeckoId);
+  if (cached) return cached;
+
   const endpoint = `https://coins.llama.fi/prices/current/coingecko:${coingeckoId}`;
 
   const response = await fetch(endpoint);
   const data = await response.json();
 
   const { coins } = await priceResponseSchema.parseAsync(data);
+  const { price } = coins[`coingecko:${coingeckoId}`];
 
-  return coins[`coingecko:${coingeckoId}`].price;
+  cache.set(coingeckoId, price);
+  return price;
 }
 
 const priceResponseSchema = z.object({
