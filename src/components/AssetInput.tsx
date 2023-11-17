@@ -1,5 +1,6 @@
+import { clsx } from "clsx";
 import { ethers } from "ethers";
-import { FC, Fragment, useEffect, useMemo, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -11,6 +12,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
 interface Props {
   amount: string;
@@ -51,11 +53,7 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances, isInitialLoading } = useBalancesByChain(
-    address,
-    chain,
-    showBalance,
-  );
+  const { data: balances } = useBalancesByChain(address, chain, showBalance);
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) {
@@ -83,12 +81,17 @@ const AssetInput: FC<Props> = ({
 
   const { slippage } = useSettingsStore();
 
-  // hotfix side effect to prevent negative amounts
+  const reset = useUsdDiffReset();
   useEffect(() => {
-    if (parseFloat(amount) < 0) {
-      onAmountChange?.("0.0");
-    }
-  }, [amount, onAmountChange]);
+    const parsed = parseFloat(amount);
+
+    // hotfix side effect to prevent negative amounts
+    if (parsed < 0) onAmountChange?.("0.0");
+    if (parsed == 0) reset();
+  }, [amount, onAmountChange, reset]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => inputRef.current?.focus(), []);
 
   return (
     <Fragment>
@@ -114,25 +117,18 @@ const AssetInput: FC<Props> = ({
         <div>
           {!onAmountChange && (
             <p
-              className={`w-full text-3xl font-medium h-10 ${
-                amount === "0.0" ? "text-neutral-300" : "text-black"
-              }`}
+              className={clsx(
+                "w-full text-3xl font-medium h-10",
+                amount === "0.0" ? "text-neutral-300" : "text-black",
+              )}
               data-testid="amount"
             >
               {amount}
             </p>
           )}
-          {showSlippage && !onAmountChange && amount !== "0.0" && (
-            <button
-              className="text-neutral-400 text-sm hover:underline"
-              onClick={() => disclosure.open("settingsDialog")}
-            >
-              Max Slippage: {slippage}%
-            </button>
-          )}
           {onAmountChange && (
             <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10"
+              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
               type="text"
               placeholder="0.0"
               value={amount}
@@ -159,58 +155,84 @@ const AssetInput: FC<Props> = ({
                   onAmountChange?.("");
                 }
               }}
+              ref={inputRef}
             />
           )}
-        </div>
-        {showBalance && address && (
-          <div className="flex items-center justify-between">
-            {isInitialLoading && (
-              <div className="w-[100px] h-[20.5px] bg-neutral-100 animate-pulse" />
+          <div className="flex items-center space-x-2 tabular-nums h-8">
+            {asset && parseFloat(amount) > 0 && (
+              <div className="text-neutral-400 text-sm">
+                <UsdValue
+                  chainId={asset.originChainID}
+                  denom={asset.originDenom}
+                  value={amount}
+                  context={onAmountChange ? "src" : "dest"}
+                />
+              </div>
             )}
-            {!isInitialLoading && selectedAssetBalance && (
-              <Fragment>
-                <p className="text-sm font-medium text-neutral-400">
-                  AVAILABLE:{" "}
-                  <span className="text-neutral-700">
-                    {selectedAssetBalance} {asset?.symbol}
-                  </span>
-                </p>
-                <div>
-                  <button
-                    className="font-extrabold text-xs bg-neutral-400 text-white px-3 py-1 rounded-md transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed"
-                    disabled={maxButtonDisabled}
-                    onClick={() => {
-                      if (!selectedAssetBalance || !chain || !asset) {
-                        return;
-                      }
-
-                      const feeDenom = getFeeDenom(chain.chainID);
-
-                      let amount = selectedAssetBalance;
-
-                      // if selected asset is the fee denom, subtract the fee
-                      if (feeDenom && feeDenom.denom === asset.denom) {
-                        const fee = getFee(chain.chainID);
-
-                        const feeInt = parseFloat(
-                          ethers.formatUnits(fee.toString(), asset.decimals),
-                        ).toFixed(asset.decimals);
-
-                        amount = (
-                          parseFloat(selectedAssetBalance) - parseFloat(feeInt)
-                        ).toFixed(asset.decimals);
-                      }
-
-                      onAmountChange?.(amount);
-                    }}
+            {!onAmountChange && (
+              <UsdDiff.Value>
+                {({ isLoading, percentage }) => (
+                  <div
+                    className={clsx(
+                      "text-sm",
+                      isLoading && "hidden",
+                      percentage > 0 ? "text-green-500" : "text-red-500",
+                    )}
                   >
-                    MAX
-                  </button>
+                    ({percentage.toFixed(2)}%)
+                  </div>
+                )}
+              </UsdDiff.Value>
+            )}
+            <div className="flex-grow" />
+            {showBalance && address && selectedAssetBalance && (
+              <div className="text-neutral-400 text-sm flex items-center space-x-2">
+                <div className="max-w-[16ch] truncate">
+                  Balance: {selectedAssetBalance}
                 </div>
-              </Fragment>
+                <button
+                  className={clsx(
+                    "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] text-white",
+                    "transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
+                  )}
+                  disabled={maxButtonDisabled}
+                  onClick={() => {
+                    if (!selectedAssetBalance || !chain || !asset) return;
+
+                    const feeDenom = getFeeDenom(chain.chainID);
+
+                    let amount = selectedAssetBalance;
+
+                    // if selected asset is the fee denom, subtract the fee
+                    if (feeDenom && feeDenom.denom === asset.denom) {
+                      const fee = getFee(chain.chainID);
+
+                      const feeInt = parseFloat(
+                        ethers.formatUnits(fee.toString(), asset.decimals),
+                      ).toFixed(asset.decimals);
+
+                      amount = (
+                        parseFloat(selectedAssetBalance) - parseFloat(feeInt)
+                      ).toFixed(asset.decimals);
+                    }
+
+                    onAmountChange?.(amount);
+                  }}
+                >
+                  Max
+                </button>
+              </div>
+            )}
+            {showSlippage && !onAmountChange && amount !== "0.0" && (
+              <button
+                className="text-neutral-400 text-sm hover:underline"
+                onClick={() => disclosure.open("settingsDialog")}
+              >
+                Max Slippage: {slippage}%
+              </button>
             )}
           </div>
-        )}
+        </div>
       </div>
       <Toast
         open={isError}
