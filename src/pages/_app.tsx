@@ -5,6 +5,7 @@ import { wallets as cosmostationWallets } from "@cosmos-kit/cosmostation-extensi
 import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { wallets as leapWallets } from "@cosmos-kit/leap-extension";
 import { wallets as metamaskWallets } from "@cosmos-kit/leap-metamask-cosmos-snap";
+import { wallets as okxWallets } from "@cosmos-kit/okxwallet";
 import { ChainProvider } from "@cosmos-kit/react";
 import * as RadixToast from "@radix-ui/react-toast";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -25,6 +26,7 @@ import { AssetsProvider } from "@/context/assets";
 import { ToastProvider } from "@/context/toast";
 import { SkipProvider } from "@/solve";
 import { queryClient } from "@/utils/query";
+import { OKXConnector } from "@/wallets/OKXConnector";
 
 const { publicClient, chains: evmChains } = configureChains(EVM_CHAINS, [
   publicProvider(),
@@ -36,6 +38,7 @@ const wagmiConfig = createConfig({
     new MetaMaskConnector({
       chains: evmChains,
     }),
+    OKXConnector,
   ],
   publicClient,
 });
@@ -51,6 +54,7 @@ export default function App({ Component, pageProps }: AppProps) {
     ...cosmostationWallets,
     ...leapWallets,
     ...metamaskWallets,
+    ...okxWallets,
   ];
 
   return (
