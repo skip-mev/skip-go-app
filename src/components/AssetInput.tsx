@@ -158,7 +158,7 @@ const AssetInput: FC<Props> = ({
               ref={inputRef}
             />
           )}
-          <div className="flex items-center space-x-2 tabular-nums">
+          <div className="flex items-center space-x-2 tabular-nums h-8">
             {asset && parseFloat(amount) > 0 && (
               <div className="text-neutral-400 text-sm">
                 <UsdValue
