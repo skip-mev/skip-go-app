@@ -128,7 +128,7 @@ const AssetInput: FC<Props> = ({
           )}
           {onAmountChange && (
             <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10"
+              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
               type="text"
               placeholder="0.0"
               value={amount}
