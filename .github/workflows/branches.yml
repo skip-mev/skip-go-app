@@ -1,17 +1,17 @@
 name: Branches
 on:
   push:
-    branches: [staging]
+    branches: [main]
 
 jobs:
-  sync-staging-dev:
-    name: branch staging -> dev
+  sync-main-dev:
+    name: branch main -> dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Fast-forward staging -> dev
+      - name: Fast-forward main -> dev
         run: |
           git checkout dev
-          git merge --ff-only staging
+          git merge --ff-only main
           git push --set-upstream origin dev
