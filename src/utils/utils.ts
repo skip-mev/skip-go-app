@@ -433,7 +433,6 @@ export function useBalancesByChain(
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    keepPreviousData: true,
     enabled: !!chain && !!address && enabled,
   });
 }
