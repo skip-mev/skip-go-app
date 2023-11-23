@@ -56,20 +56,21 @@ const AssetInput: FC<Props> = ({
   const { data: balances } = useBalancesByChain(address, chain, showBalance);
 
   const selectedAssetBalance = useMemo(() => {
-    if (!asset || !balances) {
-      return undefined;
-    }
+    if (!asset || !balances) return undefined;
 
     const balanceWei = balances[asset.denom];
+    if (!balanceWei) return "0.0";
 
-    if (!balanceWei) {
-      return "0.0";
-    }
-
-    return new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 6,
-    }).format(parseFloat(ethers.formatUnits(balanceWei, asset.decimals)));
+    const parsed = parseFloat(ethers.formatUnits(balanceWei, asset.decimals));
+    return parsed.toFixed(6);
   }, [asset, balances]);
+
+  const formattedSelectedAssetBalance = useMemo(() => {
+    const { format } = new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 6,
+    });
+    return format(parseFloat(selectedAssetBalance ?? "0.0"));
+  }, [selectedAssetBalance]);
 
   const maxButtonDisabled = useMemo(() => {
     if (!selectedAssetBalance) {
@@ -140,7 +141,7 @@ const AssetInput: FC<Props> = ({
                 latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
 
                 // prevent entering anything except numbers, commas, and periods
-                if (latest.match(/[^0-9.,]/gi)) return;
+                if (latest.match(/[^0-9.]/gi)) return;
 
                 // if there is more than one period or comma,
                 // remove all periods except the first one for decimals
@@ -188,7 +189,7 @@ const AssetInput: FC<Props> = ({
             {showBalance && address && selectedAssetBalance && (
               <div className="text-neutral-400 text-sm flex items-center space-x-2">
                 <div className="max-w-[16ch] truncate">
-                  Balance: {selectedAssetBalance}
+                  Balance: {formattedSelectedAssetBalance}
                 </div>
                 <button
                   className={clsx(
@@ -200,7 +201,6 @@ const AssetInput: FC<Props> = ({
                     if (!selectedAssetBalance || !chain || !asset) return;
 
                     const feeDenom = getFeeDenom(chain.chainID);
-
                     let amount = selectedAssetBalance;
 
                     // if selected asset is the fee denom, subtract the fee
