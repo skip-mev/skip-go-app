@@ -18,7 +18,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
 
   const skipRouter = useSkipClient();
 
-  const { data, ...queryResult } = useQuery({
+  const query = useQuery({
     queryKey: ["skip-api-chains"],
     queryFn: async () => {
       const chains = await skipRouter.chains({
@@ -42,8 +42,8 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   });
 
   return {
-    ...queryResult,
-    chains: data,
+    ...query,
+    chains: query.data,
   };
 }
 

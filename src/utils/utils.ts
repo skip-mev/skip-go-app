@@ -36,6 +36,7 @@ import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 import { Chain } from "@/api/queries";
 import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
+import { APP_URL } from "@/constants/api";
 import { EVM_CHAINS } from "@/constants/constants";
 import { useSkipClient } from "@/solve";
 
@@ -57,7 +58,7 @@ export async function getStargateClientForChainID(chainID: ChainId) {
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
+  const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
 
   try {
     const client = await StargateClient.connect(preferredEndpoint, {});
@@ -94,7 +95,7 @@ export async function getSigningStargateClientForChainID(
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
+  const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
 
   try {
     const client = await SigningStargateClient.connectWithSigner(
@@ -153,7 +154,7 @@ export async function getSigningCosmWasmClientForChainID(
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
+  const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
   try {
     const client = await SigningCosmWasmClient.connectWithSigner(
       preferredEndpoint,

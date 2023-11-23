@@ -4,7 +4,7 @@ import { getWalletClient } from "@wagmi/core";
 import { createContext, FC, PropsWithChildren } from "react";
 import { useNetwork } from "wagmi";
 
-import { API_URL } from "@/constants/api";
+import { API_URL, APP_URL } from "@/constants/api";
 import {
   getOfflineSigner,
   getOfflineSignerOnlyAmino,
@@ -66,7 +66,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
           return testnets[chainID];
         }
 
-        return `https://ibc.fun/nodes/${chainID}`;
+        return `${APP_URL}/nodes/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
         if (chainID === "injective-1") {
@@ -77,7 +77,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
           return "https://evmos-api.polkachu.com";
         }
 
-        return `https://ibc.fun/nodes/${chainID}`;
+        return `${APP_URL}/nodes/${chainID}`;
       },
     },
   });
