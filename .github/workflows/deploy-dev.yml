@@ -8,13 +8,26 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - id: checkout
+        name: Checkout
         uses: actions/checkout@v3
         with:
           ref: dev
-      - name: Pull latest 'main'
+
+      - id: pull-main
+        name: Pull latest 'main'
         run: git pull origin main
-      - name: Fast forward 'main' → 'dev'
+
+      - id: diff-check
+        name: Check if 'dev' is behind 'main'
+        run: git diff --exit-code origin/main
+
+      - id: fast-forward
+        if: steps.diff-check.outcome == 'failure'
+        name: Fast forward 'main' → 'dev'
         run: git merge --ff-only origin/main
-      - name: Push latest 'dev'
+
+      - id: push-dev
+        if: steps.diff-check.outcome == 'failure'
+        name: Push latest 'dev'
         run: git push --set-upstream origin dev
