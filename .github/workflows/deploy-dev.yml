@@ -2,6 +2,8 @@ name: Deploy (dev.ibc.fun)
 on:
   push:
     branches: [main]
+  repository_dispatch:
+    types: [deploy-dev]
   workflow_dispatch:
 
 jobs:
