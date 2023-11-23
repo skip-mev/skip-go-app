@@ -1,10 +1,20 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+const APP_URL =
+  process.env.APP_URL ||
+  (process.env.VERCEL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`) ||
+  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${
+    process.env.PORT || 3000
+  }`;
+
 /**
  * @type {import('next').NextConfig}
  * @see https://nextjs.org/docs/pages/api-reference/next-config-js
  */
 let nextConfig = {
+  env: {
+    APP_URL,
+  },
   productionBrowserSourceMaps: true,
   rewrites: async () => {
     return [
