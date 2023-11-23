@@ -1,16 +1,17 @@
-name: Branches
+name: Deploy (dev.ibc.fun)
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 jobs:
-  sync-main-dev:
-    name: branch main -> dev
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Fast-forward main -> dev
         run: |
           git checkout dev
