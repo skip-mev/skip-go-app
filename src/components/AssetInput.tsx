@@ -12,6 +12,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { SimpleTooltip } from "./SimpleTooltip";
 import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
 interface Props {
@@ -186,11 +187,22 @@ const AssetInput: FC<Props> = ({
               </UsdDiff.Value>
             )}
             <div className="flex-grow" />
-            {showBalance && address && selectedAssetBalance && (
-              <div className="text-neutral-400 text-sm flex items-center space-x-2">
-                <div className="max-w-[16ch] truncate">
-                  Balance: {formattedSelectedAssetBalance}
-                </div>
+            {showBalance && address && selectedAssetBalance && asset && (
+              <div className="text-neutral-400 text-sm flex items-center">
+                <div className="mr-1">Balance:</div>
+                <SimpleTooltip
+                  label={`${formattedSelectedAssetBalance} ${asset.symbol}`}
+                  delayDuration={0}
+                >
+                  <div
+                    className={clsx(
+                      "max-w-[16ch] truncate mr-2",
+                      "underline decoration-dotted underline-offset-4 cursor-help",
+                    )}
+                  >
+                    {formattedSelectedAssetBalance}
+                  </div>
+                </SimpleTooltip>
                 <button
                   className={clsx(
                     "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] text-white",
