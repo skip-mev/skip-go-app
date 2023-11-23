@@ -15,6 +15,13 @@ export const UsdValue = ({
 }: UsdValueProps) => {
   const { data: usdValue = 0, isLoading } = useUsdValue(args);
 
+  const prevValue = useRef(usdValue);
+  useEffect(() => {
+    if (!isLoading && prevValue.current !== usdValue) {
+      prevValue.current = usdValue;
+    }
+  }, [isLoading, usdValue]);
+
   const contextStore = useContext(ctx);
   useEffect(() => {
     if (contextStore && context) {
@@ -25,6 +32,9 @@ export const UsdValue = ({
     }
   });
 
+  if (isLoading && prevValue.current) {
+    return <>{`$${prevValue.current.toFixed(2)}`}</>;
+  }
   return <>{isLoading ? loading : `$${usdValue.toFixed(2)}`}</>;
 };
 
