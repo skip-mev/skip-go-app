@@ -11,9 +11,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-      - name: Fast-forward main -> dev
-        run: |
-          git checkout dev
-          git merge --ff-only main
-          git push --set-upstream origin dev
+          ref: dev
+      - name: Pull latest 'main'
+        run: git pull origin main
+      - name: Fast forward 'main' → 'dev'
+        run: git merge --ff-only origin/main
+      - name: Push latest 'dev'
+        run: git push --set-upstream origin dev
