@@ -22,7 +22,7 @@ import {
   StargateClient,
   StdFee,
 } from "@cosmjs/stargate";
-import { getFastestEndpoint, WalletClient } from "@cosmos-kit/core";
+import { WalletClient } from "@cosmos-kit/core";
 import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
 import { KeplrClient } from "@cosmos-kit/keplr-extension";
 import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
@@ -60,26 +60,9 @@ export async function getStargateClientForChainID(chainID: ChainId) {
 
   const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
 
-  try {
-    const client = await StargateClient.connect(preferredEndpoint, {});
+  const client = await StargateClient.connect(preferredEndpoint, {});
 
-    STARGATE_CLIENTS[chainID] = client;
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
-
-  const client = await StargateClient.connect(endpoint, {});
+  STARGATE_CLIENTS[chainID] = client;
 
   return client;
 }
@@ -97,34 +80,13 @@ export async function getSigningStargateClientForChainID(
 
   const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
 
-  try {
-    const client = await SigningStargateClient.connectWithSigner(
-      preferredEndpoint,
-      signer,
-      options,
-    );
-
-    console.log(`Connected to ${preferredEndpoint}`);
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
-
   const client = await SigningStargateClient.connectWithSigner(
-    endpoint,
+    preferredEndpoint,
     signer,
     options,
   );
+
+  console.log(`Connected to ${preferredEndpoint}`);
 
   return client;
 }
@@ -155,29 +117,9 @@ export async function getSigningCosmWasmClientForChainID(
   }
 
   const preferredEndpoint = `${APP_URL}/nodes/${chainID}`;
-  try {
-    const client = await SigningCosmWasmClient.connectWithSigner(
-      preferredEndpoint,
-      signer,
-      options,
-    );
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
 
   const client = await SigningCosmWasmClient.connectWithSigner(
-    endpoint,
+    preferredEndpoint,
     signer,
     options,
   );
