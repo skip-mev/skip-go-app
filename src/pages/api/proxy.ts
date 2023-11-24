@@ -1,18 +1,25 @@
 import httpProxy from "http-proxy";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse, PageConfig } from "next";
+
+import { raise } from "@/utils/assert";
 
 const proxy = httpProxy.createProxyServer();
 
-export const config = {
+export const config: PageConfig = {
   api: {
+    externalResolver: true,
     bodyParser: false,
   },
 };
 
-function proxyHandler(req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   return new Promise((_, reject) => {
-    const chainID = req.query.chainID as string;
+    const chainID =
+      typeof req.query.chainID === "string"
+        ? req.query.chainID
+        : raise("chainID is required");
 
+    console.log(req.url);
     if (req.url) {
       req.url = req.url.split(chainID)[1];
     }
@@ -21,17 +28,14 @@ function proxyHandler(req: NextApiRequest, res: NextApiResponse) {
 
     proxy.once("error", reject);
 
-    proxy.on("proxyRes", (proxyRes) => {
+    proxy.once("proxyRes", (proxyRes) => {
       proxyRes.headers["access-control-allow-origin"] = "*";
     });
 
     proxy.web(req, res, {
-      target: rpcURL,
-      autoRewrite: false,
-      changeOrigin: true,
       auth: `${process.env.POLKACHU_USER}:${process.env.POLKACHU_PASSWORD}`,
+      changeOrigin: true,
+      target: rpcURL,
     });
   });
 }
-
-export default proxyHandler;
