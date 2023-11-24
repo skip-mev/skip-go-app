@@ -52,7 +52,8 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
   },
   "terra-astroport": {
     name: "Terra Astroport",
-    imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
+    imageURL:
+      "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
   },
   "osmosis-poolmanager": {
     name: "Osmosis",

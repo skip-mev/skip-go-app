@@ -1,12 +1,12 @@
 import {
   ArrowLeftIcon,
-  ClipboardDocumentIcon,
   CheckIcon,
+  ClipboardDocumentIcon,
 } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
+import { useMemo, useState } from "react";
 
 import { useJsonDisclosure } from "@/context/disclosures";
-import { useMemo, useState } from "react";
 
 export const JsonDialog = () => {
   const [state, { close }] = useJsonDisclosure();

@@ -4,7 +4,10 @@ import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { useChainByID } from "@/api/queries";
-import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/constants";
+import {
+  EVM_WALLET_LOGOS,
+  INJECTED_EVM_WALLET_LOGOS,
+} from "@/constants/constants";
 import { DialogContent } from "@/elements/Dialog";
 import { getChainByID } from "@/utils/utils";
 
@@ -128,12 +131,15 @@ const WalletModalWithContext: FC = () => {
         continue;
       }
 
-      let logoUrl
+      let logoUrl;
 
-      if (connector.id === "injected" && connector.name in INJECTED_EVM_WALLET_LOGOS) {
-        logoUrl = INJECTED_EVM_WALLET_LOGOS[connector.name]
+      if (
+        connector.id === "injected" &&
+        connector.name in INJECTED_EVM_WALLET_LOGOS
+      ) {
+        logoUrl = INJECTED_EVM_WALLET_LOGOS[connector.name];
       } else {
-        logoUrl = EVM_WALLET_LOGOS[connector.id]
+        logoUrl = EVM_WALLET_LOGOS[connector.id];
       }
 
       const minimalWallet: MinimalWallet = {
