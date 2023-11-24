@@ -11,6 +11,7 @@
     "simple-import-sort/exports": "warn",
     "simple-import-sort/imports": "warn"
   },
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "src/chains/"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
