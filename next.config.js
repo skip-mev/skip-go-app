@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/// <reference path="./env.d.ts" />
+/// <reference path="./vercel.d.ts" />
 
 const APP_URL =
   process.env.APP_URL ||
@@ -48,6 +49,10 @@ let nextConfig = {
           "uuid",
         ]
       : [],
+  webpack: (config, { dev, isServer }) => {
+    if (dev && isServer) checkEnv();
+    return config;
+  },
 };
 
 /** @see https://docs.sentry.io/platforms/javascript/guides/nextjs */
@@ -79,3 +84,22 @@ const sentryOptions = {
 nextConfig = withSentryConfig(nextConfig, sentryWebpackConfig, sentryOptions);
 
 module.exports = nextConfig;
+
+function checkEnv() {
+  if (checkEnv.once) return;
+
+  const log = require("next/dist/build/output/log");
+
+  if (!process.env.NEXT_PUBLIC_API_URL) {
+    log.warn(
+      'env NEXT_PUBLIC_API_URL is not set, using SKIP_API_URL from "@skip-router/core"',
+    );
+  }
+  if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
+    log.warn(
+      "env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work",
+    );
+  }
+
+  checkEnv.once = true;
+}
