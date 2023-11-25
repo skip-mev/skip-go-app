@@ -20,14 +20,7 @@ let nextConfig = {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
   productionBrowserSourceMaps: true,
-  rewrites: async () => {
-    return [
-      {
-        source: "/nodes/:chainID/:path*",
-        destination: "/api/proxy",
-      },
-    ];
-  },
+  rewrites: async () => [],
   transpilePackages:
     process.env.NODE_ENV === "test"
       ? [
