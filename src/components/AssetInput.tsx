@@ -1,3 +1,4 @@
+import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
@@ -236,12 +237,15 @@ const AssetInput: FC<Props> = ({
               </div>
             )}
             {showSlippage && !onAmountChange && amount !== "0.0" && (
-              <button
-                className="text-neutral-400 text-sm hover:underline"
-                onClick={() => disclosure.open("settingsDialog")}
-              >
-                Max Slippage: {slippage}%
-              </button>
+              <SimpleTooltip label="Click to change max slippage">
+                <button
+                  className="text-neutral-400 text-sm hover:underline"
+                  onClick={() => disclosure.open("settingsDialog")}
+                >
+                  Max Slippage: {slippage}%{" "}
+                  <PencilSquareIcon className="w-3 h-3 inline mb-1" />
+                </button>
+              </SimpleTooltip>
             )}
           </div>
         </div>
