@@ -3,6 +3,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { FC } from "react";
 
 import { useChains as useSkipChains } from "@/api/queries";
+import { useDisclosureKey } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 
 import AssetInput from "../AssetInput";
@@ -18,6 +19,7 @@ import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
+import { SwapDetails } from "./SwapDetails";
 import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
@@ -63,6 +65,8 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
+
+  const [isSwapDetailsOpen] = useDisclosureKey("swapDetailsCollapsible");
 
   return (
     <UsdDiff.Provider>
@@ -157,9 +161,19 @@ export const SwapWidget: FC = () => {
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
               chains={chains ?? []}
-              showSlippage={route?.doesSwap}
+              showSlippage={route?.doesSwap && !isSwapDetailsOpen}
             />
           </div>
+          {route && (
+            <SwapDetails
+              amountIn={amountIn}
+              amountOut={amountOut}
+              sourceChain={sourceChain}
+              sourceAsset={sourceAsset}
+              destinationChain={destinationChain}
+              destinationAsset={destinationAsset}
+            />
+          )}
           {routeLoading && <RouteLoadingBanner />}
           {route && !routeLoading && (
             <RouteTransactionCountBanner

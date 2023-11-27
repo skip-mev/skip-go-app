@@ -24,6 +24,8 @@ module.exports = {
       animation: {
         "accordion-open": `accordion-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "accordion-closed": `accordion-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
+        "collapsible-open": `collapsible-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
+        "collapsible-closed": `collapsible-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -42,6 +44,14 @@ module.exports = {
         },
         "accordion-closed": {
           from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
+        "collapsible-open": {
+          from: { height: 0 },
+          to: { height: "var(--radix-collapsible-content-height)" },
+        },
+        "collapsible-closed": {
+          from: { height: "var(--radix-collapsible-content-height)" },
           to: { height: 0 },
         },
       },
