@@ -34,7 +34,7 @@ export const SwapDetails = ({
 
   return (
     <Collapsible.Root
-      className="space-y-4 border border-neutral-200 px-4 py-2 rounded-lg text-sm group"
+      className="border border-neutral-200 px-4 py-2 rounded-lg text-sm group"
       open={open}
       onOpenChange={control.set}
     >
@@ -69,10 +69,16 @@ export const SwapDetails = ({
         </Collapsible.Trigger>
       </div>
 
-      <Collapsible.Content asChild>
+      <Collapsible.Content
+        className={clsx(
+          "overflow-hidden",
+          "data-[state=open]:animate-collapsible-open",
+          "data-[state=closed]:animate-collapsible-closed",
+        )}
+      >
         <dl
           className={clsx(
-            "grid grid-cols-2 gap-2 pb-2",
+            "grid grid-cols-2 gap-2 mt-4 mb-2",
             "[&_dt]:text-neutral-400 [&_dt]:text-start",
             "[&_dd]:text-end [&_dd]:tabular-nums",
           )}
