@@ -18,7 +18,6 @@ import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
-import { SwapDetails } from "./SwapDetails";
 import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
@@ -161,16 +160,6 @@ export const SwapWidget: FC = () => {
               showSlippage={route?.doesSwap}
             />
           </div>
-          {route && (
-            <SwapDetails
-              amountIn={amountIn}
-              amountOut={amountOut}
-              sourceChain={sourceChain}
-              sourceAsset={sourceAsset}
-              destinationChain={destinationChain}
-              destinationAsset={destinationAsset}
-            />
-          )}
           {routeLoading && <RouteLoadingBanner />}
           {route && !routeLoading && (
             <RouteTransactionCountBanner

@@ -50,7 +50,6 @@ function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
       return ".sif";
     case "Gravity Bridge":
       return ".grv";
-    case "Neutron":
     case "Noble":
       return "";
     default:

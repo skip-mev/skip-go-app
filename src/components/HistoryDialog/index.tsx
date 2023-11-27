@@ -22,7 +22,7 @@ export const HistoryDialog = () => {
 
   return (
     <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
-      <div className="flex flex-col h-full px-4 py-6 space-y-2">
+      <div className="flex flex-col h-full px-4 py-6 space-y-6">
         <div className="flex items-center gap-4 pb-2">
           <button
             className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
@@ -34,7 +34,7 @@ export const HistoryDialog = () => {
           <div className="flex-grow" />
           <HistoryClearButton />
         </div>
-        <div className="h-full">
+        <div className="h-full overflow-y-auto scrollbar-hide">
           <HistoryList.Root>
             {entries && entries.length < 1 && (
               <span className="text-center text-sm opacity-60 p-2">
