@@ -3,6 +3,7 @@ import { create } from "zustand";
 const defaultValues = {
   historyDialog: false,
   settingsDialog: false,
+  swapDetailsCollapsible: false,
 
   // TODO: port dialogs to new system
   // assetSelect: false,
@@ -38,6 +39,9 @@ export const disclosure = {
   toggle: (key: DisclosureKey) => {
     disclosureStore.setState((state) => ({ [key]: !state[key] }));
   },
+  set: (key: DisclosureKey, value: boolean) => {
+    disclosureStore.setState({ [key]: value });
+  },
   closeAll: () => {
     disclosureStore.setState(defaultValues);
   },
@@ -49,6 +53,7 @@ export const useDisclosureKey = (key: DisclosureKey) => {
     open: ({ closeAll = false } = {}) => disclosure.open(key, { closeAll }),
     close: () => disclosure.close(key),
     toggle: () => disclosure.toggle(key),
+    set: (value: boolean) => disclosure.set(key, value),
   };
   return [state, actions] as const;
 };
