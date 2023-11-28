@@ -4,16 +4,18 @@ import { create } from "zustand";
 import { Args, useUsdDiffValue, useUsdValue } from "@/hooks/useUsdValue";
 
 type UsdValueProps = Args & {
+  error?: ReactNode;
   loading?: ReactNode;
   context?: "src" | "dest";
 };
 
 export const UsdValue = ({
+  error = "Price not available",
   loading = "...",
   context,
   ...args
 }: UsdValueProps) => {
-  const { data: usdValue = 0, isLoading } = useUsdValue(args);
+  const { data: usdValue = 0, isError, isLoading } = useUsdValue(args);
 
   const prevValue = useRef(usdValue);
   useEffect(() => {
@@ -31,6 +33,10 @@ export const UsdValue = ({
       };
     }
   });
+
+  if (isError) {
+    return <>{error}</>;
+  }
 
   if (isLoading && prevValue.current) {
     return <>{`$${prevValue.current.toFixed(2)}`}</>;
