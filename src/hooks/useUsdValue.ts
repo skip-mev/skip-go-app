@@ -34,8 +34,7 @@ export function useUsdValue({ chainId, denom, value }: Args) {
 
 export function useUsdDiffValue([args1, args2]: [Args, Args]) {
   const queryKey = useMemo(() => {
-    const hash = [...Object.values(args1), ...Object.values(args2)].join("-");
-    return ["USE_USD_DIFF_VALUES", hash] as const;
+    return ["USE_USD_DIFF_VALUES", args1, args2] as const;
   }, [args1, args2]);
 
   const enabled = useMemo(() => {
@@ -45,11 +44,11 @@ export function useUsdDiffValue([args1, args2]: [Args, Args]) {
   }, [args1.value, args2.value]);
 
   return useQuery({
-    // intentionally not including args1 and args2 since query key is using
-    // hashed values of args1 and args2
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
-    queryFn: async () => {
+    queryKeyHashFn: ([key, args1, args2]) => {
+      return [key, ...Object.values(args1), ...Object.values(args2)].join("-");
+    },
+    queryFn: async ({ queryKey: [, args1, args2] }) => {
       const [v1, v2] = await Promise.all([
         getUsdValue(args1),
         getUsdValue(args2),
