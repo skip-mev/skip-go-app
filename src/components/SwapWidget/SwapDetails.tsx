@@ -1,6 +1,8 @@
 import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
+import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -11,6 +13,7 @@ import { FormValues } from "./useSwapWidget";
 
 type Props = FormValues & {
   amountOut: string;
+  route: RouteResponse;
 };
 
 export const SwapDetails = ({
@@ -20,10 +23,24 @@ export const SwapDetails = ({
   sourceAsset,
   destinationChain,
   destinationAsset,
+  route,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
   const { slippage } = useSettingsStore();
+
+  const axelarTransferOperation = useMemo(() => {
+    for (const op of route.operations) {
+      if ("axelarTransfer" in op) return op;
+    }
+    return null;
+  }, [route]);
+
+  const bridgingFee = useMemo(() => {
+    if (!axelarTransferOperation) return 0;
+    const { feeAmount } = axelarTransferOperation.axelarTransfer;
+    return +feeAmount / Math.pow(10, 18);
+  }, [axelarTransferOperation]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
@@ -38,16 +55,18 @@ export const SwapDetails = ({
       open={open}
       onOpenChange={control.set}
     >
-      <div className="flex items-center text-center gap-1 relative">
+      <div className="flex items-center text-center gap-1 relative text-xs">
         <div>
-          <span className="mr-1">
-            1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(4)}{" "}
+          <span className="mr-2">
+            1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(6)}{" "}
             {sourceAsset.symbol}
           </span>
-          <span className="text-neutral-400 before:content-['('] after:content-[')']">
+          <span className="text-neutral-400 tabular-nums">
             <UsdValue
+              error={null}
               chainId={sourceAsset.chainID}
               denom={sourceAsset.denom}
+              coingeckoId={sourceAsset.coingeckoId}
               value={(+amountIn / +amountOut).toString()}
             />
           </span>
@@ -55,11 +74,10 @@ export const SwapDetails = ({
         <div className="flex-grow" />
         <Collapsible.Trigger
           className={clsx(
-            "flex items-center text-xs text-neutral-400",
-            "before:absolute before:inset-0 before:content-['']",
+            "flex items-center text-xs text-neutral-400 relative",
+            "before:absolute before:-inset-2 before:content-['']",
           )}
         >
-          <span>{open ? "Hide" : "Show"} Details</span>
           <ChevronDownIcon
             className={clsx(
               "w-4 h-4 transition",
@@ -95,12 +113,16 @@ export const SwapDetails = ({
             </SimpleTooltip>
           </dt>
           <dd>{slippage}%</dd>
-          <dt>{isEvm ? "Fee" : "Bridging Fee"}</dt>
-          <dd>$0</dd>
-          <dt>Order Routing</dt>
-          <dd>Skip Router</dd>
+          <dt>Bridging Fee</dt>
+          <dd>
+            {format(bridgingFee)} {isEvm ? "ETH" : ""}
+          </dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
   );
 };
+
+const { format } = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 8,
+});

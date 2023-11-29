@@ -23,7 +23,8 @@ export const SlippageSetting = () => {
             min={0}
             max={100}
             onChange={(event) => {
-              useSettingsStore.setState({ slippage: event.target.value });
+              const value = Math.max(0, Math.min(100, +event.target.value));
+              useSettingsStore.setState({ slippage: value.toString() });
             }}
           />
           <div className="absolute right-2 inset-y-0 flex items-center pointer-events-none">

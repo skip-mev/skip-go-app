@@ -119,15 +119,15 @@ const AssetInput: FC<Props> = ({
         </div>
         <div>
           {!onAmountChange && (
-            <p
+            <div
               className={clsx(
-                "w-full text-3xl font-medium h-10",
+                "w-full text-3xl font-medium h-10 truncate",
                 amount === "0.0" ? "text-neutral-300" : "text-black",
               )}
               data-testid="amount"
             >
               {amount}
-            </p>
+            </div>
           )}
           {onAmountChange && (
             <input
@@ -165,8 +165,10 @@ const AssetInput: FC<Props> = ({
             {asset && parseFloat(amount) > 0 && (
               <div className="text-neutral-400 text-sm">
                 <UsdValue
+                  error={null}
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
+                  coingeckoId={asset.coingeckoId}
                   value={amount}
                   context={onAmountChange ? "src" : "dest"}
                 />

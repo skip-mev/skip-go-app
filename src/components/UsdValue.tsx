@@ -3,6 +3,12 @@ import { create } from "zustand";
 
 import { Args, useUsdDiffValue, useUsdValue } from "@/hooks/useUsdValue";
 
+const { format } = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 6,
+});
+
 type UsdValueProps = Args & {
   error?: ReactNode;
   loading?: ReactNode;
@@ -39,9 +45,10 @@ export const UsdValue = ({
   }
 
   if (isLoading && prevValue.current) {
-    return <>{`$${prevValue.current.toFixed(2)}`}</>;
+    return <>{format(prevValue.current)}</>;
   }
-  return <>{isLoading ? loading : `$${usdValue.toFixed(2)}`}</>;
+
+  return <>{isLoading ? loading : format(usdValue)}</>;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
