@@ -41,13 +41,13 @@ export const SwapDetails = ({
       open={open}
       onOpenChange={control.set}
     >
-      <div className="flex items-center text-center gap-1 relative">
+      <div className="flex items-center text-center gap-1 relative text-xs">
         <div>
           <span className="mr-1">
             1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(4)}{" "}
             {sourceAsset.symbol}
           </span>
-          <span className="text-neutral-400 before:content-['('] after:content-[')']">
+          <span className="text-neutral-400 tabular-nums before:content-['('] after:content-[')']">
             <UsdValue
               chainId={sourceAsset.chainID}
               denom={sourceAsset.denom}
@@ -59,11 +59,10 @@ export const SwapDetails = ({
         <div className="flex-grow" />
         <Collapsible.Trigger
           className={clsx(
-            "flex items-center text-xs text-neutral-400",
-            "before:absolute before:inset-0 before:content-['']",
+            "flex items-center text-xs text-neutral-400 relative",
+            "before:absolute before:-inset-2 before:content-['']",
           )}
         >
-          <span>{open ? "Hide" : "Show"} Details</span>
           <ChevronDownIcon
             className={clsx(
               "w-4 h-4 transition",
