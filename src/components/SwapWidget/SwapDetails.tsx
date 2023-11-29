@@ -2,6 +2,7 @@ import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
+import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -27,6 +28,19 @@ export const SwapDetails = ({
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
   const { slippage } = useSettingsStore();
+
+  const axelarTransferOperation = useMemo(() => {
+    for (const op of route.operations) {
+      if ("axelarTransfer" in op) return op;
+    }
+    return null;
+  }, [route]);
+
+  const bridgingFee = useMemo(() => {
+    if (!axelarTransferOperation) return 0;
+    const { feeAmount } = axelarTransferOperation.axelarTransfer;
+    return +feeAmount / Math.pow(10, 18);
+  }, [axelarTransferOperation]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
@@ -99,11 +113,33 @@ export const SwapDetails = ({
           </dt>
           <dd>{slippage}%</dd>
           <dt>{isEvm ? "Fee" : "Bridging Fee"}</dt>
-          <dd>$0</dd>
-          <dt>Order Routing</dt>
-          <dd>Skip Router</dd>
+          <dd>
+            <SimpleTooltip
+              label={
+                axelarTransferOperation
+                  ? `${axelarTransferOperation.axelarTransfer.feeAmount} gwei`
+                  : ""
+              }
+              delayDuration={0}
+              enabled={!!axelarTransferOperation}
+            >
+              <span
+                className={
+                  axelarTransferOperation
+                    ? "underline decoration-dotted underline-offset-4 cursor-help decoration-neutral-400"
+                    : ""
+                }
+              >
+                {format(bridgingFee)} {isEvm ? "ETH" : ""}
+              </span>
+            </SimpleTooltip>
+          </dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
   );
 };
+
+const { format } = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 8,
+});
