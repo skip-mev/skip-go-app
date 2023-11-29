@@ -1,0 +1,40 @@
+diff --git a/node_modules/@skip-router/core/dist/cjs/types/converters.js b/node_modules/@skip-router/core/dist/cjs/types/converters.js
+index fc0c6de..8fac48c 100644
+--- a/node_modules/@skip-router/core/dist/cjs/types/converters.js
++++ b/node_modules/@skip-router/core/dist/cjs/types/converters.js
+@@ -29,6 +29,7 @@ function assetFromJSON(assetJSON) {
+         logoURI: assetJSON.logo_uri,
+         decimals: assetJSON.decimals,
+         tokenContract: assetJSON.token_contract,
++        coingeckoId: assetJSON.coingecko_id,
+     };
+ }
+ exports.assetFromJSON = assetFromJSON;
+@@ -45,6 +46,7 @@ function assetToJSON(asset) {
+         logo_uri: asset.logoURI,
+         decimals: asset.decimals,
+         token_contract: asset.tokenContract,
++        coingecko_id: asset.coingeckoId,
+     };
+ }
+ exports.assetToJSON = assetToJSON;
+diff --git a/node_modules/@skip-router/core/dist/cjs/types/shared.d.ts b/node_modules/@skip-router/core/dist/cjs/types/shared.d.ts
+index 1741f74..a50a8b2 100644
+--- a/node_modules/@skip-router/core/dist/cjs/types/shared.d.ts
++++ b/node_modules/@skip-router/core/dist/cjs/types/shared.d.ts
+@@ -18,6 +18,7 @@ export type AssetJSON = {
+     logo_uri: string | undefined;
+     decimals: number | undefined;
+     token_contract: string | undefined;
++    coingecko_id: string | undefined;
+ };
+ export type Asset = {
+     denom: string;
+@@ -31,6 +32,7 @@ export type Asset = {
+     logoURI: string | undefined;
+     decimals: number | undefined;
+     tokenContract: string | undefined;
++    coingeckoId: string | undefined;
+ };
+ export type TransferJSON = {
+     port: string;
