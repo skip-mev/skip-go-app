@@ -125,7 +125,7 @@ export const SwapWidget: FC = () => {
                     sourceAsset: destinationAsset,
                     destinationChain: sourceChain,
                     destinationAsset: sourceAsset,
-                    amountIn: "",
+                    amountIn: amountOut,
                   });
                 }}
                 data-testid="swap-button"
