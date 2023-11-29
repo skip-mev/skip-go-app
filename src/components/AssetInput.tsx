@@ -119,15 +119,15 @@ const AssetInput: FC<Props> = ({
         </div>
         <div>
           {!onAmountChange && (
-            <p
+            <div
               className={clsx(
-                "w-full text-3xl font-medium h-10",
+                "w-full text-3xl font-medium h-10 truncate",
                 amount === "0.0" ? "text-neutral-300" : "text-black",
               )}
               data-testid="amount"
             >
               {amount}
-            </p>
+            </div>
           )}
           {onAmountChange && (
             <input
