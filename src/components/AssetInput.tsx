@@ -165,6 +165,7 @@ const AssetInput: FC<Props> = ({
             {asset && parseFloat(amount) > 0 && (
               <div className="text-neutral-400 text-sm">
                 <UsdValue
+                  error={null}
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
                   coingeckoId={asset.coingeckoId}

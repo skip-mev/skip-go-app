@@ -57,12 +57,13 @@ export const SwapDetails = ({
     >
       <div className="flex items-center text-center gap-1 relative text-xs">
         <div>
-          <span className="mr-1">
-            1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(4)}{" "}
+          <span className="mr-2">
+            1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(6)}{" "}
             {sourceAsset.symbol}
           </span>
-          <span className="text-neutral-400 tabular-nums before:content-['('] after:content-[')']">
+          <span className="text-neutral-400 tabular-nums">
             <UsdValue
+              error={null}
               chainId={sourceAsset.chainID}
               denom={sourceAsset.denom}
               coingeckoId={sourceAsset.coingeckoId}
@@ -114,25 +115,7 @@ export const SwapDetails = ({
           <dd>{slippage}%</dd>
           <dt>Bridging Fee</dt>
           <dd>
-            <SimpleTooltip
-              label={
-                axelarTransferOperation
-                  ? `${axelarTransferOperation.axelarTransfer.feeAmount} gwei`
-                  : ""
-              }
-              delayDuration={0}
-              enabled={!!axelarTransferOperation}
-            >
-              <span
-                className={
-                  axelarTransferOperation
-                    ? "underline decoration-dotted underline-offset-4 cursor-help decoration-neutral-400"
-                    : ""
-                }
-              >
-                {format(bridgingFee)} {isEvm ? "ETH" : ""}
-              </span>
-            </SimpleTooltip>
+            {format(bridgingFee)} {isEvm ? "ETH" : ""}
           </dd>
         </dl>
       </Collapsible.Content>
