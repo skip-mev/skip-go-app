@@ -1,5 +1,6 @@
 import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
@@ -11,6 +12,7 @@ import { FormValues } from "./useSwapWidget";
 
 type Props = FormValues & {
   amountOut: string;
+  route: RouteResponse;
 };
 
 export const SwapDetails = ({
@@ -20,6 +22,7 @@ export const SwapDetails = ({
   sourceAsset,
   destinationChain,
   destinationAsset,
+  route,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 

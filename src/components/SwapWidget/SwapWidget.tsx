@@ -172,6 +172,7 @@ export const SwapWidget: FC = () => {
               sourceAsset={sourceAsset}
               destinationChain={destinationChain}
               destinationAsset={destinationAsset}
+              route={route}
             />
           )}
           {routeLoading && <RouteLoadingBanner />}
