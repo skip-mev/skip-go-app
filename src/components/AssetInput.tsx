@@ -167,6 +167,7 @@ const AssetInput: FC<Props> = ({
                 <UsdValue
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
+                  coingeckoId={asset.coingeckoId}
                   value={amount}
                   context={onAmountChange ? "src" : "dest"}
                 />

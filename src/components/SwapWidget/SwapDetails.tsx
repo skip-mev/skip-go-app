@@ -48,6 +48,7 @@ export const SwapDetails = ({
             <UsdValue
               chainId={sourceAsset.chainID}
               denom={sourceAsset.denom}
+              coingeckoId={sourceAsset.coingeckoId}
               value={(+amountIn / +amountOut).toString()}
             />
           </span>

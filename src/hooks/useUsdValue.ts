@@ -5,27 +5,26 @@ import { getAssets } from "@/chains";
 import { raise } from "@/utils/assert";
 import { getUsdPrice } from "@/utils/llama";
 
-export interface Args {
+export type Args = {
   chainId: string;
   denom: string;
+  coingeckoId?: string;
   value: string;
-}
+};
 
-export function useUsdValue({ chainId, denom, value }: Args) {
-  const queryKey = useMemo(
-    () => ["USE_USD_VALUE", chainId, denom, value] as const,
-    [chainId, denom, value],
-  );
+export function useUsdValue(args: Args) {
+  const queryKey = useMemo(() => ["USE_USD_VALUE", args] as const, [args]);
 
   const enabled = useMemo(() => {
-    const parsed = parseFloat(value);
+    const parsed = parseFloat(args.value);
     return !isNaN(parsed) && parsed > 0;
-  }, [value]);
+  }, [args.value]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, chainId, denom, value] }) => {
-      return getUsdValue({ chainId, denom, value });
+    queryKeyHashFn: ([key, args]) => [key, ...Object.values(args)].join("-"),
+    queryFn: async ({ queryKey: [, args] }) => {
+      return getUsdValue(args);
     },
     staleTime: 1000 * 60, // 1 minute
     enabled,
@@ -61,16 +60,23 @@ export function useUsdDiffValue([args1, args2]: [Args, Args]) {
   });
 }
 
-async function getUsdValue({ chainId, denom, value }: Args) {
-  const assets = getAssets(chainId);
-  const asset =
-    assets.find((asset) => asset.base === denom) ||
-    raise(`getUsdValue error: ${denom} not found in ${chainId}`);
-  const coingeckoId =
-    asset.coingecko_id ||
-    raise(
-      `getUsdValue error: ${denom} does not have a 'coingecko_id' in ${chainId}`,
-    );
+async function getUsdValue(args: Args) {
+  let coingeckoId: string;
+
+  if (args.coingeckoId) {
+    coingeckoId = args.coingeckoId;
+  } else {
+    const assets = getAssets(args.chainId);
+    const asset =
+      assets.find((asset) => asset.base === args.denom) ||
+      raise(`getUsdValue error: ${args.denom} not found in ${args.chainId}`);
+    coingeckoId =
+      asset.coingecko_id ||
+      raise(
+        `getUsdValue error: ${args.denom} does not have a 'coingecko_id' in ${args.chainId}`,
+      );
+  }
+
   const usd = await getUsdPrice({ coingeckoId });
-  return parseFloat(value) * usd;
+  return parseFloat(args.value) * usd;
 }
