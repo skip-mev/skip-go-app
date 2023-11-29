@@ -112,7 +112,7 @@ export const SwapDetails = ({
             </SimpleTooltip>
           </dt>
           <dd>{slippage}%</dd>
-          <dt>{isEvm ? "Fee" : "Bridging Fee"}</dt>
+          <dt>Bridging Fee</dt>
           <dd>
             <SimpleTooltip
               label={
