@@ -1,5 +1,8 @@
 name: Deploy (dev.ibc.fun)
 on:
+  pull_request:
+    branches: [main]
+    types: [closed]
   push:
     branches: [main]
   repository_dispatch:
@@ -25,11 +28,9 @@ jobs:
         run: git diff --exit-code origin/main
 
       - id: fast-forward
-        if: steps.diff-check.outcome == 'failure'
         name: Fast forward 'main' → 'dev'
         run: git merge --ff-only origin/main
 
       - id: push-dev
-        if: steps.diff-check.outcome == 'failure'
         name: Push latest 'dev'
         run: git push --set-upstream origin dev
