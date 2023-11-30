@@ -3,17 +3,32 @@ import { create } from "zustand";
 
 import { Args, useUsdDiffValue, useUsdValue } from "@/hooks/useUsdValue";
 
+const { format } = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 6,
+});
+
 type UsdValueProps = Args & {
+  error?: ReactNode;
   loading?: ReactNode;
   context?: "src" | "dest";
 };
 
 export const UsdValue = ({
+  error = "Price not available",
   loading = "...",
   context,
   ...args
 }: UsdValueProps) => {
-  const { data: usdValue = 0, isLoading } = useUsdValue(args);
+  const { data: usdValue = 0, isError, isLoading } = useUsdValue(args);
+
+  const prevValue = useRef(usdValue);
+  useEffect(() => {
+    if (!isLoading && prevValue.current !== usdValue) {
+      prevValue.current = usdValue;
+    }
+  }, [isLoading, usdValue]);
 
   const contextStore = useContext(ctx);
   useEffect(() => {
@@ -25,7 +40,15 @@ export const UsdValue = ({
     }
   });
 
-  return <>{isLoading ? loading : `$${usdValue.toFixed(2)}`}</>;
+  if (isError) {
+    return <>{error}</>;
+  }
+
+  if (isLoading && prevValue.current) {
+    return <>{format(prevValue.current)}</>;
+  }
+
+  return <>{isLoading ? loading : format(usdValue)}</>;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

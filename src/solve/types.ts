@@ -123,13 +123,13 @@ export interface OperationWithTransfer {
 export type Operation = OperationWithSwap | OperationWithTransfer;
 
 export function isSwapOperation(
-  operation: Operation
+  operation: Operation,
 ): operation is OperationWithSwap {
   return operation.swap !== undefined;
 }
 
 export function isTransferOperation(
-  operation: Operation
+  operation: Operation,
 ): operation is OperationWithTransfer {
   return operation.transfer !== undefined;
 }

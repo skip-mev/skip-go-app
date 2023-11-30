@@ -2,15 +2,26 @@
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:@tanstack/eslint-plugin-query/recommended"
+    "plugin:@tanstack/eslint-plugin-query/recommended",
+    "plugin:prettier/recommended"
   ],
-  "plugins": ["@typescript-eslint", "prettier", "simple-import-sort"],
-  "parser": "@typescript-eslint/parser",
+  "plugins": ["simple-import-sort"],
   "rules": {
-    "simple-import-sort/imports": "warn",
+    "@next/next/no-img-element": "off",
     "simple-import-sort/exports": "warn",
-    "@next/next/no-img-element": "off"
-  }
+    "simple-import-sort/imports": "warn"
+  },
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "src/chains/"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"]
+    }
+  ],
+  "root": true
 }

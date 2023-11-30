@@ -1,19 +1,26 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/// <reference path="./env.d.ts" />
+/// <reference path="./vercel.d.ts" />
+
+const APP_URL =
+  process.env.APP_URL ||
+  (process.env.VERCEL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`) ||
+  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${
+    process.env.PORT || 3000
+  }`;
 
 /**
  * @type {import('next').NextConfig}
  * @see https://nextjs.org/docs/pages/api-reference/next-config-js
  */
 let nextConfig = {
-  productionBrowserSourceMaps: true,
-  rewrites: async () => {
-    return [
-      {
-        source: "/nodes/:chainID/:path*",
-        destination: "/api/proxy",
-      },
-    ];
+  env: {
+    APP_URL,
   },
+  eslint: {
+    ignoreDuringBuilds: Boolean(process.env.VERCEL),
+  },
+  productionBrowserSourceMaps: true,
+  rewrites: async () => [],
   transpilePackages:
     process.env.NODE_ENV === "test"
       ? [
@@ -38,6 +45,10 @@ let nextConfig = {
           "uuid",
         ]
       : [],
+  webpack: (config, { dev, isServer }) => {
+    if (dev && isServer) checkEnv();
+    return config;
+  },
 };
 
 /** @see https://docs.sentry.io/platforms/javascript/guides/nextjs */
@@ -69,3 +80,22 @@ const sentryOptions = {
 nextConfig = withSentryConfig(nextConfig, sentryWebpackConfig, sentryOptions);
 
 module.exports = nextConfig;
+
+function checkEnv() {
+  if (checkEnv.once) return;
+
+  const log = require("next/dist/build/output/log");
+
+  if (!process.env.NEXT_PUBLIC_API_URL) {
+    log.warn(
+      'env NEXT_PUBLIC_API_URL is not set, using SKIP_API_URL from "@skip-router/core"',
+    );
+  }
+  if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
+    log.warn(
+      "env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work",
+    );
+  }
+
+  checkEnv.once = true;
+}

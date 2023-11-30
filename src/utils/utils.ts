@@ -22,7 +22,7 @@ import {
   StargateClient,
   StdFee,
 } from "@cosmjs/stargate";
-import { getFastestEndpoint, WalletClient } from "@cosmos-kit/core";
+import { WalletClient } from "@cosmos-kit/core";
 import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
 import { KeplrClient } from "@cosmos-kit/keplr-extension";
 import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
@@ -38,6 +38,8 @@ import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
 import { EVM_CHAINS } from "@/constants/constants";
 import { useSkipClient } from "@/solve";
+
+import { getNodeProxyEndpoint } from "./api";
 
 export function getChainByID(chainID: ChainId) {
   return getChain(chainID);
@@ -57,28 +59,11 @@ export async function getStargateClientForChainID(chainID: ChainId) {
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
+  const preferredEndpoint = getNodeProxyEndpoint(chainID);
 
-  try {
-    const client = await StargateClient.connect(preferredEndpoint, {});
+  const client = await StargateClient.connect(preferredEndpoint, {});
 
-    STARGATE_CLIENTS[chainID] = client;
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
-
-  const client = await StargateClient.connect(endpoint, {});
+  STARGATE_CLIENTS[chainID] = client;
 
   return client;
 }
@@ -94,36 +79,15 @@ export async function getSigningStargateClientForChainID(
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
-
-  try {
-    const client = await SigningStargateClient.connectWithSigner(
-      preferredEndpoint,
-      signer,
-      options,
-    );
-
-    console.log(`Connected to ${preferredEndpoint}`);
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
+  const preferredEndpoint = getNodeProxyEndpoint(chainID);
 
   const client = await SigningStargateClient.connectWithSigner(
-    endpoint,
+    preferredEndpoint,
     signer,
     options,
   );
+
+  console.log(`Connected to ${preferredEndpoint}`);
 
   return client;
 }
@@ -153,30 +117,10 @@ export async function getSigningCosmWasmClientForChainID(
     throw new Error(`Chain with ID ${chainID} not found`);
   }
 
-  const preferredEndpoint = `https://ibc.fun/nodes/${chainID}`;
-  try {
-    const client = await SigningCosmWasmClient.connectWithSigner(
-      preferredEndpoint,
-      signer,
-      options,
-    );
-
-    return client;
-  } catch {
-    /* empty */
-  }
-
-  const rpcEndpoints = chain.apis?.rpc ?? [];
-
-  const endpoint = await getFastestEndpoint(
-    rpcEndpoints.reduce((acc, endpoint) => {
-      return [...acc, endpoint.address];
-    }, [] as string[]),
-    "rpc",
-  );
+  const preferredEndpoint = getNodeProxyEndpoint(chainID);
 
   const client = await SigningCosmWasmClient.connectWithSigner(
-    endpoint,
+    preferredEndpoint,
     signer,
     options,
   );

@@ -1,8 +1,10 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 import { useChains as useSkipChains } from "@/api/queries";
+import { useDisclosureKey } from "@/context/disclosures";
+import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 
 import AssetInput from "../AssetInput";
@@ -18,6 +20,7 @@ import { SettingsDialog } from "../SettingsDialog";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
+import { SwapDetails } from "./SwapDetails";
 import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
@@ -63,6 +66,18 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
+
+  const [isSwapDetailsOpen] = useDisclosureKey("swapDetailsCollapsible");
+
+  useEffect(() => {
+    return useSettingsStore.subscribe((state) => {
+      if (+state.slippage < 0 || +state.slippage > 100) {
+        useSettingsStore.setState({
+          slippage: Math.max(0, Math.min(100, +state.slippage)).toString(),
+        });
+      }
+    });
+  }, []);
 
   return (
     <UsdDiff.Provider>
@@ -121,7 +136,7 @@ export const SwapWidget: FC = () => {
                     sourceAsset: destinationAsset,
                     destinationChain: sourceChain,
                     destinationAsset: sourceAsset,
-                    amountIn: "",
+                    amountIn: amountOut,
                   });
                 }}
                 data-testid="swap-button"
@@ -157,9 +172,20 @@ export const SwapWidget: FC = () => {
               chain={destinationChain}
               onChainChange={onDestinationChainChange}
               chains={chains ?? []}
-              showSlippage={route?.doesSwap}
+              showSlippage={route?.doesSwap && !isSwapDetailsOpen}
             />
           </div>
+          {route && (
+            <SwapDetails
+              amountIn={amountIn}
+              amountOut={amountOut}
+              sourceChain={sourceChain}
+              sourceAsset={sourceAsset}
+              destinationChain={destinationChain}
+              destinationAsset={destinationAsset}
+              route={route}
+            />
+          )}
           {routeLoading && <RouteLoadingBanner />}
           {route && !routeLoading && (
             <RouteTransactionCountBanner

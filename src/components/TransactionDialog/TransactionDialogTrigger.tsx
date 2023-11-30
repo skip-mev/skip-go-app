@@ -6,7 +6,7 @@ interface Props {
 
 const TransactionDialogTrigger = forwardRef(function TransactionDialogTrigger(
   { disabled, ...props }: Props,
-  ref: ForwardedRef<HTMLButtonElement>
+  ref: ForwardedRef<HTMLButtonElement>,
 ) {
   return (
     <button

@@ -1,3 +1,4 @@
+import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { SimpleTooltip } from "./SimpleTooltip";
 import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
 interface Props {
@@ -56,20 +58,21 @@ const AssetInput: FC<Props> = ({
   const { data: balances } = useBalancesByChain(address, chain, showBalance);
 
   const selectedAssetBalance = useMemo(() => {
-    if (!asset || !balances) {
-      return undefined;
-    }
+    if (!asset || !balances) return undefined;
 
     const balanceWei = balances[asset.denom];
+    if (!balanceWei) return "0.0";
 
-    if (!balanceWei) {
-      return "0.0";
-    }
-
-    return new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 6,
-    }).format(parseFloat(ethers.formatUnits(balanceWei, asset.decimals)));
+    const parsed = parseFloat(ethers.formatUnits(balanceWei, asset.decimals));
+    return parsed.toFixed(6);
   }, [asset, balances]);
+
+  const formattedSelectedAssetBalance = useMemo(() => {
+    const { format } = new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 6,
+    });
+    return format(parseFloat(selectedAssetBalance ?? "0.0"));
+  }, [selectedAssetBalance]);
 
   const maxButtonDisabled = useMemo(() => {
     if (!selectedAssetBalance) {
@@ -116,15 +119,15 @@ const AssetInput: FC<Props> = ({
         </div>
         <div>
           {!onAmountChange && (
-            <p
+            <div
               className={clsx(
-                "w-full text-3xl font-medium h-10",
+                "w-full text-3xl font-medium h-10 truncate",
                 amount === "0.0" ? "text-neutral-300" : "text-black",
               )}
               data-testid="amount"
             >
               {amount}
-            </p>
+            </div>
           )}
           {onAmountChange && (
             <input
@@ -140,7 +143,7 @@ const AssetInput: FC<Props> = ({
                 latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
 
                 // prevent entering anything except numbers, commas, and periods
-                if (latest.match(/[^0-9.,]/gi)) return;
+                if (latest.match(/[^0-9.]/gi)) return;
 
                 // if there is more than one period or comma,
                 // remove all periods except the first one for decimals
@@ -162,8 +165,10 @@ const AssetInput: FC<Props> = ({
             {asset && parseFloat(amount) > 0 && (
               <div className="text-neutral-400 text-sm">
                 <UsdValue
+                  error={null}
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
+                  coingeckoId={asset.coingeckoId}
                   value={amount}
                   context={onAmountChange ? "src" : "dest"}
                 />
@@ -185,11 +190,22 @@ const AssetInput: FC<Props> = ({
               </UsdDiff.Value>
             )}
             <div className="flex-grow" />
-            {showBalance && address && selectedAssetBalance && (
-              <div className="text-neutral-400 text-sm flex items-center space-x-2">
-                <div className="max-w-[16ch] truncate">
-                  Balance: {selectedAssetBalance}
-                </div>
+            {showBalance && address && selectedAssetBalance && asset && (
+              <div className="text-neutral-400 text-sm flex items-center">
+                <div className="mr-1">Balance:</div>
+                <SimpleTooltip
+                  label={`${formattedSelectedAssetBalance} ${asset.symbol}`}
+                  delayDuration={0}
+                >
+                  <div
+                    className={clsx(
+                      "max-w-[16ch] truncate mr-2",
+                      "underline decoration-dotted underline-offset-4 cursor-help",
+                    )}
+                  >
+                    {formattedSelectedAssetBalance}
+                  </div>
+                </SimpleTooltip>
                 <button
                   className={clsx(
                     "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] text-white",
@@ -200,7 +216,6 @@ const AssetInput: FC<Props> = ({
                     if (!selectedAssetBalance || !chain || !asset) return;
 
                     const feeDenom = getFeeDenom(chain.chainID);
-
                     let amount = selectedAssetBalance;
 
                     // if selected asset is the fee denom, subtract the fee
@@ -224,12 +239,15 @@ const AssetInput: FC<Props> = ({
               </div>
             )}
             {showSlippage && !onAmountChange && amount !== "0.0" && (
-              <button
-                className="text-neutral-400 text-sm hover:underline"
-                onClick={() => disclosure.open("settingsDialog")}
-              >
-                Max Slippage: {slippage}%
-              </button>
+              <SimpleTooltip label="Click to change max slippage">
+                <button
+                  className="text-neutral-400 text-sm hover:underline"
+                  onClick={() => disclosure.open("settingsDialog")}
+                >
+                  Max Slippage: {slippage}%{" "}
+                  <PencilSquareIcon className="w-3 h-3 inline mb-1" />
+                </button>
+              </SimpleTooltip>
             )}
           </div>
         </div>

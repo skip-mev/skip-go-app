@@ -5,6 +5,7 @@ import { createContext, FC, PropsWithChildren } from "react";
 import { useNetwork } from "wagmi";
 
 import { API_URL } from "@/constants/api";
+import { getNodeProxyEndpoint } from "@/utils/api";
 import {
   getOfflineSigner,
   getOfflineSignerOnlyAmino,
@@ -66,7 +67,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
           return testnets[chainID];
         }
 
-        return `https://ibc.fun/nodes/${chainID}`;
+        return getNodeProxyEndpoint(chainID);
       },
       getRestEndpointForChain: async (chainID) => {
         if (chainID === "injective-1") {
@@ -77,7 +78,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
           return "https://evmos-api.polkachu.com";
         }
 
-        return `https://ibc.fun/nodes/${chainID}`;
+        return getNodeProxyEndpoint(chainID);
       },
     },
   });

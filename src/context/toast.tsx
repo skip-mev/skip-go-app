@@ -28,7 +28,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   function addToast(
     title: string,
     message: string,
-    type: "success" | "error" = "error"
+    type: "success" | "error" = "error",
   ) {
     setToasts((toasts) => [...toasts, { title, message, type }]);
   }
