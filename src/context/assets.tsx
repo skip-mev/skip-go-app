@@ -40,11 +40,9 @@ function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
       if (originDenom.includes("polygon-")) {
         return ".axl (Polygon)";
       }
-
       if (originDenom.includes("avalanche-")) {
         return ".axl (Avalanche)";
       }
-
       return ".axl";
     case "Sifchain":
       return ".sif";
@@ -78,6 +76,9 @@ function getAssetSymbol(
   }
 
   if (asset.originChainID === "gravity-bridge-3") {
+    if (asset.chainID === "core-1") {
+      return asset.symbol ?? asset.denom;
+    }
     if (asset.originDenom === "ugraviton") {
       return asset.symbol ?? asset.denom;
     }
