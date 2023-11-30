@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 
+import { ConversionRate } from "../ConversionRate";
 import { SimpleTooltip } from "../SimpleTooltip";
 import { UsdValue } from "../UsdValue";
 import { FormValues } from "./useSwapWidget";
@@ -56,21 +57,29 @@ export const SwapDetails = ({
       onOpenChange={control.set}
     >
       <div className="flex items-center text-center gap-1 relative text-xs">
-        <div>
-          <span className="mr-2">
-            1 {destinationAsset.symbol} = {(+amountIn / +amountOut).toFixed(6)}{" "}
-            {sourceAsset.symbol}
-          </span>
-          <span className="text-neutral-400 tabular-nums">
-            <UsdValue
-              error={null}
-              chainId={sourceAsset.chainID}
-              denom={sourceAsset.denom}
-              coingeckoId={sourceAsset.coingeckoId}
-              value={(+amountIn / +amountOut).toString()}
-            />
-          </span>
-        </div>
+        <ConversionRate
+          srcAsset={sourceAsset}
+          destAsset={destinationAsset}
+          amountIn={amountIn}
+          amountOut={amountOut}
+        >
+          {({ left, right, conversion, toggle }) => (
+            <div>
+              <button className="mr-2" onClick={toggle}>
+                1 {left.symbol} = {format(conversion)} {right.symbol}
+              </button>
+              <span className="text-neutral-400 tabular-nums">
+                <UsdValue
+                  error={null}
+                  chainId={right.chainID}
+                  denom={right.denom}
+                  coingeckoId={right.coingeckoId}
+                  value={conversion.toString()}
+                />
+              </span>
+            </div>
+          )}
+        </ConversionRate>
         <div className="flex-grow" />
         <Collapsible.Trigger
           className={clsx(
