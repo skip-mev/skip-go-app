@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { ReactNode, useEffect, useState } from "react";
+import { tinykeys } from "tinykeys";
 
 import { API_URL } from "@/constants/api";
 
@@ -7,7 +8,6 @@ const githubUrl = "https://github.com/skip-mev/ibc-dot-fun";
 
 const buildInfo: [string, ReactNode][] = [
   ["node env", process.env.NODE_ENV],
-  ["vercel env", process.env.NEXT_PUBLIC_VERCEL_ENV ? "true" : "false"],
   ["api url", API_URL],
   [
     "commit",
@@ -29,13 +29,9 @@ export const BuildInfo = () => {
   );
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && e.shiftKey) {
-        setShow((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return tinykeys(window, {
+      "Shift+Escape": () => setShow((prev) => !prev),
+    });
   }, []);
 
   if (!show) return null;
@@ -71,9 +67,13 @@ export const BuildInfo = () => {
             ),
         )}
       </dl>
-      <div className="text-end text-xs text-neutral-500">
-        shift+esc to toggle
-      </div>
+      <hr />
+      <button
+        className="text-center text-xs text-neutral-500 w-full relative before:absolute before:-inset-1 before:content-['']"
+        onClick={() => setShow((prev) => !prev)}
+      >
+        shift+esc to toggle, click here to close
+      </button>
     </div>
   );
 };
