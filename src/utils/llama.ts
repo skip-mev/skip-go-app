@@ -1,24 +1,24 @@
 import { z } from "zod";
 
 interface Args {
-  coingeckoId: string;
+  coingeckoID: string;
 }
 
 const cache = new Map<string, number>();
 
-export async function getUsdPrice({ coingeckoId }: Args) {
-  const cached = cache.get(coingeckoId);
+export async function getUsdPrice({ coingeckoID }: Args) {
+  const cached = cache.get(coingeckoID);
   if (cached) return cached;
 
-  const endpoint = `https://coins.llama.fi/prices/current/coingecko:${coingeckoId}`;
+  const endpoint = `https://coins.llama.fi/prices/current/coingecko:${coingeckoID}`;
 
   const response = await fetch(endpoint);
   const data = await response.json();
 
   const { coins } = await priceResponseSchema.parseAsync(data);
-  const { price } = coins[`coingecko:${coingeckoId}`];
+  const { price } = coins[`coingecko:${coingeckoID}`];
 
-  cache.set(coingeckoId, price);
+  cache.set(coingeckoID, price);
   return price;
 }
 

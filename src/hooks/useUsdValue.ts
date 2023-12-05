@@ -8,7 +8,7 @@ import { getUsdPrice } from "@/utils/llama";
 export type Args = {
   chainId: string;
   denom: string;
-  coingeckoId?: string;
+  coingeckoID?: string;
   value: string;
 };
 
@@ -61,22 +61,22 @@ export function useUsdDiffValue([args1, args2]: [Args, Args]) {
 }
 
 async function getUsdValue(args: Args) {
-  let coingeckoId: string;
+  let coingeckoID: string;
 
-  if (args.coingeckoId) {
-    coingeckoId = args.coingeckoId;
+  if (args.coingeckoID) {
+    coingeckoID = args.coingeckoID;
   } else {
     const assets = getAssets(args.chainId);
     const asset =
       assets.find((asset) => asset.base === args.denom) ||
       raise(`getUsdValue error: ${args.denom} not found in ${args.chainId}`);
-    coingeckoId =
+    coingeckoID =
       asset.coingecko_id ||
       raise(
         `getUsdValue error: ${args.denom} does not have a 'coingecko_id' in ${args.chainId}`,
       );
   }
 
-  const usd = await getUsdPrice({ coingeckoId });
+  const usd = await getUsdPrice({ coingeckoID });
   return parseFloat(args.value) * usd;
 }
