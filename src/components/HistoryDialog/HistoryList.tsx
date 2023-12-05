@@ -10,7 +10,13 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import { ComponentPropsWithoutRef, forwardRef, Fragment, useMemo } from "react";
+import {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  Fragment,
+  useMemo,
+  useRef,
+} from "react";
 
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
@@ -60,6 +66,7 @@ type ItemProps = Omit<Accordion.AccordionItemProps, "value"> & {
 export const Item = forwardRef<HTMLDivElement, ItemProps>(
   function Item(props, ref) {
     const { id, data, className, ...rest } = props;
+    const headingRef = useRef<HTMLHeadingElement>(null);
 
     const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
 
@@ -81,6 +88,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
             "flex flex-col items-stretch space-y-2 relative",
             "rounded-md hover:bg-gray-100 p-2 transition-colors",
           )}
+          ref={headingRef}
         >
           <div className="flex items-center space-x-4 text-start">
             <time className="uppercase text-center text-sm opacity-60 tabular-nums">
@@ -130,6 +138,14 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
               "HistoryListTrigger hover:underline",
               "before:absolute before:content-[''] before:inset-0",
             )}
+            onClick={() => {
+              if (!headingRef.current) return;
+              const rect = headingRef.current.getBoundingClientRect();
+              const top = rect.top + window.scrollY;
+              const offset = rect.height / 2;
+              const y = top - offset;
+              window.scrollTo({ top: y, behavior: "smooth" });
+            }}
           >
             <span className="HistoryListTriggerText" />
             <ChevronDownIcon
