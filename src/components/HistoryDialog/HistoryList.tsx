@@ -114,7 +114,13 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
               })}
             >
               <span className="capitalize">{data.status}</span>
-              <StatusIcon status={data.status} className="w-4 h-4" />
+              <StatusIcon
+                status={data.status}
+                className={clsx(
+                  "w-4 h-4",
+                  data.status === "pending" && "animate-spin",
+                )}
+              />
             </div>
           </div>
 

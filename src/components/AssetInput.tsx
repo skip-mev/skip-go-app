@@ -200,7 +200,7 @@ const AssetInput: FC<Props> = ({
                   error={null}
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
-                  coingeckoId={asset.coingeckoId}
+                  coingeckoID={asset.coingeckoID}
                   value={amount}
                   context={onAmountChange ? "src" : "dest"}
                 />

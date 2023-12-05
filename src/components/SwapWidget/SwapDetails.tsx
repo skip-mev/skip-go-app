@@ -73,7 +73,7 @@ export const SwapDetails = ({
                   error={null}
                   chainId={right.chainID}
                   denom={right.denom}
-                  coingeckoId={right.coingeckoId}
+                  coingeckoID={right.coingeckoID}
                   value={conversion.toString()}
                 />
               </span>

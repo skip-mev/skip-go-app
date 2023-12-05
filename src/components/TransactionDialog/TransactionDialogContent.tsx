@@ -177,11 +177,8 @@ const TransactionDialogContent: FC<Props> = ({
               numberOfBroadcastedTransactions + 1,
           );
         },
-        onTransactionSuccess: async (txStatus) => {
-          const explorerLink = getExplorerLinkForTx(
-            txStatus.chainID,
-            txStatus.txHash,
-          );
+        onTransactionCompleted: async (chainID, txHash) => {
+          const explorerLink = getExplorerLinkForTx(chainID, txHash);
 
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
@@ -193,7 +190,7 @@ const TransactionDialogContent: FC<Props> = ({
             newStatuses[pendingIndex] = {
               status: "SUCCESS",
               explorerLink,
-              txHash: txStatus.txHash,
+              txHash,
             };
 
             if (pendingIndex < statuses.length - 1) {
