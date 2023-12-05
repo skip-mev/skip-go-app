@@ -1,5 +1,6 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { tinykeys } from "tinykeys";
 
 import { useAssets } from "@/context/assets";
 import { useDisclosureKey } from "@/context/disclosures";
@@ -17,6 +18,8 @@ export const HistoryDialog = () => {
   const entries = useMemo(() => {
     return isReady ? Object.entries(history).reverse() : undefined;
   }, [history, isReady]);
+
+  useEffect(() => tinykeys(window, { ["Escape"]: () => close() }), [close]);
 
   if (!isOpen) return null;
 
