@@ -16,7 +16,7 @@ export default function Document() {
           rel="stylesheet"
         />
       </Head>
-      <body className="bg-[#FFDC61]">
+      <body className="bg-[#FFDC61] min-h-screen overflow-y-auto relative">
         <img
           src="/site-bg-2.svg"
           className="fixed top-[200px] left-0 w-full h-full object-cover object-top pointer-events-none"
