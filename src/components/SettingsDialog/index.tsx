@@ -1,4 +1,6 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { useEffect } from "react";
+import { tinykeys } from "tinykeys";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
@@ -7,6 +9,8 @@ import { SlippageSetting } from "./SlippageSetting";
 
 export const SettingsDialog = () => {
   const [isOpen, { close }] = useDisclosureKey("settingsDialog");
+
+  useEffect(() => tinykeys(window, { ["Escape"]: () => close() }), [close]);
 
   if (!isOpen) return null;
 

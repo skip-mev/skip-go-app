@@ -1,4 +1,5 @@
 import { PencilSquareIcon } from "@heroicons/react/20/solid";
+import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
@@ -153,9 +154,40 @@ const AssetInput: FC<Props> = ({
 
                 onAmountChange?.(latest);
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
+              onKeyDown={(event) => {
+                if (!onAmountChange) return;
+
+                if (event.key === "Escape") {
                   onAmountChange?.("");
+                  return;
+                }
+
+                if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                  let value = new BigNumber(event.currentTarget.value || "0");
+                  if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    if (event.shiftKey) {
+                      value = value.plus(10);
+                    } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                      value = value.plus(0.1);
+                    } else {
+                      value = value.plus(1);
+                    }
+                  }
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    if (event.shiftKey) {
+                      value = value.minus(10);
+                    } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                      value = value.minus(0.1);
+                    } else {
+                      value = value.minus(1);
+                    }
+                  }
+                  if (value.isNegative()) {
+                    value = new BigNumber(0);
+                  }
+                  onAmountChange(value.toString());
                 }
               }}
               ref={inputRef}
@@ -168,7 +200,7 @@ const AssetInput: FC<Props> = ({
                   error={null}
                   chainId={asset.originChainID}
                   denom={asset.originDenom}
-                  coingeckoId={asset.coingeckoId}
+                  coingeckoID={asset.coingeckoID}
                   value={amount}
                   context={onAmountChange ? "src" : "dest"}
                 />

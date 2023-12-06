@@ -33,7 +33,7 @@ export const UsdValue = ({
   const contextStore = useContext(ctx);
   useEffect(() => {
     if (contextStore && context) {
-      contextStore.setState({ [context]: args });
+      contextStore.setState({ [context]: isError ? undefined : args });
       return () => {
         contextStore.setState({ [context]: undefined });
       };
