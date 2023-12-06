@@ -3,7 +3,6 @@ import { Chain } from "@/api/queries";
 // chains whose logo provided by the Skip API is not suitable for our UI.
 const chainsToUseChainListLogo = [
   "mars-1",
-  "migaloo-1",
   "neutron-1",
   "pion-1",
   "noble-1",
@@ -23,6 +22,10 @@ export function getChainLogo(chain: Chain) {
 
   if (chainsToUseChainListLogo.includes(chain.chainID)) {
     return `${chainNameToChainlistURL(chain.chainName)}/chainImg/_chainImg.svg`;
+  }
+
+  if (chain.chainID === "migaloo-1") {
+    return chain.logoURI!.replace("-light", "-dark");
   }
 
   return (
