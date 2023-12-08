@@ -14,8 +14,8 @@ import { publicProvider } from "wagmi/providers/public";
 import { getAssetLists, getChains } from "@/chains";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
+import { queryClient } from "@/lib/react-query";
 import { SkipProvider } from "@/solve";
-import { queryClient } from "@/utils/query";
 
 const { publicClient } = configureChains([mainnet], [publicProvider()]);
 
