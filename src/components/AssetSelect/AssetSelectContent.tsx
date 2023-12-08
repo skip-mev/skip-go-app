@@ -2,10 +2,10 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
-import { useWindowSize } from "usehooks-ts";
 
 import { filterSifAssets } from "@/assets/filters";
 import { AssetWithMetadata } from "@/context/assets";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 interface Props {
   assets?: AssetWithMetadata[];
