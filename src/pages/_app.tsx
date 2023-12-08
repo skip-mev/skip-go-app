@@ -43,7 +43,6 @@ export default function App({ Component, pageProps }: AppProps) {
             chains={chains}
             assetLists={assets}
             wallets={wallets}
-            wrappedWithChakra
             throwErrors={false}
           >
             <WagmiConfig config={wagmiConfig}>
