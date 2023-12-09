@@ -139,7 +139,7 @@ const WalletModalWithContext: FC = () => {
       ) {
         logoUrl = INJECTED_EVM_WALLET_LOGOS[connector.name];
       } else {
-        logoUrl = EVM_WALLET_LOGOS[connector.id];
+        logoUrl = EVM_WALLET_LOGOS[connector.id] || EVM_WALLET_LOGOS.injected;
       }
 
       const minimalWallet: MinimalWallet = {
