@@ -60,7 +60,11 @@ const RouteEnd: FC<{
   return (
     <div className="flex items-center gap-2">
       <div className="bg-white w-14 h-14 border-2 border-neutral-200 p-1.5 rounded-full">
-        <img className="w-full h-full" src={logo} alt="Osmosis Logo" />
+        <img
+          className="w-full h-full rounded-full"
+          src={logo}
+          alt="Osmosis Logo"
+        />
       </div>
       <div className="font-semibold">
         <p>
@@ -114,7 +118,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
       <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
         <div className="w-2 h-2 bg-neutral-200 rounded-full" />
       </div>
-      <div>
+      <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Transfer{" "}
           <img
@@ -167,7 +171,7 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
         <div className="w-14 h-14 flex items-center justify-center">
           <div className="w-2 h-2 bg-neutral-200 rounded-full" />
         </div>
-        <div>
+        <div className="max-w-[18rem]">
           <p className="text-sm text-neutral-500">
             Swap to{" "}
             <img
@@ -234,7 +238,7 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
       <div className="w-14 h-14 flex items-center justify-center">
         <div className="w-2 h-2 bg-neutral-200 rounded-full" />
       </div>
-      <div>
+      <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Swap{" "}
           <img

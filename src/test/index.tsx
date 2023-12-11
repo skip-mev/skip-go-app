@@ -8,22 +8,14 @@ import {
   RenderOptions,
 } from "@testing-library/react";
 import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
-import { configureChains, createConfig, mainnet, WagmiConfig } from "wagmi";
-import { publicProvider } from "wagmi/providers/public";
+import { WagmiConfig } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
+import { queryClient } from "@/lib/react-query";
+import { wagmiConfig } from "@/lib/wagmi";
 import { SkipProvider } from "@/solve";
-import { queryClient } from "@/utils/query";
-
-const { publicClient } = configureChains([mainnet], [publicProvider()]);
-
-export const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors: [],
-  publicClient,
-});
 
 type ChainProviderProps = ComponentProps<typeof ChainProvider>;
 

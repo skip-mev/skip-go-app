@@ -1,42 +1,23 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { encodeSecp256k1Pubkey, makeSignDoc } from "@cosmjs/amino";
+import { OfflineAminoSigner } from "@cosmjs/amino";
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
 } from "@cosmjs/cosmwasm-stargate";
-import { fromBase64 } from "@cosmjs/encoding";
-import { Int53 } from "@cosmjs/math";
+import { OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import {
-  EncodeObject,
-  encodePubkey,
-  makeAuthInfoBytes,
-  OfflineSigner,
-  TxBodyEncodeObject,
-} from "@cosmjs/proto-signing";
-import {
-  AminoTypes,
-  createDefaultAminoConverters,
-  SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
   StargateClient,
-  StdFee,
 } from "@cosmjs/stargate";
-import { WalletClient } from "@cosmos-kit/core";
-import { CosmostationClient } from "@cosmos-kit/cosmostation-extension/dist/extension/client";
-import { KeplrClient } from "@cosmos-kit/keplr-extension";
-import { LeapClient } from "@cosmos-kit/leap-extension/dist/extension/client";
-import { OfflineAminoSigner } from "@keplr-wallet/types";
 import { SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
-import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
 import { Chain } from "@/api/queries";
 import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
 import { EVM_CHAINS } from "@/constants/constants";
+import { MergedWalletClient } from "@/lib/cosmos-kit";
 import { useSkipClient } from "@/solve";
 
 import { getNodeProxyEndpoint } from "./api";
@@ -56,7 +37,7 @@ export async function getStargateClientForChainID(chainID: ChainId) {
   const chain = getChainByID(chainID);
 
   if (!chain) {
-    throw new Error(`Chain with ID ${chainID} not found`);
+    throw new Error(`stargateClient error: chain with ID ${chainID} not found`);
   }
 
   const preferredEndpoint = getNodeProxyEndpoint(chainID);
@@ -76,7 +57,9 @@ export async function getSigningStargateClientForChainID(
   const chain = getChainByID(chainID);
 
   if (!chain) {
-    throw new Error(`Chain with ID ${chainID} not found`);
+    throw new Error(
+      `signingStargateClient error: chain with ID ${chainID} not found`,
+    );
   }
 
   const preferredEndpoint = getNodeProxyEndpoint(chainID);
@@ -87,23 +70,34 @@ export async function getSigningStargateClientForChainID(
     options,
   );
 
-  console.log(`Connected to ${preferredEndpoint}`);
+  console.info(`signingStargateClient: Connected to ${preferredEndpoint}`);
 
   return client;
 }
 
-export async function getAddressForCosmosChain(
-  walletClient: WalletClient,
+export async function getAddressForCosmosChain<T extends MergedWalletClient>(
+  walletClient: T,
   chainId: ChainId,
 ) {
-  if (walletClient.getOfflineSigner) {
+  if ("getOfflineSigner" in walletClient && walletClient.getOfflineSigner) {
     const signer = await walletClient.getOfflineSigner(chainId);
     const accounts = await signer.getAccounts();
-
     return accounts[0].address;
   }
 
-  throw new Error("unsupported wallet");
+  if ("getAccount" in walletClient && walletClient.getAccount) {
+    const account = await walletClient.getAccount(chainId);
+    return account.address;
+  }
+
+  if ("getSimpleAccount" in walletClient) {
+    const account = await walletClient.getSimpleAccount(chainId);
+    return account.address;
+  }
+
+  throw new Error(
+    `unsupported wallet: current wallet client does not have 'getOfflineSigner' or 'getSimpleAccount'`,
+  );
 }
 
 export async function getSigningCosmWasmClientForChainID(
@@ -111,10 +105,10 @@ export async function getSigningCosmWasmClientForChainID(
   signer: OfflineSigner,
   options?: SigningCosmWasmClientOptions,
 ) {
-  const chain = getChainByID(chainID);
-
-  if (!chain) {
-    throw new Error(`Chain with ID ${chainID} not found`);
+  if (!getChainByID(chainID)) {
+    throw new Error(
+      `signingCosmWasmClient error: chain with ID ${chainID} not found`,
+    );
   }
 
   const preferredEndpoint = getNodeProxyEndpoint(chainID);
@@ -129,60 +123,88 @@ export async function getSigningCosmWasmClientForChainID(
 }
 
 // generic wrapper to support enabling chains on many different wallets
-export async function enableChains(
-  walletClient: WalletClient,
+export async function enableChains<T extends MergedWalletClient>(
+  walletClient: T,
   chains: string[],
 ) {
-  if (walletClient.enable) {
+  // mostly everything else
+  if ("enable" in walletClient && walletClient.enable) {
     return walletClient.enable(chains);
   }
 
-  // @ts-ignore
-  if (walletClient.ikeplr) {
-    // @ts-ignore
+  // cosmostation
+  if ("ikeplr" in walletClient) {
     return walletClient.ikeplr.enable(chains);
   }
 
+  // metamask snaps
   if ("snapInstalled" in walletClient) {
     return;
   }
 
-  throw new Error("Unsupported wallet");
+  // station
+  if ("client" in walletClient && "keplr" in walletClient.client) {
+    return walletClient.client.keplr.enable(chains);
+  }
+
+  throw new Error(
+    `unsupported wallet: current wallet client does not have methods to enable chains`,
+  );
 }
 
-export async function getAccount(walletClient: WalletClient, chainId: ChainId) {
+export async function getAccount<T extends MergedWalletClient>(
+  walletClient: T,
+  chainId: ChainId,
+) {
   if (walletClient.getAccount) {
     return walletClient.getAccount(chainId);
   }
 
-  throw new Error("unsupported wallet");
+  throw new Error(
+    `unsupported wallet: current wallet client does not have 'getAccount'`,
+  );
 }
 
-export async function getOfflineSigner(
-  walletClient: WalletClient,
+export async function getOfflineSigner<T extends MergedWalletClient>(
+  walletClient: T,
   chainId: ChainId,
-) {
-  if (walletClient.getOfflineSignerDirect) {
+): Promise<OfflineDirectSigner> {
+  if (
+    "getOfflineSignerDirect" in walletClient &&
+    walletClient.getOfflineSignerDirect
+  ) {
     return walletClient.getOfflineSignerDirect(chainId);
   }
 
-  if (walletClient.getOfflineSigner) {
-    return walletClient.getOfflineSigner(chainId, "direct");
+  if ("getOfflineSigner" in walletClient && walletClient.getOfflineSigner) {
+    const signer = await walletClient.getOfflineSigner(chainId, "direct");
+    if ("signDirect" in signer) return signer;
   }
 
-  throw new Error("unsupported wallet");
+  throw new Error(
+    `unsupported wallet: current wallet client does not have 'getOfflineSigner' or 'getOfflineSignerDirect'`,
+  );
 }
 
-export async function getOfflineSignerOnlyAmino(
-  walletClient: WalletClient,
+export async function getOfflineSignerOnlyAmino<T extends MergedWalletClient>(
+  walletClient: T,
   chainId: ChainId,
-) {
-  if (walletClient.getOfflineSignerAmino) {
-    const signer = walletClient.getOfflineSignerAmino(chainId);
-    return signer;
+): Promise<OfflineAminoSigner> {
+  if (
+    "getOfflineSignerAmino" in walletClient &&
+    walletClient.getOfflineSignerAmino
+  ) {
+    return walletClient.getOfflineSignerAmino(chainId);
   }
 
-  throw new Error("unsupported wallet");
+  if ("getOfflineSigner" in walletClient && walletClient.getOfflineSigner) {
+    const signer = await walletClient.getOfflineSigner(chainId, "amino");
+    if ("signAmino" in signer) return signer;
+  }
+
+  throw new Error(
+    `unsupported wallet: current wallet client does not have 'getOfflineSigner' or 'getOfflineSignerAmino'`,
+  );
 }
 
 export function getFee(chainID: ChainId) {
@@ -204,26 +226,23 @@ export function getFee(chainID: ChainId) {
   return amountNeeded;
 }
 
-export async function isLedger(walletClient: WalletClient, chainID: ChainId) {
-  if (walletClient instanceof KeplrClient && window.keplr) {
-    const key = await window.keplr.getKey(chainID);
+export async function isLedger<T extends MergedWalletClient>(
+  walletClient: T,
+  chainID: ChainId,
+) {
+  // mostly everything else
+  if ("client" in walletClient && "getKey" in walletClient.client) {
+    const key = await walletClient.client.getKey(chainID);
     return key.isNanoLedger;
   }
 
-  if (walletClient instanceof CosmostationClient) {
-    // @ts-ignore
-    const account = await window.cosmostation.cosmos.request({
+  // cosmostation
+  if ("client" in walletClient && "cosmos" in walletClient.client) {
+    const account = await walletClient.client.cosmos.request({
       method: "cos_account",
       params: { chainName: chainID },
     });
-    return account.isLedger;
-  }
-
-  if (walletClient instanceof LeapClient) {
-    // @ts-ignore
-    const key = await window.leap.getKey(chainID);
-
-    return key.isNanoLedger;
+    return Boolean(account.isLedger);
   }
 
   return false;
@@ -232,7 +251,7 @@ export async function isLedger(walletClient: WalletClient, chainID: ChainId) {
 export function getExplorerLinkForTx(chainID: ChainId, txHash: string) {
   const evmChain = EVM_CHAINS.find((c) => c.id === parseInt(chainID));
 
-  if (evmChain) {
+  if (evmChain?.blockExplorers) {
     return `${evmChain.blockExplorers.default.url}/tx/${txHash}`;
   }
 
@@ -255,77 +274,6 @@ export function getExplorerLinkForTx(chainID: ChainId, txHash: string) {
   }
 
   return chain.explorers[0].tx_page?.replace("${txHash}", txHash) ?? null;
-}
-
-// TODO: planning on refactoring the tx process, where this will find a better home.
-export async function signAmino(
-  client: SigningStargateClient,
-  signer: OfflineAminoSigner,
-  signerAddress: string,
-  messages: readonly EncodeObject[],
-  fee: StdFee,
-  memo: string,
-  { accountNumber, sequence, chainId }: SignerData,
-) {
-  const aminoTypes = new AminoTypes(createDefaultAminoConverters());
-
-  const accountFromSigner = (await signer.getAccounts()).find(
-    (account) => account.address === signerAddress,
-  );
-  if (!accountFromSigner) {
-    throw new Error("Failed to retrieve account from signer");
-  }
-
-  const pubkey = encodePubkey(encodeSecp256k1Pubkey(accountFromSigner.pubkey));
-
-  const signMode = SignMode.SIGN_MODE_LEGACY_AMINO_JSON;
-
-  const msgs = messages.map((msg) => aminoTypes.toAmino(msg));
-
-  msgs[0].value.memo = messages[0].value.memo;
-
-  const signDoc = makeSignDoc(
-    msgs,
-    fee,
-    chainId,
-    memo,
-    accountNumber,
-    sequence,
-  );
-
-  const { signature, signed } = await signer.signAmino(signerAddress, signDoc);
-
-  const signedTxBody = {
-    messages: signed.msgs.map((msg) => aminoTypes.fromAmino(msg)),
-    memo: signed.memo,
-  };
-
-  signedTxBody.messages[0].value.memo = messages[0].value.memo;
-
-  const signedTxBodyEncodeObject: TxBodyEncodeObject = {
-    typeUrl: "/cosmos.tx.v1beta1.TxBody",
-    value: signedTxBody,
-  };
-
-  const signedTxBodyBytes = client.registry.encode(signedTxBodyEncodeObject);
-
-  const signedGasLimit = Int53.fromString(signed.fee.gas).toNumber();
-  const signedSequence = Int53.fromString(signed.sequence).toNumber();
-
-  const signedAuthInfoBytes = makeAuthInfoBytes(
-    [{ pubkey, sequence: signedSequence }],
-    signed.fee.amount,
-    signedGasLimit,
-    signed.fee.granter,
-    signed.fee.payer,
-    signMode,
-  );
-
-  return TxRaw.fromPartial({
-    bodyBytes: signedTxBodyBytes,
-    authInfoBytes: signedAuthInfoBytes,
-    signatures: [fromBase64(signature.signature)],
-  });
 }
 
 export async function getBalancesByChain(address: string, chainID: ChainId) {
