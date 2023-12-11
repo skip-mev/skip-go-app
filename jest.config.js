@@ -7,7 +7,9 @@ const createJestConfig = nextJest({
 });
 
 // Add any custom config to be passed to Jest
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 const customJestConfig = {
+  preset: "ts-jest/presets/js-with-ts-esm",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jest-environment-jsdom",
   testPathIgnorePatterns: [
@@ -15,6 +17,9 @@ const customJestConfig = {
     "<rootDir>/node_modules/",
     "<rootDir>/tests/",
   ],
+  transform: {
+    "^.+\\.[tj]sx?$": ["ts-jest", { useESM: true }],
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

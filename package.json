@@ -10,7 +10,7 @@
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\"",
     "postinstall": "patch-package && run-s chains:*",
     "start": "next start",
-    "test": "jest",
+    "test": "node --experimental-vm-modules --no-warnings ./node_modules/.bin/jest",
     "test:e2e": "playwright test --project=chromium"
   },
   "dependencies": {
