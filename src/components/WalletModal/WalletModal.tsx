@@ -36,7 +36,7 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full overflow-hidden">
       <div className="py-6 px-4 relative">
         <p className="text-center font-bold">Wallets</p>
         <div className="absolute inset-y-0 flex items-center">
@@ -49,7 +49,7 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
           </button>
         </div>
       </div>
-      <div className="px-4 py-2 space-y-2">
+      <div className="px-4 py-2 space-y-2 flex-grow overflow-auto mb-8">
         {wallets.map((wallet) => (
           <div className="group relative" key={wallet.walletName}>
             <button
