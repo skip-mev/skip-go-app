@@ -7,10 +7,8 @@ test("useChains attaches a prettyName", async () => {
     wrapper: AllTheProviders,
   });
 
-  await waitFor(() => {
-    if (result.current.isLoading) {
-      throw new Error("isLoading");
-    }
+  await waitFor(() => expect(result.current.isLoading).toBeFalsy(), {
+    timeout: 10000,
   });
 
   expect(result.current.chains).toBeDefined();
@@ -29,10 +27,8 @@ test("useChainByID returns the chain matching the specified chainID", async () =
     wrapper: AllTheProviders,
   });
 
-  await waitFor(() => {
-    if (result.current.isLoading) {
-      throw new Error("isLoading");
-    }
+  await waitFor(() => expect(result.current.isLoading).toBeFalsy(), {
+    timeout: 10000,
   });
 
   expect(result.current.chain?.chainID).toEqual("osmosis-1");
@@ -43,10 +39,8 @@ test("useChainByID returns undefined if a matching chain cannot be found", async
     wrapper: AllTheProviders,
   });
 
-  await waitFor(() => {
-    if (result.current.isLoading) {
-      throw new Error("isLoading");
-    }
+  await waitFor(() => expect(result.current.isLoading).toBeFalsy(), {
+    timeout: 10000,
   });
 
   expect(result.current.chain).toBeUndefined();

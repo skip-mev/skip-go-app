@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 
 import { act, render, screen } from "@/test";
@@ -30,6 +31,7 @@ describe("WalletModal", () => {
       isWalletConnected: false,
     };
 
+    // @ts-expect-error -- mocked functions
     const wallets: MinimalWallet[] = [keplr];
 
     await act(async () => {
@@ -61,6 +63,7 @@ describe("WalletModal", () => {
       isWalletConnected: true,
     };
 
+    // @ts-expect-error -- mocked functions
     const wallets: MinimalWallet[] = [keplr];
 
     await act(async () => {
