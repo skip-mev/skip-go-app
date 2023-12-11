@@ -10,6 +10,10 @@ const createJestConfig = nextJest({
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const customJestConfig = {
   preset: "ts-jest/presets/js-with-ts-esm",
+  moduleNameMapper: {
+    isows: "<rootDir>/node_modules/isows/_cjs/index.js", // https://github.com/wagmi-dev/viem/issues/1329
+    tinykeys: "<rootDir>/node_modules/tinykeys/dist/tinykeys.js",
+  },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jest-environment-jsdom",
   testPathIgnorePatterns: [
@@ -20,6 +24,9 @@ const customJestConfig = {
   transform: {
     "^.+\\.[tj]sx?$": ["ts-jest", { useESM: true }],
   },
+  transformIgnorePatterns: [
+    "node_modules/(?!isows/)", // https://github.com/wagmi-dev/viem/issues/1329
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
