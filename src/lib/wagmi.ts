@@ -1,5 +1,4 @@
 import { configureChains, createConfig } from "wagmi";
-import { LedgerConnector } from "wagmi/connectors/ledger";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -16,12 +15,6 @@ export const wagmiConfig = createConfig({
   connectors: [
     new MetaMaskConnector({ chains }),
     new OkxWalletConnector({ chains }),
-    new LedgerConnector({
-      chains,
-      options: {
-        //
-      },
-    }),
   ],
   publicClient,
 });
