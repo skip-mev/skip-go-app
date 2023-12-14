@@ -174,7 +174,7 @@ export const SwapWidget: FC = () => {
               }}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
-              showSlippage={route?.doesSwap && !isSwapDetailsOpen}
+              showSlippage={!isSwapDetailsOpen}
             />
           </div>
           {route && (

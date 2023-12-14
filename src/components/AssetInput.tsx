@@ -256,7 +256,7 @@ const AssetInput: FC<Props> = ({
                 </button>
               </div>
             )}
-            {showSlippage && !onAmountChange && amount !== "0.0" && (
+            {showSlippage && (
               <SimpleTooltip label="Click to change max slippage">
                 <button
                   className="text-neutral-400 text-sm hover:underline"
