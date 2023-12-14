@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 const defaultValues = {
+  contactForm: false,
   historyDialog: false,
   settingsDialog: false,
   swapDetailsCollapsible: false,
