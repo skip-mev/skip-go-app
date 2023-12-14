@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useSkipClient } from "./hooks";
 
@@ -49,6 +50,8 @@ export function useRoute({
 }: UseRouteArgs) {
   const skipClient = useSkipClient();
 
+  const [refetchCount, setRefetchCount] = useState(0);
+
   return useQuery({
     queryKey: [
       "solve-route",
@@ -93,10 +96,16 @@ export function useRoute({
 
       return route;
     },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchInterval: (query) => {
+      if (refetchCount < 10 && query.isActive()) {
+        setRefetchCount((c) => c + 1);
+        return 1000 * 2;
+      }
+      return false;
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: false,
     enabled:
       enabled &&
