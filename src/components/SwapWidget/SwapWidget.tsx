@@ -134,8 +134,9 @@ export const SwapWidget: FC = () => {
                     sourceAsset: destinationAsset,
                     destinationChain: sourceChain,
                     destinationAsset: sourceAsset,
-                    amountIn: "",
-                    amountOut: "",
+                    amountIn: amountOut,
+                    amountOut: amountIn,
+                    direction: direction === "swap-in" ? "swap-out" : "swap-in",
                   });
                 }}
                 data-testid="swap-button"
