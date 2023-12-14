@@ -15,7 +15,7 @@ export const ConnectedWalletButton: FC<Props> = ({
 }) => {
   return (
     <button
-      className="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 rounded py-2 px-2.5 focus:outline-none transition-colors"
+      className="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 rounded-lg py-2 px-2.5 focus:outline-none transition-colors"
       onClick={onClick}
     >
       {walletLogo && (

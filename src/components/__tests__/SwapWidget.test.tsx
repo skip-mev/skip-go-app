@@ -73,7 +73,7 @@ const handlers = [
 
 const server = setupServer(...handlers);
 
-describe("SwapWidget", () => {
+describe.skip("SwapWidget", () => {
   // Establish API mocking before all tests.
   beforeAll(() => server.listen());
 

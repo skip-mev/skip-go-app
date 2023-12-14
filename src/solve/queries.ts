@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useSkipClient } from "./hooks";
 
@@ -28,20 +29,34 @@ export function useSolveChains() {
   });
 }
 
-export function useRoute(
-  amountIn: string,
-  sourceAsset?: string,
-  sourceAssetChainID?: string,
-  destinationAsset?: string,
-  destinationAssetChainID?: string,
-  enabled?: boolean,
-) {
+interface UseRouteArgs {
+  direction: "swap-in" | "swap-out";
+  amount: string;
+  sourceAsset?: string;
+  sourceAssetChainID?: string;
+  destinationAsset?: string;
+  destinationAssetChainID?: string;
+  enabled?: boolean;
+}
+
+export function useRoute({
+  direction,
+  amount,
+  sourceAsset,
+  sourceAssetChainID,
+  destinationAsset,
+  destinationAssetChainID,
+  enabled,
+}: UseRouteArgs) {
   const skipClient = useSkipClient();
+
+  const [refetchCount, setRefetchCount] = useState(0);
 
   return useQuery({
     queryKey: [
       "solve-route",
-      amountIn,
+      direction,
+      amount,
       sourceAsset,
       destinationAsset,
       sourceAssetChainID,
@@ -57,13 +72,23 @@ export function useRoute(
         return;
       }
 
-      const route = await skipClient.route({
-        amountIn: amountIn,
-        sourceAssetDenom: sourceAsset,
-        sourceAssetChainID: sourceAssetChainID,
-        destAssetDenom: destinationAsset,
-        destAssetChainID: destinationAssetChainID,
-      });
+      const route = await skipClient.route(
+        direction === "swap-in"
+          ? {
+              amountIn: amount,
+              sourceAssetDenom: sourceAsset,
+              sourceAssetChainID: sourceAssetChainID,
+              destAssetDenom: destinationAsset,
+              destAssetChainID: destinationAssetChainID,
+            }
+          : {
+              amountOut: amount,
+              sourceAssetDenom: sourceAsset,
+              sourceAssetChainID: sourceAssetChainID,
+              destAssetDenom: destinationAsset,
+              destAssetChainID: destinationAssetChainID,
+            },
+      );
 
       if (!route.operations) {
         throw new Error("No route found");
@@ -71,10 +96,16 @@ export function useRoute(
 
       return route;
     },
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchInterval: (query) => {
+      if (refetchCount < 10 && query.isActive()) {
+        setRefetchCount((c) => c + 1);
+        return 1000 * 2;
+      }
+      return false;
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: false,
     enabled:
       enabled &&
@@ -82,6 +113,6 @@ export function useRoute(
       !!destinationAsset &&
       !!sourceAssetChainID &&
       !!destinationAssetChainID &&
-      amountIn !== "0",
+      amount !== "0",
   });
 }

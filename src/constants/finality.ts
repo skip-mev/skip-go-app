@@ -5,6 +5,7 @@ import {
   celo,
   fantom,
   filecoin,
+  kava,
   linea,
   mainnet as ethereum,
   moonbeam,
@@ -12,8 +13,6 @@ import {
   optimism,
   polygon,
 } from "wagmi/chains";
-
-import { kava } from "./constants";
 
 /** @see https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions */
 const finalityTimeMap: Record<string, string> = {

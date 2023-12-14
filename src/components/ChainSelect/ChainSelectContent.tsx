@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { useWindowSize } from "usehooks-ts";
 
 import { Chain } from "@/api/queries";
 import { getChainLogo } from "@/cosmos";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 interface Props {
   chains: Chain[];

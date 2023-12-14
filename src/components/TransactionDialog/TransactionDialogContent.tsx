@@ -15,8 +15,8 @@ import {
   successTxHistory,
 } from "@/context/tx-history";
 import Toast from "@/elements/Toast";
+import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
-import { useFinalityTimeEstimate } from "@/utils/hooks";
 import {
   enableChains,
   getAddressForCosmosChain,

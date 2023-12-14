@@ -6,12 +6,14 @@ import TransactionDialogContent from "./TransactionDialogContent";
 export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 
 interface Props {
+  isLoading?: boolean;
   route?: RouteResponse;
   transactionCount: number;
   insufficientBalance?: boolean;
 }
 
 const TransactionDialog: FC<Props> = ({
+  isLoading,
   route,
   insufficientBalance,
   transactionCount,
@@ -23,7 +25,7 @@ const TransactionDialog: FC<Props> = ({
       <div>
         <button
           className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
-          disabled={!route}
+          disabled={!route || (typeof isLoading === "boolean" && isLoading)}
           onClick={() => setIsOpen(true)}
         >
           Preview Route

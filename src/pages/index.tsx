@@ -12,9 +12,9 @@ import {
   updateTxStatus,
   useTxHistory,
 } from "@/context/tx-history";
+import { useInterval } from "@/hooks/useInterval";
+import { queryClient } from "@/lib/react-query";
 import { useSkipClient } from "@/solve";
-import { useInterval } from "@/utils/hooks";
-import { queryClient } from "@/utils/query";
 import { getBalancesByChain } from "@/utils/utils";
 
 function routeHasAxelarTransfer(route: RouteResponse): boolean {
@@ -184,6 +184,12 @@ export default function Home() {
           <SwapWidget />
         </WalletModalProvider>
       </div>
+      <style jsx global>{`
+        html {
+          overflow-x: hidden;
+          overflow-y: scroll;
+        }
+      `}</style>
     </div>
   );
 }
