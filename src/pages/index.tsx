@@ -184,6 +184,12 @@ export default function Home() {
           <SwapWidget />
         </WalletModalProvider>
       </div>
+      <style jsx global>{`
+        html {
+          overflow-x: hidden;
+          overflow-y: scroll;
+        }
+      `}</style>
     </div>
   );
 }

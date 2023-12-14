@@ -1,5 +1,6 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { clsx } from "clsx";
 import { FC, useEffect } from "react";
 import type {} from "typed-query-selector";
 
@@ -84,8 +85,8 @@ export const SwapWidget: FC = () => {
   return (
     <UsdDiff.Provider>
       <Tooltip.Provider>
-        <div className="space-y-6">
-          <div className="flex items-center">
+        <div className="space-y-4">
+          <div className="flex items-center h-8">
             <p className="font-semibold text-2xl">From</p>
             <div className="flex-grow" />
             <HistoryButton />
@@ -127,8 +128,13 @@ export const SwapWidget: FC = () => {
           <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center">
               <button
-                className="bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform"
+                className={clsx(
+                  "bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform",
+                  "disabled:hover:scale-100 disabled:bg-gray-700 disabled:cursor-not-allowed",
+                )}
+                disabled={!destinationChain || !destinationAsset}
                 onClick={() => {
+                  if (!destinationChain || !destinationAsset) return;
                   setFormValues({
                     sourceChain: destinationChain,
                     sourceAsset: destinationAsset,
