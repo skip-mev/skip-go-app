@@ -331,6 +331,24 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             ].denomOut;
         }
 
+        if ("swapOut" in operation.swap) {
+          _actions.push({
+            type: "SWAP",
+            sourceAsset: operation.swap.swapOut.swapOperations[0].denomIn,
+            destinationAsset:
+              operation.swap.swapOut.swapOperations[
+                operation.swap.swapOut.swapOperations.length - 1
+              ].denomOut,
+            chain: operation.swap.swapOut.swapVenue.chainID,
+            venue: operation.swap.swapOut.swapVenue.name,
+          });
+
+          asset =
+            operation.swap.swapOut.swapOperations[
+              operation.swap.swapOut.swapOperations.length - 1
+            ].denomOut;
+        }
+
         return;
       }
 
