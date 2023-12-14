@@ -3,6 +3,7 @@ import { RouteResponse, SkipRouter, TxStatusResponse } from "@skip-router/core";
 import { differenceInMinutes, parseISO } from "date-fns";
 import { useState } from "react";
 
+import { ContactButton } from "@/components/ContactButton";
 import { SwapWidget } from "@/components/SwapWidget";
 import { WalletModalProvider } from "@/components/WalletModal";
 import {
@@ -179,6 +180,7 @@ export default function Home() {
 
   return (
     <div className="max-w-md mx-auto">
+      <ContactButton />
       <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
         <WalletModalProvider>
           <SwapWidget />
