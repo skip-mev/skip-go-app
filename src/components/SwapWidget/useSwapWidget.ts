@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
+import { subscribeWithSelector } from "zustand/middleware";
+import { shallow } from "zustand/shallow";
+import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -12,41 +15,44 @@ export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
 export function useSwapWidget() {
   const {
-    formValues,
-    setFormValues,
     onSourceChainChange,
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
   } = useFormValues();
 
-  const amountInWei = useMemo(() => {
-    if (!formValues.sourceAsset) {
-      return "0";
-    }
+  const amountInWei = useFormValuesStore((formValues) => {
+    return getAmountWei(formValues.sourceAsset, formValues.amountIn);
+  });
 
-    try {
-      return ethers
-        .parseUnits(formValues.amountIn, formValues.sourceAsset.decimals)
-        .toString();
-    } catch (err) {
-      return "0";
-    }
-  }, [formValues.amountIn, formValues.sourceAsset]);
+  const amountOutWei = useFormValuesStore((formValues) => {
+    return getAmountWei(formValues.destinationAsset, formValues.amountOut);
+  });
+
+  const {
+    amountIn,
+    amountOut,
+    direction,
+    destinationAsset,
+    destinationChain,
+    sourceAsset,
+    sourceChain,
+  } = useFormValuesStore();
 
   const {
     data: routeResponse,
     fetchStatus: routeFetchStatus,
     isError: routeQueryIsError,
     error: routeQueryError,
-  } = useRoute(
-    amountInWei,
-    formValues.sourceAsset?.denom,
-    formValues.sourceAsset?.chainID,
-    formValues.destinationAsset?.denom,
-    formValues.destinationAsset?.chainID,
-    true,
-  );
+  } = useRoute({
+    direction: direction,
+    amount: direction === "swap-in" ? amountInWei : amountOutWei,
+    sourceAsset: sourceAsset?.denom,
+    sourceAssetChainID: sourceAsset?.chainID,
+    destinationAsset: destinationAsset?.denom,
+    destinationAssetChainID: destinationAsset?.chainID,
+    enabled: true,
+  });
 
   const errorMessage = useMemo(() => {
     if (!routeQueryError) {
@@ -88,55 +94,62 @@ export function useSwapWidget() {
     return routeFetchStatus === "fetching";
   }, [routeFetchStatus]);
 
-  const amountOut = useMemo(() => {
-    if (!routeResponse) {
-      return "0.0";
-    }
+  useEffect(() => {
+    if (!routeResponse || routeLoading) return;
 
-    return ethers.formatUnits(
-      routeResponse.amountOut,
-      formValues.destinationAsset?.decimals ?? 6,
+    const newAmount =
+      direction === "swap-in"
+        ? routeResponse.amountOut
+        : routeResponse.amountIn;
+
+    const formattedNewAmount =
+      direction === "swap-in"
+        ? parseAmountWei(newAmount, destinationAsset?.decimals)
+        : parseAmountWei(newAmount, sourceAsset?.decimals);
+
+    useFormValuesStore.setState(
+      direction === "swap-in"
+        ? { amountOut: formattedNewAmount }
+        : { amountIn: formattedNewAmount },
     );
-  }, [formValues.destinationAsset?.decimals, routeResponse]);
+  }, [
+    routeResponse,
+    routeLoading,
+    direction,
+    sourceAsset?.decimals,
+    destinationAsset?.decimals,
+  ]);
 
-  const { address } = useAccount(
-    formValues.sourceChain?.chainID ?? "cosmoshub-4",
-  );
+  const { address } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances } = useBalancesByChain(
-    address,
-    formValues.sourceChain,
-  );
+  const { data: balances } = useBalancesByChain(address, sourceChain);
 
   const insufficientBalance = useMemo(() => {
-    if (!formValues.sourceAsset || !balances) {
+    if (!sourceAsset || !balances) {
       return false;
     }
 
-    const amountIn = parseFloat(formValues.amountIn);
+    const parsedAmountIn = parseFloat(amountIn);
 
-    if (isNaN(amountIn)) {
+    if (isNaN(parsedAmountIn)) {
       return false;
     }
 
-    const balanceStr = balances[formValues.sourceAsset.denom] ?? "0";
+    const balanceStr = balances[sourceAsset.denom] ?? "0";
 
     const balance = parseFloat(
-      ethers.formatUnits(balanceStr, formValues.sourceAsset.decimals),
+      ethers.formatUnits(balanceStr, sourceAsset.decimals),
     );
 
-    return amountIn > balance;
-  }, [balances, formValues.amountIn, formValues.sourceAsset]);
+    return parsedAmountIn > balance;
+  }, [balances, amountIn, sourceAsset]);
 
   const { chain: currentEvmChain } = useNetwork();
 
   const { switchNetwork } = useSwitchNetwork();
 
   useEffect(() => {
-    if (
-      !formValues.sourceChain ||
-      formValues.sourceChain.chainType === "cosmos"
-    ) {
+    if (!sourceChain || sourceChain.chainType === "cosmos") {
       return;
     }
 
@@ -144,22 +157,22 @@ export function useSwapWidget() {
       return;
     }
 
-    const chainID = parseInt(formValues.sourceChain.chainID);
+    const chainID = parseInt(sourceChain.chainID);
 
     if (currentEvmChain.id !== chainID) {
       switchNetwork(chainID);
     }
-  }, [currentEvmChain, formValues.sourceChain, switchNetwork]);
+  }, [currentEvmChain, sourceChain, switchNetwork]);
 
   return {
-    amountIn: formValues.amountIn,
+    amountIn,
     amountOut,
-    destinationAsset: formValues.destinationAsset,
-    destinationChain: formValues.destinationChain,
-    formValues,
-    setFormValues,
-    sourceAsset: formValues.sourceAsset,
-    sourceChain: formValues.sourceChain,
+    direction,
+    destinationAsset,
+    destinationChain,
+    sourceAsset,
+    sourceChain,
+    setFormValues: useFormValuesStore.setState,
     routeLoading,
     numberOfTransactions: numberOfTransactions ?? 0,
     route: routeResponse,
@@ -175,11 +188,21 @@ export function useSwapWidget() {
 
 export interface FormValues {
   amountIn: string;
+  amountOut: string;
   sourceChain?: Chain;
   sourceAsset?: AssetWithMetadata;
   destinationChain?: Chain;
   destinationAsset?: AssetWithMetadata;
+  direction: "swap-in" | "swap-out";
 }
+
+const useFormValuesStore = create(
+  subscribeWithSelector<FormValues>(() => ({
+    amountIn: "",
+    amountOut: "",
+    direction: "swap-in",
+  })),
+);
 
 // useFormValues returns a set of form values that are used to populate the swap widget
 // and handles logic regarding setting initial values based on local storage and other form values.
@@ -191,127 +214,138 @@ function useFormValues() {
   const [userSelectedDestinationAsset, setUserSelectedDestinationAsset] =
     useState(false);
 
-  const [formValues, setFormValues] = useState<FormValues>({
-    amountIn: "",
-  });
-
   // Select initial source chain.
   // - If chainID exists in local storage, use that.
   // - Otherwise, default to cosmoshub-4.
   useEffect(() => {
-    if (!formValues.sourceChain && (chains ?? []).length > 0) {
-      const chainID =
-        localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
-      setFormValues((values) => ({
-        ...values,
-        sourceChain: (chains ?? []).find((chain) => chain.chainID === chainID),
-      }));
-    }
-  }, [chains, formValues.sourceChain]);
+    return useFormValuesStore.subscribe(
+      (state) => state.sourceChain,
+      (sourceChain) => {
+        if (!sourceChain && (chains ?? []).length > 0) {
+          const chainID =
+            localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
+          useFormValuesStore.setState({
+            sourceChain: (chains ?? []).find(
+              (chain) => chain.chainID === chainID,
+            ),
+          });
+        }
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, [chains]);
 
   // When source chain changes, save to local storage.
   useEffect(() => {
-    if (formValues.sourceChain) {
-      localStorage.setItem(
-        LAST_SOURCE_CHAIN_KEY,
-        formValues.sourceChain.chainID,
-      );
-    }
-  }, [formValues.sourceChain]);
+    return useFormValuesStore.subscribe(
+      (state) => state.sourceChain,
+      (sourceChain) => {
+        if (sourceChain) {
+          localStorage.setItem(LAST_SOURCE_CHAIN_KEY, sourceChain.chainID);
+        }
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, []);
 
   // Select initial source asset.
   // - If fee denom exists for source chain, use that.
   // - Otherwise, default to first asset in list.
   useEffect(() => {
-    if (formValues.sourceChain && !formValues.sourceAsset) {
-      const feeAsset = getFeeDenom(formValues.sourceChain.chainID);
+    return useFormValuesStore.subscribe(
+      (state) => [state.sourceChain, state.sourceAsset] as const,
+      ([sourceChain, sourceAsset]) => {
+        if (sourceChain && !sourceAsset) {
+          const feeAsset = getFeeDenom(sourceChain.chainID);
 
-      if (feeAsset) {
-        setFormValues((values) => ({
-          ...values,
-          sourceAsset: feeAsset,
-        }));
-      } else {
-        const assets = assetsByChainID(formValues.sourceChain.chainID);
-        if (assets.length > 0) {
-          setFormValues((values) => ({
-            ...values,
-            sourceAsset: assets[0],
-          }));
+          if (feeAsset) {
+            useFormValuesStore.setState({ sourceAsset: feeAsset });
+          } else {
+            const assets = assetsByChainID(sourceChain.chainID);
+            if (assets.length > 0) {
+              useFormValuesStore.setState({ sourceAsset: assets[0] });
+            }
+          }
         }
-      }
-    }
-  }, [
-    assetsByChainID,
-    formValues.sourceAsset,
-    formValues.sourceChain,
-    getFeeDenom,
-  ]);
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, [assetsByChainID, getFeeDenom]);
 
-  const onSourceChainChange = (chain: Chain) => {
-    setFormValues({
-      ...formValues,
+  const onSourceChainChange = useCallback((chain: Chain) => {
+    useFormValuesStore.setState({
       sourceChain: chain,
       sourceAsset: undefined,
       amountIn: "",
     });
-  };
+  }, []);
 
-  const onSourceAssetChange = (asset: AssetWithMetadata) => {
-    setFormValues({
-      ...formValues,
+  const onSourceAssetChange = useCallback((asset: AssetWithMetadata) => {
+    useFormValuesStore.setState({
       sourceAsset: asset,
     });
-  };
+  }, []);
 
   // When a new destination chain is selected, select a new destination asset:
   // - If there is a destination asset already selected, try to find the equivalent asset on the new chain.
   // - Otherwise, if fee denom exists for destination chain, use that.
   // - Otherwise, default to first asset in list.
-  const onDestinationChainChange = (chain: Chain) => {
-    const assets = assetsByChainID(chain.chainID);
+  const onDestinationChainChange = useCallback(
+    (chain: Chain) => {
+      const formValues = useFormValuesStore.getState();
+      const assets = assetsByChainID(chain.chainID);
 
-    let destinationAsset = getFeeDenom(chain.chainID) ?? assets[0];
-    if (formValues.destinationAsset && userSelectedDestinationAsset) {
-      const equivalentAsset = findEquivalentAsset(
-        formValues.destinationAsset,
-        assets,
-      );
+      let destinationAsset = getFeeDenom(chain.chainID) ?? assets[0];
+      if (formValues.destinationAsset && userSelectedDestinationAsset) {
+        const equivalentAsset = findEquivalentAsset(
+          formValues.destinationAsset,
+          assets,
+        );
 
-      if (equivalentAsset) {
-        destinationAsset = equivalentAsset;
+        if (equivalentAsset) {
+          destinationAsset = equivalentAsset;
+        }
       }
-    }
 
-    setFormValues((values) => ({
-      ...values,
-      destinationChain: chain,
-      destinationAsset,
-    }));
-  };
+      useFormValuesStore.setState({
+        destinationChain: chain,
+        destinationAsset,
+      });
+    },
+    [assetsByChainID, getFeeDenom, userSelectedDestinationAsset],
+  );
 
-  const onDestinationAssetChange = (asset: AssetWithMetadata) => {
-    // If destination asset is defined, but no destination chain, select chain based off asset.
-    let destinationChain = formValues.destinationChain;
-    if (!destinationChain) {
-      destinationChain = (chains ?? []).find(
-        (c) => c.chainID === asset.chainID,
-      );
-    }
+  const onDestinationAssetChange = useCallback(
+    (asset: AssetWithMetadata) => {
+      // If destination asset is defined, but no destination chain, select chain based off asset.
+      let { destinationChain } = useFormValuesStore.getState();
+      if (!destinationChain) {
+        destinationChain = (chains ?? []).find(
+          (c) => c.chainID === asset.chainID,
+        );
+      }
 
-    // If destination asset is user selected, set flag to true.
-    setUserSelectedDestinationAsset(true);
+      // If destination asset is user selected, set flag to true.
+      setUserSelectedDestinationAsset(true);
 
-    setFormValues({
-      ...formValues,
-      destinationAsset: asset,
-      destinationChain,
-    });
-  };
+      useFormValuesStore.setState({
+        destinationAsset: asset,
+        destinationChain,
+      });
+    },
+    [chains],
+  );
 
   return {
-    formValues,
-    setFormValues,
     onSourceAssetChange,
     onSourceChainChange,
     onDestinationChainChange,
@@ -329,4 +363,22 @@ function findEquivalentAsset(
 
     return isSameOriginChain && isSameOriginDenom;
   });
+}
+
+function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
+  if (!asset || !amount) return "0";
+  try {
+    return ethers.parseUnits(amount, asset.decimals).toString();
+  } catch {
+    return "0";
+  }
+}
+
+function parseAmountWei(amount?: string, decimals = 6) {
+  if (!amount) return "0";
+  try {
+    return ethers.formatUnits(amount, decimals ?? 6);
+  } catch {
+    return "0";
+  }
 }

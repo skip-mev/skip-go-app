@@ -2,7 +2,7 @@ import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
-import { FC, Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { FC, Fragment, useEffect, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -94,9 +94,6 @@ const AssetInput: FC<Props> = ({
     if (parsed == 0) reset();
   }, [amount, onAmountChange, reset]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => inputRef.current?.focus(), []);
-
   return (
     <Fragment>
       <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">
@@ -119,80 +116,69 @@ const AssetInput: FC<Props> = ({
           </div>
         </div>
         <div>
-          {!onAmountChange && (
-            <div
-              className={clsx(
-                "w-full text-3xl font-medium h-10 truncate",
-                amount === "0.0" ? "text-neutral-300" : "text-black",
-              )}
-              data-testid="amount"
-            >
-              {amount}
-            </div>
-          )}
-          {onAmountChange && (
-            <input
-              className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
-              type="text"
-              placeholder="0.0"
-              value={amount}
-              inputMode="numeric"
-              onChange={(e) => {
-                let latest = e.target.value;
+          <input
+            data-testid="amount"
+            className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
+            type="text"
+            placeholder="0.0"
+            value={amount}
+            inputMode="numeric"
+            onChange={(e) => {
+              if (!onAmountChange) return;
 
-                // replace first comma with period
-                latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
+              let latest = e.target.value;
 
-                // prevent entering anything except numbers, commas, and periods
-                if (latest.match(/[^0-9.]/gi)) return;
+              // replace first comma with period
+              latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
 
-                // if there is more than one period or comma,
-                // remove all periods except the first one for decimals
-                if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
-                  latest = latest.replace(/([,.].*)[,.]/g, "$1");
-                }
+              // prevent entering anything except numbers, commas, and periods
+              if (latest.match(/[^0-9.]/gi)) return;
 
-                onAmountChange?.(latest);
-              }}
-              onKeyDown={(event) => {
-                if (!onAmountChange) return;
+              // if there is more than one period or comma,
+              // remove all periods except the first one for decimals
+              if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
+                latest = latest.replace(/([,.].*)[,.]/g, "$1");
+              }
 
-                if (event.key === "Escape") {
-                  onAmountChange?.("");
-                  return;
-                }
+              onAmountChange?.(latest);
+            }}
+            onKeyDown={(event) => {
+              if (!onAmountChange) return;
 
-                if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-                  let value = new BigNumber(event.currentTarget.value || "0");
-                  if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    if (event.shiftKey) {
-                      value = value.plus(10);
-                    } else if (event.altKey || event.ctrlKey || event.metaKey) {
-                      value = value.plus(0.1);
-                    } else {
-                      value = value.plus(1);
-                    }
+              if (event.key === "Escape") {
+                onAmountChange?.("");
+                return;
+              }
+
+              if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                let value = new BigNumber(event.currentTarget.value || "0");
+                if (event.key === "ArrowUp") {
+                  event.preventDefault();
+                  if (event.shiftKey) {
+                    value = value.plus(10);
+                  } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                    value = value.plus(0.1);
+                  } else {
+                    value = value.plus(1);
                   }
-                  if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    if (event.shiftKey) {
-                      value = value.minus(10);
-                    } else if (event.altKey || event.ctrlKey || event.metaKey) {
-                      value = value.minus(0.1);
-                    } else {
-                      value = value.minus(1);
-                    }
-                  }
-                  if (value.isNegative()) {
-                    value = new BigNumber(0);
-                  }
-                  onAmountChange(value.toString());
                 }
-              }}
-              ref={inputRef}
-            />
-          )}
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  if (event.shiftKey) {
+                    value = value.minus(10);
+                  } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                    value = value.minus(0.1);
+                  } else {
+                    value = value.minus(1);
+                  }
+                }
+                if (value.isNegative()) {
+                  value = new BigNumber(0);
+                }
+                onAmountChange(value.toString());
+              }
+            }}
+          />
           <div className="flex items-center space-x-2 tabular-nums h-8">
             {asset && parseFloat(amount) > 0 && (
               <div className="text-neutral-400 text-sm">
