@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+
+const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 
 /** @type {import('tailwindcss').Config} */
@@ -8,17 +10,6 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  safelist: [
-    "bg-indigo-400/10",
-    "text-indigo-400",
-    "bg-blue-400/10",
-    "text-blue-400",
-    "bg-emerald-400/10",
-    "text-emerald-400",
-    "border-rose-500",
-    "border-emerald-500",
-    "border-l-8",
-  ],
   theme: {
     extend: {
       animation: {
@@ -26,6 +17,10 @@ module.exports = {
         "accordion-closed": `accordion-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "collapsible-open": `collapsible-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "collapsible-closed": `collapsible-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
+        "slide-up-and-fade": `slide-up-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-right-and-fade": `slide-right-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-down-and-fade": `slide-down-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-left-and-fade": `slide-left-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -35,7 +30,7 @@ module.exports = {
         squiggle: "url('/squiggle.svg')",
       },
       fontFamily: {
-        sans: ["Jost", "sans-serif"],
+        sans: ["Jost", ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
         "accordion-open": {
@@ -53,6 +48,22 @@ module.exports = {
         "collapsible-closed": {
           from: { height: "var(--radix-collapsible-content-height)" },
           to: { height: 0 },
+        },
+        "slide-up-and-fade": {
+          from: { opacity: 0, transform: "translateY(2px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+        "slide-right-and-fade": {
+          from: { opacity: 0, transform: "translateX(-2px)" },
+          to: { opacity: 1, transform: "translateX(0)" },
+        },
+        "slide-down-and-fade": {
+          from: { opacity: 0, transform: "translateY(-2px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+        "slide-left-and-fade": {
+          from: { opacity: 0, transform: "translateX(2px)" },
+          to: { opacity: 1, transform: "translateX(0)" },
         },
       },
     },
