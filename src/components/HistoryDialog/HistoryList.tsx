@@ -20,7 +20,7 @@ import {
 
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
-import { useFinalityTimeEstimate } from "@/utils/hooks";
+import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 
 import { AssetValue } from "../AssetValue";
 import { ChainSymbol } from "../ChainSymbol";

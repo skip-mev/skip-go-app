@@ -1,6 +1,7 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { FC, useEffect } from "react";
+import type {} from "typed-query-selector";
 
 import { useChains as useSkipChains } from "@/api/queries";
 import { useDisclosureKey } from "@/context/disclosures";
@@ -31,7 +32,7 @@ export const SwapWidget: FC = () => {
   const {
     amountIn,
     amountOut,
-    formValues,
+    direction,
     setFormValues,
     sourceAsset,
     sourceChain,
@@ -70,6 +71,7 @@ export const SwapWidget: FC = () => {
   const [isSwapDetailsOpen] = useDisclosureKey("swapDetailsCollapsible");
 
   useEffect(() => {
+    document.querySelector("[data-testid='source'] input")?.focus();
     return useSettingsStore.subscribe((state) => {
       if (+state.slippage < 0 || +state.slippage > 100) {
         useSettingsStore.setState({
@@ -111,18 +113,15 @@ export const SwapWidget: FC = () => {
           <div data-testid="source">
             <AssetInput
               amount={amountIn}
-              onAmountChange={(amount) =>
-                setFormValues({
-                  ...formValues,
-                  amountIn: amount,
-                })
-              }
               asset={sourceAsset}
-              onAssetChange={onSourceAssetChange}
               chain={sourceChain}
+              chains={chains ?? []}
+              onAmountChange={(amount) => {
+                setFormValues({ amountIn: amount, direction: "swap-in" });
+              }}
+              onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
-              chains={chains ?? []}
             />
           </div>
           <div className="relative">
@@ -131,12 +130,13 @@ export const SwapWidget: FC = () => {
                 className="bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform"
                 onClick={() => {
                   setFormValues({
-                    ...formValues,
                     sourceChain: destinationChain,
                     sourceAsset: destinationAsset,
                     destinationChain: sourceChain,
                     destinationAsset: sourceAsset,
-                    amountIn: "",
+                    amountIn: amountOut,
+                    amountOut: amountIn,
+                    direction: direction === "swap-in" ? "swap-out" : "swap-in",
                   });
                 }}
                 data-testid="swap-button"
@@ -168,15 +168,19 @@ export const SwapWidget: FC = () => {
             <AssetInput
               amount={amountOut}
               asset={destinationAsset}
-              onAssetChange={onDestinationAssetChange}
               chain={destinationChain}
-              onChainChange={onDestinationChainChange}
               chains={chains ?? []}
-              showSlippage={route?.doesSwap && !isSwapDetailsOpen}
+              onAmountChange={(amount) => {
+                setFormValues({ amountOut: amount, direction: "swap-out" });
+              }}
+              onAssetChange={onDestinationAssetChange}
+              onChainChange={onDestinationChainChange}
+              showSlippage={!isSwapDetailsOpen}
             />
           </div>
           {route && (
             <SwapDetails
+              direction={direction}
               amountIn={amountIn}
               amountOut={amountOut}
               sourceChain={sourceChain}
@@ -235,6 +239,7 @@ export const SwapWidget: FC = () => {
           {sourceChain && isWalletConnected && (
             <div className="space-y-4">
               <TransactionDialog
+                isLoading={routeLoading}
                 route={route}
                 transactionCount={numberOfTransactions}
                 insufficientBalance={insufficientBalance}

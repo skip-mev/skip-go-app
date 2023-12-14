@@ -28,20 +28,32 @@ export function useSolveChains() {
   });
 }
 
-export function useRoute(
-  amountIn: string,
-  sourceAsset?: string,
-  sourceAssetChainID?: string,
-  destinationAsset?: string,
-  destinationAssetChainID?: string,
-  enabled?: boolean,
-) {
+interface UseRouteArgs {
+  direction: "swap-in" | "swap-out";
+  amount: string;
+  sourceAsset?: string;
+  sourceAssetChainID?: string;
+  destinationAsset?: string;
+  destinationAssetChainID?: string;
+  enabled?: boolean;
+}
+
+export function useRoute({
+  direction,
+  amount,
+  sourceAsset,
+  sourceAssetChainID,
+  destinationAsset,
+  destinationAssetChainID,
+  enabled,
+}: UseRouteArgs) {
   const skipClient = useSkipClient();
 
   return useQuery({
     queryKey: [
       "solve-route",
-      amountIn,
+      direction,
+      amount,
       sourceAsset,
       destinationAsset,
       sourceAssetChainID,
@@ -57,13 +69,23 @@ export function useRoute(
         return;
       }
 
-      const route = await skipClient.route({
-        amountIn: amountIn,
-        sourceAssetDenom: sourceAsset,
-        sourceAssetChainID: sourceAssetChainID,
-        destAssetDenom: destinationAsset,
-        destAssetChainID: destinationAssetChainID,
-      });
+      const route = await skipClient.route(
+        direction === "swap-in"
+          ? {
+              amountIn: amount,
+              sourceAssetDenom: sourceAsset,
+              sourceAssetChainID: sourceAssetChainID,
+              destAssetDenom: destinationAsset,
+              destAssetChainID: destinationAssetChainID,
+            }
+          : {
+              amountOut: amount,
+              sourceAssetDenom: sourceAsset,
+              sourceAssetChainID: sourceAssetChainID,
+              destAssetDenom: destinationAsset,
+              destAssetChainID: destinationAssetChainID,
+            },
+      );
 
       if (!route.operations) {
         throw new Error("No route found");
@@ -82,6 +104,6 @@ export function useRoute(
       !!destinationAsset &&
       !!sourceAssetChainID &&
       !!destinationAssetChainID &&
-      amountIn !== "0",
+      amount !== "0",
   });
 }
