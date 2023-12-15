@@ -14,6 +14,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { ClientOnly } from "./ClientOnly";
 import { SimpleTooltip } from "./SimpleTooltip";
 import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
@@ -258,17 +259,19 @@ const AssetInput: FC<Props> = ({
                 </button>
               </div>
             )}
-            {showSlippage && (
-              <SimpleTooltip label="Click to change max slippage">
-                <button
-                  className="text-neutral-400 text-sm hover:underline"
-                  onClick={() => disclosure.open("settingsDialog")}
-                >
-                  Max Slippage: {slippage}%{" "}
-                  <PencilSquareIcon className="w-3 h-3 inline mb-1" />
-                </button>
-              </SimpleTooltip>
-            )}
+            <ClientOnly>
+              {showSlippage && (
+                <SimpleTooltip label="Click to change max slippage">
+                  <button
+                    className="text-neutral-400 text-sm hover:underline"
+                    onClick={() => disclosure.open("settingsDialog")}
+                  >
+                    Max Slippage: {slippage}%{" "}
+                    <PencilSquareIcon className="w-3 h-3 inline mb-1" />
+                  </button>
+                </SimpleTooltip>
+              )}
+            </ClientOnly>
           </div>
         </div>
       </div>
