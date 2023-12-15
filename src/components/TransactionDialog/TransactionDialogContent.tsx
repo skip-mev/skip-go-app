@@ -11,7 +11,7 @@ import { useToast } from "@/context/toast";
 import {
   addTxHistory,
   addTxStatus,
-  removeTxHistory,
+  failTxHistory,
   successTxHistory,
 } from "@/context/tx-history";
 import Toast from "@/elements/Toast";
@@ -219,7 +219,7 @@ const TransactionDialogContent: FC<Props> = ({
         setTxError(err.message);
         setIsError(true);
       }
-      removeTxHistory(historyId);
+      failTxHistory(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
