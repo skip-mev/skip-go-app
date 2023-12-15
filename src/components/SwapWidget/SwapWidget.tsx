@@ -123,6 +123,7 @@ export const SwapWidget: FC = () => {
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
+              context="src"
             />
           </div>
           <div className="relative">
@@ -182,6 +183,7 @@ export const SwapWidget: FC = () => {
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
               showSlippage={!isSwapDetailsOpen}
+              context="dest"
             />
           </div>
           {route && (

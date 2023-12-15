@@ -27,6 +27,7 @@ interface Props {
   chains: Chain[];
   showBalance?: boolean;
   showSlippage?: boolean;
+  context?: "src" | "dest";
 }
 
 const AssetInput: FC<Props> = ({
@@ -39,6 +40,7 @@ const AssetInput: FC<Props> = ({
   onChainChange,
   showBalance,
   showSlippage,
+  context,
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -188,11 +190,11 @@ const AssetInput: FC<Props> = ({
                   denom={asset.originDenom}
                   coingeckoID={asset.coingeckoID}
                   value={amount}
-                  context={onAmountChange ? "src" : "dest"}
+                  context={context}
                 />
               </div>
             )}
-            {!onAmountChange && (
+            {context === "dest" && (
               <UsdDiff.Value>
                 {({ isLoading, percentage }) => (
                   <div
