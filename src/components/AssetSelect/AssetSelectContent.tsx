@@ -124,9 +124,7 @@ const AssetSelectContent: FC<Props> = ({
                 }
               />
               <div className="flex-1">
-                <p className="font-semibold text-lg">
-                  {asset.symbol} {asset.isCW20 ? "(cw20)" : null}
-                </p>
+                <p className="font-semibold text-lg">{asset.symbol}</p>
                 {showChainInfo && (
                   <p className="text-sm text-neutral-400">{asset.chainID}</p>
                 )}
