@@ -122,7 +122,17 @@ export function useSwapWidget() {
 
   const { address } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances } = useBalancesByChain(address, sourceChain);
+  const { assetsByChainID } = useAssets();
+
+  const sourceChainAssets = assetsByChainID(
+    sourceChain?.chainID ?? "cosmoshub-4",
+  );
+
+  const { data: balances } = useBalancesByChain(
+    address,
+    sourceChain,
+    sourceChainAssets,
+  );
 
   const insufficientBalance = useMemo(() => {
     if (!sourceAsset || !balances) {

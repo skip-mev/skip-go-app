@@ -59,7 +59,12 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances } = useBalancesByChain(address, chain, showBalance);
+  const { data: balances } = useBalancesByChain(
+    address,
+    chain,
+    assets,
+    showBalance,
+  );
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return undefined;

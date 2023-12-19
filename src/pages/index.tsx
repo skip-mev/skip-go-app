@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { SwapWidget } from "@/components/SwapWidget";
 import { WalletModalProvider } from "@/components/WalletModal";
+import { useAssets } from "@/context/assets";
 import {
   failTxHistory,
   successTxHistory,
@@ -124,10 +125,15 @@ export default function Home() {
   const { walletRepos } = useManager();
   const history = useTxHistory();
   const skipRouter = useSkipClient();
+  const { assetsByChainID } = useAssets();
 
   async function prefetchBalances(address: string, chainID: string) {
     try {
-      const balances = await getBalancesByChain(address, chainID);
+      const balances = await getBalancesByChain(
+        address,
+        chainID,
+        assetsByChainID(chainID),
+      );
 
       queryClient.setQueryData(
         ["balances-by-chain", address, chainID],
