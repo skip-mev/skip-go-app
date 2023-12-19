@@ -13,6 +13,17 @@
     "test": "node --experimental-vm-modules --no-warnings ./node_modules/.bin/jest",
     "test:e2e": "playwright test --project=chromium"
   },
+  "overrides": {
+    "@cosmjs/amino": "0.31.x",
+    "@cosmjs/cosmwasm-stargate": "0.31.x",
+    "@cosmjs/encoding": "0.31.x",
+    "@cosmjs/ledger-amino": "0.31.x",
+    "@cosmjs/math": "0.31.x",
+    "@cosmjs/proto-signing": "0.31.x",
+    "@cosmjs/stargate": "0.31.x",
+    "@cosmjs/tendermint-rpc": "0.31.x",
+    "cosmjs-types": "0.8.x"
+  },
   "dependencies": {
     "@cosmjs/amino": "0.31.x",
     "@cosmjs/cosmwasm-stargate": "0.31.x",
@@ -60,11 +71,10 @@
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
-    "cosmjs-types": "^0.9.0",
+    "cosmjs-types": "0.8.x",
     "date-fns": "^3.0.0",
     "download": "^8.0.0",
     "ethers": "^6.9.0",
-    "framer-motion": "^10.16.16",
     "next": "^14.0.4",
     "postcss": "^8.4.32",
     "react": "^18.2.0",
