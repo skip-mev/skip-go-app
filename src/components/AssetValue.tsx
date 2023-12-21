@@ -19,9 +19,8 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
   }, [chainId, denom, getAsset]);
 
   const formattedValue = useMemo(() => {
-    const v = formatUnits(value, decimals);
-    const w = 9;
-    if (v.length > w) return v.slice(0, w) + "…";
+    let v = formatUnits(value, decimals);
+    v = format(parseFloat(v));
     return v;
   }, [decimals, value]);
 
@@ -31,3 +30,5 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
     </span>
   );
 };
+
+const { format } = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });

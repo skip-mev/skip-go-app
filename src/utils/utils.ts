@@ -1,5 +1,6 @@
 import { OfflineAminoSigner } from "@cosmjs/amino";
 import {
+  CosmWasmClient,
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
 } from "@cosmjs/cosmwasm-stargate";
@@ -17,6 +18,7 @@ import { Chain } from "@/api/queries";
 import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
 import { EVM_CHAINS } from "@/constants/constants";
+import { AssetWithMetadata } from "@/context/assets";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 import { useSkipClient } from "@/solve";
 
@@ -45,6 +47,28 @@ export async function getStargateClientForChainID(chainID: ChainId) {
   const client = await StargateClient.connect(preferredEndpoint, {});
 
   STARGATE_CLIENTS[chainID] = client;
+
+  return client;
+}
+
+const COSMWASM_CLIENTS: Record<string, CosmWasmClient> = {};
+
+export async function getCosmWasmClientForChainID(chainID: ChainId) {
+  if (COSMWASM_CLIENTS[chainID]) {
+    return COSMWASM_CLIENTS[chainID];
+  }
+
+  const chain = getChainByID(chainID);
+
+  if (!chain) {
+    throw new Error(`cosmWasmClient error: chain with ID ${chainID} not found`);
+  }
+
+  const preferredEndpoint = getNodeProxyEndpoint(chainID);
+
+  const client = await CosmWasmClient.connect(preferredEndpoint);
+
+  COSMWASM_CLIENTS[chainID] = client;
 
   return client;
 }
@@ -276,12 +300,29 @@ export function getExplorerLinkForTx(chainID: ChainId, txHash: string) {
   return chain.explorers[0].tx_page?.replace("${txHash}", txHash) ?? null;
 }
 
-export async function getBalancesByChain(address: string, chainID: ChainId) {
+export async function getBalancesByChain(
+  address: string,
+  chainID: ChainId,
+  assets: AssetWithMetadata[],
+) {
   const client = await getStargateClientForChainID(chainID);
+  const cosmwasmClient = await getCosmWasmClientForChainID(chainID);
 
   const balances = await client.getAllBalances(address);
 
-  return balances.reduce(
+  const cw20Assets = assets.filter((asset) => asset.isCW20);
+
+  const cw20Balances = await Promise.all(
+    cw20Assets.map((asset) => {
+      return cosmwasmClient.queryContractSmart(asset.tokenContract as string, {
+        balance: {
+          address,
+        },
+      });
+    }),
+  );
+
+  const allBalances = balances.reduce(
     (acc, balance) => {
       return {
         ...acc,
@@ -290,11 +331,22 @@ export async function getBalancesByChain(address: string, chainID: ChainId) {
     },
     {} as Record<string, string>,
   );
+
+  cw20Balances.forEach((balance, index) => {
+    const asset = cw20Assets[index];
+
+    if (balance.balance !== "0") {
+      allBalances[asset.denom] = balance.balance;
+    }
+  });
+
+  return allBalances;
 }
 
 export function useBalancesByChain(
   address?: string,
   chain?: Chain,
+  assets?: AssetWithMetadata[],
   enabled: boolean = true,
 ) {
   const publicClient = usePublicClient({
@@ -304,7 +356,7 @@ export function useBalancesByChain(
   const skipRouter = useSkipClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain],
+    queryKey: ["balances-by-chain", address, chain, assets],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
@@ -319,7 +371,7 @@ export function useBalancesByChain(
         );
       }
 
-      return getBalancesByChain(address, chain.chainID);
+      return getBalancesByChain(address, chain.chainID, assets ?? []);
     },
     refetchInterval: 1000,
     refetchOnMount: false,

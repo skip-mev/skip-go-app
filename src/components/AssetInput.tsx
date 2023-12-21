@@ -14,6 +14,7 @@ import { getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
+import { ClientOnly } from "./ClientOnly";
 import { SimpleTooltip } from "./SimpleTooltip";
 import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
@@ -27,6 +28,7 @@ interface Props {
   chains: Chain[];
   showBalance?: boolean;
   showSlippage?: boolean;
+  context?: "src" | "dest";
 }
 
 const AssetInput: FC<Props> = ({
@@ -39,6 +41,7 @@ const AssetInput: FC<Props> = ({
   onChainChange,
   showBalance,
   showSlippage,
+  context,
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -56,7 +59,12 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances } = useBalancesByChain(address, chain, showBalance);
+  const { data: balances } = useBalancesByChain(
+    address,
+    chain,
+    assets,
+    showBalance,
+  );
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return undefined;
@@ -188,11 +196,11 @@ const AssetInput: FC<Props> = ({
                   denom={asset.originDenom}
                   coingeckoID={asset.coingeckoID}
                   value={amount}
-                  context={onAmountChange ? "src" : "dest"}
+                  context={context}
                 />
               </div>
             )}
-            {!onAmountChange && (
+            {context === "dest" && (
               <UsdDiff.Value>
                 {({ isLoading, percentage }) => (
                   <div
@@ -256,17 +264,19 @@ const AssetInput: FC<Props> = ({
                 </button>
               </div>
             )}
-            {showSlippage && (
-              <SimpleTooltip label="Click to change max slippage">
-                <button
-                  className="text-neutral-400 text-sm hover:underline"
-                  onClick={() => disclosure.open("settingsDialog")}
-                >
-                  Max Slippage: {slippage}%{" "}
-                  <PencilSquareIcon className="w-3 h-3 inline mb-1" />
-                </button>
-              </SimpleTooltip>
-            )}
+            <ClientOnly>
+              {showSlippage && (
+                <SimpleTooltip label="Click to change max slippage">
+                  <button
+                    className="text-neutral-400 text-sm hover:underline"
+                    onClick={() => disclosure.open("settingsDialog")}
+                  >
+                    Max Slippage: {slippage}%{" "}
+                    <PencilSquareIcon className="w-3 h-3 inline mb-1" />
+                  </button>
+                </SimpleTooltip>
+              )}
+            </ClientOnly>
           </div>
         </div>
       </div>

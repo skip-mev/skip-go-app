@@ -39,10 +39,7 @@ export const addTxHistory = (input: TxHistoryItemInput) => {
     ...input,
   };
 
-  useTxHistory.setState((state) => ({
-    ...state,
-    [id]: newItem,
-  }));
+  useTxHistory.setState({ [id]: newItem });
 
   return [id, newItem] as const;
 };
@@ -57,7 +54,7 @@ export const successTxHistory = (id: string) => {
       status: "success",
     };
 
-    return { ...state, [id]: latest };
+    return { [id]: latest };
   });
 };
 
@@ -71,7 +68,7 @@ export const failTxHistory = (id: string) => {
       status: "failed",
     };
 
-    return { ...state, [id]: latest };
+    return { [id]: latest };
   });
 };
 
@@ -95,7 +92,7 @@ export const addTxStatus = (id: string, txStatus: TxStatus) => {
       txStatus: newTxStatus,
     };
 
-    return { ...state, [id]: latest };
+    return { [id]: latest };
   });
 };
 
@@ -116,7 +113,7 @@ export const updateTxStatus = (id: string, txStatus: TxStatus) => {
       txStatus: newTxStatus,
     };
 
-    return { ...state, [id]: latest };
+    return { [id]: latest };
   });
 };
 

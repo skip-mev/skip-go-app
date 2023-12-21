@@ -91,22 +91,22 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
           ref={headingRef}
         >
           <div className="flex items-center space-x-4 text-start">
-            <time className="uppercase text-center text-sm opacity-60 tabular-nums">
+            <time className="uppercase text-center text-sm opacity-60 tabular-nums whitespace-nowrap">
               <RenderDate date={data.timestamp} />
             </time>
             <div className="flex-grow">
-              <div className="font-medium text-sm flex items-center space-x-1">
+              <div className="font-medium text-sm flex items-center">
                 <ChainSymbol chainId={data.route.sourceAssetChainID} />
-                <ArrowRightIcon className="w-4 h-4" />
+                <ArrowRightIcon className="w-4 h-4 mx-1" />
                 <ChainSymbol chainId={data.route.destAssetChainID} />
               </div>
-              <div className="opacity-60 text-sm flex items-center space-x-1">
+              <div className="opacity-60 text-sm flex items-center">
                 <AssetValue
                   chainId={data.route.sourceAssetChainID}
                   denom={data.route.sourceAssetDenom}
                   value={data.route.amountIn}
                 />
-                <ArrowRightIcon className="w-3 h-3" />
+                <ArrowRightIcon className="w-3 h-3 mx-1" />
                 <AssetValue
                   chainId={data.route.destAssetChainID}
                   denom={data.route.destAssetDenom}
@@ -168,10 +168,10 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
           <DescriptionList.Root className="pt-2">
             <DescriptionList.Row>
               <DescriptionList.Dt>Chain Route</DescriptionList.Dt>
-              <DescriptionList.Dd className="flex flex-wrap items-center space-x-1">
+              <DescriptionList.Dd className="flex flex-wrap items-center">
                 {data.route.chainIDs.map((chainId, i) => (
                   <Fragment key={i}>
-                    {i > 0 && <ArrowRightIcon className="w-4 h-4" />}
+                    {i > 0 && <ArrowRightIcon className="w-4 h-4 mx-1" />}
                     <ChainSymbol chainId={chainId} />
                   </Fragment>
                 ))}

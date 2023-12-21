@@ -11,6 +11,7 @@ export function useAssets() {
     queryFn: () => {
       return skipClient.assets({
         includeEvmAssets: true,
+        includeCW20Assets: true,
       });
     },
   });
