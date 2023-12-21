@@ -1,6 +1,7 @@
 import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
+import { CHAIN_IDS_L5_NODES } from "@/constants/rpc";
 import { getCorsDomains } from "@/lib/edge-config";
 import { getPolkachuAuthHeader } from "@/utils/api";
 import { raise } from "@/utils/assert";
@@ -49,16 +50,23 @@ export default async function handler(req: NextRequest) {
   const args = searchParams.getAll("$args");
   searchParams.delete("$args");
 
-  const rpcURL = `https://${chainID}-skip-rpc.polkachu.com`;
-  const search = searchParams.toString();
+  const shouldUseL5 = CHAIN_IDS_L5_NODES.includes(chainID);
 
+  const headers = new Headers();
+  const rpcURL = shouldUseL5
+    ? `https://skip-secretnetwork-rpc.lavenderfive.com`
+    : `https://${chainID}-skip-rpc.polkachu.com`;
+
+  if (!shouldUseL5) {
+    headers.set("authorization", getPolkachuAuthHeader());
+  }
+
+  const search = searchParams.toString();
   const proxyDest = [rpcURL, ...args].join("/") + (search ? `?${search}` : "");
 
   return fetch(proxyDest, {
     body: req.body,
-    headers: {
-      authorization: getPolkachuAuthHeader(),
-    },
+    headers,
     method: req.method,
   });
 }
