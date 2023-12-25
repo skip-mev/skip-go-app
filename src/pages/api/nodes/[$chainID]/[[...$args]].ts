@@ -60,7 +60,7 @@ export default async function handler(req: NextRequest) {
   if (shouldUseL5) {
     rpcURL = `https://skip-secretnetwork-rpc.lavenderfive.com`;
   } else if (shouldUsePolkachuBackup) {
-    rpcURL = `https://${chainID}-skip-rpc.polkachu.com`;
+    rpcURL = `https://${chainID}-1-skip-rpc.polkachu.com`;
   } else {
     rpcURL = `https://${chainID}-skip-rpc.polkachu.com`;
   }
