@@ -50,6 +50,7 @@ export const SwapWidget: FC = () => {
     swapPriceImpactPercent,
     priceImpactThresholdReached,
     routeError,
+    routeWarning,
   } = useSwapWidget();
 
   let usdDiffPercent = 0.0;
@@ -269,6 +270,7 @@ export const SwapWidget: FC = () => {
                   priceImpactThresholdReached ||
                   Math.abs(usdDiffPercent * 100) > PRICE_IMPACT_THRESHOLD
                 }
+                routeWarning={routeWarning}
               />
               {insufficientBalance && (
                 <p className="text-center font-semibold text-sm text-red-500">

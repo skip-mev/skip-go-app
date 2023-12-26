@@ -2,9 +2,13 @@ import { useDisclosureKey } from "@/context/disclosures";
 
 interface Props {
   onGoBack: () => void;
+  warningMessage?: string;
 }
 
-export const PriceImpactWarning = ({ onGoBack }: Props) => {
+export const PriceImpactWarning = ({
+  onGoBack,
+  warningMessage = "",
+}: Props) => {
   const [isOpen, control] = useDisclosureKey("priceImpactWarning");
 
   if (!isOpen) return null;
@@ -31,8 +35,8 @@ export const PriceImpactWarning = ({ onGoBack }: Props) => {
             <p className="font-bold text-lg text-center text-red-500 mb-2">
               Price Impact Warning
             </p>
-            <p className="text-center text-lg max-w-72 mx-auto leading-snug text-gray-500">
-              This route has a high price impact. Do you want to continue?
+            <p className="text-center text-lg px-4 leading-snug text-gray-500">
+              {warningMessage} Do you want to continue?
             </p>
           </div>
           <div className="flex items-end gap-2">
