@@ -96,15 +96,6 @@ const AssetInput: FC<Props> = ({
 
   const { slippage } = useSettingsStore();
 
-  // const reset = useUsdDiffReset();
-  // useEffect(() => {
-  //   const parsed = parseFloat(amount);
-
-  //   // hotfix side effect to prevent negative amounts
-  //   if (parsed < 0) onAmountChange?.("0.0");
-  //   if (parsed == 0) reset();
-  // }, [amount, onAmountChange, reset]);
-
   return (
     <Fragment>
       <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">

@@ -439,7 +439,3 @@ export function formatUSD(amount: string | number) {
   const amountNumber = typeof amount === "string" ? parseFloat(amount) : amount;
   return format(amountNumber);
 }
-
-// export {
-//   formatUSD: format,
-// }
