@@ -187,12 +187,6 @@ export function useSwapWidget() {
   }, [swapPriceImpactPercent]);
 
   const usdDiffPercent = useMemo(() => {
-    // if (route?.usdAmountIn && route?.usdAmountOut) {
-    // usdDiffPercent =
-    // (parseFloat(route.usdAmountOut) - parseFloat(route.usdAmountIn)) /
-    // parseFloat(route.usdAmountIn);
-    // }
-
     if (!routeResponse) {
       return undefined;
     }
@@ -206,8 +200,6 @@ export function useSwapWidget() {
 
     return (usdAmountOut - usdAmountIn) / usdAmountIn;
   }, [routeResponse]);
-
-  console.log(usdDiffPercent);
 
   const routeWarning = useMemo(() => {
     if (!routeResponse) {
