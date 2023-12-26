@@ -13,6 +13,8 @@ import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
+export const PRICE_IMPACT_THRESHOLD = 0.01;
+
 export function useSwapWidget() {
   const {
     onSourceChainChange,
@@ -174,6 +176,16 @@ export function useSwapWidget() {
     }
   }, [currentEvmChain, sourceChain, switchNetwork]);
 
+  const swapPriceImpactPercent = useMemo(() => {
+    if (!routeResponse?.swapPriceImpactPercent) return undefined;
+    return parseFloat(routeResponse.swapPriceImpactPercent) / 100;
+  }, [routeResponse]);
+
+  const priceImpactThresholdReached = useMemo(() => {
+    if (!swapPriceImpactPercent) return false;
+    return swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD;
+  }, [swapPriceImpactPercent]);
+
   return {
     amountIn,
     amountOut,
@@ -193,6 +205,8 @@ export function useSwapWidget() {
     onDestinationAssetChange,
     noRouteFound: routeQueryIsError,
     routeError: errorMessage,
+    swapPriceImpactPercent,
+    priceImpactThresholdReached,
   };
 }
 
