@@ -13,7 +13,7 @@ interface Props {
   route?: RouteResponse;
   transactionCount: number;
   insufficientBalance?: boolean;
-  priceImpactThresholdReached?: boolean;
+  shouldShowPriceImpactWarning?: boolean;
 }
 
 const TransactionDialog: FC<Props> = ({
@@ -21,7 +21,7 @@ const TransactionDialog: FC<Props> = ({
   route,
   insufficientBalance,
   transactionCount,
-  priceImpactThresholdReached,
+  shouldShowPriceImpactWarning,
 }) => {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +38,7 @@ const TransactionDialog: FC<Props> = ({
       return;
     }
 
-    if (priceImpactThresholdReached) {
+    if (shouldShowPriceImpactWarning) {
       control.open();
       setHasDisplayedWarning(true);
     }
@@ -47,7 +47,7 @@ const TransactionDialog: FC<Props> = ({
     setHasDisplayedWarning,
     isOpen,
     hasDisplayedWarning,
-    priceImpactThresholdReached,
+    shouldShowPriceImpactWarning,
   ]);
 
   return (
