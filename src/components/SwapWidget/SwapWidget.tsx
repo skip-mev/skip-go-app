@@ -23,7 +23,7 @@ import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { SwapDetails } from "./SwapDetails";
-import { useSwapWidget } from "./useSwapWidget";
+import { PRICE_IMPACT_THRESHOLD, useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
@@ -47,8 +47,18 @@ export const SwapWidget: FC = () => {
     onSourceAssetChange,
     onDestinationChainChange,
     onDestinationAssetChange,
+    swapPriceImpactPercent,
+    priceImpactThresholdReached,
     routeError,
+    routeWarning,
   } = useSwapWidget();
+
+  let usdDiffPercent = 0.0;
+  if (route?.usdAmountIn && route?.usdAmountOut) {
+    usdDiffPercent =
+      (parseFloat(route.usdAmountOut) - parseFloat(route.usdAmountIn)) /
+      parseFloat(route.usdAmountIn);
+  }
 
   const {
     address,
@@ -114,6 +124,7 @@ export const SwapWidget: FC = () => {
           <div data-testid="source">
             <AssetInput
               amount={amountIn}
+              amountUSD={route?.usdAmountIn}
               asset={sourceAsset}
               chain={sourceChain}
               chains={chains ?? []}
@@ -174,6 +185,8 @@ export const SwapWidget: FC = () => {
           <div data-testid="destination">
             <AssetInput
               amount={amountOut}
+              amountUSD={route?.usdAmountOut}
+              diffPercentage={usdDiffPercent}
               asset={destinationAsset}
               chain={destinationChain}
               chains={chains ?? []}
@@ -196,6 +209,8 @@ export const SwapWidget: FC = () => {
               destinationChain={destinationChain}
               destinationAsset={destinationAsset}
               route={route}
+              priceImpactPercent={swapPriceImpactPercent ?? 0}
+              priceImpactThresholdReached={priceImpactThresholdReached}
             />
           )}
           {routeLoading && <RouteLoadingBanner />}
@@ -251,6 +266,11 @@ export const SwapWidget: FC = () => {
                 route={route}
                 transactionCount={numberOfTransactions}
                 insufficientBalance={insufficientBalance}
+                shouldShowPriceImpactWarning={
+                  priceImpactThresholdReached ||
+                  Math.abs(usdDiffPercent * 100) > PRICE_IMPACT_THRESHOLD
+                }
+                routeWarning={routeWarning}
               />
               {insufficientBalance && (
                 <p className="text-center font-semibold text-sm text-red-500">

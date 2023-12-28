@@ -2,7 +2,7 @@ import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -15,6 +15,8 @@ import { FormValues } from "./useSwapWidget";
 type Props = FormValues & {
   amountOut: string;
   route: RouteResponse;
+  priceImpactPercent: number;
+  priceImpactThresholdReached: boolean;
 };
 
 export const SwapDetails = ({
@@ -25,6 +27,8 @@ export const SwapDetails = ({
   destinationChain,
   destinationAsset,
   route,
+  priceImpactPercent,
+  priceImpactThresholdReached,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
@@ -42,6 +46,12 @@ export const SwapDetails = ({
     const { feeAmount } = axelarTransferOperation.axelarTransfer;
     return +feeAmount / Math.pow(10, 18);
   }, [axelarTransferOperation]);
+
+  useEffect(() => {
+    if (priceImpactThresholdReached) {
+      control.open();
+    }
+  }, [control, priceImpactThresholdReached]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
@@ -110,6 +120,29 @@ export const SwapDetails = ({
             "[&_dd]:text-end [&_dd]:tabular-nums",
           )}
         >
+          {priceImpactPercent ? (
+            <Fragment>
+              <dt>
+                <span
+                  className={clsx(
+                    priceImpactThresholdReached ? "text-red-500" : undefined,
+                  )}
+                >
+                  Price Impact
+                </span>
+              </dt>
+              <dd
+                className={clsx(
+                  priceImpactThresholdReached ? "text-red-500" : undefined,
+                )}
+              >
+                {new Intl.NumberFormat("en-US", {
+                  style: "percent",
+                  maximumFractionDigits: 2,
+                }).format(priceImpactPercent)}
+              </dd>
+            </Fragment>
+          ) : null}
           <dt>
             Max Slippage{" "}
             <SimpleTooltip label="Click to change max slippage">

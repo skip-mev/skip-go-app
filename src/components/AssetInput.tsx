@@ -2,7 +2,7 @@ import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
-import { FC, Fragment, useEffect, useMemo, useState } from "react";
+import { FC, Fragment, useMemo, useState } from "react";
 
 import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -10,16 +10,17 @@ import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
-import { getFee, useBalancesByChain } from "@/utils/utils";
+import { formatUSD, getFee, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
 import { ClientOnly } from "./ClientOnly";
 import { SimpleTooltip } from "./SimpleTooltip";
-import { UsdDiff, UsdValue, useUsdDiffReset } from "./UsdValue";
 
 interface Props {
   amount: string;
+  amountUSD?: string;
+  diffPercentage?: number;
   onAmountChange?: (amount: string) => void;
   asset?: AssetWithMetadata;
   onAssetChange?: (asset: AssetWithMetadata) => void;
@@ -33,6 +34,8 @@ interface Props {
 
 const AssetInput: FC<Props> = ({
   amount,
+  amountUSD,
+  diffPercentage = 0,
   onAmountChange,
   asset,
   onAssetChange,
@@ -92,15 +95,6 @@ const AssetInput: FC<Props> = ({
   }, [selectedAssetBalance]);
 
   const { slippage } = useSettingsStore();
-
-  const reset = useUsdDiffReset();
-  useEffect(() => {
-    const parsed = parseFloat(amount);
-
-    // hotfix side effect to prevent negative amounts
-    if (parsed < 0) onAmountChange?.("0.0");
-    if (parsed == 0) reset();
-  }, [amount, onAmountChange, reset]);
 
   return (
     <Fragment>
@@ -188,33 +182,22 @@ const AssetInput: FC<Props> = ({
             }}
           />
           <div className="flex items-center space-x-2 tabular-nums h-8">
-            {asset && parseFloat(amount) > 0 && (
-              <div className="text-neutral-400 text-sm">
-                <UsdValue
-                  error={null}
-                  chainId={asset.originChainID}
-                  denom={asset.originDenom}
-                  coingeckoID={asset.coingeckoID}
-                  value={amount}
-                  context={context}
-                />
-              </div>
-            )}
-            {context === "dest" && (
-              <UsdDiff.Value>
-                {({ isLoading, percentage }) => (
-                  <div
-                    className={clsx(
-                      "text-sm",
-                      isLoading && "hidden",
-                      percentage > 0 ? "text-green-500" : "text-red-500",
-                    )}
-                  >
-                    ({percentage.toFixed(2)}%)
-                  </div>
+            <p className="text-neutral-400 text-sm">
+              {amountUSD ? formatUSD(amountUSD) : null}
+            </p>
+            {amountUSD !== undefined && context === "dest" ? (
+              <p
+                className={clsx(
+                  "text-sm",
+                  diffPercentage >= 0 ? "text-green-500" : "text-red-500",
                 )}
-              </UsdDiff.Value>
-            )}
+              >
+                {new Intl.NumberFormat("en-US", {
+                  style: "percent",
+                  maximumFractionDigits: 2,
+                }).format(diffPercentage)}
+              </p>
+            ) : null}
             <div className="flex-grow" />
             {showBalance && address && selectedAssetBalance && asset && (
               <div className="text-neutral-400 text-sm flex items-center">
