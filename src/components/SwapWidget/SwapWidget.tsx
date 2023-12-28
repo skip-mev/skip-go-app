@@ -23,7 +23,7 @@ import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { SwapDetails } from "./SwapDetails";
-import { PRICE_IMPACT_THRESHOLD, useSwapWidget } from "./useSwapWidget";
+import { useSwapWidget } from "./useSwapWidget";
 
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
@@ -50,7 +50,8 @@ export const SwapWidget: FC = () => {
     swapPriceImpactPercent,
     priceImpactThresholdReached,
     routeError,
-    routeWarning,
+    routeWarningTitle,
+    routeWarningMessage,
   } = useSwapWidget();
 
   let usdDiffPercent = 0.0;
@@ -267,10 +268,10 @@ export const SwapWidget: FC = () => {
                 transactionCount={numberOfTransactions}
                 insufficientBalance={insufficientBalance}
                 shouldShowPriceImpactWarning={
-                  priceImpactThresholdReached ||
-                  Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD
+                  !!routeWarningTitle && !!routeWarningMessage
                 }
-                routeWarning={routeWarning}
+                routeWarningTitle={routeWarningTitle}
+                routeWarningMessage={routeWarningMessage}
               />
               {insufficientBalance && (
                 <p className="text-center font-semibold text-sm text-red-500">
