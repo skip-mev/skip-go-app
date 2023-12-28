@@ -2,16 +2,18 @@ import { useDisclosureKey } from "@/context/disclosures";
 
 interface Props {
   onGoBack: () => void;
-  warningMessage?: string;
+  message?: string;
+  title?: string;
 }
 
 export const PriceImpactWarning = ({
   onGoBack,
-  warningMessage = "",
+  message = "",
+  title = "",
 }: Props) => {
   const [isOpen, control] = useDisclosureKey("priceImpactWarning");
 
-  if (!isOpen) return null;
+  if (!isOpen || title === "") return null;
 
   return (
     <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
@@ -33,27 +35,27 @@ export const PriceImpactWarning = ({
               </svg>
             </div>
             <p className="font-bold text-lg text-center text-red-500 mb-2">
-              Price Impact Warning
+              {title}
             </p>
             <p className="text-center text-lg px-4 leading-snug text-gray-500">
-              {warningMessage} Do you want to continue?
+              {message} Do you want to continue?
             </p>
           </div>
           <div className="flex items-end gap-2">
             <button
               className="bg-[#FF486E] hover:bg-[#ed1149] transition-colors text-white font-semibold py-4 rounded-md w-full"
-              onClick={() => control.close()}
-            >
-              Continue
-            </button>
-            <button
-              className="border border-gray-400 text-gray-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-gray-50"
               onClick={() => {
                 control.close();
                 onGoBack();
               }}
             >
               Go Back
+            </button>
+            <button
+              className="border border-gray-400 text-gray-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-gray-50"
+              onClick={() => control.close()}
+            >
+              Continue
             </button>
           </div>
         </div>

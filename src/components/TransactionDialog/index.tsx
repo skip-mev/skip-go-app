@@ -14,7 +14,8 @@ interface Props {
   transactionCount: number;
   insufficientBalance?: boolean;
   shouldShowPriceImpactWarning?: boolean;
-  routeWarning?: string;
+  routeWarningMessage?: string;
+  routeWarningTitle?: string;
 }
 
 const TransactionDialog: FC<Props> = ({
@@ -23,7 +24,8 @@ const TransactionDialog: FC<Props> = ({
   insufficientBalance,
   transactionCount,
   shouldShowPriceImpactWarning,
-  routeWarning,
+  routeWarningMessage,
+  routeWarningTitle,
 }) => {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +79,8 @@ const TransactionDialog: FC<Props> = ({
       </div>
       <PriceImpactWarning
         onGoBack={() => setIsOpen(false)}
-        warningMessage={routeWarning}
+        message={routeWarningMessage}
+        title={routeWarningTitle}
       />
     </Fragment>
   );

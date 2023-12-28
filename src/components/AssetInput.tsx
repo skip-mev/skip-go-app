@@ -185,7 +185,9 @@ const AssetInput: FC<Props> = ({
             <p className="text-neutral-400 text-sm">
               {amountUSD ? formatUSD(amountUSD) : null}
             </p>
-            {amountUSD !== undefined && context === "dest" ? (
+            {amountUSD !== undefined &&
+            diffPercentage !== 0 &&
+            context === "dest" ? (
               <p
                 className={clsx(
                   "text-sm",

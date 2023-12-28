@@ -201,16 +201,19 @@ export function useSwapWidget() {
     return (usdAmountOut - usdAmountIn) / usdAmountIn;
   }, [routeResponse]);
 
-  const routeWarning = useMemo(() => {
+  const [routeWarningTitle, routeWarningMessage] = useMemo(() => {
     if (!routeResponse) {
-      return undefined;
+      return [undefined, undefined];
     }
 
     if (
       !routeResponse.swapPriceImpactPercent &&
       (!routeResponse.usdAmountIn || !routeResponse.usdAmountOut)
     ) {
-      return "We were unable to calculate the price impact of this route.";
+      return [
+        "Low Information Trade",
+        "We were unable to calculate the price impact of this route.",
+      ];
     }
 
     if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
@@ -228,7 +231,10 @@ export function useSwapWidget() {
         style: "percent",
         maximumFractionDigits: 2,
       }).format(Math.abs(usdDiffPercent));
-      return `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`;
+      return [
+        "Bad Trade Warning",
+        `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`,
+      ];
     }
 
     if (
@@ -239,8 +245,13 @@ export function useSwapWidget() {
         style: "percent",
         maximumFractionDigits: 2,
       }).format(swapPriceImpactPercent);
-      return `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`;
+      return [
+        "Bad Trade Warning",
+        `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`,
+      ];
     }
+
+    return [undefined, undefined];
   }, [routeResponse, swapPriceImpactPercent, usdDiffPercent]);
 
   return {
@@ -264,7 +275,8 @@ export function useSwapWidget() {
     routeError: errorMessage,
     swapPriceImpactPercent,
     priceImpactThresholdReached,
-    routeWarning,
+    routeWarningTitle,
+    routeWarningMessage,
   };
 }
 
