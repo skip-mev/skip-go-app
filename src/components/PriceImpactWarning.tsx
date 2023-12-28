@@ -11,7 +11,7 @@ export const PriceImpactWarning = ({
 }: Props) => {
   const [isOpen, control] = useDisclosureKey("priceImpactWarning");
 
-  if (!isOpen) return null;
+  if (!isOpen || warningMessage === "") return null;
 
   return (
     <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
@@ -33,7 +33,7 @@ export const PriceImpactWarning = ({
               </svg>
             </div>
             <p className="font-bold text-lg text-center text-red-500 mb-2">
-              Price Impact Warning
+              Bad Trade Warning
             </p>
             <p className="text-center text-lg px-4 leading-snug text-gray-500">
               {warningMessage} Do you want to continue?
@@ -42,18 +42,18 @@ export const PriceImpactWarning = ({
           <div className="flex items-end gap-2">
             <button
               className="bg-[#FF486E] hover:bg-[#ed1149] transition-colors text-white font-semibold py-4 rounded-md w-full"
-              onClick={() => control.close()}
-            >
-              Continue
-            </button>
-            <button
-              className="border border-gray-400 text-gray-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-gray-50"
               onClick={() => {
                 control.close();
                 onGoBack();
               }}
             >
               Go Back
+            </button>
+            <button
+              className="border border-gray-400 text-gray-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-gray-50"
+              onClick={() => control.close()}
+            >
+              Continue
             </button>
           </div>
         </div>

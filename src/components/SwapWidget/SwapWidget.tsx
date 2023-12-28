@@ -268,7 +268,7 @@ export const SwapWidget: FC = () => {
                 insufficientBalance={insufficientBalance}
                 shouldShowPriceImpactWarning={
                   priceImpactThresholdReached ||
-                  Math.abs(usdDiffPercent * 100) > PRICE_IMPACT_THRESHOLD
+                  Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD
                 }
                 routeWarning={routeWarning}
               />
