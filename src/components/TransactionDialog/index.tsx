@@ -1,6 +1,9 @@
 import { RouteResponse } from "@skip-router/core";
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useEffect, useState } from "react";
 
+import { useDisclosureKey } from "@/context/disclosures";
+
+import { PriceImpactWarning } from "../PriceImpactWarning";
 import TransactionDialogContent from "./TransactionDialogContent";
 
 export type ActionType = "NONE" | "TRANSFER" | "SWAP";
@@ -10,6 +13,9 @@ interface Props {
   route?: RouteResponse;
   transactionCount: number;
   insufficientBalance?: boolean;
+  shouldShowPriceImpactWarning?: boolean;
+  routeWarningMessage?: string;
+  routeWarningTitle?: string;
 }
 
 const TransactionDialog: FC<Props> = ({
@@ -17,8 +23,36 @@ const TransactionDialog: FC<Props> = ({
   route,
   insufficientBalance,
   transactionCount,
+  shouldShowPriceImpactWarning,
+  routeWarningMessage,
+  routeWarningTitle,
 }) => {
+  const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  const [, control] = useDisclosureKey("priceImpactWarning");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setHasDisplayedWarning(false);
+      return;
+    }
+
+    if (hasDisplayedWarning) {
+      return;
+    }
+
+    if (shouldShowPriceImpactWarning) {
+      control.open();
+      setHasDisplayedWarning(true);
+    }
+  }, [
+    control,
+    setHasDisplayedWarning,
+    isOpen,
+    hasDisplayedWarning,
+    shouldShowPriceImpactWarning,
+  ]);
 
   return (
     <Fragment>
@@ -43,6 +77,11 @@ const TransactionDialog: FC<Props> = ({
           </div>
         )}
       </div>
+      <PriceImpactWarning
+        onGoBack={() => setIsOpen(false)}
+        message={routeWarningMessage}
+        title={routeWarningTitle}
+      />
     </Fragment>
   );
 };

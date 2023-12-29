@@ -13,6 +13,8 @@ import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
+export const PRICE_IMPACT_THRESHOLD = 0.1;
+
 export function useSwapWidget() {
   const {
     onSourceChainChange,
@@ -174,6 +176,84 @@ export function useSwapWidget() {
     }
   }, [currentEvmChain, sourceChain, switchNetwork]);
 
+  const swapPriceImpactPercent = useMemo(() => {
+    if (!routeResponse?.swapPriceImpactPercent) return undefined;
+    return parseFloat(routeResponse.swapPriceImpactPercent) / 100;
+  }, [routeResponse]);
+
+  const priceImpactThresholdReached = useMemo(() => {
+    if (!swapPriceImpactPercent) return false;
+    return swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD;
+  }, [swapPriceImpactPercent]);
+
+  const usdDiffPercent = useMemo(() => {
+    if (!routeResponse) {
+      return undefined;
+    }
+
+    if (!routeResponse.usdAmountIn || !routeResponse.usdAmountOut) {
+      return undefined;
+    }
+
+    const usdAmountIn = parseFloat(routeResponse.usdAmountIn);
+    const usdAmountOut = parseFloat(routeResponse.usdAmountOut);
+
+    return (usdAmountOut - usdAmountIn) / usdAmountIn;
+  }, [routeResponse]);
+
+  const [routeWarningTitle, routeWarningMessage] = useMemo(() => {
+    if (!routeResponse) {
+      return [undefined, undefined];
+    }
+
+    if (
+      !routeResponse.swapPriceImpactPercent &&
+      (!routeResponse.usdAmountIn || !routeResponse.usdAmountOut)
+    ) {
+      return [
+        "Low Information Trade",
+        "We were unable to calculate the price impact of this route.",
+      ];
+    }
+
+    if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
+      const amountInUSD = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(parseFloat(routeResponse.usdAmountIn ?? "0"));
+
+      const amountOutUSD = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(parseFloat(routeResponse.usdAmountOut ?? "0"));
+
+      const formattedUsdDiffPercent = new Intl.NumberFormat("en-US", {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }).format(Math.abs(usdDiffPercent));
+      return [
+        "Bad Trade Warning",
+        `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`,
+      ];
+    }
+
+    if (
+      swapPriceImpactPercent &&
+      swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD
+    ) {
+      const formattedPriceImpact = new Intl.NumberFormat("en-US", {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }).format(swapPriceImpactPercent);
+      return [
+        "Bad Trade Warning",
+        `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`,
+      ];
+    }
+
+    return [undefined, undefined];
+  }, [routeResponse, swapPriceImpactPercent, usdDiffPercent]);
+
   return {
     amountIn,
     amountOut,
@@ -193,6 +273,10 @@ export function useSwapWidget() {
     onDestinationAssetChange,
     noRouteFound: routeQueryIsError,
     routeError: errorMessage,
+    swapPriceImpactPercent,
+    priceImpactThresholdReached,
+    routeWarningTitle,
+    routeWarningMessage,
   };
 }
 
