@@ -16,12 +16,12 @@ export type UseChainsQueryArgs<T = Chain[]> = {
 export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   const { select = (t) => t as T } = args;
 
-  const skipRouter = useSkipClient();
+  const skipClient = useSkipClient();
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ["skip-api-chains"],
     queryFn: async () => {
-      const chains = await skipRouter.chains({
+      const chains = await skipClient.chains({
         includeEVM: true,
       });
 
@@ -40,20 +40,10 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
     },
     select,
   });
-
-  return {
-    ...query,
-    chains: query.data,
-  };
 }
 
 export function useChainByID(chainID: string) {
-  const { chains, ...queryResult } = useChains({
+  return useChains({
     select: (chains) => (chains ?? []).find((c) => c.chainID === chainID),
   });
-
-  return {
-    ...queryResult,
-    chain: chains,
-  };
 }

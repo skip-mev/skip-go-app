@@ -128,7 +128,7 @@ function getAssetSymbol(
 }
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { chains } = useChains();
+  const { data: chains } = useChains();
 
   const { data: solveAssets } = useSolveAssets();
 

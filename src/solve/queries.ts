@@ -1,32 +1,23 @@
+import { AssetsRequest } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSkipClient } from "./hooks";
 
-export function useAssets() {
+export function useAssets(options: AssetsRequest = {}) {
   const skipClient = useSkipClient();
 
+  const queryKey = useMemo(() => ["solve-assets", options] as const, [options]);
+
   return useQuery({
-    queryKey: ["solve-assets"],
-    queryFn: () => {
+    queryKey,
+    queryFn: ({ queryKey: [, options] }) => {
       return skipClient.assets({
         includeEvmAssets: true,
         includeCW20Assets: true,
+        ...options,
       });
     },
-  });
-}
-
-export function useSolveChains() {
-  const skipClient = useSkipClient();
-  return useQuery({
-    queryKey: ["solve-chains"],
-    queryFn: () => {
-      return skipClient.chains({
-        includeEVM: true,
-      });
-    },
-    placeholderData: [],
   });
 }
 
@@ -53,17 +44,40 @@ export function useRoute({
 
   const [refetchCount, setRefetchCount] = useState(0);
 
-  return useQuery({
-    queryKey: [
-      "solve-route",
-      direction,
+  const queryKey = useMemo(
+    () =>
+      [
+        "solve-route",
+        direction,
+        amount,
+        sourceAsset,
+        destinationAsset,
+        sourceAssetChainID,
+        destinationAssetChainID,
+      ] as const,
+    [
       amount,
-      sourceAsset,
       destinationAsset,
-      sourceAssetChainID,
       destinationAssetChainID,
+      direction,
+      sourceAsset,
+      sourceAssetChainID,
     ],
-    queryFn: async () => {
+  );
+
+  const query = useQuery({
+    queryKey,
+    queryFn: async ({
+      queryKey: [
+        ,
+        direction,
+        amount,
+        sourceAsset,
+        destinationAsset,
+        sourceAssetChainID,
+        destinationAssetChainID,
+      ],
+    }) => {
       if (
         !sourceAsset ||
         !sourceAssetChainID ||
@@ -97,17 +111,7 @@ export function useRoute({
 
       return route;
     },
-    refetchInterval: (query) => {
-      if (refetchCount < 10 && query.isActive()) {
-        setRefetchCount((c) => c + 1);
-        return 1000 * 2;
-      }
-      return false;
-    },
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: false,
+    refetchInterval: refetchCount < 10 ? 1000 * 5 : false,
     enabled:
       enabled &&
       !!sourceAsset &&
@@ -116,4 +120,16 @@ export function useRoute({
       !!destinationAssetChainID &&
       amount !== "0",
   });
+
+  useEffect(() => {
+    if (query.isRefetching) {
+      setRefetchCount((count) => count + 1);
+    }
+  }, [query.isRefetching]);
+
+  useEffect(() => {
+    setRefetchCount(0);
+  }, [queryKey]);
+
+  return query;
 }

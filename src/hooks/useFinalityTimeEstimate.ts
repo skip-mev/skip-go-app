@@ -5,7 +5,7 @@ import { useChains } from "@/api/queries";
 import { getFinalityTime } from "@/constants/finality";
 
 export function useFinalityTimeEstimate(route: RouteResponse) {
-  const { chains = [] } = useChains();
+  const { data: chains = [] } = useChains();
 
   return useMemo(() => {
     for (const operation of route.operations) {

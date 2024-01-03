@@ -105,7 +105,7 @@ const WalletModalWithContext: FC = () => {
 
   const { setIsOpen } = useWalletModal();
 
-  const { chain } = useChainByID(chainID);
+  const { data: chain } = useChainByID(chainID);
 
   if (!chain) {
     return null;

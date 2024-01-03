@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ChainSymbol = ({ chainId }: Props) => {
-  const { chain } = useChainByID(chainId);
+  const { data: chain } = useChainByID(chainId);
 
   const src = useMemo(() => {
     if (!chain) return;

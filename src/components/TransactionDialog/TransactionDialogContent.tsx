@@ -51,9 +51,9 @@ const TransactionDialogContent: FC<Props> = ({
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { toast } = useToast();
-  const { chains = [] } = useChains();
+  const { data: chains = [] } = useChains();
 
-  const skipRouter = useSkipClient();
+  const skipClient = useSkipClient();
   const { address: evmAddress } = useAccount();
 
   const [transacting, setTransacting] = useState(false);
@@ -139,7 +139,7 @@ const TransactionDialogContent: FC<Props> = ({
         ...txStatuses.slice(1),
       ]);
 
-      await skipRouter.executeRoute({
+      await skipClient.executeRoute({
         route,
         userAddresses,
         validateGasBalance: true,

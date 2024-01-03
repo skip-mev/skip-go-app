@@ -13,7 +13,7 @@ const TransactionSuccessView: FC<{
   transactions: RouteTransaction[];
 }> = ({ route, onClose, transactions }) => {
   const { getAsset } = useAssets();
-  const { chains } = useChains();
+  const { data: chains } = useChains();
 
   const sourceAsset = getAsset(
     route.sourceAssetDenom,

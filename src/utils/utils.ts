@@ -353,7 +353,7 @@ export function useBalancesByChain(
     chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
   });
 
-  const skipRouter = useSkipClient();
+  const skipClient = useSkipClient();
 
   return useQuery({
     queryKey: ["balances-by-chain", address, chain, assets],
@@ -364,7 +364,7 @@ export function useBalancesByChain(
 
       if (chain.chainType === "evm") {
         return getEvmChainBalances(
-          skipRouter,
+          skipClient,
           publicClient,
           address,
           chain.chainID,
@@ -373,10 +373,7 @@ export function useBalancesByChain(
 
       return getBalancesByChain(address, chain.chainID, assets ?? []);
     },
-    refetchInterval: 1000,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchInterval: 1000 * 5,
     enabled: !!chain && !!address && enabled,
   });
 }

@@ -65,7 +65,7 @@ function maybeGetAxelarscanLinkFromTransactionStatus(
 async function updatePendingRoute(
   id: string,
   historyItem: TxHistoryItem,
-  skipRouter: SkipRouter,
+  skipClient: SkipRouter,
 ) {
   const firstTx =
     historyItem.txStatus.length > 0 ? historyItem.txStatus[0] : undefined;
@@ -75,7 +75,7 @@ async function updatePendingRoute(
   }
 
   try {
-    const status = await skipRouter.transactionStatus({
+    const status = await skipClient.transactionStatus({
       chainID: firstTx.chainId,
       txHash: firstTx.txHash,
     });
@@ -95,11 +95,11 @@ async function updatePendingRoute(
 async function updateAxelarscanLink(
   id: string,
   historyItem: TxHistoryItem,
-  skipRouter: SkipRouter,
+  skipClient: SkipRouter,
 ) {
   for (const tx of historyItem.txStatus) {
     try {
-      const status = await skipRouter.transactionStatus({
+      const status = await skipClient.transactionStatus({
         chainID: tx.chainId,
         txHash: tx.txHash,
       });
@@ -124,7 +124,7 @@ async function updateAxelarscanLink(
 export default function Home() {
   const { walletRepos } = useManager();
   const history = useTxHistory();
-  const skipRouter = useSkipClient();
+  const skipClient = useSkipClient();
   const { assetsByChainID } = useAssets();
 
   async function prefetchBalances(address: string, chainID: string) {
@@ -155,11 +155,11 @@ export default function Home() {
       }
 
       if (historyItem.status === "pending") {
-        await updatePendingRoute(id, historyItem, skipRouter);
+        await updatePendingRoute(id, historyItem, skipClient);
       }
 
       if (historyItemIsMissingAxelarlarscanLink(historyItem)) {
-        await updateAxelarscanLink(id, historyItem, skipRouter);
+        await updateAxelarscanLink(id, historyItem, skipClient);
       }
     }
   }
@@ -170,7 +170,7 @@ export default function Home() {
         prefetchBalances(repo.current.address, repo.chainRecord.chain.chain_id);
       }
     }
-  }, 5000);
+  }, 1000 * 5);
 
   // on the first run (aka page load), check all transactions in the history
   const [firstRun, setFirstRun] = useState(true);
@@ -181,7 +181,7 @@ export default function Home() {
     if (firstRun) {
       setFirstRun(false);
     }
-  }, 2000);
+  }, 1000 * 2);
 
   return (
     <div className="max-w-md mx-auto">

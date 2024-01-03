@@ -28,7 +28,7 @@ import { useSwapWidget } from "./useSwapWidget";
 export const SwapWidget: FC = () => {
   const { openWalletModal } = useWalletModal();
 
-  const { chains } = useSkipChains();
+  const { data: chains } = useSkipChains();
 
   const {
     amountIn,

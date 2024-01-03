@@ -78,8 +78,8 @@ const RouteEnd: FC<{
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
   console.log("destination chain id", action.destinationChain);
-  const { chain: sourceChain } = useChainByID(action.sourceChain);
-  const { chain: destinationChain } = useChainByID(action.destinationChain);
+  const { data: sourceChain } = useChainByID(action.sourceChain);
+  const { data: destinationChain } = useChainByID(action.destinationChain);
 
   const { getAsset } = useAssets();
 
@@ -284,8 +284,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     route.destAssetChainID,
   );
 
-  const { chain: sourceChain } = useChainByID(route.sourceAssetChainID);
-  const { chain: destinationChain } = useChainByID(route.destAssetChainID);
+  const { data: sourceChain } = useChainByID(route.sourceAssetChainID);
+  const { data: destinationChain } = useChainByID(route.destAssetChainID);
 
   const amountIn = useMemo(() => {
     try {

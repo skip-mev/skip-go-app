@@ -5,7 +5,7 @@ import { useChainByID } from "@/api/queries";
 import { EVM_WALLET_LOGOS } from "@/constants/constants";
 
 export function useAccount(chainID: string) {
-  const { chain } = useChainByID(chainID);
+  const { data: chain } = useChainByID(chainID);
 
   const cosmosChain = useChain(chain?.record?.chain_name ?? "cosmoshub");
 
