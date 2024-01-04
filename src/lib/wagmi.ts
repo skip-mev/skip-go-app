@@ -3,7 +3,7 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
 
-import { EVM_CHAINS } from "@/constants/constants";
+import { EVM_CHAINS } from "@/constants/wagmi";
 
 const { publicClient, chains } = configureChains(EVM_CHAINS, [
   publicProvider(),

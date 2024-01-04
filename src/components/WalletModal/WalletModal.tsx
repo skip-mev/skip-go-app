@@ -4,10 +4,7 @@ import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { useChainByID } from "@/api/queries";
-import {
-  EVM_WALLET_LOGOS,
-  INJECTED_EVM_WALLET_LOGOS,
-} from "@/constants/constants";
+import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { DialogContent } from "@/elements/Dialog";
 import { getChainByID } from "@/utils/utils";
 

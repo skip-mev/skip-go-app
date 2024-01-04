@@ -17,7 +17,7 @@ import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 import { Chain } from "@/api/queries";
 import { ChainId, getChain } from "@/chains";
 import { multicall3ABI } from "@/constants/abis";
-import { EVM_CHAINS } from "@/constants/constants";
+import { EVM_CHAINS } from "@/constants/wagmi";
 import { AssetWithMetadata } from "@/context/assets";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 import { useSkipClient } from "@/solve";
