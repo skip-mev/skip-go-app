@@ -1,3 +1,4 @@
+import { WalletClient } from "@cosmos-kit/core";
 import { wallets as cosmostation } from "@cosmos-kit/cosmostation";
 import { wallets as keplr } from "@cosmos-kit/keplr";
 import { wallets as leap } from "@cosmos-kit/leap";
@@ -17,6 +18,7 @@ export const wallets = [
 ];
 
 export type MergedWalletClient =
+  | WalletClient
   | import("@cosmos-kit/cosmostation-extension/cjs/extension/client").CosmostationClient
   | import("@cosmos-kit/cosmostation-mobile/cjs/wallet-connect/client").CosmostationClient
   | import("@cosmos-kit/keplr-extension/cjs/extension/client").KeplrClient
