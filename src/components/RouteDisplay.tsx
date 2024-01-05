@@ -4,8 +4,8 @@ import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
 import { useAssets } from "@/context/assets";
-import { getChainLogo } from "@/cosmos";
 import { useChainByID } from "@/hooks/useChains";
+import { getChainLogo } from "@/lib/cosmos";
 
 export interface SwapVenueConfig {
   name: string;
