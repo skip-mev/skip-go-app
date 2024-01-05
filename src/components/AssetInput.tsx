@@ -3,6 +3,7 @@ import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo } from "react";
+import toast from "react-hot-toast";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { disclosure } from "@/context/disclosures";
@@ -240,6 +241,17 @@ const AssetInput: FC<Props> = ({
                         .shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
 
                       amount = amount.minus(fee);
+                      if (amount.isNegative()) {
+                        amount = new BigNumber(0);
+                        toast.error(
+                          <p>
+                            <strong>Insufficient Balance</strong>
+                            <br />
+                            You need to have at least ≈{fee.toString()} to
+                            accommodate gas fees.
+                          </p>,
+                        );
+                      }
                     }
 
                     onAmountChange?.(amount.toString());
