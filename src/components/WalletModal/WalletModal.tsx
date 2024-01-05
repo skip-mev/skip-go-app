@@ -1,13 +1,17 @@
-import { useManager } from "@cosmos-kit/react";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { FC } from "react";
+import { useManager, useWalletClient } from "@cosmos-kit/react";
+import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
+import { clsx } from "clsx";
+import { ComponentProps, FC, ReactNode, useEffect, useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { create } from "zustand";
 
-import { useChainByID } from "@/hooks/useChains";
 import { chainIdToName } from "@/chains/types";
-import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { DialogContent } from "@/components/Dialog";
+import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
+import { useChainByID } from "@/hooks/useChains";
+import { MergedWalletClient } from "@/lib/cosmos-kit";
 
+import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
 
 export interface MinimalWallet {
@@ -26,11 +30,15 @@ interface Props {
   onClose: () => void;
 }
 
+const useStore = create<Record<string, true>>(() => ({}));
+
 export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
   async function onWalletConnect(wallet: MinimalWallet) {
     await wallet.connect();
     onClose();
   }
+
+  const totalWallets = useStore((state) => Object.keys(state).length);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -47,8 +55,31 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
         </div>
       </div>
       <div className="px-4 py-2 space-y-2 flex-grow overflow-auto mb-8">
+        {totalWallets < 1 && (
+          <div className="flex flex-col items-center py-8 space-y-4 text-center">
+            <FaceFrownIcon className="w-12 h-12 text-gray-500" />
+            <h4 className="text-center font-medium">No Wallets Available</h4>
+            <p className="text-sm lg:px-8">
+              Please install or enable your preferred wallet extension.
+              <br />
+              <AdaptiveLink
+                href="https://cosmos.network/wallets/"
+                className="text-red-500 hover:underline"
+              >
+                View available wallets in Cosmos
+              </AdaptiveLink>
+            </p>
+          </div>
+        )}
         {wallets.map((wallet) => (
-          <div className="group relative" key={wallet.walletName}>
+          <WalletListItem
+            key={wallet.walletName}
+            walletName={wallet.walletName}
+            className={clsx(
+              "group relative data-[unsupported=true]:opacity-30",
+              "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
+            )}
+          >
             <button
               className="flex items-center gap-2 w-full p-2 rounded-lg transition-colors group-hover:bg-[#FF486E]/20"
               onClick={() => onWalletConnect(wallet)}
@@ -86,9 +117,46 @@ export const WalletModal: FC<Props> = ({ onClose, wallets }) => {
                 Disconnect
               </button>
             ) : null}
-          </div>
+          </WalletListItem>
         ))}
       </div>
+    </div>
+  );
+};
+
+const WalletListItem = ({
+  children,
+  walletName,
+  ...props
+}: ComponentProps<"div"> & {
+  children: ReactNode;
+  walletName: string;
+}) => {
+  const { client } = useWalletClient(walletName);
+  const walletClient = client as MergedWalletClient | undefined;
+
+  const show = useMemo(() => {
+    if (!walletClient) return false;
+    if ("snapInstalled" in walletClient) {
+      return walletClient.snapInstalled;
+    }
+    return true;
+  }, [walletClient]);
+
+  useEffect(() => {
+    const unregister = () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      useStore.setState(({ [walletName]: _, ...latest }) => latest, true);
+    };
+    if (show) useStore.setState({ [walletName]: true });
+    else unregister();
+    return unregister;
+  }, [show, walletName]);
+
+  // return <div {...props}>{show ? children : null}</div>;
+  return (
+    <div data-unsupported={!show} {...props}>
+      {children}
     </div>
   );
 };
