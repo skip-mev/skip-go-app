@@ -172,7 +172,7 @@ const TransactionDialogContent: FC<Props> = ({
         console.error(err);
       }
       if (err instanceof Error) {
-        toast.error(err.message, { duration: Infinity });
+        toast.error(err.message);
       }
       failTxHistory(historyId);
       setTxStatuses((statuses) => {

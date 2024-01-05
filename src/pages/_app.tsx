@@ -59,7 +59,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 </MainLayout>
                 <Toaster
                   position="bottom-center"
-                  toastOptions={{ duration: 1000 * 60 }}
+                  toastOptions={{ duration: 1000 * 10 }}
                 />
               </AssetsProvider>
             </SkipProvider>
