@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-import Toast from "@/elements/Toast";
+import Toast from "@/components/Toast";
 
 interface ToastContext {
   toast: (title: string, message: string, type: "success" | "error") => void;

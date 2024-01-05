@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-import { Dialog } from "@/elements/Dialog";
+import { Dialog } from "@/components/Dialog";
 
 interface WalletModalContext {
   chainID: string;

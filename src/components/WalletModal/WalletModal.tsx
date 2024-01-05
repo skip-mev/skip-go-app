@@ -6,7 +6,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useChainByID } from "@/api/queries";
 import { chainIdToName } from "@/chains/types";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
-import { DialogContent } from "@/elements/Dialog";
+import { DialogContent } from "@/components/Dialog";
 
 import { useWalletModal } from "./context";
 

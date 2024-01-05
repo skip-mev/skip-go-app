@@ -2,8 +2,8 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { FC, useState } from "react";
 
+import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
 import { AssetWithMetadata } from "@/context/assets";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 
 import AssetSelectContent from "./AssetSelectContent";
 

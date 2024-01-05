@@ -14,7 +14,7 @@ import {
   failTxHistory,
   successTxHistory,
 } from "@/context/tx-history";
-import Toast from "@/elements/Toast";
+import Toast from "@/components/Toast";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
 import {

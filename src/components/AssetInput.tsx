@@ -8,7 +8,7 @@ import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import Toast from "@/elements/Toast";
+import Toast from "@/components/Toast";
 import { useAccount } from "@/hooks/useAccount";
 import { formatUSD, useBalancesByChain } from "@/utils/utils";
 
