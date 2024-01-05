@@ -28,6 +28,5 @@ export type MergedWalletClient =
   | import("@cosmos-kit/leap-mobile/cjs/wallet-connect/client").LeapClient
   | import("@cosmos-kit/okxwallet-extension/cjs/extension/client").OkxwalletClient
   | import("@cosmos-kit/station-extension/cjs/extension/client").StationClient
-  | import("@cosmos-kit/station-extension/cjs/extension/client").StationClient
   | import("@cosmos-kit/vectis-extension/cjs/extension/client").VectisClient
   | import("@cosmos-kit/xdefi-extension/cjs/extension/client").XDEFIClient;
