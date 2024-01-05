@@ -2,8 +2,8 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 
-import { Chain } from "@/api/queries";
 import { getChainLogo } from "@/cosmos";
+import { Chain } from "@/hooks/useChains";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
 interface Props {

@@ -5,9 +5,9 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
-import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAccount } from "@/hooks/useAccount";
+import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
 import { useBalancesByChain } from "@/utils/utils";
 

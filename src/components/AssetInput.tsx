@@ -4,12 +4,12 @@ import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { Chain } from "@/api/queries";
+import Toast from "@/components/Toast";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import Toast from "@/components/Toast";
 import { useAccount } from "@/hooks/useAccount";
+import { Chain } from "@/hooks/useChains";
 import { formatUSD, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";

@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ForwardedRef, forwardRef } from "react";
 
-import { Chain } from "@/api/queries";
+import { Chain } from "@/hooks/useChains";
 
 interface Props {
   chain?: Chain;

@@ -5,7 +5,7 @@ import { clsx } from "clsx";
 import { FC, Fragment, useState } from "react";
 import { useAccount } from "wagmi";
 
-import { Chain, useChains } from "@/api/queries";
+import Toast from "@/components/Toast";
 import { useSettingsStore } from "@/context/settings";
 import { useToast } from "@/context/toast";
 import {
@@ -14,7 +14,7 @@ import {
   failTxHistory,
   successTxHistory,
 } from "@/context/tx-history";
-import Toast from "@/components/Toast";
+import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
 import {

@@ -7,7 +7,7 @@ import {
   useMemo,
 } from "react";
 
-import { Chain, useChains } from "@/api/queries";
+import { Chain, useChains } from "@/hooks/useChains";
 
 import {
   filterAssetsWithMetadata,

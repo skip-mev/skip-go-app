@@ -4,10 +4,10 @@ import { clsx } from "clsx";
 import { FC, useEffect } from "react";
 import type {} from "typed-query-selector";
 
-import { useChains as useSkipChains } from "@/api/queries";
 import { useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
+import { useChains as useSkipChains } from "@/hooks/useChains";
 
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";

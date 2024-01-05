@@ -2,8 +2,8 @@ import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { FC } from "react";
 
-import { Chain, useChains } from "@/api/queries";
 import { useAssets } from "@/context/assets";
+import { Chain, useChains } from "@/hooks/useChains";
 
 import { RouteTransaction } from "./TransactionDialog/TransactionDialogContent";
 

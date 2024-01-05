@@ -1,6 +1,6 @@
 import { AllTheProviders, renderHook, waitFor } from "@/test";
 
-import { useChainByID, useChains } from "../queries";
+import { useChainByID, useChains } from "../useChains";
 
 test("useChains attaches a prettyName", async () => {
   const { result } = renderHook(() => useChains(), {

@@ -1,8 +1,8 @@
 import { RouteResponse } from "@skip-router/core";
 import { useMemo } from "react";
 
-import { useChains } from "@/api/queries";
 import { getFinalityTime } from "@/constants/finality";
+import { useChains } from "@/hooks/useChains";
 
 export function useFinalityTimeEstimate(route: RouteResponse) {
   const { data: chains = [] } = useChains();

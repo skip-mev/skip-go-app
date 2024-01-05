@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
-import { useChainByID } from "@/api/queries";
+import { useChainByID } from "@/hooks/useChains";
 import { chainIdToName } from "@/chains/types";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { DialogContent } from "@/components/Dialog";

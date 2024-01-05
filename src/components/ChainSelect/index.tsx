@@ -1,7 +1,7 @@
 import { FC, Fragment, useState } from "react";
 
-import { Chain } from "@/api/queries";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
+import { Chain } from "@/hooks/useChains";
 
 import ChainSelectContent from "./ChainSelectContent";
 import ChainSelectTrigger from "./ChainSelectTrigger";

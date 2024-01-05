@@ -14,11 +14,11 @@ import { SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
-import { Chain } from "@/api/queries";
 import { ChainId } from "@/chains/types";
 import { multicall3ABI } from "@/constants/abis";
 import { EVM_CHAINS } from "@/constants/wagmi";
 import { AssetWithMetadata } from "@/context/assets";
+import { Chain } from "@/hooks/useChains";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 import { useSkipClient } from "@/solve";
 

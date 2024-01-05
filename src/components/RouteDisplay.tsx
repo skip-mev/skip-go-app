@@ -3,9 +3,9 @@ import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
 import { getChainLogo } from "@/cosmos";
+import { useChainByID } from "@/hooks/useChains";
 
 export interface SwapVenueConfig {
   name: string;

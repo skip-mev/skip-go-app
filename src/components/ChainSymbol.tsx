@@ -1,9 +1,9 @@
 import { CubeIcon } from "@heroicons/react/20/solid";
 import { useMemo } from "react";
 
-import { useChainByID } from "@/api/queries";
 import { ChainId } from "@/chains/types";
 import { getChainLogo } from "@/cosmos";
+import { useChainByID } from "@/hooks/useChains";
 
 interface Props {
   chainId: ChainId;
