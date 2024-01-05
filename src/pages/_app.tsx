@@ -3,7 +3,8 @@ import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
 import * as RadixToast from "@radix-ui/react-toast";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
 import Head from "next/head";
@@ -19,6 +20,10 @@ import { wallets } from "@/lib/cosmos-kit";
 import { queryClient } from "@/lib/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
 import { SkipProvider } from "@/solve";
+
+const persister = createSyncStoragePersister({
+  storage: typeof window !== "undefined" ? window.sessionStorage : undefined,
+});
 
 type ChainProviderProps = ComponentProps<typeof ChainProvider>;
 
@@ -38,7 +43,10 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <main>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister }}
+        >
           <ChainProvider
             chains={chains}
             assetLists={assets}
@@ -60,7 +68,7 @@ export default function App({ Component, pageProps }: AppProps) {
               </SkipProvider>
             </WagmiConfig>
           </ChainProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </main>
       <Analytics />
       <BuildInfo />
