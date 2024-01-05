@@ -47,7 +47,7 @@ export async function enableChains<T extends MergedWalletClient>(
   }
 
   // CosmosSnapClient
-  if ("handleConnect" in walletClient) {
+  if ("snapInstalled" in walletClient && walletClient.snapInstalled) {
     return walletClient.handleConnect();
   }
 
