@@ -4,9 +4,9 @@ import { FC } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { useChainByID } from "@/api/queries";
+import { chainIdToName } from "@/chains/types";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { DialogContent } from "@/elements/Dialog";
-import { getChainByID } from "@/utils/utils";
 
 import { useWalletModal } from "./context";
 
@@ -113,10 +113,8 @@ const WalletModalWithContext: FC = () => {
   let wallets: MinimalWallet[] = [];
 
   if (chainType === "cosmos") {
-    const chainName = getChainByID(chainID).chain_name;
-
+    const chainName = chainIdToName[chainID];
     const walletRepo = getWalletRepo(chainName);
-
     wallets = walletRepo.wallets;
   }
 

@@ -1,31 +1,24 @@
-/* eslint-disable */
-// @ts-nocheck
-import { Asset, AssetList, Chain } from "@graz-sh/types";
 
-import {
-  assetsRecord,
-  ChainIdOrName,
-  chainIds,
-  chainIdToName,
-  chainNameToId,
-  chainRecord,
-} from "./generated";
+import { Asset, AssetList, Chain } from "@graz-sh/types";
+import { ChainId, chainIdToName, chainIds } from "./types";
+import { chainRecord } from "./chains";
+import { assetsRecord } from "./assets";
 
 function raise(message?: string, opts?: ErrorOptions): never {
   throw new Error(message, opts);
 }
 
-export function getChain(idOrName: ChainIdOrName): Chain {
+export function getChain(chainId: ChainId): Chain {
   return (
-    chainRecord[chainNameToId[idOrName]] ||
-    raise(`chain '${idOrName}' does not exist in chainRecord`)
+    chainRecord[chainId] ||
+    raise(`chain '${chainId}' does not exist in chainRecord`)
   );
 }
 
-export function getAssets(idOrName: ChainIdOrName): Asset[] {
+export function getAssets(chainId: ChainId): Asset[] {
   return (
-    assetsRecord[chainNameToId[idOrName]] ||
-    raise(`chain '${idOrName}' does not exist in assetsRecord`)
+    assetsRecord[chainId] ||
+    raise(`chain '${chainId}' does not exist in assetsRecord`)
   );
 }
 
@@ -40,4 +33,4 @@ export function getAssetLists(): AssetList[] {
   }));
 }
 
-export * from "./generated";
+export * from "./types";

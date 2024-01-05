@@ -7,7 +7,7 @@ import { EVM_WALLET_LOGOS } from "@/constants/wagmi";
 export function useAccount(chainID: string) {
   const { data: chain } = useChainByID(chainID);
 
-  const cosmosChain = useChain(chain?.record?.chain_name ?? "cosmoshub");
+  const cosmosChain = useChain(chain?.chainName ?? "cosmoshub");
 
   const wagmiAccount = useWagmiAccount();
 

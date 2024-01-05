@@ -1,12 +1,12 @@
 import { BigNumberish, formatUnits } from "ethers";
 import { useMemo } from "react";
 
-import { ChainIdOrName } from "@/chains";
+import { ChainId } from "@/chains/types";
 import { useAssets } from "@/context/assets";
 import { raise } from "@/utils/assert";
 
 interface Props {
-  chainId: ChainIdOrName;
+  chainId: ChainId;
   denom: string;
   value: BigNumberish;
 }
