@@ -3,7 +3,6 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ethers, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 
-import { filterSifAssets } from "@/assets/filters";
 import { AssetWithMetadata } from "@/context/assets";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
@@ -54,7 +53,15 @@ const AssetSelectContent: FC<Props> = ({
 
       return 0;
     })
-    .filter(filterSifAssets)
+    .filter((asset) => {
+      if (
+        asset.originChainID === "sifchain-1" &&
+        asset.originDenom !== "rowan"
+      ) {
+        return false;
+      }
+      return true;
+    })
     .sort((a, b) => {
       const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
       const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
