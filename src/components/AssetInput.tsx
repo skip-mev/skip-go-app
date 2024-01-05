@@ -219,10 +219,15 @@ const AssetInput: FC<Props> = ({
                     "transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
                   )}
                   disabled={maxButtonDisabled}
-                  onClick={() => {
+                  onClick={(event) => {
                     if (!selectedAssetBalance || !chain || !asset) return;
 
                     let amount = new BigNumber(selectedAssetBalance);
+
+                    if (event.shiftKey) {
+                      onAmountChange?.(amount.toString());
+                      return;
+                    }
 
                     const feeDenom = getFeeDenom(chain.chainID)!;
                     const { gasPrice } = chain.feeAssets.find(
