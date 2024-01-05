@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { matchSorter } from "match-sorter";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/hooks/useChains";
@@ -27,22 +28,8 @@ const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
 
   const filteredChains = useMemo(() => {
     if (!searchValue) return chains;
-    return chains.filter((chain) => {
-      if (
-        chain.chainID &&
-        chain.chainID.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        return true;
-      }
-
-      if (
-        chain.chainName &&
-        chain.chainName.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        return true;
-      }
-
-      return chain.chainName.toLowerCase().includes(searchValue.toLowerCase());
+    return matchSorter(chains, searchValue, {
+      keys: ["chainID", "chainName"],
     });
   }, [chains, searchValue]);
 

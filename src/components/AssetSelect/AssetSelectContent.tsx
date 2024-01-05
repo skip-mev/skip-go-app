@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { formatUnits, toBigInt } from "ethers";
-import { FC, useEffect, useRef, useState } from "react";
+import { matchSorter } from "match-sorter";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { AssetWithMetadata } from "@/context/assets";
 import { useWindowSize } from "@/hooks/useWindowSize";
@@ -34,54 +35,39 @@ const AssetSelectContent: FC<Props> = ({
 
   const [searchValue, setSearchValue] = useState("");
 
-  const sortedAssets = assets
-    ?.sort((a, b) => {
-      if (!a.symbol) {
-        return 1;
-      }
+  const sortedAssets = useMemo(() => {
+    return assets
+      ?.sort((a, b) => {
+        if (!a.symbol) return 1;
+        if (!b.symbol) return -1;
+        if (a.symbol > b.symbol) return 1;
+        if (a.symbol < b.symbol) return -1;
+        return 0;
+      })
+      .filter((asset) => {
+        if (
+          asset.originChainID === "sifchain-1" &&
+          asset.originDenom !== "rowan"
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
+        const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
+        if (balanceA > balanceB) return -1;
+        if (balanceA < balanceB) return 1;
+        return 0;
+      });
+  }, [assets, balances]);
 
-      if (!b.symbol) {
-        return -1;
-      }
-
-      if (a.symbol > b.symbol) {
-        return 1;
-      }
-
-      if (a.symbol < b.symbol) {
-        return -1;
-      }
-
-      return 0;
-    })
-    .filter((asset) => {
-      if (
-        asset.originChainID === "sifchain-1" &&
-        asset.originDenom !== "rowan"
-      ) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
-      const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
-
-      if (balanceA > balanceB) return -1;
-      if (balanceA < balanceB) return 1;
-
-      return 0;
+  const filteredAssets = useMemo(() => {
+    if (!searchValue) return sortedAssets;
+    return matchSorter(sortedAssets || [], searchValue, {
+      keys: ["symbol", "denom"],
     });
-
-  const filteredAssets = sortedAssets?.filter((asset) => {
-    if (!searchValue) return true;
-
-    if (asset.symbol?.toLowerCase().includes(searchValue.toLowerCase())) {
-      return true;
-    }
-
-    return asset.denom.toLowerCase().includes(searchValue.toLowerCase());
-  });
+  }, [searchValue, sortedAssets]);
 
   return (
     <div className="flex flex-col h-full px-4 py-6 space-y-6">
