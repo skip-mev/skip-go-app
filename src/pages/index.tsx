@@ -13,10 +13,10 @@ import {
   updateTxStatus,
   useTxHistory,
 } from "@/context/tx-history";
+import { getBalancesByChain } from "@/hooks/useBalancesByChain";
 import { useInterval } from "@/hooks/useInterval";
 import { queryClient } from "@/lib/react-query";
 import { useSkipClient } from "@/solve";
-import { getBalancesByChain } from "@/utils/utils";
 
 function routeHasAxelarTransfer(route: RouteResponse): boolean {
   for (const operation of route.operations) {

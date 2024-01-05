@@ -7,10 +7,10 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAccount } from "@/hooks/useAccount";
+import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
 import { formatPercent, formatUSD } from "@/utils/intl";
-import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 

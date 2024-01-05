@@ -1,4 +1,3 @@
-import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -16,15 +15,11 @@ import {
 } from "@/context/tx-history";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
+import { useGetChainWalletClient } from "@/hooks/useGetChainWalletClient";
 import { useSkipClient } from "@/solve";
-import {
-  enableChains,
-  getAddressForCosmosChain,
-  getExplorerLinkForTx,
-  getOfflineSigner,
-  getOfflineSignerOnlyAmino,
-  isLedger,
-} from "@/utils/utils";
+import { enableChains, getAddressForCosmosChain } from "@/utils/chain";
+import { getChainExplorerUrl } from "@/utils/explorer";
+import { getOfflineSigner } from "@/utils/signer";
 
 import RouteDisplay from "../RouteDisplay";
 import TransactionSuccessView from "../TransactionSuccessView";
@@ -32,8 +27,8 @@ import * as AlertCollapse from "./AlertCollapse";
 
 export interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
-  explorerLink: string | null;
-  txHash: string | null;
+  explorerLink: string | null | undefined;
+  txHash: string | null | undefined;
 }
 
 interface Props {
@@ -65,8 +60,6 @@ const TransactionDialogContent: FC<Props> = ({
   const [numberOfBroadcastedTransactions, setNumberOfBroadcastedTransactions] =
     useState(0);
 
-  const { getWalletRepo } = useManager();
-
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => {
       return {
@@ -77,24 +70,7 @@ const TransactionDialogContent: FC<Props> = ({
     }),
   );
 
-  async function getCosmosKitWalletClient(chain: Chain) {
-    const walletRepo = await getWalletRepo(chain.record?.chain_name ?? "");
-
-    const currentCosmosKitWallet = localStorage.getItem(
-      "cosmos-kit@2:core//current-wallet",
-    );
-
-    if (!currentCosmosKitWallet) {
-      throw new Error("No CosmosKit wallet found");
-    }
-
-    const wallet = walletRepo.getWallet(currentCosmosKitWallet);
-    if (!wallet) {
-      throw new Error("No wallet found");
-    }
-
-    return wallet.client;
-  }
+  const getChainWalletClient = useGetChainWalletClient();
 
   const onSubmit = async () => {
     setTransacting(true);
@@ -103,7 +79,6 @@ const TransactionDialogContent: FC<Props> = ({
 
     try {
       const userAddresses: Record<string, string> = {};
-      const addressList = [];
 
       // get addresses
       for (const chainID of route.chainIDs) {
@@ -113,11 +88,10 @@ const TransactionDialogContent: FC<Props> = ({
         }
 
         if (chain.chainType === "cosmos") {
-          const walletClient = await getCosmosKitWalletClient(chain);
+          const walletClient = getChainWalletClient(chain.chainName ?? "");
           await enableChains(walletClient, [chainID]);
           const address = await getAddressForCosmosChain(walletClient, chainID);
           userAddresses[chainID] = address;
-          addressList.push(address);
         }
 
         if (chain.chainType === "evm") {
@@ -126,7 +100,6 @@ const TransactionDialogContent: FC<Props> = ({
           }
 
           userAddresses[chainID] = evmAddress;
-          addressList.push(evmAddress);
         }
       }
 
@@ -150,21 +123,13 @@ const TransactionDialogContent: FC<Props> = ({
             throw new Error(`No chain found for chainID ${chainID}`);
           }
 
-          const walletClient = await getCosmosKitWalletClient(chain);
-
-          const signerIsLedger = await isLedger(walletClient, chainID);
-
-          if (signerIsLedger) {
-            return getOfflineSignerOnlyAmino(walletClient, chainID);
-          }
+          const walletClient = getChainWalletClient(chain.chainName ?? "");
 
           return getOfflineSigner(walletClient, chainID);
         },
         onTransactionBroadcast: async (txStatus) => {
-          const explorerLink = getExplorerLinkForTx(
-            txStatus.chainID,
-            txStatus.txHash,
-          );
+          const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
+          const explorerLink = makeExplorerUrl?.(txStatus.txHash);
 
           addTxStatus(historyId, {
             chainId: txStatus.chainID,
@@ -178,7 +143,8 @@ const TransactionDialogContent: FC<Props> = ({
           );
         },
         onTransactionCompleted: async (chainID, txHash) => {
-          const explorerLink = getExplorerLinkForTx(chainID, txHash);
+          const makeExplorerUrl = await getChainExplorerUrl(chainID);
+          const explorerLink = makeExplorerUrl?.(txHash);
 
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];

@@ -9,9 +9,9 @@ import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
+import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
 import { formatMaxFraction, formatPercent, formatUSD } from "@/utils/intl";
-import { useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";

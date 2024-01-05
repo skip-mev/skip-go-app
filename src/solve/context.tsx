@@ -6,17 +6,10 @@ import { useNetwork } from "wagmi";
 
 import { API_URL } from "@/constants/api";
 import { getNodeProxyEndpoint } from "@/utils/api";
-import {
-  getOfflineSigner,
-  getOfflineSignerOnlyAmino,
-  isLedger,
-} from "@/utils/utils";
+import { getOfflineSigner } from "@/utils/signer";
 
 export const SkipContext = createContext<
-  | {
-      skipClient: SkipRouter;
-    }
-  | undefined
+  { skipClient: SkipRouter } | undefined
 >(undefined);
 
 export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -29,13 +22,6 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!walletClient) {
         throw new Error("No offline signer available");
       }
-
-      const signerIsLedger = await isLedger(walletClient, chainID);
-
-      if (signerIsLedger) {
-        return getOfflineSignerOnlyAmino(walletClient, chainID);
-      }
-
       return getOfflineSigner(walletClient, chainID);
     },
     getEVMSigner: async (chainID) => {
