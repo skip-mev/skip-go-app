@@ -1,7 +1,12 @@
+import { BigNumber } from "bignumber.js";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
-import { subscribeWithSelector } from "zustand/middleware";
+import {
+  createJSONStorage,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
@@ -283,23 +288,61 @@ export interface FormValues {
   direction: "swap-in" | "swap-out";
 }
 
+const defaultValues: FormValues = {
+  amountIn: "",
+  amountOut: "",
+  direction: "swap-in",
+};
+
 const useFormValuesStore = create(
-  subscribeWithSelector<FormValues>(() => ({
-    amountIn: "",
-    amountOut: "",
-    direction: "swap-in",
-  })),
+  subscribeWithSelector(
+    persist(() => defaultValues, {
+      name: "ibc-dot-fun//form-values",
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state): Partial<FormValues> => ({
+        sourceChain: state.sourceChain,
+        sourceAsset: state.sourceAsset,
+        destinationChain: state.destinationChain,
+        destinationAsset: state.destinationAsset,
+      }),
+      skipHydration: true,
+    }),
+  ),
 );
 
 // useFormValues returns a set of form values that are used to populate the swap widget
 // and handles logic regarding setting initial values based on local storage and other form values.
 function useFormValues() {
+  useEffect(() => void useFormValuesStore.persist.rehydrate(), []);
+
   const { data: chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
 
   const [userSelectedDestinationAsset, setUserSelectedDestinationAsset] =
     useState(false);
+
+  useEffect(() => {
+    return useFormValuesStore.subscribe(
+      (state) => state.amountIn,
+      (current, prev) => {
+        if ((!current || current == "0") && prev) {
+          useFormValuesStore.setState({ amountOut: "" });
+        }
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    return useFormValuesStore.subscribe(
+      (state) => state.amountOut,
+      (current, prev) => {
+        if ((!current || current == "0") && prev) {
+          useFormValuesStore.setState({ amountIn: "" });
+        }
+      },
+    );
+  }, []);
 
   // Select initial source chain.
   // - If chainID exists in local storage, use that.
@@ -309,8 +352,7 @@ function useFormValues() {
       (state) => state.sourceChain,
       (sourceChain) => {
         if (!sourceChain && (chains ?? []).length > 0) {
-          const chainID =
-            localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
+          const chainID = "cosmoshub-4";
           useFormValuesStore.setState({
             sourceChain: (chains ?? []).find(
               (chain) => chain.chainID === chainID,
@@ -324,22 +366,6 @@ function useFormValues() {
       },
     );
   }, [chains]);
-
-  // When source chain changes, save to local storage.
-  useEffect(() => {
-    return useFormValuesStore.subscribe(
-      (state) => state.sourceChain,
-      (sourceChain) => {
-        if (sourceChain) {
-          localStorage.setItem(LAST_SOURCE_CHAIN_KEY, sourceChain.chainID);
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, []);
 
   // Select initial source asset.
   // - If fee denom exists for source chain, use that.
@@ -455,8 +481,11 @@ function findEquivalentAsset(
 function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
   if (!asset || !amount) return "0";
   try {
-    return ethers.parseUnits(amount, asset.decimals).toString();
-  } catch {
+    return new BigNumber(amount).shiftedBy(asset.decimals ?? 6).toFixed(0);
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(err);
+    }
     return "0";
   }
 }
@@ -465,7 +494,10 @@ function parseAmountWei(amount?: string, decimals = 6) {
   if (!amount) return "0";
   try {
     return ethers.formatUnits(amount, decimals ?? 6);
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(err);
+    }
     return "0";
   }
 }

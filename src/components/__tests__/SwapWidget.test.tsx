@@ -7,7 +7,6 @@ import { act, fireEvent, render, screen, waitFor, within } from "@/test";
 import { ASSETS_RESPONSE } from "../../../fixtures/assets";
 import { CHAINS_RESPONSE } from "../../../fixtures/chains";
 import { SwapWidget } from "../SwapWidget";
-import { LAST_SOURCE_CHAIN_KEY } from "../SwapWidget/useSwapWidget";
 
 const handlers = [
   rest.get(`${API_URL}/v1/info/chains`, (_, res, ctx) => {
@@ -117,7 +116,7 @@ describe.skip("SwapWidget", () => {
     expect(sourceChainButton).toHaveTextContent("Osmosis");
 
     // Source chain is stored in local storage
-    expect(localStorage.getItem(LAST_SOURCE_CHAIN_KEY)).toEqual("osmosis-1");
+    // expect(localStorage.getItem(LAST_SOURCE_CHAIN_KEY)).toEqual("osmosis-1");
 
     // Source asset is now OSMO
     expect(
