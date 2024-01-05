@@ -7,13 +7,12 @@ interface SettingsStore {
 }
 
 export const defaultValues: SettingsStore = {
-  gas: (200_000).toString(),
+  gas: (150_000).toString(),
   slippage: (3).toString(),
 };
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(() => defaultValues, {
     name: "SettingsStore",
-    version: 1,
   }),
 );
