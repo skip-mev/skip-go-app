@@ -10,7 +10,7 @@ import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
-import { formatUSD, getFee, useBalancesByChain } from "@/utils/utils";
+import { formatUSD, useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -226,23 +226,25 @@ const AssetInput: FC<Props> = ({
                   onClick={() => {
                     if (!selectedAssetBalance || !chain || !asset) return;
 
-                    const feeDenom = getFeeDenom(chain.chainID);
-                    let amount = selectedAssetBalance;
+                    let amount = new BigNumber(selectedAssetBalance);
+
+                    const feeDenom = getFeeDenom(chain.chainID)!;
+                    const { gasPrice } = chain.feeAssets.find(
+                      (a) => a.denom === feeDenom.denom,
+                    )!;
 
                     // if selected asset is the fee denom, subtract the fee
-                    if (feeDenom && feeDenom.denom === asset.denom) {
-                      const fee = getFee(chain.chainID);
+                    if (feeDenom.denom === asset.denom) {
+                      const { gas } = useSettingsStore.getState();
 
-                      const feeInt = parseFloat(
-                        ethers.formatUnits(fee.toString(), asset.decimals),
-                      ).toFixed(asset.decimals);
+                      const fee = new BigNumber(gasPrice.average)
+                        .multipliedBy(gas)
+                        .shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
 
-                      amount = (
-                        parseFloat(selectedAssetBalance) - parseFloat(feeInt)
-                      ).toFixed(asset.decimals);
+                      amount = amount.minus(fee);
                     }
 
-                    onAmountChange?.(amount);
+                    onAmountChange?.(amount.toString());
                   }}
                 >
                   Max
