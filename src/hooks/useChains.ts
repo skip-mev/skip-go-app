@@ -33,6 +33,9 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
           return chainA.prettyName.localeCompare(chainB.prettyName);
         });
     },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
     select,
   });
 }

@@ -18,6 +18,9 @@ export function useAssets(options: AssetsRequest = {}) {
         ...options,
       });
     },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 }
 
