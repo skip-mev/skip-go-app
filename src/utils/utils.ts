@@ -418,17 +418,3 @@ async function getEvmChainBalances(
     {} as Record<string, string>,
   );
 }
-
-export const wait = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-const { format } = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 6,
-});
-
-export function formatUSD(amount: string | number) {
-  const amountNumber = typeof amount === "string" ? parseFloat(amount) : amount;
-  return format(amountNumber);
-}

@@ -6,6 +6,7 @@ import { Fragment, useEffect, useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
+import { formatMaxFraction, formatPercent } from "@/utils/intl";
 
 import { ConversionRate } from "../ConversionRate";
 import { SimpleTooltip } from "../SimpleTooltip";
@@ -76,7 +77,7 @@ export const SwapDetails = ({
           {({ left, right, conversion, toggle }) => (
             <div>
               <button className="mr-2" onClick={toggle}>
-                1 {left.symbol} = {format(conversion)} {right.symbol}
+                1 {left.symbol} = {formatMaxFraction(conversion)} {right.symbol}
               </button>
               <span className="text-neutral-400 tabular-nums">
                 <UsdValue
@@ -136,10 +137,7 @@ export const SwapDetails = ({
                   priceImpactThresholdReached ? "text-red-500" : undefined,
                 )}
               >
-                {new Intl.NumberFormat("en-US", {
-                  style: "percent",
-                  maximumFractionDigits: 2,
-                }).format(priceImpactPercent)}
+                {formatPercent(priceImpactPercent)}
               </dd>
             </Fragment>
           ) : null}
@@ -157,14 +155,10 @@ export const SwapDetails = ({
           <dd>{slippage}%</dd>
           <dt>Bridging Fee</dt>
           <dd>
-            {format(bridgingFee)} {isEvm ? "ETH" : ""}
+            {formatMaxFraction(bridgingFee)} {isEvm ? "ETH" : ""}
           </dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
   );
 };
-
-const { format } = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 8,
-});

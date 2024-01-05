@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { ethers, toBigInt } from "ethers";
+import { formatUnits, toBigInt } from "ethers";
 import { FC, useEffect, useRef, useState } from "react";
 
 import { AssetWithMetadata } from "@/context/assets";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { formatMaxFraction } from "@/utils/intl";
 
 interface Props {
   assets?: AssetWithMetadata[];
@@ -139,14 +140,9 @@ const AssetSelectContent: FC<Props> = ({
               <div>
                 {balances[asset.denom] && (
                   <p className="font-medium text-sm text-neutral-400">
-                    {new Intl.NumberFormat("en-US", {
-                      maximumFractionDigits: 6,
-                    }).format(
+                    {formatMaxFraction(
                       parseFloat(
-                        ethers.formatUnits(
-                          balances[asset.denom],
-                          asset.decimals,
-                        ),
+                        formatUnits(balances[asset.denom], asset.decimals),
                       ),
                     )}
                   </p>

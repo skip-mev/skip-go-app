@@ -2,12 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useRef } from "react";
 import { create } from "zustand";
 
 import { Args, useUsdDiffValue, useUsdValue } from "@/hooks/useUsdValue";
-
-const { format } = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 6,
-});
+import { formatUSD } from "@/utils/intl";
 
 type UsdValueProps = Args & {
   error?: ReactNode;
@@ -45,10 +40,10 @@ export const UsdValue = ({
   }
 
   if (isLoading && prevValue.current) {
-    return <>{format(prevValue.current)}</>;
+    return <>{formatUSD(prevValue.current)}</>;
   }
 
-  return <>{isLoading ? loading : format(usdValue)}</>;
+  return <>{isLoading ? loading : formatUSD(usdValue)}</>;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

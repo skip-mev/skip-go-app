@@ -9,6 +9,7 @@ import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAccount } from "@/hooks/useAccount";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
+import { formatPercent, formatUSD } from "@/utils/intl";
 import { useBalancesByChain } from "@/utils/utils";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
@@ -217,20 +218,15 @@ export function useSwapWidget() {
     }
 
     if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
-      const amountInUSD = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(parseFloat(routeResponse.usdAmountIn ?? "0"));
+      const amountInUSD = formatUSD(
+        parseFloat(routeResponse.usdAmountIn ?? "0"),
+      );
 
-      const amountOutUSD = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(parseFloat(routeResponse.usdAmountOut ?? "0"));
+      const amountOutUSD = formatUSD(
+        parseFloat(routeResponse.usdAmountOut ?? "0"),
+      );
 
-      const formattedUsdDiffPercent = new Intl.NumberFormat("en-US", {
-        style: "percent",
-        maximumFractionDigits: 2,
-      }).format(Math.abs(usdDiffPercent));
+      const formattedUsdDiffPercent = formatPercent(Math.abs(usdDiffPercent));
       return [
         "Bad Trade Warning",
         `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`,
@@ -241,10 +237,7 @@ export function useSwapWidget() {
       swapPriceImpactPercent &&
       swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD
     ) {
-      const formattedPriceImpact = new Intl.NumberFormat("en-US", {
-        style: "percent",
-        maximumFractionDigits: 2,
-      }).format(swapPriceImpactPercent);
+      const formattedPriceImpact = formatPercent(swapPriceImpactPercent);
       return [
         "Bad Trade Warning",
         `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`,

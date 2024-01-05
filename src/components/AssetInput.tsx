@@ -10,7 +10,8 @@ import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 import { Chain } from "@/hooks/useChains";
-import { formatUSD, useBalancesByChain } from "@/utils/utils";
+import { formatMaxFraction, formatPercent, formatUSD } from "@/utils/intl";
+import { useBalancesByChain } from "@/utils/utils";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -80,10 +81,8 @@ const AssetInput: FC<Props> = ({
   }, [asset, balances]);
 
   const formattedSelectedAssetBalance = useMemo(() => {
-    const { format } = new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 6,
-    });
-    return format(parseFloat(selectedAssetBalance ?? "0.0"));
+    const amount = parseFloat(selectedAssetBalance ?? "0.0");
+    return formatMaxFraction(amount, 6);
   }, [selectedAssetBalance]);
 
   const maxButtonDisabled = useMemo(() => {
@@ -194,10 +193,7 @@ const AssetInput: FC<Props> = ({
                   diffPercentage >= 0 ? "text-green-500" : "text-red-500",
                 )}
               >
-                {new Intl.NumberFormat("en-US", {
-                  style: "percent",
-                  maximumFractionDigits: 2,
-                }).format(diffPercentage)}
+                {formatPercent(diffPercentage)}
               </p>
             ) : null}
             <div className="flex-grow" />
