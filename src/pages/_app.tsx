@@ -2,20 +2,19 @@ import "@/styles/globals.css";
 import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
-import * as RadixToast from "@radix-ui/react-toast";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { ComponentProps } from "react";
+import { Toaster } from "react-hot-toast";
 import { WagmiConfig } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
 import { BuildInfo } from "@/components/BuildInfo";
 import MainLayout from "@/components/MainLayout";
 import { AssetsProvider } from "@/context/assets";
-import { ToastProvider } from "@/context/toast";
 import { wallets } from "@/lib/cosmos-kit";
 import { queryClient } from "@/lib/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
@@ -42,34 +41,31 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Interchain transfers and swaps on any Cosmos chain"
         />
       </Head>
-      <main>
-        <PersistQueryClientProvider
-          client={queryClient}
-          persistOptions={{ persister }}
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister }}
+      >
+        <ChainProvider
+          chains={chains}
+          assetLists={assets}
+          wallets={wallets}
+          throwErrors={false}
         >
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={wallets}
-            throwErrors={false}
-          >
-            <WagmiConfig config={wagmiConfig}>
-              <SkipProvider>
-                <AssetsProvider>
-                  <RadixToast.ToastProvider>
-                    <ToastProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                    </ToastProvider>
-                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                  </RadixToast.ToastProvider>
-                </AssetsProvider>
-              </SkipProvider>
-            </WagmiConfig>
-          </ChainProvider>
-        </PersistQueryClientProvider>
-      </main>
+          <WagmiConfig config={wagmiConfig}>
+            <SkipProvider>
+              <AssetsProvider>
+                <MainLayout>
+                  <Component {...pageProps} />
+                </MainLayout>
+                <Toaster
+                  position="bottom-center"
+                  toastOptions={{ duration: 1000 * 60 }}
+                />
+              </AssetsProvider>
+            </SkipProvider>
+          </WagmiConfig>
+        </ChainProvider>
+      </PersistQueryClientProvider>
       <Analytics />
       <BuildInfo />
     </>

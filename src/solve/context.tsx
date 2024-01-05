@@ -70,11 +70,7 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
   });
 
   return (
-    <SkipContext.Provider
-      value={{
-        skipClient: skipClient,
-      }}
-    >
+    <SkipContext.Provider value={{ skipClient }}>
       {children}
     </SkipContext.Provider>
   );

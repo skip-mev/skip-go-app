@@ -2,9 +2,8 @@ import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { FC, Fragment, useMemo } from "react";
 
-import Toast from "@/components/Toast";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -47,8 +46,6 @@ const AssetInput: FC<Props> = ({
   showSlippage,
   context,
 }) => {
-  const [isError, setIsError] = useState(false);
-
   const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
 
   const assets = useMemo(() => {
@@ -268,11 +265,6 @@ const AssetInput: FC<Props> = ({
           </div>
         </div>
       </div>
-      <Toast
-        open={isError}
-        setOpen={setIsError}
-        description={`There was an error loading assets for ${chain?.chainName}. Please try again.`}
-      />
     </Fragment>
   );
 };

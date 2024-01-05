@@ -2,11 +2,10 @@ import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 import { FC, Fragment, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useAccount } from "wagmi";
 
-import Toast from "@/components/Toast";
 import { useSettingsStore } from "@/context/settings";
-import { useToast } from "@/context/toast";
 import {
   addTxHistory,
   addTxStatus,
@@ -44,17 +43,12 @@ const TransactionDialogContent: FC<Props> = ({
   insufficentBalance,
   transactionCount,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { toast } = useToast();
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
   const { address: evmAddress } = useAccount();
 
   const [transacting, setTransacting] = useState(false);
-
-  const [isError, setIsError] = useState(false);
-  const [txError, setTxError] = useState<string | null>(null);
 
   const [txComplete, setTxComplete] = useState(false);
   const [numberOfBroadcastedTransactions, setNumberOfBroadcastedTransactions] =
@@ -172,18 +166,13 @@ const TransactionDialogContent: FC<Props> = ({
         },
       });
 
-      toast(
-        "Transaction Successful",
-        "Your transaction was successful",
-        "success",
-      );
-
       setTxComplete(true);
     } catch (err: unknown) {
-      console.error(err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(err);
+      }
       if (err instanceof Error) {
-        setTxError(err.message);
-        setIsError(true);
+        toast.error(err.message, { duration: Infinity });
       }
       failTxHistory(historyId);
       setTxStatuses((statuses) => {
@@ -378,7 +367,6 @@ const TransactionDialogContent: FC<Props> = ({
           </AlertCollapse.Root>
         )}
       </div>
-      <Toast open={isError} setOpen={setIsError} description={txError ?? ""} />
     </Fragment>
   );
 };
