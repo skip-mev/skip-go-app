@@ -6,15 +6,14 @@ import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persist
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
-import Head from "next/head";
 import { ComponentProps } from "react";
 import { Toaster } from "react-hot-toast";
 import { WagmiConfig } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
-import { BuildInfo } from "@/components/BuildInfo";
-import MainLayout from "@/components/MainLayout";
 import { DefaultSeo } from "@/components/DefaultSeo";
+import Header from "@/components/Header";
+import SkipBanner from "@/components/SkipBanner";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
 import { queryClient } from "@/lib/react-query";
@@ -34,22 +33,25 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <DefaultSeo />
+      <Analytics />
       <PersistQueryClientProvider
         client={queryClient}
         persistOptions={{ persister }}
       >
         <ChainProvider
-          chains={chains}
           assetLists={assets}
-          wallets={wallets}
+          chains={chains}
           throwErrors={false}
+          wallets={wallets}
         >
           <WagmiConfig config={wagmiConfig}>
             <SkipProvider>
               <AssetsProvider>
-                <MainLayout>
+                <main className="min-h-screen flex flex-col items-center relative">
+                  <SkipBanner />
+                  <Header />
                   <Component {...pageProps} />
-                </MainLayout>
+                </main>
                 <Toaster
                   position="bottom-center"
                   toastOptions={{ duration: 1000 * 10 }}
@@ -59,8 +61,6 @@ export default function App({ Component, pageProps }: AppProps) {
           </WagmiConfig>
         </ChainProvider>
       </PersistQueryClientProvider>
-      <Analytics />
-      <BuildInfo />
     </>
   );
 }

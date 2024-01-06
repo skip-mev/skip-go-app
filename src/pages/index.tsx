@@ -184,18 +184,12 @@ export default function Home() {
   }, 1000 * 2);
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white shadow-xl rounded-3xl p-6 py-6 relative">
+    <div className="flex flex-col items-center justify-center sm:pb-8">
+      <div className="bg-white shadow-xl sm:rounded-3xl p-6 relative w-screen sm:max-w-[450px]">
         <WalletModalProvider>
           <SwapWidget />
         </WalletModalProvider>
       </div>
-      <style jsx global>{`
-        html {
-          overflow-x: hidden;
-          overflow-y: scroll;
-        }
-      `}</style>
     </div>
   );
 }
