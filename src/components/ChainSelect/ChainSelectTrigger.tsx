@@ -13,7 +13,7 @@ const ChainSelectTrigger = forwardRef<HTMLButtonElement, Props>(
     return (
       <button
         className={clsx(
-          "flex items-center p-4 w-full",
+          "flex items-center px-4 py-2 sm:py-4 w-full",
           "font-semibold text-left whitespace-nowrap bg-neutral-100 rounded-md transition-colors",
           "border border-neutral-200 hover:border-neutral-300",
         )}

@@ -28,7 +28,7 @@ const AssetSelect: FC<Props> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <button
-          className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center gap-2 p-4 w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center gap-2 px-4 py-2 sm:py-4 w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!assets || assets.length === 0}
         >
           {asset && (
