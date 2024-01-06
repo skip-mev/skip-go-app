@@ -19,12 +19,13 @@ export const SimpleTooltip = (props: Props) => {
       <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content
+          sideOffset={4}
           {..._content}
           className={clsx(
             "rounded-md bg-white px-4 py-2 leading-none",
             "select-none shadow shadow-neutral-500/50",
             "text-sm",
-            "animate-in",
+            "animate-slide-up-and-fade",
             _content?.className,
           )}
         >
