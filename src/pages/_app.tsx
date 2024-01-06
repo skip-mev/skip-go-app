@@ -1,5 +1,5 @@
+import "@fontsource/jost/latin.css";
 import "@/styles/globals.css";
-import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
