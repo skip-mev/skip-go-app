@@ -1,10 +1,14 @@
 import { Chain as SkipChain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 
+import { chainIdToName } from "@/chains";
 import { chainIdToPrettyName } from "@/chains/pretty";
 import { useSkipClient } from "@/solve";
 
-export type Chain = SkipChain & { prettyName: string };
+export type Chain = SkipChain & {
+  prettyName: string;
+  registryChainName: string;
+};
 
 export type UseChainsQueryArgs<T = Chain[]> = {
   select?: (arr?: Chain[]) => T;
@@ -27,6 +31,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
           return {
             ...chain,
             prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
+            registryChainName: chainIdToName[chain.chainID],
           };
         })
         .sort((chainA, chainB) => {

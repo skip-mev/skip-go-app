@@ -7,7 +7,7 @@ import { useChainByID } from "@/hooks/useChains";
 export function useAccount(chainID: string) {
   const { data: chain } = useChainByID(chainID);
 
-  const cosmosChain = useChain(chain?.chainName ?? "cosmoshub");
+  const cosmosChain = useChain(chain?.registryChainName ?? "cosmoshub");
 
   const wagmiAccount = useWagmiAccount();
 
