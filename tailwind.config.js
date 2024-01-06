@@ -15,7 +15,7 @@ module.exports = {
       animation: {
         "accordion-open": `accordion-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "accordion-closed": `accordion-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
-        "banner-rotate": `banner-rotate 10s linear infinite`,
+        "banner-rotate": `banner-rotate 20s linear infinite`,
         "collapsible-open": `collapsible-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "collapsible-closed": `collapsible-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "fade-zoom-in": `fade-zoom-in 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
@@ -23,6 +23,7 @@ module.exports = {
         "slide-right-and-fade": `slide-right-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
         "slide-down-and-fade": `slide-down-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
         "slide-left-and-fade": `slide-left-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "spin-swap": `spin 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.27)`,
       },
       fontFamily: {
         sans: ["Jost", ...defaultTheme.fontFamily.sans],

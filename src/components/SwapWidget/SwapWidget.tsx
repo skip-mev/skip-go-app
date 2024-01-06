@@ -93,6 +93,15 @@ export const SwapWidget: FC = () => {
     });
   }, []);
 
+  const invertButtonRef = useRef<ElementRef<"button">>(null);
+  useEffect(() => {
+    const ref = invertButtonRef.current;
+    if (!ref) return;
+    const listener = () => ref.setAttribute("data-swap", "false");
+    ref.addEventListener("animationend", listener);
+    return () => ref.removeEventListener("animationend", listener);
+  }, []);
+
   return (
     <UsdDiff.Provider>
       <Tooltip.Provider>
@@ -142,12 +151,19 @@ export const SwapWidget: FC = () => {
             <div className="absolute inset-0 flex items-center justify-center">
               <button
                 className={clsx(
-                  "bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform",
+                  "bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-105 hover:rotate-3 transition-transform",
                   "disabled:hover:scale-100 disabled:bg-gray-700 disabled:cursor-not-allowed",
+                  "data-[swap=true]:animate-spin-swap data-[swap=true]:pointer-events-none",
                 )}
                 disabled={!destinationChain || !destinationAsset}
                 onClick={() => {
-                  if (!destinationChain || !destinationAsset) return;
+                  if (
+                    !destinationChain ||
+                    !destinationAsset ||
+                    !invertButtonRef.current
+                  )
+                    return;
+                  invertButtonRef.current.setAttribute("data-swap", "true");
                   setFormValues({
                     sourceChain: destinationChain,
                     sourceAsset: destinationAsset,
@@ -159,6 +175,7 @@ export const SwapWidget: FC = () => {
                   });
                 }}
                 data-testid="swap-button"
+                ref={invertButtonRef}
               >
                 <ArrowsUpDownIcon className="w-4 h-4" />
               </button>
