@@ -1,10 +1,9 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
-import { FC, useEffect } from "react";
+import { ElementRef, FC, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
 
-import { useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
@@ -79,8 +78,6 @@ export const SwapWidget: FC = () => {
     !!sourceChain &&
     !!destinationChain &&
     sourceChain.chainType !== destinationChain.chainType;
-
-  const [isSwapDetailsOpen] = useDisclosureKey("swapDetailsCollapsible");
 
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();
@@ -213,7 +210,7 @@ export const SwapWidget: FC = () => {
               }}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
-              showSlippage={!isSwapDetailsOpen}
+              showBalance
               context="dest"
             />
           </div>

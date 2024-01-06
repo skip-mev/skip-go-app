@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { formatUnits, toBigInt } from "ethers";
 import { matchSorter } from "match-sorter";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AssetWithMetadata } from "@/context/assets";
 import { useWindowSize } from "@/hooks/useWindowSize";
@@ -16,13 +15,13 @@ interface Props {
   showChainInfo?: boolean;
 }
 
-const AssetSelectContent: FC<Props> = ({
+function AssetSelectContent({
   assets,
   balances,
   onChange,
   onClose,
   showChainInfo,
-}) => {
+}: Props) {
   const { width } = useWindowSize();
 
   const inputEl = useRef<HTMLInputElement>(null);
@@ -96,17 +95,9 @@ const AssetSelectContent: FC<Props> = ({
         <div className="h-full overflow-y-auto scrollbar-hide">
           {filteredAssets?.map((asset) => (
             <button
-              className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
               key={`${asset.chainID}-${asset.denom}`}
-              onClick={() => {
-                onClose();
-
-                if (!onChange) {
-                  return;
-                }
-
-                onChange(asset);
-              }}
+              className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
+              onClick={() => (onClose(), onChange?.(asset))}
             >
               <img
                 alt={asset.symbol}
@@ -140,6 +131,6 @@ const AssetSelectContent: FC<Props> = ({
       </div>
     </div>
   );
-};
+}
 
 export default AssetSelectContent;

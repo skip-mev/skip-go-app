@@ -76,7 +76,7 @@ export const SwapDetails = ({
         >
           {({ left, right, conversion, toggle }) => (
             <div>
-              <button className="mr-2" onClick={toggle}>
+              <button className="mr-2 tabular-nums" onClick={toggle}>
                 1 {left.symbol} = {formatMaxFraction(conversion)} {right.symbol}
               </button>
               <span className="text-neutral-400 tabular-nums">
@@ -92,6 +92,11 @@ export const SwapDetails = ({
           )}
         </ConversionRate>
         <div className="flex-grow" />
+        {!open && (
+          <span className="text-neutral-400 tabular-nums">
+            Max Slippage: {slippage}%
+          </span>
+        )}
         <Collapsible.Trigger
           className={clsx(
             "flex items-center text-xs text-neutral-400 relative",

@@ -143,24 +143,21 @@ export function useSwapWidget() {
   );
 
   const insufficientBalance = useMemo(() => {
-    if (!sourceAsset || !balances) {
-      return false;
-    }
+    const asset = direction === "swap-in" ? sourceAsset : destinationAsset;
 
-    const parsedAmountIn = parseFloat(amountIn);
+    if (!asset || !balances) return false;
 
-    if (isNaN(parsedAmountIn)) {
-      return false;
-    }
-
-    const balanceStr = balances[sourceAsset.denom] ?? "0";
-
-    const balance = parseFloat(
-      ethers.formatUnits(balanceStr, sourceAsset.decimals),
+    const parsedAmount = parseFloat(
+      direction === "swap-in" ? amountIn : amountOut,
     );
 
-    return parsedAmountIn > balance;
-  }, [balances, amountIn, sourceAsset]);
+    if (isNaN(parsedAmount)) return false;
+
+    const balanceStr = balances[asset.denom] ?? "0";
+    const balance = parseFloat(ethers.formatUnits(balanceStr, asset.decimals));
+
+    return parsedAmount > balance;
+  }, [amountIn, amountOut, balances, direction, sourceAsset, destinationAsset]);
 
   const { chain: currentEvmChain } = useNetwork();
 
@@ -481,7 +478,9 @@ function findEquivalentAsset(
 function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
   if (!asset || !amount) return "0";
   try {
-    return new BigNumber(amount).shiftedBy(asset.decimals ?? 6).toFixed(0);
+    return new BigNumber(amount.replace(/,/g, ""))
+      .shiftedBy(asset.decimals ?? 6)
+      .toFixed(0);
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
       console.error(err);
@@ -493,7 +492,7 @@ function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
 function parseAmountWei(amount?: string, decimals = 6) {
   if (!amount) return "0";
   try {
-    return ethers.formatUnits(amount, decimals ?? 6);
+    return ethers.formatUnits(amount.replace(/,/g, ""), decimals ?? 6);
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
       console.error(err);
