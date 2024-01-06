@@ -35,7 +35,7 @@ export const JsonDialog = () => {
           "text-sm px-2 py-1 border rounded-lg transition-colors",
           "flex items-center justify-center space-x-1 flex-grow",
           {
-            "bg-gray-100 hover:bg-gray-200": !copied,
+            "bg-neutral-100 hover:bg-neutral-200": !copied,
             "bg-green-100 hover:bg-green-200": copied,
             "border-green-400 text-green-900": copied,
           },

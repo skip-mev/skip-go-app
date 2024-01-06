@@ -37,7 +37,7 @@ export const PriceImpactWarning = ({
             <p className="font-bold text-lg text-center text-red-500 mb-2">
               {title}
             </p>
-            <p className="text-center text-lg px-4 leading-snug text-gray-500">
+            <p className="text-center text-lg px-4 leading-snug text-neutral-500">
               {message} Do you want to continue?
             </p>
           </div>
@@ -52,7 +52,7 @@ export const PriceImpactWarning = ({
               Go Back
             </button>
             <button
-              className="border border-gray-400 text-gray-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-gray-50"
+              className="border border-neutral-400 text-neutral-500 font-semibold py-4 rounded-md w-full transition-colors hover:bg-neutral-50"
               onClick={() => control.close()}
             >
               Continue

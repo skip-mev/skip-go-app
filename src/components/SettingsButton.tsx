@@ -14,7 +14,7 @@ export const SettingsButton = ({
       <Tooltip.Trigger asChild>
         <button
           className={clsx(
-            "p-2 rounded-full text-black/80 hover:text-black/100 hover:bg-gray-100",
+            "p-2 rounded-full text-black/80 hover:text-black/100 hover:bg-neutral-100",
             "focus:outline-none transition-colors",
             className,
           )}

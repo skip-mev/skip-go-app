@@ -1,5 +1,3 @@
-import { FC } from "react";
-
 interface Props {
   address: string;
   onClick: () => void;
@@ -7,15 +5,15 @@ interface Props {
   walletLogo?: string;
 }
 
-export const ConnectedWalletButton: FC<Props> = ({
+export function ConnectedWalletButton({
   address,
   onClick,
   walletLogo,
   walletName,
-}) => {
+}: Props) {
   return (
     <button
-      className="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 rounded-lg py-2 px-2.5 focus:outline-none transition-colors"
+      className="flex items-center gap-2 border border-neutral-300 hover:bg-neutral-50 rounded-lg py-2 px-2.5 focus:outline-none transition-colors"
       onClick={onClick}
     >
       {walletLogo && (
@@ -26,4 +24,4 @@ export const ConnectedWalletButton: FC<Props> = ({
       </span>
     </button>
   );
-};
+}
