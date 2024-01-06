@@ -1,7 +1,7 @@
 import Link, { LinkProps } from "next/link";
 import { ComponentPropsWithoutRef, useMemo } from "react";
 
-type Props = LinkProps &
+export type AdaptiveLinkProps = LinkProps &
   Omit<ComponentPropsWithoutRef<"a">, "href"> & { isExternal?: boolean };
 
 export function AdaptiveLink({
@@ -10,7 +10,7 @@ export function AdaptiveLink({
   rel = "",
   target,
   ...props
-}: Props) {
+}: AdaptiveLinkProps) {
   const isActuallyExternal = useMemo(() => {
     if (typeof isExternal === "boolean") {
       return isExternal;
