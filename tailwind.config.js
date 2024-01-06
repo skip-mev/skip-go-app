@@ -15,19 +15,14 @@ module.exports = {
       animation: {
         "accordion-open": `accordion-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "accordion-closed": `accordion-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
+        "banner-rotate": `banner-rotate 10s linear infinite`,
         "collapsible-open": `collapsible-open 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
         "collapsible-closed": `collapsible-closed 150ms cubic-bezier(0.87, 0, 0.13, 1)`,
-        "slide-up-and-fade": `slide-up-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
-        "slide-right-and-fade": `slide-right-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
-        "slide-down-and-fade": `slide-down-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
-        "slide-left-and-fade": `slide-left-and-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)`,
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": `conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))`,
-        "site-bg": "url('/site-bg.svg')",
-        "site-bg-2": "url('/site-bg-2.svg')",
-        squiggle: "url('/squiggle.svg')",
+        "fade-zoom-in": `fade-zoom-in 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-up-and-fade": `slide-up-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-right-and-fade": `slide-right-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-down-and-fade": `slide-down-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
+        "slide-left-and-fade": `slide-left-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
       },
       fontFamily: {
         sans: ["Jost", ...defaultTheme.fontFamily.sans],
@@ -41,6 +36,10 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "banner-rotate": {
+          from: { transform: "translateX(-975px)" },
+          to: { transform: "translateX(-142px)" },
+        },
         "collapsible-open": {
           from: { height: 0 },
           to: { height: "var(--radix-collapsible-content-height)" },
@@ -48,6 +47,10 @@ module.exports = {
         "collapsible-closed": {
           from: { height: "var(--radix-collapsible-content-height)" },
           to: { height: 0 },
+        },
+        "fade-zoom-in": {
+          from: { opacity: 0, transform: "scale(0.9)" },
+          to: { opacity: 1, transform: "scale(1)" },
         },
         "slide-up-and-fade": {
           from: { opacity: 0, transform: "translateY(2px)" },
@@ -79,6 +82,20 @@ module.exports = {
           {
             content: "'Show Details'",
           },
+        ".number-input-arrows-hide": {
+          "&, &::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+            "-moz-appearance": "textfield",
+            "-webkit-appearance": "none",
+            margin: 0,
+          },
+        },
+        ".scrollbar-hide": {
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
       });
     }),
   ],
