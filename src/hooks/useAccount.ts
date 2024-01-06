@@ -1,13 +1,15 @@
 import { useChain } from "@cosmos-kit/react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { EVM_WALLET_LOGOS } from "@/constants/wagmi";
+import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { useChainByID } from "@/hooks/useChains";
 
 export function useAccount(chainID: string) {
   const { data: chain } = useChainByID(chainID);
 
-  const cosmosChain = useChain(chain?.registryChainName ?? "cosmoshub");
+  const cosmosChain = useChain(
+    chain && chain.chainType === "cosmos" ? chain.chainName : "cosmoshub",
+  );
 
   const wagmiAccount = useWagmiAccount();
 
@@ -20,7 +22,10 @@ export function useAccount(chainID: string) {
             walletName: wagmiAccount.connector.id,
             walletPrettyName: wagmiAccount.connector.name,
             walletInfo: {
-              logo: EVM_WALLET_LOGOS[wagmiAccount.connector.id],
+              logo:
+                wagmiAccount.connector.id === "injected"
+                  ? INJECTED_EVM_WALLET_LOGOS[wagmiAccount.connector.name]
+                  : EVM_WALLET_LOGOS[wagmiAccount.connector.id],
             },
           }
         : undefined,
