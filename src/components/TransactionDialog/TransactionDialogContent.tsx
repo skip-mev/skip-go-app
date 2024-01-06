@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { FC, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount } from "wagmi";
 
@@ -37,12 +37,12 @@ interface Props {
   onClose: () => void;
 }
 
-const TransactionDialogContent: FC<Props> = ({
+function TransactionDialogContent({
   route,
   onClose,
   insufficentBalance,
   transactionCount,
-}) => {
+}: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -214,7 +214,7 @@ const TransactionDialogContent: FC<Props> = ({
   }
 
   return (
-    <div className="flex flex-col h-full px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
+    <div className="flex flex-col h-full p-6 space-y-6 overflow-y-auto scrollbar-hide">
       <div>
         <div className="flex items-center gap-4">
           <button
@@ -229,16 +229,7 @@ const TransactionDialogContent: FC<Props> = ({
       <div className="border border-neutral-300 rounded-xl p-4">
         <RouteDisplay route={route} />
       </div>
-      <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-        <p className="flex-1">
-          This route requires{" "}
-          <span className="text-white">
-            {transactionCount} Transaction
-            {transactionCount > 1 ? "s" : ""}
-          </span>{" "}
-          to complete
-        </p>
-      </div>
+
       <div className="flex-1 space-y-6">
         {txStatuses.map(({ status, explorerLink, txHash }, i) => (
           <div key={`tx-${i}`} className="flex items-center gap-4">
@@ -293,6 +284,38 @@ const TransactionDialogContent: FC<Props> = ({
         ))}
       </div>
       <div className="space-y-4">
+        {estimatedFinalityTime !== "" && (
+          <AlertCollapse.Root type="info">
+            <AlertCollapse.Trigger>
+              EVM bridging finality time is {estimatedFinalityTime}
+            </AlertCollapse.Trigger>
+            <AlertCollapse.Content>
+              <p>
+                This swap contains at least one EVM chain, so it might take
+                longer. Read more about{" "}
+                <a
+                  href={HREF_COMMON_FINALITY_TIMES}
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  common finality times
+                </a>
+                .
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
+        )}
+        <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+          <p className="flex-1">
+            This route requires{" "}
+            <span className="text-white">
+              {transactionCount} Transaction
+              {transactionCount > 1 ? "s" : ""}
+            </span>{" "}
+            to complete
+          </p>
+        </div>
         {transacting ? (
           <button
             className={clsx(
@@ -349,31 +372,9 @@ const TransactionDialogContent: FC<Props> = ({
           </p>
         )}
       </div>
-      {estimatedFinalityTime !== "" && (
-        <AlertCollapse.Root type="info">
-          <AlertCollapse.Trigger>
-            EVM bridging finality time is {estimatedFinalityTime}
-          </AlertCollapse.Trigger>
-          <AlertCollapse.Content>
-            <p>
-              This swap contains at least one EVM chain, so it might take
-              longer. Read more about{" "}
-              <a
-                href={HREF_COMMON_FINALITY_TIMES}
-                className="underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                common finality times
-              </a>
-              .
-            </p>
-          </AlertCollapse.Content>
-        </AlertCollapse.Root>
-      )}
     </div>
   );
-};
+}
 
 const HREF_COMMON_FINALITY_TIMES = `https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions`;
 
