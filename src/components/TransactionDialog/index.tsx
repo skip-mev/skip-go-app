@@ -65,7 +65,7 @@ const TransactionDialog: FC<Props> = ({
           Preview Route
         </button>
         {isOpen && (
-          <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+          <div className="absolute inset-0 bg-white rounded-3xl z-[999] animate-fade-zoom-in">
             {route && (
               <TransactionDialogContent
                 route={route}

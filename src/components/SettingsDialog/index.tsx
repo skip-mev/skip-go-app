@@ -17,7 +17,7 @@ export const SettingsDialog = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+    <div className="absolute inset-0 bg-white rounded-3xl z-[999] animate-fade-zoom-in">
       <div className="h-full px-4 py-6 overflow-y-auto scrollbar-hide">
         <div className="flex items-center gap-4 pb-2">
           <button
