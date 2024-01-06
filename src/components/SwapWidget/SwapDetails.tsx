@@ -77,7 +77,11 @@ export const SwapDetails = ({
           {({ left, right, conversion, toggle }) => (
             <div>
               <button className="mr-2 tabular-nums" onClick={toggle}>
-                1 {left.symbol} = {formatMaxFraction(conversion)} {right.symbol}
+                1 {(left.symbol ?? "").replace(/\sEthereum$/, "")} ={" "}
+                {conversion.toLocaleString("en-US", {
+                  maximumFractionDigits: 4,
+                })}{" "}
+                {(right.symbol ?? "").replace(/\sEthereum$/, "")}
               </button>
               <span className="text-neutral-400 tabular-nums">
                 <UsdValue
@@ -94,7 +98,7 @@ export const SwapDetails = ({
         <div className="flex-grow" />
         {!open && (
           <span className="text-neutral-400 tabular-nums">
-            Max Slippage: {slippage}%
+            Max Slip: {slippage}%
           </span>
         )}
         <Collapsible.Trigger

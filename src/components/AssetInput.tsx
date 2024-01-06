@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
-import { ethers } from "ethers";
-import { FC, MouseEventHandler, useMemo } from "react";
+import { formatUnits } from "ethers";
+import { MouseEventHandler, useMemo } from "react";
 import toast from "react-hot-toast";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
@@ -30,7 +30,7 @@ interface Props {
   context?: "src" | "dest";
 }
 
-const AssetInput: FC<Props> = ({
+function AssetInput({
   amount,
   amountUSD,
   diffPercentage = 0,
@@ -42,7 +42,7 @@ const AssetInput: FC<Props> = ({
   onChainChange,
   showBalance,
   context,
-}) => {
+}: Props) {
   const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
 
   const assets = useMemo(() => {
@@ -57,12 +57,7 @@ const AssetInput: FC<Props> = ({
 
   const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
 
-  const { data: balances } = useBalancesByChain(
-    address,
-    chain,
-    assets,
-    showBalance,
-  );
+  const { data: balances } = useBalancesByChain(address, chain, assets);
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return 0;
@@ -70,12 +65,13 @@ const AssetInput: FC<Props> = ({
     const balanceWei = balances[asset.denom];
     if (!balanceWei) return 0;
 
-    return parseFloat(ethers.formatUnits(balanceWei, asset.decimals));
+    return parseFloat(formatUnits(balanceWei, asset.decimals));
   }, [asset, balances]);
 
   const formattedSelectedAssetBalance = useMemo(() => {
     return selectedAssetBalance.toLocaleString("en-US", {
       minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
     });
   }, [selectedAssetBalance]);
 
@@ -93,14 +89,15 @@ const AssetInput: FC<Props> = ({
       return;
     }
 
-    const feeDenom = getFeeDenom(chain.chainID)!;
-    const { gasPrice } = chain.feeAssets.find(
-      (a) => a.denom === feeDenom.denom,
-    )!;
+    const feeDenom = getFeeDenom(chain.chainID);
 
     // if selected asset is the fee denom, subtract the fee
-    if (feeDenom.denom === asset.denom) {
+    if (feeDenom && feeDenom.denom === asset.denom) {
       const { gas } = useSettingsStore.getState();
+
+      const { gasPrice } = chain.feeAssets.find(
+        (a) => a.denom === feeDenom.denom,
+      )!;
 
       const fee = new BigNumber(gasPrice.average)
         .multipliedBy(gas)
@@ -130,7 +127,7 @@ const AssetInput: FC<Props> = ({
         "hover:border-neutral-300 hover:shadow-sm",
       )}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
         <div>
           <ChainSelect chain={chain} chains={chains} onChange={onChainChange} />
         </div>
@@ -228,10 +225,7 @@ const AssetInput: FC<Props> = ({
           {showBalance && address && asset && (
             <div className="text-neutral-400 text-sm flex items-center">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip
-                label={`${selectedAssetBalance} ${asset.symbol}`}
-                delayDuration={0}
-              >
+              <SimpleTooltip label={`${selectedAssetBalance} ${asset.symbol}`}>
                 <div
                   className={clsx(
                     "max-w-[16ch] truncate mr-2 tabular-nums",
@@ -257,6 +251,6 @@ const AssetInput: FC<Props> = ({
       </div>
     </div>
   );
-};
+}
 
 export default AssetInput;

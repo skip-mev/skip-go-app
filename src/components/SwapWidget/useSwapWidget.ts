@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { ethers } from "ethers";
+import { ethers, formatUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 import {
@@ -105,18 +105,18 @@ export function useSwapWidget() {
   useEffect(() => {
     if (!routeResponse || routeLoading) return;
 
-    const newAmount =
-      direction === "swap-in"
-        ? routeResponse.amountOut
-        : routeResponse.amountIn;
+    const isSwapIn = direction === "swap-in";
 
-    const formattedNewAmount =
-      direction === "swap-in"
-        ? parseAmountWei(newAmount, destinationAsset?.decimals)
-        : parseAmountWei(newAmount, sourceAsset?.decimals);
+    const newAmount = isSwapIn
+      ? routeResponse.amountOut
+      : routeResponse.amountIn;
+
+    const formattedNewAmount = isSwapIn
+      ? parseAmountWei(newAmount, destinationAsset?.decimals)
+      : parseAmountWei(newAmount, sourceAsset?.decimals);
 
     useFormValuesStore.setState(
-      direction === "swap-in"
+      isSwapIn
         ? { amountOut: formattedNewAmount }
         : { amountIn: formattedNewAmount },
     );
@@ -143,21 +143,19 @@ export function useSwapWidget() {
   );
 
   const insufficientBalance = useMemo(() => {
-    const asset = direction === "swap-in" ? sourceAsset : destinationAsset;
+    const asset = sourceAsset;
 
     if (!asset || !balances) return false;
 
-    const parsedAmount = parseFloat(
-      direction === "swap-in" ? amountIn : amountOut,
-    );
+    const parsedAmount = parseFloat(amountIn);
 
     if (isNaN(parsedAmount)) return false;
 
     const balanceStr = balances[asset.denom] ?? "0";
-    const balance = parseFloat(ethers.formatUnits(balanceStr, asset.decimals));
+    const balance = parseFloat(formatUnits(balanceStr, asset.decimals));
 
     return parsedAmount > balance;
-  }, [amountIn, amountOut, balances, direction, sourceAsset, destinationAsset]);
+  }, [amountIn, balances, sourceAsset]);
 
   const { chain: currentEvmChain } = useNetwork();
 
