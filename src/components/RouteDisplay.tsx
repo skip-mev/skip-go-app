@@ -402,7 +402,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   return (
     <div className="relative h-full">
-      <div className="absolute w-14 inset-y-0 z-0 py-7 flex justify-center items-center">
+      <div className="absolute w-14 inset-y-0 py-7 flex justify-center items-center">
         <div className="w-0.5 h-full bg-neutral-200"></div>
       </div>
       <div className="relative flex flex-col gap-4 justify-between h-full">

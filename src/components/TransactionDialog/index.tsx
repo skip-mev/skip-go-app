@@ -1,5 +1,5 @@
 import { RouteResponse } from "@skip-router/core";
-import { FC, Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
@@ -18,7 +18,7 @@ interface Props {
   routeWarningTitle?: string;
 }
 
-const TransactionDialog: FC<Props> = ({
+function TransactionDialog({
   isLoading,
   route,
   insufficientBalance,
@@ -26,7 +26,7 @@ const TransactionDialog: FC<Props> = ({
   shouldShowPriceImpactWarning,
   routeWarningMessage,
   routeWarningTitle,
-}) => {
+}: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -65,7 +65,7 @@ const TransactionDialog: FC<Props> = ({
           Preview Route
         </button>
         {isOpen && (
-          <div className="absolute inset-0 bg-white rounded-3xl z-[999] animate-fade-zoom-in">
+          <div className="absolute inset-0 bg-white rounded-3xl">
             {route && (
               <TransactionDialogContent
                 route={route}
@@ -84,6 +84,6 @@ const TransactionDialog: FC<Props> = ({
       />
     </Fragment>
   );
-};
+}
 
 export default TransactionDialog;

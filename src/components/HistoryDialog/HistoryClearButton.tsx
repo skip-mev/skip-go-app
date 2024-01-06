@@ -35,7 +35,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
           <Tooltip.Content
             className={clsx(
               "rounded-md bg-[#fbeef1] px-4 py-2 leading-none",
-              "select-none shadow z-[9999]",
+              "select-none shadow",
               "text-sm text-[#FF486E] font-medium",
             )}
           >

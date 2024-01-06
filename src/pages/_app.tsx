@@ -47,8 +47,8 @@ export default function App({ Component, pageProps }: AppProps) {
           <WagmiConfig config={wagmiConfig}>
             <SkipProvider>
               <AssetsProvider>
-                <main className="min-h-screen flex flex-col items-center relative">
-                  <SkipBanner />
+                <main className="min-h-screen flex flex-col items-center relative sm:pt-11">
+                  <SkipBanner className="z-50 top-0 inset-x-0 sm:fixed" />
                   <Header />
                   <Component {...pageProps} />
                 </main>

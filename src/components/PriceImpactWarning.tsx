@@ -16,7 +16,7 @@ export const PriceImpactWarning = ({
   if (!isOpen || title === "") return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+    <div className="absolute inset-0 bg-white rounded-3xl">
       <div className="h-full px-4 py-6 overflow-y-auto scrollbar-hide">
         <div className="h-full flex flex-col">
           <div className="flex-1 pt-8">

@@ -14,7 +14,6 @@ interface Props {
 
 const ChainSelect: FC<Props> = ({ chain, chains, onChange = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Fragment>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

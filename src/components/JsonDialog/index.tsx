@@ -28,7 +28,7 @@ export const JsonDialog = () => {
   if (!state) return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999] overflow-hidden">
+    <div className="absolute inset-0 bg-white rounded-3xl overflow-hidden">
       <button
         className={clsx(
           "absolute top-5 right-4",

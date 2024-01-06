@@ -22,7 +22,7 @@ export const SimpleTooltip = (props: Props) => {
           {..._content}
           className={clsx(
             "rounded-md bg-white px-4 py-2 leading-none",
-            "select-none shadow z-[9999] shadow-neutral-500/50",
+            "select-none shadow shadow-neutral-500/50",
             "text-sm",
             "animate-in",
             _content?.className,

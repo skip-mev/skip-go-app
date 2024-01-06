@@ -1,5 +1,5 @@
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { FC, PropsWithChildren, useRef } from "react";
+import { PropsWithChildren, useRef } from "react";
 
 import { DialogContext } from "./context";
 
@@ -8,7 +8,7 @@ interface Props extends PropsWithChildren {
   onOpenChange: (open: boolean) => void;
 }
 
-export const Dialog: FC<Props> = ({ children, open, onOpenChange }) => {
+export function Dialog({ children, open, onOpenChange }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   return (
@@ -19,4 +19,4 @@ export const Dialog: FC<Props> = ({ children, open, onOpenChange }) => {
       </RadixDialog.Root>
     </DialogContext.Provider>
   );
-};
+}

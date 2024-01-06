@@ -26,7 +26,7 @@ export const HistoryDialog = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999] animate-fade-zoom-in">
+    <div className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
       <div className="flex flex-col h-full px-4 py-6 space-y-2">
         <div className="flex items-center gap-4 pb-2">
           <button
