@@ -14,6 +14,7 @@ import { WagmiConfig } from "wagmi";
 import { getAssetLists, getChains } from "@/chains";
 import { BuildInfo } from "@/components/BuildInfo";
 import MainLayout from "@/components/MainLayout";
+import { DefaultSeo } from "@/components/DefaultSeo";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
 import { queryClient } from "@/lib/react-query";
@@ -32,15 +33,7 @@ const chains = getChains() as ChainProviderProps["chains"];
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Head>
-        <title>
-          ibc.fun | Interchain transfers and swaps on any Cosmos chain
-        </title>
-        <meta
-          name="description"
-          content="Interchain transfers and swaps on any Cosmos chain"
-        />
-      </Head>
+      <DefaultSeo />
       <PersistQueryClientProvider
         client={queryClient}
         persistOptions={{ persister }}
