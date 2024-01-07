@@ -72,7 +72,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
       ) : (
         <ScrollArea.Root
           className={clsx(
-            "overflow-hidden relative flex-grow",
+            "overflow-hidden relative flex-grow isolate",
             "before:absolute before:top-0 before:inset-x-0 before:h-2 before:z-10",
             "before:bg-gradient-to-b before:from-white before:to-transparent",
             "after:absolute after:bottom-0 after:inset-x-0 after:h-2 after:z-10",

@@ -77,7 +77,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
       )}
       <ScrollArea.Root
         className={clsx(
-          "overflow-hidden relative flex-grow",
+          "overflow-hidden relative flex-grow isolate",
           "before:absolute before:bottom-0 before:inset-x-0 before:h-2 before:z-10",
           "before:bg-gradient-to-t before:from-white before:to-transparent",
         )}

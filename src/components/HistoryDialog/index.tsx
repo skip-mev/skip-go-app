@@ -41,7 +41,7 @@ export const HistoryDialog = () => {
         </div>
         <ScrollArea.Root
           className={clsx(
-            "overflow-hidden -mx-4 relative",
+              "overflow-hidden -mx-4 relative isolate",
             "before:absolute before:bottom-0 before:inset-x-0 before:h-2 before:z-10",
             "before:bg-gradient-to-t before:from-white before:to-transparent",
           )}
