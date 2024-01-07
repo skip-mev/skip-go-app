@@ -1,4 +1,4 @@
-import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon, Cog6ToothIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -33,7 +33,7 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { slippage } = useSettingsStore();
+  const { gas, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -63,7 +63,12 @@ export const SwapDetails = ({
 
   return (
     <Collapsible.Root
-      className="border border-neutral-200 px-4 py-2 rounded-lg text-sm group"
+      className={clsx(
+        "px-4 py-2 rounded-lg text-sm group",
+        "border border-neutral-200 transition-[border,shadow]",
+        "hover:border-neutral-300 hover:shadow-sm",
+        "focus-within:border-neutral-300 focus-within:shadow-sm",
+      )}
       open={open}
       onOpenChange={control.set}
     >
@@ -96,17 +101,21 @@ export const SwapDetails = ({
           )}
         </ConversionRate>
         <div className="flex-grow" />
-        {!open && (
-          <span className="text-neutral-400 tabular-nums">
-            Max Slip: {slippage}%
-          </span>
-        )}
         <Collapsible.Trigger
           className={clsx(
-            "flex items-center text-xs text-neutral-400 relative",
+            "flex items-center text-xs relative gap-1",
             "before:absolute before:-inset-2 before:content-['']",
+            "text-neutral-400",
           )}
         >
+          <span
+            className={clsx(
+              "text-neutral-400 tabular-nums transition-opacity",
+              open ? "opacity-0" : "opacity-100",
+            )}
+          >
+            Slippage: {slippage}%
+          </span>
           <ChevronDownIcon
             className={clsx(
               "w-4 h-4 transition",
@@ -132,36 +141,46 @@ export const SwapDetails = ({
         >
           {priceImpactPercent ? (
             <Fragment>
-              <dt>
-                <span
-                  className={clsx(
-                    priceImpactThresholdReached ? "text-red-500" : undefined,
-                  )}
-                >
-                  Price Impact
-                </span>
+              <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>
+                Price Impact
               </dt>
-              <dd
-                className={clsx(
-                  priceImpactThresholdReached ? "text-red-500" : undefined,
-                )}
-              >
+              <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>
                 {formatPercent(priceImpactPercent)}
               </dd>
             </Fragment>
           ) : null}
-          <dt>
-            Max Slippage{" "}
-            <SimpleTooltip label="Click to change max slippage">
+          <dt>Slippage</dt>
+          <dd>
+            <SimpleTooltip label="Click to change maximum slippage">
               <button
-                className="relative before:absolute before:-inset-2"
+                className={clsx(
+                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "text-neutral-500 bg-neutral-100 hover:bg-neutral-200",
+                  "rounded",
+                )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <PencilSquareIcon className="w-3 h-3 -mb-px" />
+                <Cog6ToothIcon className="w-2.5 h-2.5" />
               </button>
             </SimpleTooltip>
-          </dt>
-          <dd>{slippage}%</dd>
+            {slippage}%
+          </dd>
+          <dt>Gas Adjustment</dt>
+          <dd>
+            <SimpleTooltip label="Click to change gas adjusment">
+              <button
+                className={clsx(
+                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "text-neutral-500 bg-neutral-100 hover:bg-neutral-200",
+                  "rounded",
+                )}
+                onClick={() => disclosure.open("settingsDialog")}
+              >
+                <Cog6ToothIcon className="w-2.5 h-2.5" />
+              </button>
+            </SimpleTooltip>
+            {gas}
+          </dd>
           <dt>Bridging Fee</dt>
           <dd>
             {formatMaxFraction(bridgingFee)} {isEvm ? "ETH" : ""}
