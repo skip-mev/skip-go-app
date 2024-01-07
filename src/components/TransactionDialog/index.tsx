@@ -1,4 +1,5 @@
 import { RouteResponse } from "@skip-router/core";
+import { clsx } from "clsx";
 import { Fragment, useEffect, useState } from "react";
 
 import { useDisclosureKey } from "@/context/disclosures";
@@ -58,7 +59,11 @@ function TransactionDialog({
     <Fragment>
       <div>
         <button
-          className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+          className={clsx(
+            "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full outline-none transition-[opacity,transform]",
+            "disabled:cursor-not-allowed disabled:opacity-75",
+            "enabled:hover:scale-105 enabled:hover:rotate-1",
+          )}
           disabled={!route || (typeof isLoading === "boolean" && isLoading)}
           onClick={() => setIsOpen(true)}
         >

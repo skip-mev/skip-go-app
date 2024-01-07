@@ -9,12 +9,13 @@ type Props = ComponentProps<"button"> & {
 
 export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
   function Component(props, ref) {
-    const { address, walletLogo, walletName, ...rest } = props;
+    const { address, walletLogo, walletName, className, ...rest } = props;
     return (
       <button
         className={clsx(
           "flex items-center gap-2 focus:outline-none transition-colors",
-          "border border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 rounded-lg py-2 px-2.5",
+          "border border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 rounded-lg px-2 py-1.5",
+          className,
         )}
         {...rest}
         ref={ref}
