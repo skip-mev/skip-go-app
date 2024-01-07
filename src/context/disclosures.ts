@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 const defaultValues = {
   historyDialog: false,
@@ -17,9 +18,16 @@ export type DisclosureStore = typeof defaultValues & {
 };
 export type DisclosureKey = keyof typeof defaultValues;
 
-const disclosureStore = create<DisclosureStore>(() => ({
-  ...defaultValues,
-}));
+const disclosureStore = create(
+  persist((): DisclosureStore => defaultValues, {
+    name: "DisclosuresState",
+    version: 1,
+    partialize: (state) => ({
+      historyDialog: state.historyDialog,
+    }),
+    skipHydration: true,
+  }),
+);
 
 const scrollStore = create<{ value: number[] }>(() => ({ value: [] }));
 const persistScroll = () => {
@@ -87,6 +95,7 @@ export const disclosure = {
     disclosureStore.setState(defaultValues);
     restoreScroll();
   },
+  rehydrate: () => disclosureStore.persist.rehydrate(),
 };
 
 export const useDisclosureKey = (key: DisclosureKey) => {

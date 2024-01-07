@@ -1,9 +1,10 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
-import { ElementRef, FC, useEffect, useRef } from "react";
+import { ElementRef, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
 
+import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
@@ -26,7 +27,9 @@ import { useWalletModal, WalletModal } from "../WalletModal";
 import { SwapDetails } from "./SwapDetails";
 import { useSwapWidget } from "./useSwapWidget";
 
-export const SwapWidget: FC = () => {
+export function SwapWidget() {
+  useEffect(() => void disclosure.rehydrate(), []);
+
   const { openWalletModal } = useWalletModal();
 
   const { data: chains } = useSkipChains();
@@ -306,4 +309,4 @@ export const SwapWidget: FC = () => {
       <WalletModal />
     </UsdDiff.Provider>
   );
-};
+}
