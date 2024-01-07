@@ -10,7 +10,7 @@ export function ConnectWalletButtonSmall({
     <button
       className={clsx(
         "bg-[#FF486E]/20 hover:bg-[#FF486E]/30 text-[#FF486E]",
-        "text-xs font-semibold rounded-lg py-1 px-2.5 pr-1 flex items-center gap-1 transition-colors focus:outline-none",
+        "text-xs font-semibold rounded-md py-1 px-2.5 pr-1 flex items-center gap-1 transition-colors focus:outline-none",
         className,
       )}
       {...props}
