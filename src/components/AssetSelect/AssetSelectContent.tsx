@@ -6,7 +6,6 @@ import { matchSorter } from "match-sorter";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AssetWithMetadata } from "@/context/assets";
-import { useWindowSize } from "@/hooks/useWindowSize";
 import { formatMaxFraction } from "@/utils/intl";
 
 interface Props {
@@ -24,15 +23,9 @@ function AssetSelectContent({
   onClose,
   showChainInfo,
 }: Props) {
-  const { width } = useWindowSize();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const inputEl = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (width >= 768) {
-      inputEl.current?.focus();
-    }
-  }, [width]);
+  useEffect(() => inputRef.current?.focus(), []);
 
   const [searchValue, setSearchValue] = useState("");
 
@@ -71,7 +64,7 @@ function AssetSelectContent({
   }, [searchValue, sortedAssets]);
 
   return (
-    <div className="flex flex-col h-full px-6 pt-6 pb-2">
+    <div className="flex flex-col h-full p-6 pb-2 isolate">
       <div className="flex items-center gap-4 mb-4">
         <button
           className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
@@ -82,12 +75,12 @@ function AssetSelectContent({
         <p className="font-bold text-xl">Select Token</p>
       </div>
       <input
-        className="w-full border p-4 rounded-md"
+        className="w-full border px-4 py-2 rounded-md z-20"
         type="text"
         placeholder="Search name or paste address"
         onChange={(e) => setSearchValue(e.target.value)}
         value={searchValue}
-        ref={inputEl}
+        ref={inputRef}
       />
       <ScrollArea.Root
         className={clsx(
