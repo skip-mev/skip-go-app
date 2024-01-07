@@ -22,7 +22,7 @@ export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
         {walletLogo && (
           <img alt={walletName} className="w-4 h-4" src={walletLogo} />
         )}
-        <span className="text-xs font-bold">
+        <span className="text-xs font-bold tabular-nums">
           {address.slice(0, 8)}...{address.slice(-5)}
         </span>
       </button>
