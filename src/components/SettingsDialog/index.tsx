@@ -1,4 +1,7 @@
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowLeftIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/16/solid";
 import { useEffect } from "react";
 import { tinykeys } from "tinykeys";
 
@@ -36,7 +39,7 @@ export const SettingsDialog = () => {
           users. Users must pay a gas fee, usually in the native token, to have
           their transactions processed by the network.{" "}
           <AdaptiveLink href="https://docs.cosmos.network/main/glossary#gas">
-            (Learn more)
+            <QuestionMarkCircleIcon className="w-3.5 h-3.5 inline mb-1.5" />
           </AdaptiveLink>
         </p>
         <SlippageSetting />
@@ -44,7 +47,7 @@ export const SettingsDialog = () => {
           Slippage is how much price movement you can tolerate between the time
           you send out a transaction and the time it&apos;s executed.{" "}
           <AdaptiveLink href="https://medium.com/onomy-protocol/what-is-slippage-in-defi-62a0d068feb3">
-            (Learn more)
+            <QuestionMarkCircleIcon className="w-3.5 h-3.5 inline mb-1.5" />
           </AdaptiveLink>
         </p>
       </div>
