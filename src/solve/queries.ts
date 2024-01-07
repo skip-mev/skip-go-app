@@ -1,4 +1,4 @@
-import { AssetsRequest } from "@skip-router/core";
+import { AssetsRequest, SwapVenue } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -32,6 +32,7 @@ interface UseRouteArgs {
   destinationAsset?: string;
   destinationAssetChainID?: string;
   enabled?: boolean;
+  swapVenue?: SwapVenue;
 }
 
 export function useRoute({
@@ -42,6 +43,7 @@ export function useRoute({
   destinationAsset,
   destinationAssetChainID,
   enabled,
+  swapVenue,
 }: UseRouteArgs) {
   const skipClient = useSkipClient();
 
@@ -57,6 +59,7 @@ export function useRoute({
         destinationAsset,
         sourceAssetChainID,
         destinationAssetChainID,
+        swapVenue,
       ] as const,
     [
       amount,
@@ -65,6 +68,7 @@ export function useRoute({
       direction,
       sourceAsset,
       sourceAssetChainID,
+      swapVenue,
     ],
   );
 
@@ -79,6 +83,7 @@ export function useRoute({
         destinationAsset,
         sourceAssetChainID,
         destinationAssetChainID,
+        swapVenue,
       ],
     }) => {
       if (
@@ -98,6 +103,7 @@ export function useRoute({
               sourceAssetChainID: sourceAssetChainID,
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
+              swapVenue,
             }
           : {
               amountOut: amount,
@@ -105,6 +111,7 @@ export function useRoute({
               sourceAssetChainID: sourceAssetChainID,
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
+              swapVenue,
             },
       );
 
