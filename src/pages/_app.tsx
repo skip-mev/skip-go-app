@@ -41,6 +41,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <ChainProvider
           assetLists={assets}
           chains={chains}
+          sessionOptions={{
+            duration: 1000 * 60 * 60 * 24, // 1 day
+          }}
           throwErrors={false}
           wallets={wallets}
         >
