@@ -14,6 +14,7 @@ import { formatPercent, formatUSD } from "@/utils/intl";
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
 import { SimpleTooltip } from "./SimpleTooltip";
+import { SpinnerIcon } from "./SpinnerIcon";
 
 interface Props {
   amount: string;
@@ -28,6 +29,7 @@ interface Props {
   showBalance?: boolean;
   showSlippage?: boolean;
   context?: "src" | "dest";
+  isLoading?: boolean;
 }
 
 function AssetInput({
@@ -42,6 +44,7 @@ function AssetInput({
   onChainChange,
   showBalance,
   context,
+  isLoading,
 }: Props) {
   const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
 
@@ -141,10 +144,17 @@ function AssetInput({
           />
         </div>
       </div>
-      <div className="relative">
+      <div className="relative isolate">
+        {isLoading && (
+          <SpinnerIcon className="absolute right-2 top-2 animate-spin h-4 w-4 text-neutral-300 z-10" />
+        )}
         <input
           data-testid="amount"
-          className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
+          className={clsx(
+            "w-full text-3xl font-medium h-10 tabular-nums",
+            "focus:outline-none placeholder:text-neutral-300",
+            isLoading && "animate-pulse text-neutral-500",
+          )}
           type="text"
           placeholder="0.0"
           value={amount}

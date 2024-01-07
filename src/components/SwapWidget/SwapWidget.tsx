@@ -76,7 +76,6 @@ export const SwapWidget: FC = () => {
 
   const isWalletConnected = isSrcConnected && isDestConnected;
 
-  const shouldShowDestinationWalletButton = true;
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();
     return useSettingsStore.subscribe((state) => {
@@ -142,6 +141,7 @@ export const SwapWidget: FC = () => {
               onChainChange={onSourceChainChange}
               showBalance
               context="src"
+              isLoading={direction === "swap-out" && routeLoading}
             />
           </div>
           <div className="relative">
@@ -179,34 +179,32 @@ export const SwapWidget: FC = () => {
               </button>
             </div>
             <p className="font-semibold text-2xl">To</p>
-            {shouldShowDestinationWalletButton ? (
-              <div className="absolute inset-y-0 right-0 flex items-center">
-                {destAddress && destWallet && isDestConnected ? (
-                  <SimpleTooltip label="Change Destination Wallet">
-                    <ConnectedWalletButton
-                      address={destAddress}
-                      onClick={() => {
-                        openWalletModal(destinationChain?.chainID ?? "");
-                      }}
-                      walletName={destWallet.walletPrettyName}
-                      walletLogo={
-                        destWallet.walletInfo.logo
-                          ? typeof destWallet.walletInfo.logo === "string"
-                            ? destWallet.walletInfo.logo
-                            : destWallet.walletInfo.logo.major
-                          : ""
-                      }
-                    />
-                  </SimpleTooltip>
-                ) : (
-                  <ConnectWalletButtonSmall
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              {destAddress && destWallet && isDestConnected ? (
+                <SimpleTooltip label="Change Destination Wallet">
+                  <ConnectedWalletButton
+                    address={destAddress}
                     onClick={() => {
                       openWalletModal(destinationChain?.chainID ?? "");
                     }}
+                    walletName={destWallet.walletPrettyName}
+                    walletLogo={
+                      destWallet.walletInfo.logo
+                        ? typeof destWallet.walletInfo.logo === "string"
+                          ? destWallet.walletInfo.logo
+                          : destWallet.walletInfo.logo.major
+                        : ""
+                    }
                   />
-                )}
-              </div>
-            ) : null}
+                </SimpleTooltip>
+              ) : (
+                <ConnectWalletButtonSmall
+                  onClick={() => {
+                    openWalletModal(destinationChain?.chainID ?? "");
+                  }}
+                />
+              )}
+            </div>
           </div>
           <div data-testid="destination">
             <AssetInput
@@ -223,6 +221,7 @@ export const SwapWidget: FC = () => {
               onChainChange={onDestinationChainChange}
               showBalance
               context="dest"
+              isLoading={direction === "swap-in" && routeLoading}
             />
           </div>
           {route && (
