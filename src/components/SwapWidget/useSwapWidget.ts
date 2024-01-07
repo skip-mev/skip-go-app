@@ -292,7 +292,8 @@ const defaultValues: FormValues = {
 const useFormValuesStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
-      name: "ibc-dot-fun//form-values",
+      name: "SwapWidgetState",
+      version: 1,
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state): Partial<FormValues> => ({
         sourceChain: state.sourceChain,

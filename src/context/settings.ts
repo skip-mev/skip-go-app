@@ -13,6 +13,6 @@ export const defaultValues: SettingsStore = {
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(() => defaultValues, {
-    name: "SettingsStore",
+    name: "SettingsState",
   }),
 );
