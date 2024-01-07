@@ -115,6 +115,7 @@ export function useRoute({
       return route;
     },
     refetchInterval: refetchCount < 10 ? 1000 * 5 : false,
+    retry: false,
     enabled:
       enabled &&
       !!sourceAsset &&
