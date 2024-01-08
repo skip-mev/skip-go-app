@@ -141,8 +141,8 @@ export function SwapWidget() {
               <button
                 className={clsx(
                   "bg-neutral-900 text-white w-8 h-8 rounded-md flex items-center justify-center pointer-events-auto",
-                  "hover:scale-105 hover:rotate-3 transition-transform",
-                  "disabled:hover:scale-100 disabled:bg-neutral-700 disabled:cursor-not-allowed",
+                  "enabled:hover:scale-105 enabled:hover:rotate-3 transition-transform",
+                  "disabled:hover:scale-100 disabled:bg-neutral-500 disabled:cursor-not-allowed",
                   "data-[swap=true]:animate-spin-swap data-[swap=true]:pointer-events-none",
                 )}
                 disabled={!destinationChain || !destinationAsset}

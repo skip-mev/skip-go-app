@@ -237,7 +237,7 @@ function AssetInput({
           ) : null}
           <div className="flex-grow" />
           {showBalance && account?.address && asset && (
-            <div className="text-neutral-400 text-sm flex items-center">
+            <div className="text-neutral-400 text-sm flex items-center animate-slide-left-and-fade">
               <span className="mr-1">Balance:</span>
               <SimpleTooltip label={`${selectedAssetBalance} ${asset.symbol}`}>
                 <div
