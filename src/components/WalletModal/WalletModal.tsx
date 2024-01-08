@@ -1,22 +1,18 @@
-import {
-  useManager,
-  useWalletClient as useCosmosWalletClient,
-} from "@cosmos-kit/react";
+import { useManager } from "@cosmos-kit/react";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { clsx } from "clsx";
-import { ComponentProps, ReactNode, useEffect, useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { create } from "zustand";
 
 import { chainIdToName } from "@/chains/types";
 import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { useChainByID } from "@/hooks/useChains";
-import { MergedWalletClient } from "@/lib/cosmos-kit";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
+import { useTotalWallets, WalletListItem } from "./WalletListItem";
 
 export interface MinimalWallet {
   walletName: string;
@@ -35,15 +31,13 @@ interface Props {
   onClose: () => void;
 }
 
-const useStore = create<Record<string, true>>(() => ({}));
-
 export function WalletModal({ chainType, onClose, wallets }: Props) {
   async function onWalletConnect(wallet: MinimalWallet) {
     await wallet.connect();
     onClose();
   }
 
-  const totalWallets = useStore((state) => Object.keys(state).length);
+  const totalWallets = useTotalWallets();
 
   return (
     <div className="flex flex-col h-full px-6 pt-6 pb-2">
@@ -59,18 +53,23 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         </button>
         <p className="font-bold text-xl text-center">Connect Wallet</p>
       </div>
-      {chainType === "cosmos" && totalWallets < 1 && (
-        <div className="flex flex-col items-center py-8 space-y-4 text-center">
-          <FaceFrownIcon className="w-12 h-12 text-gray-500" />
+      {totalWallets < 1 && (
+        <div className="flex flex-col items-center py-16 space-y-4 text-center">
+          <FaceFrownIcon className="w-16 h-16 text-gray-500" />
           <h4 className="text-center font-medium">No Wallets Available</h4>
-          <p className="text-sm lg:px-8">
+          <p className="text-sm lg:px-8 text-neutral-600">
             Please install or enable your preferred wallet extension.
             <br />
             <AdaptiveLink
-              href="https://cosmos.network/wallets"
-              className="text-red-500 hover:underline"
+              href={
+                chainType === "cosmos"
+                  ? "https://cosmos.network/wallets"
+                  : "https://ethereum.org/en/wallets/find-wallet"
+              }
+              className="text-red-500 hover:underline inline-flex items-center gap-1"
             >
-              View available wallets in Cosmos
+              <span>Explore available wallets</span>
+              <ArrowTopRightOnSquareIcon className="w-3 h-3" />
             </AdaptiveLink>
           </p>
         </div>
@@ -83,56 +82,53 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         )}
       >
         <ScrollArea.Viewport className="w-full h-full py-4">
-          {wallets.map((wallet) => {
-            const ListItem =
-              chainType === "cosmos" ? CosmosWalletListItem : "div";
-            return (
-              <ListItem
-                key={wallet.walletName}
-                walletName={wallet.walletName}
-                className={clsx(
-                  "mb-2 group relative data-[unsupported=true]:opacity-30",
-                  "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
-                )}
+          {wallets.map((wallet) => (
+            <WalletListItem
+              key={wallet.walletName}
+              chainType={chainType}
+              walletName={wallet.walletName}
+              className={clsx(
+                "mb-2 group relative data-[unsupported=true]:opacity-30",
+                "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
+              )}
+            >
+              <button
+                className="flex items-center gap-2 w-full p-2 rounded-lg transition-colors group-hover:bg-[#FF486E]/20 focus:-outline-offset-2"
+                onClick={() => onWalletConnect(wallet)}
               >
-                <button
-                  className="flex items-center gap-2 w-full p-2 rounded-lg transition-colors group-hover:bg-[#FF486E]/20 focus:-outline-offset-2"
-                  onClick={() => onWalletConnect(wallet)}
-                >
-                  {wallet.walletInfo.logo && (
-                    <img
-                      alt={wallet.walletPrettyName}
-                      className="w-9 h-9"
-                      src={
-                        typeof wallet.walletInfo.logo === "string"
-                          ? wallet.walletInfo.logo
-                          : wallet.walletInfo.logo.major
-                      }
-                      aria-hidden="true"
-                    />
-                  )}
-                  <p className="font-semibold text-left flex-1">
-                    {wallet.walletPrettyName === "Leap Cosmos MetaMask"
-                      ? "Metamask (Leap Snap)"
-                      : wallet.walletPrettyName}
-                  </p>
-                </button>
-                {wallet.isWalletConnected && (
-                  <button
-                    aria-label={`Disconnect ${wallet.walletPrettyName}`}
-                    className="bg-[#FF486E]/20 group-hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 flex items-center gap-1 transition-colors focus:outline-none absolute right-4 top-1/2 -translate-y-1/2"
-                    onClick={async (event) => {
-                      event.stopPropagation();
-                      await wallet.disconnect();
-                      onClose();
-                    }}
-                  >
-                    Disconnect
-                  </button>
+                {wallet.walletInfo.logo && (
+                  <img
+                    alt={wallet.walletPrettyName}
+                    className="w-9 h-9"
+                    src={
+                      typeof wallet.walletInfo.logo === "string"
+                        ? wallet.walletInfo.logo
+                        : wallet.walletInfo.logo.major
+                    }
+                    aria-hidden="true"
+                  />
                 )}
-              </ListItem>
-            );
-          })}
+                <p className="font-semibold text-left flex-1">
+                  {wallet.walletPrettyName === "Leap Cosmos MetaMask"
+                    ? "Metamask (Leap Snap)"
+                    : wallet.walletPrettyName}
+                </p>
+              </button>
+              {wallet.isWalletConnected && (
+                <button
+                  aria-label={`Disconnect ${wallet.walletPrettyName}`}
+                  className="bg-[#FF486E]/20 group-hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 flex items-center gap-1 transition-colors focus:outline-none absolute right-4 top-1/2 -translate-y-1/2"
+                  onClick={async (event) => {
+                    event.stopPropagation();
+                    await wallet.disconnect();
+                    onClose();
+                  }}
+                >
+                  Disconnect
+                </button>
+              )}
+            </WalletListItem>
+          ))}
         </ScrollArea.Viewport>
         <ScrollArea.Scrollbar
           className="z-20 flex select-none touch-none py-4 transition-colors duration-[160ms] ease-out data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2"
@@ -145,43 +141,6 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
     </div>
   );
 }
-
-const CosmosWalletListItem = ({
-  children,
-  walletName,
-  ...props
-}: ComponentProps<"div"> & {
-  children: ReactNode;
-  walletName: string;
-}) => {
-  const { client } = useCosmosWalletClient(walletName);
-  const walletClient = client as MergedWalletClient | undefined;
-
-  const show = useMemo(() => {
-    if (!walletClient) return false;
-    if ("snapInstalled" in walletClient) {
-      return walletClient.snapInstalled;
-    }
-    return true;
-  }, [walletClient]);
-
-  useEffect(() => {
-    const unregister = () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      useStore.setState(({ [walletName]: _, ...latest }) => latest, true);
-    };
-    if (show) useStore.setState({ [walletName]: true });
-    else unregister();
-    return unregister;
-  }, [show, walletName]);
-
-  return <div {...props}>{show ? children : null}</div>;
-  // return (
-  //   <div data-unsupported={!show} {...props}>
-  //     {children}
-  //   </div>
-  // );
-};
 
 function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
