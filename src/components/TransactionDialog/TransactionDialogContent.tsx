@@ -1,9 +1,10 @@
+import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { useAccount } from "wagmi";
+import { useAccount as useWagmiAccount } from "wagmi";
 
 import { useSettingsStore } from "@/context/settings";
 import {
@@ -14,11 +15,10 @@ import {
 } from "@/context/tx-history";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
-import { useGetChainWalletClient } from "@/hooks/useGetChainWalletClient";
 import { useSkipClient } from "@/solve";
-import { enableChains, getAddressForCosmosChain } from "@/utils/chain";
+import { raise } from "@/utils/assert";
+import { enableChains } from "@/utils/chain";
 import { getChainExplorerUrl } from "@/utils/explorer";
-import { getOfflineSigner } from "@/utils/signer";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
@@ -47,7 +47,7 @@ function TransactionDialogContent({
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
-  const { address: evmAddress } = useAccount();
+  const { address: evmAddress } = useWagmiAccount();
 
   const [transacting, setTransacting] = useState(false);
 
@@ -65,9 +65,9 @@ function TransactionDialogContent({
     }),
   );
 
-  const getChainWalletClient = useGetChainWalletClient();
+  const { getWalletRepo } = useManager();
 
-  const onSubmit = async () => {
+  async function onSubmit() {
     setTransacting(true);
 
     const [historyId] = addTxHistory({ route });
@@ -75,17 +75,26 @@ function TransactionDialogContent({
     try {
       const userAddresses: Record<string, string> = {};
 
-      // get addresses
       for (const chainID of route.chainIDs) {
-        const chain = chains.find((c) => c.chainID === chainID);
-        if (!chain) {
-          throw new Error(`No chain found for chainID ${chainID}`);
-        }
+        const chain =
+          chains.find((c) => c.chainID === chainID) ||
+          raise(`executeRoute error: cannot find chain '${chainID}'`);
 
         if (chain.chainType === "cosmos") {
-          const walletClient = getChainWalletClient(chain.chainName ?? "");
-          await enableChains(walletClient, [chainID]);
-          const address = await getAddressForCosmosChain(walletClient, chainID);
+          const { wallets } = getWalletRepo(chain.chainName);
+
+          const wallet =
+            wallets.find((w) => w.isActive) ||
+            raise(
+              `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
+            );
+          await enableChains(wallet.client, [chainID]);
+
+          const address =
+            wallet.address ||
+            raise(
+              `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
+            );
           userAddresses[chainID] = address;
         }
 
@@ -113,14 +122,24 @@ function TransactionDialogContent({
         validateGasBalance: true,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         getCosmosSigner: async (chainID) => {
-          const chain = chains.find((c) => c.chainID === chainID);
-          if (!chain) {
-            throw new Error(`No chain found for chainID ${chainID}`);
-          }
+          const chain =
+            chains.find((c) => c.chainID === chainID) ||
+            raise(`executeRoute error: cannot find chain '${chainID}'`);
 
-          const walletClient = getChainWalletClient(chain.chainName ?? "");
+          const { wallets } = getWalletRepo(chain.chainName);
 
-          return getOfflineSigner(walletClient, chainID);
+          const wallet =
+            wallets.find((w) => w.isActive) ||
+            raise(
+              `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
+            );
+
+          return (
+            wallet.offlineSigner ||
+            raise(
+              `executeRoute error: offline signer not initialized for ${wallet.walletName}`,
+            )
+          );
         },
         onTransactionBroadcast: async (txStatus) => {
           const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
@@ -200,7 +219,7 @@ function TransactionDialogContent({
       setTransacting(false);
       setNumberOfBroadcastedTransactions(0);
     }
-  };
+  }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
