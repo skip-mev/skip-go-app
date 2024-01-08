@@ -20,7 +20,7 @@ export type AssetWithMetadata = Required<Asset>;
 
 interface AssetsContext {
   assets: Record<string, AssetWithMetadata[]>;
-  assetsByChainID: (chainID: string) => AssetWithMetadata[];
+  assetsByChainID: (chainID?: string) => AssetWithMetadata[];
   getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
   getFeeDenom(chainID: string): AssetWithMetadata | undefined;
   getNativeAssets(): AssetWithMetadata[];
@@ -155,9 +155,9 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     return data;
   }, [chains, solveAssets]);
 
-  const assetsByChainID = useCallback(
-    (chainID: string) => {
-      return assets[chainID] || [];
+  const assetsByChainID: AssetsContext["assetsByChainID"] = useCallback(
+    (chainID?: string) => {
+      return chainID ? assets[chainID] || [] : [];
     },
     [assets],
   );

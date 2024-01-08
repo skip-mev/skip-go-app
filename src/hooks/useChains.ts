@@ -11,6 +11,7 @@ export type Chain = SkipChain & {
 };
 
 export type UseChainsQueryArgs<T = Chain[]> = {
+  enabled?: boolean;
   select?: (arr?: Chain[]) => T;
 };
 
@@ -42,11 +43,13 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
     select,
+    enabled: args.enabled,
   });
 }
 
-export function useChainByID(chainID: string) {
+export function useChainByID(chainID?: string) {
   return useChains({
     select: (chains) => (chains ?? []).find((c) => c.chainID === chainID),
+    enabled: Boolean(chainID),
   });
 }

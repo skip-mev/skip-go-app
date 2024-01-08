@@ -128,16 +128,14 @@ export function useSwapWidget() {
     destinationAsset?.decimals,
   ]);
 
-  const { address } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
+  const account = useAccount(sourceChain?.chainID);
 
   const { assetsByChainID } = useAssets();
 
-  const sourceChainAssets = assetsByChainID(
-    sourceChain?.chainID ?? "cosmoshub-4",
-  );
+  const sourceChainAssets = assetsByChainID(sourceChain?.chainID);
 
   const { data: balances } = useBalancesByChain(
-    address,
+    account?.address,
     sourceChain,
     sourceChainAssets,
   );

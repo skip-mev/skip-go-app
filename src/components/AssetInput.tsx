@@ -58,9 +58,13 @@ function AssetInput({
 
   const showChainInfo = chain ? false : true;
 
-  const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
+  const account = useAccount(chain?.chainID);
 
-  const { data: balances } = useBalancesByChain(address, chain, assets);
+  const { data: balances } = useBalancesByChain(
+    account?.address,
+    chain,
+    assets,
+  );
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return 0;
@@ -232,7 +236,7 @@ function AssetInput({
             </p>
           ) : null}
           <div className="flex-grow" />
-          {showBalance && address && asset && (
+          {showBalance && account?.address && asset && (
             <div className="text-neutral-400 text-sm flex items-center">
               <span className="mr-1">Balance:</span>
               <SimpleTooltip label={`${selectedAssetBalance} ${asset.symbol}`}>

@@ -12,7 +12,6 @@ import { useChains as useSkipChains } from "@/hooks/useChains";
 import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
-import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
@@ -65,19 +64,11 @@ export function SwapWidget() {
       parseFloat(route.usdAmountIn);
   }
 
-  const {
-    address: srcAddress,
-    isWalletConnected: isSrcConnected,
-    wallet: srcWallet,
-  } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
+  const srcAccount = useAccount(sourceChain?.chainID);
+  const destAccount = useAccount(destinationChain?.chainID);
 
-  const {
-    address: destAddress,
-    isWalletConnected: isDestConnected,
-    wallet: destWallet,
-  } = useAccount(destinationChain?.chainID ?? "cosmoshub-4");
-
-  const isWalletConnected = isSrcConnected && isDestConnected;
+  const isWalletConnected =
+    srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
 
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();
@@ -109,25 +100,23 @@ export function SwapWidget() {
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
-            {srcAddress && srcWallet && isSrcConnected ? (
+            {srcAccount?.address && srcAccount?.wallet && (
               <SimpleTooltip label="Change Source Wallet">
                 <ConnectedWalletButton
-                  address={srcAddress}
+                  address={srcAccount.address}
                   onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
-                  walletName={srcWallet.walletPrettyName}
+                  walletName={srcAccount.wallet?.walletPrettyName}
                   walletLogo={
-                    srcWallet.walletInfo.logo
-                      ? typeof srcWallet.walletInfo.logo === "string"
-                        ? srcWallet.walletInfo.logo
-                        : srcWallet.walletInfo.logo.major
+                    srcAccount.wallet.walletInfo
+                      ? typeof srcAccount.wallet.walletInfo.logo === "string"
+                        ? srcAccount.wallet.walletInfo.logo
+                        : srcAccount.wallet.walletInfo.logo?.major ||
+                          srcAccount.wallet.walletInfo.logo?.minor
                       : ""
                   }
+                  className="animate-slide-left-and-fade"
                 />
               </SimpleTooltip>
-            ) : (
-              <ConnectWalletButtonSmall
-                onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
-              />
             )}
           </div>
           <div data-testid="source">
@@ -183,29 +172,23 @@ export function SwapWidget() {
             </div>
             <p className="font-semibold text-2xl">To</p>
             <div className="absolute inset-y-0 right-0 flex items-center">
-              {destAddress && destWallet && isDestConnected ? (
-                <SimpleTooltip label="Change Destination Wallet">
+              {destAccount?.address && destAccount?.wallet && (
+                <SimpleTooltip label="Change Source Wallet">
                   <ConnectedWalletButton
-                    address={destAddress}
-                    onClick={() => {
-                      openWalletModal(destinationChain?.chainID ?? "");
-                    }}
-                    walletName={destWallet.walletPrettyName}
+                    address={destAccount.address}
+                    onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
+                    walletName={destAccount.wallet?.walletPrettyName}
                     walletLogo={
-                      destWallet.walletInfo.logo
-                        ? typeof destWallet.walletInfo.logo === "string"
-                          ? destWallet.walletInfo.logo
-                          : destWallet.walletInfo.logo.major
+                      destAccount.wallet.walletInfo
+                        ? typeof destAccount.wallet.walletInfo.logo === "string"
+                          ? destAccount.wallet.walletInfo.logo
+                          : destAccount.wallet.walletInfo.logo?.major ||
+                            destAccount.wallet.walletInfo.logo?.minor
                         : ""
                     }
+                    className="animate-slide-left-and-fade"
                   />
                 </SimpleTooltip>
-              ) : (
-                <ConnectWalletButtonSmall
-                  onClick={() => {
-                    openWalletModal(destinationChain?.chainID ?? "");
-                  }}
-                />
               )}
             </div>
           </div>
@@ -264,15 +247,15 @@ export function SwapWidget() {
               </p>
             </div>
           )}
-          {sourceChain && !isWalletConnected && (
+          {!isWalletConnected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
               onClick={() => {
-                if (!isSrcConnected) {
+                if (sourceChain && !srcAccount?.isWalletConnected) {
                   openWalletModal(sourceChain.chainID);
                   return;
                 }
-                if (destinationChain && !isDestConnected) {
+                if (destinationChain && !destAccount?.isWalletConnected) {
                   openWalletModal(destinationChain.chainID);
                   return;
                 }
