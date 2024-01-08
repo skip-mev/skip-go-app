@@ -13,7 +13,7 @@ export const PriceImpactWarning = ({
   message = "",
   title = "",
 }: Props) => {
-  const [isOpen, control] = useDisclosureKey("priceImpactWarning");
+  const [isOpen, control] = useDisclosureKey("priceImpactDialog");
 
   if (!isOpen || title === "") return null;
 

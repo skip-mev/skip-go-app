@@ -31,7 +31,7 @@ function TransactionDialog({
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const [, control] = useDisclosureKey("priceImpactWarning");
+  const [, control] = useDisclosureKey("priceImpactDialog");
 
   useEffect(() => {
     if (!isOpen) {

@@ -3,9 +3,9 @@ import { persist } from "zustand/middleware";
 
 const defaultValues = {
   historyDialog: false,
+  priceImpactDialog: false,
   settingsDialog: false,
   swapDetailsCollapsible: false,
-  priceImpactWarning: false,
 
   // TODO: port dialogs to new system
   // assetSelect: false,

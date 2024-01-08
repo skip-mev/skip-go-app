@@ -77,7 +77,6 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  console.log("destination chain id", action.destinationChain);
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
