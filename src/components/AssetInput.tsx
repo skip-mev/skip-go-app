@@ -10,6 +10,10 @@ import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
 import { formatPercent, formatUSD } from "@/utils/intl";
+import {
+  formatNumberWithCommas,
+  formatNumberWithoutCommas,
+} from "@/utils/number";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -161,26 +165,23 @@ function AssetInput({
           )}
           type="text"
           placeholder="0.0"
-          value={amount}
+          value={formatNumberWithCommas(amount)}
           inputMode="numeric"
           onChange={(e) => {
             if (!onAmountChange) return;
 
             let latest = e.target.value;
 
-            // replace first comma with period
-            latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
-
-            // prevent entering anything except numbers, commas, and periods
-            if (latest.match(/[^0-9.]/gi)) return;
+            // Remove non-numeric and non-decimal characters
+            latest = latest.replace(/[^\d.]/g, "");
 
             // if there is more than one period or comma,
             // remove all periods except the first one for decimals
-            if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
-              latest = latest.replace(/([,.].*)[,.]/g, "$1");
+            if ((latest.match(/[.]/g)?.length ?? 0) > 1) {
+              latest = latest.replace(/([.].*)[.]/g, "$1");
             }
 
-            onAmountChange?.(latest);
+            onAmountChange?.(formatNumberWithoutCommas(latest));
           }}
           onKeyDown={(event) => {
             if (!onAmountChange) return;
@@ -191,7 +192,9 @@ function AssetInput({
             }
 
             if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-              let value = new BigNumber(event.currentTarget.value || "0");
+              let value = new BigNumber(
+                formatNumberWithoutCommas(event.currentTarget.value) || "0",
+              );
               if (event.key === "ArrowUp") {
                 event.preventDefault();
                 if (event.shiftKey) {
