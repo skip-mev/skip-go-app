@@ -110,8 +110,8 @@ export const SwapDetails = ({
         >
           <span
             className={clsx(
-              "text-neutral-400 tabular-nums transition-opacity",
-              open ? "opacity-0" : "opacity-100",
+              "text-neutral-400 tabular-nums transition-opacity animate-slide-left-and-fade",
+              open && "hidden",
             )}
           >
             Slippage: {slippage}%
