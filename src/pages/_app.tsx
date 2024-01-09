@@ -2,7 +2,6 @@ import "@fontsource/jost/latin.css";
 import "@/styles/globals.css";
 
 import { ChainProvider } from "@cosmos-kit/react";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
@@ -14,15 +13,12 @@ import { getAssetLists, getChains } from "@/chains";
 import { DefaultSeo } from "@/components/DefaultSeo";
 import Header from "@/components/Header";
 import SkipBanner from "@/components/SkipBanner";
+import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
-import { queryClient } from "@/lib/react-query";
+import { persister, queryClient } from "@/lib/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
 import { SkipProvider } from "@/solve";
-
-const persister = createSyncStoragePersister({
-  storage: typeof window !== "undefined" ? window.sessionStorage : undefined,
-});
 
 type ChainProviderProps = ComponentProps<typeof ChainProvider>;
 
@@ -45,6 +41,12 @@ export default function App({ Component, pageProps }: AppProps) {
             duration: 1000 * 60 * 60 * 24, // 1 day
           }}
           throwErrors={false}
+          walletConnectOptions={{
+            signClient: {
+              name: metadata.name,
+              projectId: "e3985828cd157df821cfed8b7519cacc",
+            },
+          }}
           wallets={wallets}
         >
           <WagmiConfig config={wagmiConfig}>
