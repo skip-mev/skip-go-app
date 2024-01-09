@@ -1,5 +1,5 @@
 import { useWalletClient as useCosmosWalletClient } from "@cosmos-kit/react";
-import { ComponentProps, ReactNode, useEffect, useMemo } from "react";
+import { ComponentProps, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useConnect } from "wagmi";
 import { create } from "zustand";
@@ -13,7 +13,6 @@ export function useTotalWallets() {
 }
 
 type Props = ComponentProps<"div"> & {
-  children: ReactNode;
   chainType: string;
   walletName: string;
 };
@@ -39,7 +38,6 @@ const CosmosWalletListItem = ({
   walletName,
   ...props
 }: ComponentProps<"div"> & {
-  children: ReactNode;
   walletName: string;
 }) => {
   const { client } = useCosmosWalletClient(walletName);
@@ -71,7 +69,6 @@ const EvmWalletListItem = ({
   walletName,
   ...props
 }: ComponentProps<"div"> & {
-  children: ReactNode;
   walletName: string;
 }) => {
   const { connectors } = useConnect({
