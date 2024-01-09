@@ -150,7 +150,7 @@ function AssetInput({
       </div>
       <div className="relative isolate">
         {isLoading && (
-          <SpinnerIcon className="absolute right-2 top-2 animate-spin h-4 w-4 text-neutral-300 z-10" />
+          <SpinnerIcon className="absolute right-3 top-3 animate-spin h-4 w-4 text-neutral-300 z-10" />
         )}
         <input
           data-testid="amount"
