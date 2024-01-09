@@ -263,7 +263,21 @@ export function SwapWidget() {
                 }
               }}
             >
-              Connect Wallet
+              <span
+                key={`${srcAccount?.isWalletConnected ? "src" : "no-src"}-${
+                  destAccount?.isWalletConnected ? "dest" : "no-dest"
+                }`}
+              >
+                {!srcAccount?.isWalletConnected &&
+                  !destAccount?.isWalletConnected &&
+                  "Connect Wallet"}
+                {!srcAccount?.isWalletConnected &&
+                  destAccount?.isWalletConnected &&
+                  "Connect Source Wallet"}
+                {srcAccount?.isWalletConnected &&
+                  !destAccount?.isWalletConnected &&
+                  "Connect Destination Wallet"}
+              </span>
             </button>
           )}
           {sourceChain && isWalletConnected && (
