@@ -8,7 +8,9 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { chainIdToName } from "@/chains/types";
 import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
+import { trackAccount } from "@/context/account";
 import { useChainByID } from "@/hooks/useChains";
+import { MergedWalletClient } from "@/lib/cosmos-kit";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
@@ -164,7 +166,23 @@ function WalletModalWithContext() {
   if (chainType === "cosmos") {
     const chainName = chainIdToName[chainID];
     const walletRepo = getWalletRepo(chainName);
-    wallets = walletRepo.wallets;
+    wallets = walletRepo.wallets.map((w) => ({
+      walletName: w.walletName,
+      walletPrettyName: w.walletPrettyName,
+      walletInfo: {
+        logo: w.walletInfo.logo,
+      },
+      connect: async () => {
+        const client = w.client as MergedWalletClient;
+        await w.connect();
+        trackAccount.track(chainID, w.walletName);
+      },
+      disconnect: async () => {
+        await w.disconnect();
+        trackAccount.untrack(chainID);
+      },
+      isWalletConnected: w.isWalletConnected,
+    }));
   }
 
   if (chainType === "evm") {

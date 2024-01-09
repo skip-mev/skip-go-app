@@ -1,34 +1,38 @@
-import { useManager } from "@cosmos-kit/react";
+import { useChain as useCosmosChain } from "@cosmos-kit/react";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
+import { useTrackAccount } from "@/context/account";
 import { useChainByID } from "@/hooks/useChains";
 
 export function useAccount(chainID?: string) {
   const { data: chain } = useChainByID(chainID);
 
-  const { getWalletRepo } = useManager();
-  const cosmosAccount = useMemo(() => {
-    if (chain?.chainType !== "cosmos") return;
-    const { wallets } = getWalletRepo(chain.chainName);
-    return wallets.find((w) => w.isActive);
-  }, [chain, getWalletRepo]);
+  const { walletRepo } = useCosmosChain(
+    chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub",
+    true,
+  );
+
+  const walletName = useTrackAccount(chainID);
+  const cosmosWallet = walletRepo.wallets.find((w) => {
+    return w.walletName === walletName;
+  });
 
   const wagmiAccount = useWagmiAccount();
 
   const account = useMemo(() => {
     if (!chain) return;
-    if (chain.chainType === "cosmos" && cosmosAccount) {
+    if (chain.chainType === "cosmos" && cosmosWallet) {
       return {
-        address: cosmosAccount.address,
-        isWalletConnected: cosmosAccount.isWalletConnected,
-        wallet: cosmosAccount
+        address: cosmosWallet.address,
+        isWalletConnected: cosmosWallet.isWalletConnected,
+        wallet: cosmosWallet
           ? {
-              walletName: cosmosAccount.walletInfo.name,
-              walletPrettyName: cosmosAccount.walletInfo.prettyName,
+              walletName: cosmosWallet.walletInfo.name,
+              walletPrettyName: cosmosWallet.walletInfo.prettyName,
               walletInfo: {
-                logo: cosmosAccount.walletInfo.logo,
+                logo: cosmosWallet.walletInfo.logo,
               },
             }
           : undefined,
@@ -52,7 +56,7 @@ export function useAccount(chainID?: string) {
           : undefined,
       };
     }
-  }, [chain, cosmosAccount, wagmiAccount]);
+  }, [chain, cosmosWallet, wagmiAccount]);
 
   return account;
 }
