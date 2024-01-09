@@ -3,6 +3,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { clsx } from "clsx";
+import { useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
@@ -10,7 +11,6 @@ import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackAccount } from "@/context/account";
 import { useChainByID } from "@/hooks/useChains";
-import { MergedWalletClient } from "@/lib/cosmos-kit";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
@@ -34,12 +34,20 @@ interface Props {
 }
 
 export function WalletModal({ chainType, onClose, wallets }: Props) {
+  const { context } = useWalletModal();
+
   async function onWalletConnect(wallet: MinimalWallet) {
     await wallet.connect();
     onClose();
   }
 
   const totalWallets = useTotalWallets();
+
+  const contextText = useMemo(() => {
+    if (context === "src") return "Source";
+    if (context === "dest") return "Destination";
+    return "";
+  }, [context]);
 
   return (
     <div className="flex flex-col h-full px-6 pt-6 pb-2">
@@ -53,7 +61,9 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         >
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
-        <p className="font-bold text-xl text-center">Connect Wallet</p>
+        <p className="font-bold text-xl text-center">
+          Connect {contextText} Wallet
+        </p>
       </div>
       {totalWallets < 1 && (
         <div className="flex flex-col items-center py-16 space-y-4 text-center">
@@ -173,7 +183,6 @@ function WalletModalWithContext() {
         logo: w.walletInfo.logo,
       },
       connect: async () => {
-        const client = w.client as MergedWalletClient;
         await w.connect();
         trackAccount.track(chainID, w.walletName);
       },
