@@ -1,4 +1,4 @@
-import { ChevronDownIcon, Cog6ToothIcon } from "@heroicons/react/16/solid";
+import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -155,12 +155,12 @@ export const SwapDetails = ({
               <button
                 className={clsx(
                   "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
-                  "text-neutral-500 bg-neutral-100 hover:bg-neutral-200",
+                  "text-red-500 hover:bg-neutral-100",
                   "rounded",
                 )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <Cog6ToothIcon className="w-2.5 h-2.5" />
+                <PencilSquareIcon className="w-3 h-3" />
               </button>
             </SimpleTooltip>
             {slippage}%
@@ -171,15 +171,15 @@ export const SwapDetails = ({
               <button
                 className={clsx(
                   "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
-                  "text-neutral-500 bg-neutral-100 hover:bg-neutral-200",
+                  "text-red-500 hover:bg-neutral-100",
                   "rounded",
                 )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <Cog6ToothIcon className="w-2.5 h-2.5" />
+                <PencilSquareIcon className="w-3 h-3" />
               </button>
             </SimpleTooltip>
-            {gas}
+            {parseFloat(gas).toLocaleString()}
           </dd>
           <dt>Bridging Fee</dt>
           <dd>
