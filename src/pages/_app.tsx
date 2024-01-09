@@ -13,7 +13,6 @@ import { getAssetLists, getChains } from "@/chains";
 import { DefaultSeo } from "@/components/DefaultSeo";
 import Header from "@/components/Header";
 import SkipBanner from "@/components/SkipBanner";
-import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
 import { persister, queryClient } from "@/lib/react-query";
@@ -41,12 +40,6 @@ export default function App({ Component, pageProps }: AppProps) {
             duration: 1000 * 60 * 60 * 24, // 1 day
           }}
           throwErrors={false}
-          walletConnectOptions={{
-            signClient: {
-              name: metadata.name,
-              projectId: "e3985828cd157df821cfed8b7519cacc",
-            },
-          }}
           wallets={wallets}
         >
           <WagmiConfig config={wagmiConfig}>
