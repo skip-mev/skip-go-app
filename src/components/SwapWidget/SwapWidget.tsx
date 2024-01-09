@@ -100,7 +100,7 @@ export function SwapWidget() {
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
-            {srcAccount?.address && srcAccount?.wallet && (
+            {srcAccount?.address && srcAccount?.wallet ? (
               <SimpleTooltip label="Change Source Wallet">
                 <ConnectedWalletButton
                   address={srcAccount.address}
@@ -117,7 +117,7 @@ export function SwapWidget() {
                   className="animate-slide-left-and-fade"
                 />
               </SimpleTooltip>
-            )}
+            ) : null}
           </div>
           <div data-testid="source">
             <AssetInput
@@ -172,11 +172,13 @@ export function SwapWidget() {
             </div>
             <p className="font-semibold text-2xl">To</p>
             <div className="absolute inset-y-0 right-0 flex items-center">
-              {destAccount?.address && destAccount?.wallet && (
-                <SimpleTooltip label="Change Source Wallet">
+              {destAccount?.address && destAccount?.wallet ? (
+                <SimpleTooltip label="Change Destination Wallet">
                   <ConnectedWalletButton
                     address={destAccount.address}
-                    onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
+                    onClick={() => {
+                      openWalletModal(destinationChain?.chainID ?? "");
+                    }}
                     walletName={destAccount.wallet?.walletPrettyName}
                     walletLogo={
                       destAccount.wallet.walletInfo
@@ -189,7 +191,7 @@ export function SwapWidget() {
                     className="animate-slide-left-and-fade"
                   />
                 </SimpleTooltip>
-              )}
+              ) : null}
             </div>
           </div>
           <div data-testid="destination">
