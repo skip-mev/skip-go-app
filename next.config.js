@@ -20,7 +20,12 @@ let nextConfig = {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
   productionBrowserSourceMaps: true,
-  rewrites: async () => [],
+  rewrites: async () => [
+    {
+      source: "/.well-known/walletconnect.txt",
+      destination: "/api/walletconnect/verify",
+    },
+  ],
   transpilePackages:
     process.env.NODE_ENV === "test"
       ? [

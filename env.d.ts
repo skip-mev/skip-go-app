@@ -8,5 +8,7 @@ declare namespace NodeJS {
 
     readonly CORS_EDGE_CONFIG?: string;
     readonly RESEND_API_KEY?: string;
+    readonly NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?: string;
+    readonly WALLETCONNECT_VERIFY_KEY?: string;
   }
 }
