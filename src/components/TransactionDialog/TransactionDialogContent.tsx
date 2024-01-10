@@ -133,6 +133,7 @@ function TransactionDialogContent({
             raise(
               `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
             );
+          await wallet.initOfflineSigner();
 
           return (
             wallet.offlineSigner ||
