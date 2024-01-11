@@ -3,11 +3,13 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
 } from "react";
 
-import { Chain, useChains } from "@/api/queries";
+import { Chain, useChains } from "@/hooks/useChains";
 
 import {
   filterAssetsWithMetadata,
@@ -18,7 +20,7 @@ export type AssetWithMetadata = Required<Asset>;
 
 interface AssetsContext {
   assets: Record<string, AssetWithMetadata[]>;
-  assetsByChainID: (chainID: string) => AssetWithMetadata[];
+  assetsByChainID: (chainID?: string) => AssetWithMetadata[];
   getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
   getFeeDenom(chainID: string): AssetWithMetadata | undefined;
   getNativeAssets(): AssetWithMetadata[];
@@ -128,67 +130,65 @@ function getAssetSymbol(
 }
 
 export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { chains } = useChains();
-
+  const { data: chains } = useChains();
   const { data: solveAssets } = useSolveAssets();
 
   const assets = useMemo(() => {
-    if (!solveAssets || !chains) {
-      return {};
+    const data: Record<string, AssetWithMetadata[]> = {};
+
+    if (!solveAssets || !chains) return data;
+
+    for (const [chainID, assets] of Object.entries(solveAssets)) {
+      data[chainID] = filterAssetsWithMetadata(assets).map((asset) => {
+        const logoURI =
+          asset.originDenom === "utia"
+            ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
+            : asset.logoURI;
+        return {
+          ...asset,
+          symbol: getAssetSymbol(asset, assets, chains),
+          logoURI,
+        };
+      });
     }
 
-    return Object.entries(solveAssets).reduce(
-      (acc, [chainID, assets]) => {
-        return {
-          ...acc,
-          [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
-            ...asset,
-            symbol: getAssetSymbol(asset, assets, chains),
-            logoURI:
-              asset.originDenom === "utia"
-                ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
-                : asset.logoURI,
-          })),
-        };
-      },
-      {} as Record<string, AssetWithMetadata[]>,
-    );
+    return data;
   }, [chains, solveAssets]);
 
-  function assetsByChainID(chainID: string) {
-    return assets[chainID] || [];
-  }
+  const assetsByChainID: AssetsContext["assetsByChainID"] = useCallback(
+    (chainID?: string) => {
+      return chainID ? assets[chainID] || [] : [];
+    },
+    [assets],
+  );
 
-  function getAsset(denom: string, chainID: string) {
-    const asset = assets[chainID]?.find((asset) => asset.denom === denom);
+  const getAsset = useCallback(
+    (denom: string, chainID: string) => {
+      const asset = assets[chainID]?.find((asset) => asset.denom === denom);
+      return asset;
+    },
+    [assets],
+  );
 
-    return asset;
-  }
+  const getFeeDenom = useCallback(
+    (chainID: string) => {
+      const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
 
-  function getFeeDenom(chainID: string) {
-    const chain = (chains ?? []).find((c) => c.chainID === chainID);
+      if (!chain || chain.feeAssets.length === 0) return undefined;
 
-    if (!chain || chain.feeAssets.length === 0) {
-      return undefined;
-    }
+      // prioritize non-ibc assets
+      const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
+        if (a.denom.includes("ibc/")) return 1;
+        if (b.denom.includes("ibc/")) return -1;
+        return 0;
+      });
 
-    // prioritize non-ibc assets
-    const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
-      if (a.denom.includes("ibc/")) {
-        return 1;
-      }
+      return getAsset(sortedFeeDenoms[0].denom, chainID);
+    },
+    [chains, getAsset],
+  );
 
-      if (b.denom.includes("ibc/")) {
-        return -1;
-      }
-
-      return 0;
-    });
-
-    return getAsset(sortedFeeDenoms[0].denom, chainID);
-  }
-
-  function getNativeAssets() {
+  const getNativeAssets = useCallback(() => {
     const nativeAssets: AssetWithMetadata[] = [];
 
     for (const chainAssetList of Object.values(assets)) {
@@ -200,9 +200,24 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return nativeAssets;
-  }
+  }, [assets]);
 
   const isReady = useMemo(() => Object.keys(assets).length > 0, [assets]);
+
+  useEffect(() => {
+    if (!isReady || !chains || !assets) return;
+    const load = (src: string) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => img.remove();
+    };
+    chains.forEach(({ chainID, logoURI }) => {
+      logoURI && load(logoURI);
+      (assets[chainID] || []).forEach(({ logoURI }) => {
+        logoURI && load(logoURI);
+      });
+    });
+  }, [assets, chains, isReady]);
 
   return (
     <AssetsContext.Provider

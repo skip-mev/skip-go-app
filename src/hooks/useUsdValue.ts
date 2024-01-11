@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { getAssets } from "@/chains";
 import { raise } from "@/utils/assert";
-import { getUsdPrice } from "@/utils/llama";
+import { getUsdPrice } from "@/utils/usd";
 
 export type Args = {
   chainId: string;

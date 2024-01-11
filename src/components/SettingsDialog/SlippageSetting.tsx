@@ -11,7 +11,7 @@ export const SlippageSetting = () => {
     <div className="flex items-center p-2 space-x-2">
       <h3>Slippage</h3>
       <div className="flex-grow" />
-      <div className="flex flex-col items-stretch space-y-1">
+      <div className="flex flex-col items-stretch gap-1 w-full max-w-32">
         <div className="relative text-sm">
           <input
             className={clsx(
@@ -31,7 +31,7 @@ export const SlippageSetting = () => {
             %
           </div>
         </div>
-        <div className="flex items-center space-x-1">
+        <div className="grid grid-flow-col gap-1">
           {OPTION_VALUES.map((value, i) => (
             <button
               key={i}

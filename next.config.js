@@ -20,7 +20,12 @@ let nextConfig = {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
   productionBrowserSourceMaps: true,
-  rewrites: async () => [],
+  rewrites: async () => [
+    {
+      source: "/.well-known/walletconnect.txt",
+      destination: "/api/walletconnect/verify",
+    },
+  ],
   transpilePackages:
     process.env.NODE_ENV === "test"
       ? [
@@ -86,11 +91,6 @@ function checkEnv() {
 
   const log = require("next/dist/build/output/log");
 
-  if (!process.env.NEXT_PUBLIC_API_URL) {
-    log.warn(
-      'env NEXT_PUBLIC_API_URL is not set, using SKIP_API_URL from "@skip-router/core"',
-    );
-  }
   if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
     log.warn(
       "env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work",

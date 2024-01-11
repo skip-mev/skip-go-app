@@ -1,6 +1,6 @@
 import { AllTheProviders, renderHook, waitFor } from "@/test";
 
-import { useChainByID, useChains } from "../queries";
+import { useChainByID, useChains } from "../useChains";
 
 test("useChains attaches a prettyName", async () => {
   const { result } = renderHook(() => useChains(), {
@@ -11,13 +11,13 @@ test("useChains attaches a prettyName", async () => {
     timeout: 10000,
   });
 
-  expect(result.current.chains).toBeDefined();
+  expect(result.current.data).toBeDefined();
 
-  if (!result.current.chains) {
+  if (!result.current.data) {
     throw new Error("chains is undefined");
   }
 
-  for (const chain of result.current.chains) {
+  for (const chain of result.current.data) {
     expect(chain.prettyName).toBeDefined();
   }
 });
@@ -31,7 +31,7 @@ test("useChainByID returns the chain matching the specified chainID", async () =
     timeout: 10000,
   });
 
-  expect(result.current.chain?.chainID).toEqual("osmosis-1");
+  expect(result.current.data?.chainID).toEqual("osmosis-1");
 });
 
 test("useChainByID returns undefined if a matching chain cannot be found", async () => {
@@ -43,5 +43,5 @@ test("useChainByID returns undefined if a matching chain cannot be found", async
     timeout: 10000,
   });
 
-  expect(result.current.chain).toBeUndefined();
+  expect(result.current.data).toBeUndefined();
 });

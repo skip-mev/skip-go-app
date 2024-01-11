@@ -1,22 +1,23 @@
+import "@fontsource/jost/latin.css";
 import "@/styles/globals.css";
-import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
-import * as RadixToast from "@radix-ui/react-toast";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
-import Head from "next/head";
 import { ComponentProps } from "react";
+import { Toaster } from "react-hot-toast";
 import { WagmiConfig } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
-import { BuildInfo } from "@/components/BuildInfo";
-import MainLayout from "@/components/MainLayout";
+import { DefaultSeo } from "@/components/DefaultSeo";
+import { Footer } from "@/components/Footer";
+import Header from "@/components/Header";
+import SkipBanner from "@/components/SkipBanner";
+import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
-import { ToastProvider } from "@/context/toast";
 import { wallets } from "@/lib/cosmos-kit";
-import { queryClient } from "@/lib/react-query";
+import { persister, queryClient } from "@/lib/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
 import { SkipProvider } from "@/solve";
 
@@ -28,42 +29,49 @@ const chains = getChains() as ChainProviderProps["chains"];
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Head>
-        <title>
-          ibc.fun | Interchain transfers and swaps on any Cosmos chain
-        </title>
-        <meta
-          name="description"
-          content="Interchain transfers and swaps on any Cosmos chain"
-        />
-      </Head>
-      <main>
-        <QueryClientProvider client={queryClient}>
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={wallets}
-            throwErrors={false}
-          >
-            <WagmiConfig config={wagmiConfig}>
-              <SkipProvider>
-                <AssetsProvider>
-                  <RadixToast.ToastProvider>
-                    <ToastProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                    </ToastProvider>
-                    <RadixToast.Viewport className="w-[390px] max-w-[100vw] flex flex-col gap-2 p-6 fixed bottom-0 right-0 z-[999999]" />
-                  </RadixToast.ToastProvider>
-                </AssetsProvider>
-              </SkipProvider>
-            </WagmiConfig>
-          </ChainProvider>
-        </QueryClientProvider>
-      </main>
+      <DefaultSeo />
       <Analytics />
-      <BuildInfo />
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister }}
+      >
+        <ChainProvider
+          assetLists={assets}
+          chains={chains}
+          sessionOptions={{
+            duration: 1000 * 60 * 60 * 24, // 1 day
+          }}
+          throwErrors={false}
+          walletConnectOptions={
+            process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+              ? {
+                  signClient: {
+                    name: metadata.name,
+                    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+                  },
+                }
+              : undefined
+          }
+          wallets={wallets}
+        >
+          <WagmiConfig config={wagmiConfig}>
+            <SkipProvider>
+              <AssetsProvider>
+                <main className="min-h-screen flex flex-col items-center relative sm:pt-11">
+                  <SkipBanner className="z-50 top-0 inset-x-0 sm:fixed w-screen" />
+                  <Header />
+                  <Component {...pageProps} />
+                  <Footer />
+                </main>
+                <Toaster
+                  position="bottom-center"
+                  toastOptions={{ duration: 1000 * 10 }}
+                />
+              </AssetsProvider>
+            </SkipProvider>
+          </WagmiConfig>
+        </ChainProvider>
+      </PersistQueryClientProvider>
     </>
   );
 }

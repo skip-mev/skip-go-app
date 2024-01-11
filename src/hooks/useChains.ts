@@ -1,59 +1,55 @@
 import { Chain as SkipChain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 
-import { chainRecord } from "@/chains";
+import { chainIdToName } from "@/chains";
+import { chainIdToPrettyName } from "@/chains/pretty";
 import { useSkipClient } from "@/solve";
 
-export type Chain = {
+export type Chain = SkipChain & {
   prettyName: string;
-  record?: (typeof chainRecord)[string];
-} & SkipChain;
+  registryChainName: string;
+};
 
 export type UseChainsQueryArgs<T = Chain[]> = {
+  enabled?: boolean;
   select?: (arr?: Chain[]) => T;
 };
 
 export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   const { select = (t) => t as T } = args;
 
-  const skipRouter = useSkipClient();
+  const skipClient = useSkipClient();
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ["skip-api-chains"],
     queryFn: async () => {
-      const chains = await skipRouter.chains({
+      const chains = await skipClient.chains({
         includeEVM: true,
       });
 
       return chains
         .map((chain): Chain => {
-          const record = chainRecord[chain.chainID];
           return {
             ...chain,
-            prettyName: record?.pretty_name ?? chain.chainName,
-            record,
+            prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
+            registryChainName: chainIdToName[chain.chainID],
           };
         })
         .sort((chainA, chainB) => {
           return chainA.prettyName.localeCompare(chainB.prettyName);
         });
     },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
     select,
+    enabled: args.enabled,
   });
-
-  return {
-    ...query,
-    chains: query.data,
-  };
 }
 
-export function useChainByID(chainID: string) {
-  const { chains, ...queryResult } = useChains({
+export function useChainByID(chainID?: string) {
+  return useChains({
     select: (chains) => (chains ?? []).find((c) => c.chainID === chainID),
+    enabled: Boolean(chainID),
   });
-
-  return {
-    ...queryResult,
-    chain: chains,
-  };
 }

@@ -1,5 +1,6 @@
 import { RouteResponse } from "@skip-router/core";
-import { FC, Fragment, useEffect, useState } from "react";
+import { clsx } from "clsx";
+import { Fragment, useEffect, useState } from "react";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
@@ -18,7 +19,7 @@ interface Props {
   routeWarningTitle?: string;
 }
 
-const TransactionDialog: FC<Props> = ({
+function TransactionDialog({
   isLoading,
   route,
   insufficientBalance,
@@ -26,11 +27,11 @@ const TransactionDialog: FC<Props> = ({
   shouldShowPriceImpactWarning,
   routeWarningMessage,
   routeWarningTitle,
-}) => {
+}: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const [, control] = useDisclosureKey("priceImpactWarning");
+  const [, control] = useDisclosureKey("priceImpactDialog");
 
   useEffect(() => {
     if (!isOpen) {
@@ -58,14 +59,18 @@ const TransactionDialog: FC<Props> = ({
     <Fragment>
       <div>
         <button
-          className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+          className={clsx(
+            "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full outline-none transition-[opacity,transform]",
+            "disabled:cursor-not-allowed disabled:opacity-75",
+            "enabled:hover:scale-105 enabled:hover:rotate-1",
+          )}
           disabled={!route || (typeof isLoading === "boolean" && isLoading)}
           onClick={() => setIsOpen(true)}
         >
           Preview Route
         </button>
         {isOpen && (
-          <div className="absolute inset-0 bg-white rounded-3xl z-[999]">
+          <div className="absolute inset-0 bg-white rounded-3xl">
             {route && (
               <TransactionDialogContent
                 route={route}
@@ -84,6 +89,6 @@ const TransactionDialog: FC<Props> = ({
       />
     </Fragment>
   );
-};
+}
 
 export default TransactionDialog;

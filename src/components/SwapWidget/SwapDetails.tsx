@@ -1,4 +1,4 @@
-import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -6,6 +6,7 @@ import { Fragment, useEffect, useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
+import { formatMaxFraction, formatPercent } from "@/utils/intl";
 
 import { ConversionRate } from "../ConversionRate";
 import { SimpleTooltip } from "../SimpleTooltip";
@@ -32,7 +33,7 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { slippage } = useSettingsStore();
+  const { gas, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -62,7 +63,12 @@ export const SwapDetails = ({
 
   return (
     <Collapsible.Root
-      className="border border-neutral-200 px-4 py-2 rounded-lg text-sm group"
+      className={clsx(
+        "px-4 py-2 rounded-lg text-sm group",
+        "border border-neutral-200 transition-[border,shadow]",
+        "hover:border-neutral-300 hover:shadow-sm",
+        "focus-within:border-neutral-300 focus-within:shadow-sm",
+      )}
       open={open}
       onOpenChange={control.set}
     >
@@ -75,8 +81,12 @@ export const SwapDetails = ({
         >
           {({ left, right, conversion, toggle }) => (
             <div>
-              <button className="mr-2" onClick={toggle}>
-                1 {left.symbol} = {format(conversion)} {right.symbol}
+              <button className="mr-2 tabular-nums" onClick={toggle}>
+                1 {(left.symbol ?? "").replace(/\sEthereum$/, "")} ={" "}
+                {conversion.toLocaleString("en-US", {
+                  maximumFractionDigits: 4,
+                })}{" "}
+                {(right.symbol ?? "").replace(/\sEthereum$/, "")}
               </button>
               <span className="text-neutral-400 tabular-nums">
                 <UsdValue
@@ -93,10 +103,19 @@ export const SwapDetails = ({
         <div className="flex-grow" />
         <Collapsible.Trigger
           className={clsx(
-            "flex items-center text-xs text-neutral-400 relative",
+            "flex items-center text-xs relative gap-1",
             "before:absolute before:-inset-2 before:content-['']",
+            "text-neutral-400",
           )}
         >
+          <span
+            className={clsx(
+              "text-neutral-400 tabular-nums transition-opacity animate-slide-left-and-fade",
+              open && "hidden",
+            )}
+          >
+            Slippage: {slippage}%
+          </span>
           <ChevronDownIcon
             className={clsx(
               "w-4 h-4 transition",
@@ -122,49 +141,52 @@ export const SwapDetails = ({
         >
           {priceImpactPercent ? (
             <Fragment>
-              <dt>
-                <span
-                  className={clsx(
-                    priceImpactThresholdReached ? "text-red-500" : undefined,
-                  )}
-                >
-                  Price Impact
-                </span>
+              <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>
+                Price Impact
               </dt>
-              <dd
-                className={clsx(
-                  priceImpactThresholdReached ? "text-red-500" : undefined,
-                )}
-              >
-                {new Intl.NumberFormat("en-US", {
-                  style: "percent",
-                  maximumFractionDigits: 2,
-                }).format(priceImpactPercent)}
+              <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>
+                {formatPercent(priceImpactPercent)}
               </dd>
             </Fragment>
           ) : null}
-          <dt>
-            Max Slippage{" "}
-            <SimpleTooltip label="Click to change max slippage">
+          <dt>Slippage</dt>
+          <dd>
+            <SimpleTooltip label="Click to change maximum slippage">
               <button
-                className="relative before:absolute before:-inset-2"
+                className={clsx(
+                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "text-red-500 hover:bg-neutral-100",
+                  "rounded",
+                )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <PencilSquareIcon className="w-3 h-3 -mb-px" />
+                <PencilSquareIcon className="w-3 h-3" />
               </button>
             </SimpleTooltip>
-          </dt>
-          <dd>{slippage}%</dd>
+            {slippage}%
+          </dd>
+          <dt>Gas Adjustment</dt>
+          <dd>
+            <SimpleTooltip label="Click to change gas adjusment">
+              <button
+                className={clsx(
+                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "text-red-500 hover:bg-neutral-100",
+                  "rounded",
+                )}
+                onClick={() => disclosure.open("settingsDialog")}
+              >
+                <PencilSquareIcon className="w-3 h-3" />
+              </button>
+            </SimpleTooltip>
+            {parseFloat(gas).toLocaleString()}
+          </dd>
           <dt>Bridging Fee</dt>
           <dd>
-            {format(bridgingFee)} {isEvm ? "ETH" : ""}
+            {formatMaxFraction(bridgingFee)} {isEvm ? "ETH" : ""}
           </dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
   );
 };
-
-const { format } = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 8,
-});

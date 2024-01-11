@@ -1,17 +1,18 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
-import { FC, useEffect } from "react";
+import { ElementRef, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
 
-import { useChains as useSkipChains } from "@/api/queries";
-import { useDisclosureKey } from "@/context/disclosures";
+import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
+import { useChains as useSkipChains } from "@/hooks/useChains";
 
+import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
-import { ConnectWalletButtonSmall } from "../ConnectWalletButtonSmall";
+import { ContactDialog } from "../ContactDialog";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
@@ -19,16 +20,19 @@ import RouteLoadingBanner from "../RouteLoadingBanner";
 import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
 import { SettingsButton } from "../SettingsButton";
 import { SettingsDialog } from "../SettingsDialog";
+import { SimpleTooltip } from "../SimpleTooltip";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
 import { useWalletModal, WalletModal } from "../WalletModal";
 import { SwapDetails } from "./SwapDetails";
 import { useSwapWidget } from "./useSwapWidget";
 
-export const SwapWidget: FC = () => {
+export function SwapWidget() {
+  useEffect(() => void disclosure.rehydrate(), []);
+
   const { openWalletModal } = useWalletModal();
 
-  const { chains } = useSkipChains();
+  const { data: chains } = useSkipChains();
 
   const {
     amountIn,
@@ -61,26 +65,15 @@ export const SwapWidget: FC = () => {
       parseFloat(route.usdAmountIn);
   }
 
-  const {
-    address,
-    isWalletConnected: isSourceWalletConnected,
-    wallet,
-  } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
-
-  const {
-    address: destinationChainAddress,
-    isWalletConnected: isDestinationWalletConnected,
-  } = useAccount(destinationChain?.chainID ?? "cosmoshub-4");
+  const srcAccount = useAccount(sourceChain?.chainID);
+  const destAccount = useAccount(destinationChain?.chainID);
 
   const isWalletConnected =
-    isSourceWalletConnected && isDestinationWalletConnected;
+    srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
 
-  const shouldShowDestinationWalletButton =
-    !!sourceChain &&
-    !!destinationChain &&
-    sourceChain.chainType !== destinationChain.chainType;
-
-  const [isSwapDetailsOpen] = useDisclosureKey("swapDetailsCollapsible");
+  function promptDestAsset() {
+    document.querySelector("[data-testid='destination'] button")?.click();
+  }
 
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();
@@ -93,9 +86,22 @@ export const SwapWidget: FC = () => {
     });
   }, []);
 
+  const invertButtonRef = useRef<ElementRef<"button">>(null);
+  useEffect(() => {
+    const ref = invertButtonRef.current;
+    if (!ref) return;
+    const listener = () => ref.setAttribute("data-swap", "false");
+    ref.addEventListener("animationend", listener);
+    return () => ref.removeEventListener("animationend", listener);
+  }, []);
+
+  const accountStateKey = `${
+    srcAccount?.isWalletConnected ? "src" : "no-src"
+  }-${destAccount?.isWalletConnected ? "dest" : "no-dest"}`;
+
   return (
     <UsdDiff.Provider>
-      <Tooltip.Provider>
+      <Tooltip.Provider delayDuration={0} disableHoverableContent>
         <div className="space-y-4">
           <div className="flex items-center h-8">
             <p className="font-semibold text-2xl">From</p>
@@ -103,24 +109,27 @@ export const SwapWidget: FC = () => {
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
-            {address && wallet && isSourceWalletConnected ? (
-              <ConnectedWalletButton
-                address={address}
-                onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
-                walletName={wallet.walletPrettyName}
-                walletLogo={
-                  wallet.walletInfo.logo
-                    ? typeof wallet.walletInfo.logo === "string"
-                      ? wallet.walletInfo.logo
-                      : wallet.walletInfo.logo.major
-                    : ""
-                }
-              />
-            ) : (
-              <ConnectWalletButtonSmall
-                onClick={() => openWalletModal(sourceChain?.chainID ?? "")}
-              />
-            )}
+            {srcAccount?.address && srcAccount?.wallet ? (
+              <SimpleTooltip label="Change Source Wallet">
+                <ConnectedWalletButton
+                  address={srcAccount.address}
+                  onClick={() =>
+                    sourceChain?.chainID &&
+                    openWalletModal(sourceChain.chainID, "src")
+                  }
+                  walletName={srcAccount.wallet?.walletPrettyName}
+                  walletLogo={
+                    srcAccount.wallet.walletInfo
+                      ? typeof srcAccount.wallet.walletInfo.logo === "string"
+                        ? srcAccount.wallet.walletInfo.logo
+                        : srcAccount.wallet.walletInfo.logo?.major ||
+                          srcAccount.wallet.walletInfo.logo?.minor
+                      : ""
+                  }
+                  className="animate-slide-left-and-fade"
+                />
+              </SimpleTooltip>
+            ) : null}
           </div>
           <div data-testid="source">
             <AssetInput
@@ -136,18 +145,22 @@ export const SwapWidget: FC = () => {
               onChainChange={onSourceChainChange}
               showBalance
               context="src"
+              isLoading={direction === "swap-out" && routeLoading}
             />
           </div>
           <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <button
                 className={clsx(
-                  "bg-black text-white w-10 h-10 rounded-md flex items-center justify-center z-10 hover:scale-110 transition-transform",
-                  "disabled:hover:scale-100 disabled:bg-gray-700 disabled:cursor-not-allowed",
+                  "bg-neutral-900 text-white w-8 h-8 rounded-md flex items-center justify-center pointer-events-auto",
+                  "enabled:hover:scale-105 enabled:hover:rotate-3 transition-transform",
+                  "disabled:hover:scale-100 disabled:bg-neutral-500 disabled:cursor-not-allowed",
+                  "data-[swap=true]:animate-spin-swap data-[swap=true]:pointer-events-none",
                 )}
-                disabled={!destinationChain || !destinationAsset}
+                disabled={!destinationChain}
                 onClick={() => {
-                  if (!destinationChain || !destinationAsset) return;
+                  if (!destinationChain || !invertButtonRef.current) return;
+                  invertButtonRef.current.setAttribute("data-swap", "true");
                   setFormValues({
                     sourceChain: destinationChain,
                     sourceAsset: destinationAsset,
@@ -159,29 +172,35 @@ export const SwapWidget: FC = () => {
                   });
                 }}
                 data-testid="swap-button"
+                ref={invertButtonRef}
               >
                 <ArrowsUpDownIcon className="w-4 h-4" />
               </button>
             </div>
             <p className="font-semibold text-2xl">To</p>
-            {shouldShowDestinationWalletButton ? (
-              <div className="absolute inset-y-0 right-0 flex items-center">
-                <button
-                  className="bg-[#FF486E]/20 hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 flex items-center gap-1 transition-colors focus:outline-none"
-                  onClick={() =>
-                    openWalletModal(destinationChain?.chainID ?? "cosmoshub-4")
-                  }
-                  data-testid="destination-wallet-btn"
-                >
-                  {destinationChainAddress
-                    ? `${destinationChainAddress.slice(
-                        0,
-                        8,
-                      )}...${destinationChainAddress.slice(-5)}`
-                    : "Connect Wallet"}
-                </button>
-              </div>
-            ) : null}
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              {destAccount?.address && destAccount?.wallet ? (
+                <SimpleTooltip label="Change Destination Wallet">
+                  <ConnectedWalletButton
+                    address={destAccount.address}
+                    onClick={() => {
+                      destinationChain?.chainID &&
+                        openWalletModal(destinationChain.chainID, "dest");
+                    }}
+                    walletName={destAccount.wallet?.walletPrettyName}
+                    walletLogo={
+                      destAccount.wallet.walletInfo
+                        ? typeof destAccount.wallet.walletInfo.logo === "string"
+                          ? destAccount.wallet.walletInfo.logo
+                          : destAccount.wallet.walletInfo.logo?.major ||
+                            destAccount.wallet.walletInfo.logo?.minor
+                        : ""
+                    }
+                    className="animate-slide-left-and-fade"
+                  />
+                </SimpleTooltip>
+              ) : null}
+            </div>
           </div>
           <div data-testid="destination">
             <AssetInput
@@ -196,8 +215,9 @@ export const SwapWidget: FC = () => {
               }}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
-              showSlippage={!isSwapDetailsOpen}
+              showBalance
               context="dest"
+              isLoading={direction === "swap-in" && routeLoading}
             />
           </div>
           {route && (
@@ -220,44 +240,52 @@ export const SwapWidget: FC = () => {
               numberOfTransactions={numberOfTransactions}
             />
           )}
-          {routeError !== "" && (
+          {!!routeError && (
             <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
               <p className="flex-1">{routeError}</p>
             </div>
           )}
-          {destinationChain?.chainID === "dydx-mainnet-1" ? (
+          {destinationChain?.chainID === "dydx-mainnet-1" && (
             <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-              <p className="flex-1">
+              <p className="flex-1 [&_a]:underline">
                 This transaction will let you transfer and stake tokens on dydx,
                 it will not allow you to trade. Follow the{" "}
-                <a
-                  href="https://dydx.exchange/"
-                  className="underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <AdaptiveLink href="https://dydx.exchange">
                   dydx frontend
-                </a>{" "}
+                </AdaptiveLink>{" "}
                 directions to set up a trading account
               </p>
             </div>
-          ) : null}
-          {sourceChain && !isWalletConnected && (
+          )}
+          {!isWalletConnected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
               onClick={() => {
-                if (!isSourceWalletConnected) {
-                  openWalletModal(sourceChain.chainID);
+                if (sourceChain && !srcAccount?.isWalletConnected) {
+                  openWalletModal(sourceChain.chainID, "src");
                   return;
                 }
-
-                if (destinationChain && !isDestinationWalletConnected) {
-                  openWalletModal(destinationChain.chainID);
+                if (!destinationChain) {
+                  promptDestAsset();
+                  return;
+                }
+                if (destinationChain && !destAccount?.isWalletConnected) {
+                  openWalletModal(destinationChain.chainID, "dest");
                   return;
                 }
               }}
             >
-              Connect Wallet
+              <div key={accountStateKey} className="animate-slide-up-and-fade">
+                {!srcAccount?.isWalletConnected &&
+                  !destAccount?.isWalletConnected &&
+                  "Connect Wallet"}
+                {!srcAccount?.isWalletConnected &&
+                  destAccount?.isWalletConnected &&
+                  "Connect Source Wallet"}
+                {srcAccount?.isWalletConnected &&
+                  !destAccount?.isWalletConnected &&
+                  "Connect Destination Wallet"}
+              </div>
             </button>
           )}
           {sourceChain && isWalletConnected && (
@@ -281,6 +309,7 @@ export const SwapWidget: FC = () => {
             </div>
           )}
         </div>
+        <ContactDialog />
         <HistoryDialog />
         <SettingsDialog />
         <JsonDialog />
@@ -288,4 +317,4 @@ export const SwapWidget: FC = () => {
       <WalletModal />
     </UsdDiff.Provider>
   );
-};
+}

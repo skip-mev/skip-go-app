@@ -1,32 +1,26 @@
+import { AssetsRequest, SwapVenue } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSkipClient } from "./hooks";
 
-export function useAssets() {
+export function useAssets(options: AssetsRequest = {}) {
   const skipClient = useSkipClient();
 
+  const queryKey = useMemo(() => ["solve-assets", options] as const, [options]);
+
   return useQuery({
-    queryKey: ["solve-assets"],
-    queryFn: () => {
+    queryKey,
+    queryFn: ({ queryKey: [, options] }) => {
       return skipClient.assets({
         includeEvmAssets: true,
         includeCW20Assets: true,
+        ...options,
       });
     },
-  });
-}
-
-export function useSolveChains() {
-  const skipClient = useSkipClient();
-  return useQuery({
-    queryKey: ["solve-chains"],
-    queryFn: () => {
-      return skipClient.chains({
-        includeEVM: true,
-      });
-    },
-    placeholderData: [],
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -38,6 +32,7 @@ interface UseRouteArgs {
   destinationAsset?: string;
   destinationAssetChainID?: string;
   enabled?: boolean;
+  swapVenue?: SwapVenue;
 }
 
 export function useRoute({
@@ -48,22 +43,49 @@ export function useRoute({
   destinationAsset,
   destinationAssetChainID,
   enabled,
+  swapVenue,
 }: UseRouteArgs) {
   const skipClient = useSkipClient();
 
   const [refetchCount, setRefetchCount] = useState(0);
 
-  return useQuery({
-    queryKey: [
-      "solve-route",
-      direction,
+  const queryKey = useMemo(
+    () =>
+      [
+        "solve-route",
+        direction,
+        amount,
+        sourceAsset,
+        destinationAsset,
+        sourceAssetChainID,
+        destinationAssetChainID,
+        swapVenue,
+      ] as const,
+    [
       amount,
-      sourceAsset,
       destinationAsset,
-      sourceAssetChainID,
       destinationAssetChainID,
+      direction,
+      sourceAsset,
+      sourceAssetChainID,
+      swapVenue,
     ],
-    queryFn: async () => {
+  );
+
+  const query = useQuery({
+    queryKey,
+    queryFn: async ({
+      queryKey: [
+        ,
+        direction,
+        amount,
+        sourceAsset,
+        destinationAsset,
+        sourceAssetChainID,
+        destinationAssetChainID,
+        swapVenue,
+      ],
+    }) => {
       if (
         !sourceAsset ||
         !sourceAssetChainID ||
@@ -81,6 +103,7 @@ export function useRoute({
               sourceAssetChainID: sourceAssetChainID,
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
+              swapVenue,
             }
           : {
               amountOut: amount,
@@ -88,6 +111,7 @@ export function useRoute({
               sourceAssetChainID: sourceAssetChainID,
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
+              swapVenue,
             },
       );
 
@@ -97,16 +121,7 @@ export function useRoute({
 
       return route;
     },
-    refetchInterval: (query) => {
-      if (refetchCount < 10 && query.isActive()) {
-        setRefetchCount((c) => c + 1);
-        return 1000 * 2;
-      }
-      return false;
-    },
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    refetchInterval: refetchCount < 10 ? 1000 * 5 : false,
     retry: false,
     enabled:
       enabled &&
@@ -116,4 +131,16 @@ export function useRoute({
       !!destinationAssetChainID &&
       amount !== "0",
   });
+
+  useEffect(() => {
+    if (query.isRefetching) {
+      setRefetchCount((count) => count + 1);
+    }
+  }, [query.isRefetching]);
+
+  useEffect(() => {
+    setRefetchCount(0);
+  }, [queryKey]);
+
+  return query;
 }

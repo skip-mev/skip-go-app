@@ -3,9 +3,9 @@ import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
 import { FC, Fragment, useMemo, useState } from "react";
 
-import { useChainByID } from "@/api/queries";
 import { useAssets } from "@/context/assets";
-import { getChainLogo } from "@/cosmos";
+import { useChainByID } from "@/hooks/useChains";
+import { getChainLogo } from "@/lib/cosmos";
 
 export interface SwapVenueConfig {
   name: string;
@@ -77,9 +77,8 @@ const RouteEnd: FC<{
 };
 
 const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
-  console.log("destination chain id", action.destinationChain);
-  const { chain: sourceChain } = useChainByID(action.sourceChain);
-  const { chain: destinationChain } = useChainByID(action.destinationChain);
+  const { data: sourceChain } = useChainByID(action.sourceChain);
+  const { data: destinationChain } = useChainByID(action.destinationChain);
 
   const { getAsset } = useAssets();
 
@@ -284,8 +283,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
     route.destAssetChainID,
   );
 
-  const { chain: sourceChain } = useChainByID(route.sourceAssetChainID);
-  const { chain: destinationChain } = useChainByID(route.destAssetChainID);
+  const { data: sourceChain } = useChainByID(route.sourceAssetChainID);
+  const { data: destinationChain } = useChainByID(route.destAssetChainID);
 
   const amountIn = useMemo(() => {
     try {
@@ -402,7 +401,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   return (
     <div className="relative h-full">
-      <div className="absolute w-14 inset-y-0 z-0 py-7 flex justify-center items-center">
+      <div className="absolute w-14 inset-y-0 py-7 flex justify-center items-center">
         <div className="w-0.5 h-full bg-neutral-200"></div>
       </div>
       <div className="relative flex flex-col gap-4 justify-between h-full">

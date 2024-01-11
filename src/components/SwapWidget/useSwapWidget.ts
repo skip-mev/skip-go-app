@@ -1,15 +1,21 @@
-import { ethers } from "ethers";
+import { BigNumber } from "bignumber.js";
+import { ethers, formatUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNetwork, useSwitchNetwork } from "wagmi";
-import { subscribeWithSelector } from "zustand/middleware";
+import {
+  createJSONStorage,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
-import { Chain, useChains } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAccount } from "@/hooks/useAccount";
+import { useBalancesByChain } from "@/hooks/useBalancesByChain";
+import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
-import { useBalancesByChain } from "@/utils/utils";
+import { formatPercent, formatUSD } from "@/utils/intl";
 
 export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
@@ -99,18 +105,18 @@ export function useSwapWidget() {
   useEffect(() => {
     if (!routeResponse || routeLoading) return;
 
-    const newAmount =
-      direction === "swap-in"
-        ? routeResponse.amountOut
-        : routeResponse.amountIn;
+    const isSwapIn = direction === "swap-in";
 
-    const formattedNewAmount =
-      direction === "swap-in"
-        ? parseAmountWei(newAmount, destinationAsset?.decimals)
-        : parseAmountWei(newAmount, sourceAsset?.decimals);
+    const newAmount = isSwapIn
+      ? routeResponse.amountOut
+      : routeResponse.amountIn;
+
+    const formattedNewAmount = isSwapIn
+      ? parseAmountWei(newAmount, destinationAsset?.decimals)
+      : parseAmountWei(newAmount, sourceAsset?.decimals);
 
     useFormValuesStore.setState(
-      direction === "swap-in"
+      isSwapIn
         ? { amountOut: formattedNewAmount }
         : { amountIn: formattedNewAmount },
     );
@@ -122,39 +128,32 @@ export function useSwapWidget() {
     destinationAsset?.decimals,
   ]);
 
-  const { address } = useAccount(sourceChain?.chainID ?? "cosmoshub-4");
+  const account = useAccount(sourceChain?.chainID);
 
   const { assetsByChainID } = useAssets();
 
-  const sourceChainAssets = assetsByChainID(
-    sourceChain?.chainID ?? "cosmoshub-4",
-  );
+  const sourceChainAssets = assetsByChainID(sourceChain?.chainID);
 
   const { data: balances } = useBalancesByChain(
-    address,
+    account?.address,
     sourceChain,
     sourceChainAssets,
   );
 
   const insufficientBalance = useMemo(() => {
-    if (!sourceAsset || !balances) {
-      return false;
-    }
+    const asset = sourceAsset;
 
-    const parsedAmountIn = parseFloat(amountIn);
+    if (!asset || !balances) return false;
 
-    if (isNaN(parsedAmountIn)) {
-      return false;
-    }
+    const parsedAmount = parseFloat(amountIn);
 
-    const balanceStr = balances[sourceAsset.denom] ?? "0";
+    if (isNaN(parsedAmount)) return false;
 
-    const balance = parseFloat(
-      ethers.formatUnits(balanceStr, sourceAsset.decimals),
-    );
+    const balanceStr = balances[asset.denom] ?? "0";
+    const balance = parseFloat(formatUnits(balanceStr, asset.decimals));
 
-    return parsedAmountIn > balance;
-  }, [balances, amountIn, sourceAsset]);
+    return parsedAmount > balance;
+  }, [amountIn, balances, sourceAsset]);
 
   const { chain: currentEvmChain } = useNetwork();
 
@@ -217,20 +216,15 @@ export function useSwapWidget() {
     }
 
     if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
-      const amountInUSD = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(parseFloat(routeResponse.usdAmountIn ?? "0"));
+      const amountInUSD = formatUSD(
+        parseFloat(routeResponse.usdAmountIn ?? "0"),
+      );
 
-      const amountOutUSD = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(parseFloat(routeResponse.usdAmountOut ?? "0"));
+      const amountOutUSD = formatUSD(
+        parseFloat(routeResponse.usdAmountOut ?? "0"),
+      );
 
-      const formattedUsdDiffPercent = new Intl.NumberFormat("en-US", {
-        style: "percent",
-        maximumFractionDigits: 2,
-      }).format(Math.abs(usdDiffPercent));
+      const formattedUsdDiffPercent = formatPercent(Math.abs(usdDiffPercent));
       return [
         "Bad Trade Warning",
         `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`,
@@ -241,10 +235,7 @@ export function useSwapWidget() {
       swapPriceImpactPercent &&
       swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD
     ) {
-      const formattedPriceImpact = new Intl.NumberFormat("en-US", {
-        style: "percent",
-        maximumFractionDigits: 2,
-      }).format(swapPriceImpactPercent);
+      const formattedPriceImpact = formatPercent(swapPriceImpactPercent);
       return [
         "Bad Trade Warning",
         `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`,
@@ -290,23 +281,62 @@ export interface FormValues {
   direction: "swap-in" | "swap-out";
 }
 
+const defaultValues: FormValues = {
+  amountIn: "",
+  amountOut: "",
+  direction: "swap-in",
+};
+
 const useFormValuesStore = create(
-  subscribeWithSelector<FormValues>(() => ({
-    amountIn: "",
-    amountOut: "",
-    direction: "swap-in",
-  })),
+  subscribeWithSelector(
+    persist(() => defaultValues, {
+      name: "SwapWidgetState",
+      version: 1,
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state): Partial<FormValues> => ({
+        sourceChain: state.sourceChain,
+        sourceAsset: state.sourceAsset,
+        destinationChain: state.destinationChain,
+        destinationAsset: state.destinationAsset,
+      }),
+      skipHydration: true,
+    }),
+  ),
 );
 
 // useFormValues returns a set of form values that are used to populate the swap widget
 // and handles logic regarding setting initial values based on local storage and other form values.
 function useFormValues() {
-  const { chains } = useChains();
+  useEffect(() => void useFormValuesStore.persist.rehydrate(), []);
+
+  const { data: chains } = useChains();
 
   const { assetsByChainID, getFeeDenom } = useAssets();
 
   const [userSelectedDestinationAsset, setUserSelectedDestinationAsset] =
     useState(false);
+
+  useEffect(() => {
+    return useFormValuesStore.subscribe(
+      (state) => state.amountIn,
+      (current, prev) => {
+        if ((!current || current == "0") && prev) {
+          useFormValuesStore.setState({ amountOut: "" });
+        }
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    return useFormValuesStore.subscribe(
+      (state) => state.amountOut,
+      (current, prev) => {
+        if ((!current || current == "0") && prev) {
+          useFormValuesStore.setState({ amountIn: "" });
+        }
+      },
+    );
+  }, []);
 
   // Select initial source chain.
   // - If chainID exists in local storage, use that.
@@ -316,8 +346,7 @@ function useFormValues() {
       (state) => state.sourceChain,
       (sourceChain) => {
         if (!sourceChain && (chains ?? []).length > 0) {
-          const chainID =
-            localStorage.getItem(LAST_SOURCE_CHAIN_KEY) ?? "cosmoshub-4";
+          const chainID = "cosmoshub-4";
           useFormValuesStore.setState({
             sourceChain: (chains ?? []).find(
               (chain) => chain.chainID === chainID,
@@ -331,22 +360,6 @@ function useFormValues() {
       },
     );
   }, [chains]);
-
-  // When source chain changes, save to local storage.
-  useEffect(() => {
-    return useFormValuesStore.subscribe(
-      (state) => state.sourceChain,
-      (sourceChain) => {
-        if (sourceChain) {
-          localStorage.setItem(LAST_SOURCE_CHAIN_KEY, sourceChain.chainID);
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, []);
 
   // Select initial source asset.
   // - If fee denom exists for source chain, use that.
@@ -462,8 +475,13 @@ function findEquivalentAsset(
 function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
   if (!asset || !amount) return "0";
   try {
-    return ethers.parseUnits(amount, asset.decimals).toString();
-  } catch {
+    return new BigNumber(amount.replace(/,/g, ""))
+      .shiftedBy(asset.decimals ?? 6)
+      .toFixed(0);
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(err);
+    }
     return "0";
   }
 }
@@ -471,8 +489,11 @@ function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
 function parseAmountWei(amount?: string, decimals = 6) {
   if (!amount) return "0";
   try {
-    return ethers.formatUnits(amount, decimals ?? 6);
-  } catch {
+    return ethers.formatUnits(amount.replace(/,/g, ""), decimals ?? 6);
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(err);
+    }
     return "0";
   }
 }

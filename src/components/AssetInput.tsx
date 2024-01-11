@@ -1,21 +1,24 @@
-import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
-import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { formatUnits } from "ethers";
+import { MouseEventHandler, useMemo } from "react";
+import toast from "react-hot-toast";
 
-import { Chain } from "@/api/queries";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import Toast from "@/elements/Toast";
 import { useAccount } from "@/hooks/useAccount";
-import { formatUSD, getFee, useBalancesByChain } from "@/utils/utils";
+import { useBalancesByChain } from "@/hooks/useBalancesByChain";
+import { Chain } from "@/hooks/useChains";
+import { formatPercent, formatUSD } from "@/utils/intl";
+import {
+  formatNumberWithCommas,
+  formatNumberWithoutCommas,
+} from "@/utils/number";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
-import { ClientOnly } from "./ClientOnly";
 import { SimpleTooltip } from "./SimpleTooltip";
+import { SpinnerIcon } from "./SpinnerIcon";
 
 interface Props {
   amount: string;
@@ -30,9 +33,10 @@ interface Props {
   showBalance?: boolean;
   showSlippage?: boolean;
   context?: "src" | "dest";
+  isLoading?: boolean;
 }
 
-const AssetInput: FC<Props> = ({
+function AssetInput({
   amount,
   amountUSD,
   diffPercentage = 0,
@@ -43,11 +47,9 @@ const AssetInput: FC<Props> = ({
   chains,
   onChainChange,
   showBalance,
-  showSlippage,
   context,
-}) => {
-  const [isError, setIsError] = useState(false);
-
+  isLoading,
+}: Props) {
   const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
 
   const assets = useMemo(() => {
@@ -60,218 +62,212 @@ const AssetInput: FC<Props> = ({
 
   const showChainInfo = chain ? false : true;
 
-  const { address } = useAccount(chain?.chainID ?? "cosmoshub-4");
+  const account = useAccount(chain?.chainID);
 
   const { data: balances } = useBalancesByChain(
-    address,
+    account?.address,
     chain,
     assets,
-    showBalance,
   );
 
   const selectedAssetBalance = useMemo(() => {
-    if (!asset || !balances) return undefined;
+    if (!asset || !balances) return 0;
 
     const balanceWei = balances[asset.denom];
-    if (!balanceWei) return "0.0";
+    if (!balanceWei) return 0;
 
-    const parsed = parseFloat(ethers.formatUnits(balanceWei, asset.decimals));
-    return parsed.toFixed(6);
+    return parseFloat(formatUnits(balanceWei, asset.decimals));
   }, [asset, balances]);
 
   const formattedSelectedAssetBalance = useMemo(() => {
-    const { format } = new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 6,
+    return selectedAssetBalance.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
     });
-    return format(parseFloat(selectedAssetBalance ?? "0.0"));
   }, [selectedAssetBalance]);
 
   const maxButtonDisabled = useMemo(() => {
-    if (!selectedAssetBalance) {
-      return true;
-    }
-
-    return selectedAssetBalance === "0.0";
+    return selectedAssetBalance <= 0;
   }, [selectedAssetBalance]);
 
-  const { slippage } = useSettingsStore();
+  const handleMax: MouseEventHandler<HTMLButtonElement> = (event) => {
+    if (!selectedAssetBalance || !chain || !asset) return;
+
+    let amount = new BigNumber(selectedAssetBalance);
+
+    if (event.shiftKey) {
+      onAmountChange?.(amount.toString());
+      return;
+    }
+
+    const feeDenom = getFeeDenom(chain.chainID);
+
+    // if selected asset is the fee denom, subtract the fee
+    if (feeDenom && feeDenom.denom === asset.denom) {
+      const { gas } = useSettingsStore.getState();
+
+      const { gasPrice } = chain.feeAssets.find(
+        (a) => a.denom === feeDenom.denom,
+      )!;
+
+      const fee = new BigNumber(gasPrice.average)
+        .multipliedBy(gas)
+        .shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
+
+      amount = amount.minus(fee);
+      if (amount.isNegative()) {
+        amount = new BigNumber(0);
+        toast.error(
+          <p>
+            <strong>Insufficient Balance</strong>
+            <br />
+            You need to have at least ≈{fee.toString()} to accommodate gas fees.
+          </p>,
+        );
+      }
+    }
+
+    onAmountChange?.(amount.toString());
+  };
 
   return (
-    <Fragment>
-      <div className="space-y-4 border border-neutral-200 p-4 rounded-lg">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <ChainSelect
-              chain={chain}
-              chains={chains}
-              onChange={onChainChange}
-            />
-          </div>
-          <div>
-            <AssetSelect
-              asset={asset}
-              assets={assets}
-              balances={balances}
-              onChange={onAssetChange}
-              showChainInfo={showChainInfo}
-            />
-          </div>
+    <div
+      className={clsx(
+        "space-y-4 border border-neutral-200 p-4 rounded-lg transition-[border,shadow]",
+        "focus-within:border-neutral-300 focus-within:shadow-sm",
+        "hover:border-neutral-300 hover:shadow-sm",
+      )}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+        <div>
+          <ChainSelect chain={chain} chains={chains} onChange={onChainChange} />
         </div>
         <div>
-          <input
-            data-testid="amount"
-            className="w-full text-3xl font-medium focus:outline-none placeholder:text-neutral-300 h-10 tabular-nums"
-            type="text"
-            placeholder="0.0"
-            value={amount}
-            inputMode="numeric"
-            onChange={(e) => {
-              if (!onAmountChange) return;
-
-              let latest = e.target.value;
-
-              // replace first comma with period
-              latest = latest.replace(/^(\d+)[,]/, "$1.").replace(/^-/, "");
-
-              // prevent entering anything except numbers, commas, and periods
-              if (latest.match(/[^0-9.]/gi)) return;
-
-              // if there is more than one period or comma,
-              // remove all periods except the first one for decimals
-              if ((latest.match(/[.,]/g)?.length ?? 0) > 1) {
-                latest = latest.replace(/([,.].*)[,.]/g, "$1");
-              }
-
-              onAmountChange?.(latest);
-            }}
-            onKeyDown={(event) => {
-              if (!onAmountChange) return;
-
-              if (event.key === "Escape") {
-                onAmountChange?.("");
-                return;
-              }
-
-              if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-                let value = new BigNumber(event.currentTarget.value || "0");
-                if (event.key === "ArrowUp") {
-                  event.preventDefault();
-                  if (event.shiftKey) {
-                    value = value.plus(10);
-                  } else if (event.altKey || event.ctrlKey || event.metaKey) {
-                    value = value.plus(0.1);
-                  } else {
-                    value = value.plus(1);
-                  }
-                }
-                if (event.key === "ArrowDown") {
-                  event.preventDefault();
-                  if (event.shiftKey) {
-                    value = value.minus(10);
-                  } else if (event.altKey || event.ctrlKey || event.metaKey) {
-                    value = value.minus(0.1);
-                  } else {
-                    value = value.minus(1);
-                  }
-                }
-                if (value.isNegative()) {
-                  value = new BigNumber(0);
-                }
-                onAmountChange(value.toString());
-              }
-            }}
+          <AssetSelect
+            asset={asset}
+            assets={assets}
+            balances={balances}
+            onChange={onAssetChange}
+            showChainInfo={showChainInfo}
           />
-          <div className="flex items-center space-x-2 tabular-nums h-8">
-            <p className="text-neutral-400 text-sm">
-              {amountUSD ? formatUSD(amountUSD) : null}
-            </p>
-            {amountUSD !== undefined &&
-            diffPercentage !== 0 &&
-            context === "dest" ? (
-              <p
-                className={clsx(
-                  "text-sm",
-                  diffPercentage >= 0 ? "text-green-500" : "text-red-500",
-                )}
-              >
-                {new Intl.NumberFormat("en-US", {
-                  style: "percent",
-                  maximumFractionDigits: 2,
-                }).format(diffPercentage)}
-              </p>
-            ) : null}
-            <div className="flex-grow" />
-            {showBalance && address && selectedAssetBalance && asset && (
-              <div className="text-neutral-400 text-sm flex items-center">
-                <div className="mr-1">Balance:</div>
-                <SimpleTooltip
-                  label={`${formattedSelectedAssetBalance} ${asset.symbol}`}
-                  delayDuration={0}
-                >
-                  <div
-                    className={clsx(
-                      "max-w-[16ch] truncate mr-2",
-                      "underline decoration-dotted underline-offset-4 cursor-help",
-                    )}
-                  >
-                    {formattedSelectedAssetBalance}
-                  </div>
-                </SimpleTooltip>
-                <button
-                  className={clsx(
-                    "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] text-white",
-                    "transition-transform enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
-                  )}
-                  disabled={maxButtonDisabled}
-                  onClick={() => {
-                    if (!selectedAssetBalance || !chain || !asset) return;
-
-                    const feeDenom = getFeeDenom(chain.chainID);
-                    let amount = selectedAssetBalance;
-
-                    // if selected asset is the fee denom, subtract the fee
-                    if (feeDenom && feeDenom.denom === asset.denom) {
-                      const fee = getFee(chain.chainID);
-
-                      const feeInt = parseFloat(
-                        ethers.formatUnits(fee.toString(), asset.decimals),
-                      ).toFixed(asset.decimals);
-
-                      amount = (
-                        parseFloat(selectedAssetBalance) - parseFloat(feeInt)
-                      ).toFixed(asset.decimals);
-                    }
-
-                    onAmountChange?.(amount);
-                  }}
-                >
-                  Max
-                </button>
-              </div>
-            )}
-            <ClientOnly>
-              {showSlippage && (
-                <SimpleTooltip label="Click to change max slippage">
-                  <button
-                    className="text-neutral-400 text-sm hover:underline"
-                    onClick={() => disclosure.open("settingsDialog")}
-                  >
-                    Max Slippage: {slippage}%{" "}
-                    <PencilSquareIcon className="w-3 h-3 inline mb-1" />
-                  </button>
-                </SimpleTooltip>
-              )}
-            </ClientOnly>
-          </div>
         </div>
       </div>
-      <Toast
-        open={isError}
-        setOpen={setIsError}
-        description={`There was an error loading assets for ${chain?.chainName}. Please try again.`}
-      />
-    </Fragment>
+      <div className="relative isolate">
+        {isLoading && (
+          <SpinnerIcon className="absolute right-3 top-3 animate-spin h-4 w-4 text-neutral-300 z-10" />
+        )}
+        <input
+          data-testid="amount"
+          className={clsx(
+            "w-full text-3xl font-medium h-10 tabular-nums",
+            "focus:outline-none placeholder:text-neutral-300",
+            isLoading && "animate-pulse text-neutral-500",
+          )}
+          type="text"
+          placeholder="0.0"
+          value={formatNumberWithCommas(amount)}
+          inputMode="numeric"
+          onChange={(e) => {
+            if (!onAmountChange) return;
+
+            let latest = e.target.value;
+
+            // Remove non-numeric and non-decimal characters
+            latest = latest.replace(/[^\d.]/g, "");
+
+            // if there is more than one period or comma,
+            // remove all periods except the first one for decimals
+            if ((latest.match(/[.]/g)?.length ?? 0) > 1) {
+              latest = latest.replace(/([.].*)[.]/g, "$1");
+            }
+
+            onAmountChange?.(formatNumberWithoutCommas(latest));
+          }}
+          onKeyDown={(event) => {
+            if (!onAmountChange) return;
+
+            if (event.key === "Escape") {
+              onAmountChange?.("");
+              return;
+            }
+
+            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+              let value = new BigNumber(
+                formatNumberWithoutCommas(event.currentTarget.value) || "0",
+              );
+              if (event.key === "ArrowUp") {
+                event.preventDefault();
+                if (event.shiftKey) {
+                  value = value.plus(10);
+                } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                  value = value.plus(0.1);
+                } else {
+                  value = value.plus(1);
+                }
+              }
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                if (event.shiftKey) {
+                  value = value.minus(10);
+                } else if (event.altKey || event.ctrlKey || event.metaKey) {
+                  value = value.minus(0.1);
+                } else {
+                  value = value.minus(1);
+                }
+              }
+              if (value.isNegative()) {
+                value = new BigNumber(0);
+              }
+              onAmountChange(value.toString());
+            }
+          }}
+        />
+        <div className="flex items-center space-x-2 tabular-nums h-8">
+          <p className="text-neutral-400 text-sm tabular-nums">
+            {amountUSD ? formatUSD(amountUSD) : null}
+          </p>
+          {amountUSD !== undefined &&
+          diffPercentage !== 0 &&
+          context === "dest" ? (
+            <p
+              className={clsx(
+                "text-sm tabular-nums",
+                diffPercentage >= 0 ? "text-green-500" : "text-red-500",
+              )}
+            >
+              ({formatPercent(diffPercentage)})
+            </p>
+          ) : null}
+          <div className="flex-grow" />
+          {showBalance && account?.address && asset && (
+            <div className="text-neutral-400 text-sm flex items-center animate-slide-left-and-fade">
+              <span className="mr-1">Balance:</span>
+              <SimpleTooltip label={`${selectedAssetBalance} ${asset.symbol}`}>
+                <div
+                  className={clsx(
+                    "max-w-[16ch] truncate mr-2 tabular-nums",
+                    "underline decoration-dotted underline-offset-4 cursor-help",
+                  )}
+                >
+                  {formattedSelectedAssetBalance}
+                </div>
+              </SimpleTooltip>
+              <button
+                className={clsx(
+                  "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] disabled:bg-red-200 text-white",
+                  "transition-[transform,background] enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
+                )}
+                disabled={maxButtonDisabled}
+                onClick={handleMax}
+              >
+                Max
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 export default AssetInput;

@@ -2,38 +2,32 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { FC, Fragment, useState } from "react";
-import { useAccount } from "wagmi";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useAccount as useWagmiAccount } from "wagmi";
 
-import { Chain, useChains } from "@/api/queries";
+import { getTrackAccount } from "@/context/account";
 import { useSettingsStore } from "@/context/settings";
-import { useToast } from "@/context/toast";
 import {
   addTxHistory,
   addTxStatus,
   failTxHistory,
   successTxHistory,
 } from "@/context/tx-history";
-import Toast from "@/elements/Toast";
+import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
-import {
-  enableChains,
-  getAddressForCosmosChain,
-  getExplorerLinkForTx,
-  getOfflineSigner,
-  getOfflineSignerOnlyAmino,
-  isLedger,
-} from "@/utils/utils";
+import { getChainExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
+import { SpinnerIcon } from "../SpinnerIcon";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
 
 export interface RouteTransaction {
   status: "INIT" | "PENDING" | "SUCCESS";
-  explorerLink: string | null;
-  txHash: string | null;
+  explorerLink: string | null | undefined;
+  txHash: string | null | undefined;
 }
 
 interface Props {
@@ -43,90 +37,74 @@ interface Props {
   onClose: () => void;
 }
 
-const TransactionDialogContent: FC<Props> = ({
+function TransactionDialogContent({
   route,
   onClose,
   insufficentBalance,
   transactionCount,
-}) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { toast } = useToast();
-  const { chains = [] } = useChains();
+}: Props) {
+  const { data: chains = [] } = useChains();
 
-  const skipRouter = useSkipClient();
-  const { address: evmAddress } = useAccount();
+  const skipClient = useSkipClient();
+  const { address: evmAddress } = useWagmiAccount();
 
   const [transacting, setTransacting] = useState(false);
 
-  const [isError, setIsError] = useState(false);
-  const [txError, setTxError] = useState<string | null>(null);
-
   const [txComplete, setTxComplete] = useState(false);
-  const [numberOfBroadcastedTransactions, setNumberOfBroadcastedTransactions] =
-    useState(0);
+  const [broadcastedTxs, setBroadcastedTxs] = useState(0);
+
+  const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
+    Array.from({ length: transactionCount }, () => ({
+      status: "INIT",
+      explorerLink: null,
+      txHash: null,
+    })),
+  );
 
   const { getWalletRepo } = useManager();
 
-  const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
-    Array.from({ length: transactionCount }, () => {
-      return {
-        status: "INIT",
-        explorerLink: null,
-        txHash: null,
-      };
-    }),
-  );
-
-  async function getCosmosKitWalletClient(chain: Chain) {
-    const walletRepo = await getWalletRepo(chain.record?.chain_name ?? "");
-
-    const currentCosmosKitWallet = localStorage.getItem(
-      "cosmos-kit@2:core//current-wallet",
-    );
-
-    if (!currentCosmosKitWallet) {
-      throw new Error("No CosmosKit wallet found");
-    }
-
-    const wallet = walletRepo.getWallet(currentCosmosKitWallet);
-    if (!wallet) {
-      throw new Error("No wallet found");
-    }
-
-    return wallet.client;
-  }
-
-  const onSubmit = async () => {
+  async function onSubmit() {
     setTransacting(true);
 
     const [historyId] = addTxHistory({ route });
 
     try {
       const userAddresses: Record<string, string> = {};
-      const addressList = [];
 
-      // get addresses
       for (const chainID of route.chainIDs) {
         const chain = chains.find((c) => c.chainID === chainID);
         if (!chain) {
-          throw new Error(`No chain found for chainID ${chainID}`);
+          throw new Error(`executeRoute error: cannot find chain '${chainID}'`);
         }
 
         if (chain.chainType === "cosmos") {
-          const walletClient = await getCosmosKitWalletClient(chain);
-          await enableChains(walletClient, [chainID]);
-          const address = await getAddressForCosmosChain(walletClient, chainID);
-          userAddresses[chainID] = address;
-          addressList.push(address);
+          const { wallets } = getWalletRepo(chain.chainName);
+
+          const walletName = getTrackAccount(chainID);
+          const wallet = wallets.find((w) => w.walletName === walletName);
+          if (!wallet) {
+            throw new Error(
+              `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
+            );
+          }
+          if (wallet.isWalletDisconnected) {
+            await wallet.connect();
+          }
+
+          if (!wallet.address) {
+            throw new Error(
+              `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
+            );
+          }
+          userAddresses[chainID] = wallet.address;
         }
 
         if (chain.chainType === "evm") {
           if (!evmAddress) {
-            throw new Error(`EVM wallet not connected`);
+            throw new Error(`executeRoute error: evm wallet not connected`);
           }
 
           userAddresses[chainID] = evmAddress;
-          addressList.push(evmAddress);
         }
       }
 
@@ -139,32 +117,14 @@ const TransactionDialogContent: FC<Props> = ({
         ...txStatuses.slice(1),
       ]);
 
-      await skipRouter.executeRoute({
+      await skipClient.executeRoute({
         route,
         userAddresses,
         validateGasBalance: true,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getCosmosSigner: async (chainID) => {
-          const chain = chains.find((c) => c.chainID === chainID);
-          if (!chain) {
-            throw new Error(`No chain found for chainID ${chainID}`);
-          }
-
-          const walletClient = await getCosmosKitWalletClient(chain);
-
-          const signerIsLedger = await isLedger(walletClient, chainID);
-
-          if (signerIsLedger) {
-            return getOfflineSignerOnlyAmino(walletClient, chainID);
-          }
-
-          return getOfflineSigner(walletClient, chainID);
-        },
         onTransactionBroadcast: async (txStatus) => {
-          const explorerLink = getExplorerLinkForTx(
-            txStatus.chainID,
-            txStatus.txHash,
-          );
+          const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
+          const explorerLink = makeExplorerUrl?.(txStatus.txHash);
 
           addTxStatus(historyId, {
             chainId: txStatus.chainID,
@@ -172,13 +132,14 @@ const TransactionDialogContent: FC<Props> = ({
             explorerLink: explorerLink || "#",
           });
 
-          setNumberOfBroadcastedTransactions(
+          setBroadcastedTxs(
             (numberOfBroadcastedTransactions) =>
               numberOfBroadcastedTransactions + 1,
           );
         },
         onTransactionCompleted: async (chainID, txHash) => {
-          const explorerLink = getExplorerLinkForTx(chainID, txHash);
+          const makeExplorerUrl = await getChainExplorerUrl(chainID);
+          const explorerLink = makeExplorerUrl?.(txHash);
 
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
@@ -206,18 +167,19 @@ const TransactionDialogContent: FC<Props> = ({
         },
       });
 
-      toast(
-        "Transaction Successful",
-        "Your transaction was successful",
-        "success",
-      );
-
       setTxComplete(true);
     } catch (err: unknown) {
-      console.error(err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(err);
+      }
       if (err instanceof Error) {
-        setTxError(err.message);
-        setIsError(true);
+        toast.error(
+          <p>
+            <strong>Swap Failed!</strong>
+            <br />
+            {err.name}: {err.message}
+          </p>,
+        );
       }
       failTxHistory(historyId);
       setTxStatuses((statuses) => {
@@ -236,9 +198,9 @@ const TransactionDialogContent: FC<Props> = ({
     } finally {
       successTxHistory(historyId);
       setTransacting(false);
-      setNumberOfBroadcastedTransactions(0);
+      setBroadcastedTxs(0);
     }
-  };
+  }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
@@ -253,142 +215,57 @@ const TransactionDialogContent: FC<Props> = ({
   }
 
   return (
-    <Fragment>
-      <div className="flex flex-col h-full px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
-        <div>
-          <div className="flex items-center gap-4">
-            <button
-              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-              onClick={onClose}
-            >
-              <ArrowLeftIcon className="w-6 h-6" />
-            </button>
-            <p className="font-bold text-xl">Transaction Preview</p>
-          </div>
+    <div className="flex flex-col h-full p-6 space-y-6 overflow-y-auto scrollbar-hide">
+      <div>
+        <div className="flex items-center gap-4">
+          <button
+            className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            onClick={onClose}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
+          </button>
+          <p className="font-bold text-xl">Transaction Preview</p>
         </div>
-        <div className="border border-neutral-300 rounded-xl p-4">
-          <RouteDisplay route={route} />
-        </div>
-        <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
-          <p className="flex-1">
-            This route requires{" "}
-            <span className="text-white">
-              {transactionCount} Transaction
-              {transactionCount > 1 ? "s" : ""}
-            </span>{" "}
-            to complete
-          </p>
-        </div>
-        <div className="flex-1 space-y-6">
-          {txStatuses.map(({ status, explorerLink, txHash }, i) => (
-            <div key={`tx-${i}`} className="flex items-center gap-4">
-              {status === "INIT" && (
-                <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
-              )}
-              {status === "PENDING" && (
-                <svg
-                  className="animate-spin h-7 w-7 inline-block text-neutral-300"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              )}
-              {status === "SUCCESS" && (
-                <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
-              )}
-              <div className="flex-1">
-                <p className="font-semibold">Transaction {i + 1}</p>
-              </div>
-              <div>
-                {txHash && explorerLink && (
-                  <a
-                    className="text-sm font-bold text-[#FF486E] hover:underline"
-                    href={explorerLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span>
-                      {txHash.slice(0, 6)}
-                      ...
-                      {txHash.slice(-6)}
-                    </span>
-                  </a>
-                )}
-              </div>
+      </div>
+      <div className="border border-neutral-300 rounded-xl p-4">
+        <RouteDisplay route={route} />
+      </div>
+
+      <div className="flex-1 space-y-6">
+        {txStatuses.map(({ status, explorerLink, txHash }, i) => (
+          <div key={`tx-${i}`} className="flex items-center gap-4">
+            {status === "INIT" && (
+              <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
+            )}
+            {status === "PENDING" && (
+              <SpinnerIcon className="animate-spin h-7 w-7 inline-block text-neutral-300" />
+            )}
+            {status === "SUCCESS" && (
+              <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
+            )}
+            <div className="flex-1">
+              <p className="font-semibold">Transaction {i + 1}</p>
             </div>
-          ))}
-        </div>
-        <div className="space-y-4">
-          {transacting ? (
-            <button
-              className={clsx(
-                "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
-                "transition-transform outline-none",
-                "enabled:hover:scale-105 enabled:hover:rotate-1",
-                "disabled:cursor-not-allowed disabled:opacity-75",
-              )}
-              onClick={onClose}
-              disabled={route.txsRequired !== numberOfBroadcastedTransactions}
-            >
-              {route.txsRequired !== numberOfBroadcastedTransactions ? (
-                <svg
-                  className="animate-spin h-4 w-4 inline-block text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            <div>
+              {txHash && explorerLink && (
+                <a
+                  className="text-sm font-bold text-[#FF486E] hover:underline"
+                  href={explorerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx={12}
-                    cy={12}
-                    r={10}
-                    stroke="currentColor"
-                    strokeWidth={4}
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              ) : (
-                <span>{route.doesSwap ? "Swap" : "Transfer"} Again</span>
+                  <span>
+                    {txHash.slice(0, 6)}
+                    ...
+                    {txHash.slice(-6)}
+                  </span>
+                </a>
               )}
-            </button>
-          ) : (
-            <button
-              className={clsx(
-                "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
-                "transition-transform outline-none",
-                "enabled:hover:scale-105 enabled:hover:rotate-1",
-                "disabled:cursor-not-allowed disabled:opacity-75",
-              )}
-              onClick={onSubmit}
-              disabled={transacting || insufficentBalance}
-            >
-              Submit
-            </button>
-          )}
-          {insufficentBalance && !transacting && !txComplete && (
-            <p className="text-center font-semibold text-sm text-red-500">
-              Insufficient Balance
-            </p>
-          )}
-        </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="space-y-4">
         {estimatedFinalityTime !== "" && (
           <AlertCollapse.Root type="info">
             <AlertCollapse.Trigger>
@@ -411,11 +288,75 @@ const TransactionDialogContent: FC<Props> = ({
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+          <p className="flex-1">
+            This route requires{" "}
+            <span className="text-white">
+              {transactionCount} Transaction
+              {transactionCount > 1 ? "s" : ""}
+            </span>{" "}
+            to complete
+          </p>
+        </div>
+        {transacting ? (
+          <button
+            className={clsx(
+              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
+              "transition-transform outline-none",
+              "enabled:hover:scale-105 enabled:hover:rotate-1",
+              "disabled:cursor-not-allowed disabled:opacity-75",
+            )}
+            onClick={onClose}
+            disabled={route.txsRequired !== broadcastedTxs}
+          >
+            {route.txsRequired !== broadcastedTxs ? (
+              <svg
+                className="animate-spin h-4 w-4 inline-block text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx={12}
+                  cy={12}
+                  r={10}
+                  stroke="currentColor"
+                  strokeWidth={4}
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            ) : (
+              <span>{route.doesSwap ? "Swap" : "Transfer"} Again</span>
+            )}
+          </button>
+        ) : (
+          <button
+            className={clsx(
+              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
+              "transition-transform outline-none",
+              "enabled:hover:scale-105 enabled:hover:rotate-1",
+              "disabled:cursor-not-allowed disabled:opacity-75",
+            )}
+            onClick={onSubmit}
+            disabled={transacting || insufficentBalance}
+          >
+            Submit
+          </button>
+        )}
+        {insufficentBalance && !transacting && !txComplete && (
+          <p className="text-center font-semibold text-sm text-red-500">
+            Insufficient Balance
+          </p>
+        )}
       </div>
-      <Toast open={isError} setOpen={setIsError} description={txError ?? ""} />
-    </Fragment>
+    </div>
   );
-};
+}
 
 const HREF_COMMON_FINALITY_TIMES = `https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions`;
 

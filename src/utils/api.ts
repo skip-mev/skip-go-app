@@ -1,5 +1,7 @@
+import { APP_URL } from "@/constants/api";
+
 export function getNodeProxyEndpoint(...args: string[]) {
-  return `${process.env.APP_URL}/api/nodes/${args.join("/")}`;
+  return `${APP_URL}/api/nodes/${args.join("/")}`;
 }
 
 export function getPolkachuAuthHeader() {

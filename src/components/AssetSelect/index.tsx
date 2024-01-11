@@ -1,9 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { FC, useState } from "react";
+import { clsx } from "clsx";
+import { useState } from "react";
 
+import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
 import { AssetWithMetadata } from "@/context/assets";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
 
 import AssetSelectContent from "./AssetSelectContent";
 
@@ -15,20 +15,24 @@ interface Props {
   showChainInfo?: boolean;
 }
 
-const AssetSelect: FC<Props> = ({
+function AssetSelect({
   asset,
   assets,
   balances,
   onChange,
   showChainInfo,
-}) => {
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <button
-          className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center gap-2 p-4 w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={clsx(
+            "font-semibold text-left whitespace-nowrap",
+            "bg-neutral-100 rounded-md flex items-center gap-2 px-4 py-2 sm:py-4 w-full transition-colors",
+            "border border-neutral-200 hover:border-neutral-300",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+          )}
           disabled={!assets || assets.length === 0}
         >
           {asset && (
@@ -36,8 +40,8 @@ const AssetSelect: FC<Props> = ({
               alt={asset.symbol}
               className="w-6 h-6 rounded-full"
               src={asset.logoURI}
-              onError={(e) =>
-                (e.currentTarget.src =
+              onError={(event) =>
+                (event.currentTarget.src =
                   "https://api.dicebear.com/6.x/shapes/svg")
               }
             />
@@ -62,6 +66,6 @@ const AssetSelect: FC<Props> = ({
       </DialogContent>
     </Dialog>
   );
-};
+}
 
 export default AssetSelect;

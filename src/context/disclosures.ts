@@ -1,10 +1,12 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 const defaultValues = {
+  contactDialog: false,
   historyDialog: false,
+  priceImpactDialog: false,
   settingsDialog: false,
   swapDetailsCollapsible: false,
-  priceImpactWarning: false,
 
   // TODO: port dialogs to new system
   // assetSelect: false,
@@ -17,17 +19,25 @@ export type DisclosureStore = typeof defaultValues & {
 };
 export type DisclosureKey = keyof typeof defaultValues;
 
-const disclosureStore = create<DisclosureStore>(() => ({
-  ...defaultValues,
-}));
+const disclosureStore = create(
+  persist((): DisclosureStore => defaultValues, {
+    name: "DisclosuresState",
+    version: 1,
+    partialize: (state) => ({
+      historyDialog: state.historyDialog,
+    }),
+    skipHydration: true,
+    storage: createJSONStorage(() => window.sessionStorage),
+  }),
+);
 
 const scrollStore = create<{ value: number[] }>(() => ({ value: [] }));
-const persistScroll = () => {
+function persistScroll() {
   scrollStore.setState((prev) => ({
     value: prev.value.concat(window.scrollY),
   }));
-};
-const restoreScroll = () => {
+}
+function restoreScroll() {
   let value: number | undefined;
   scrollStore.setState((prev) => {
     value = prev.value.pop();
@@ -37,13 +47,13 @@ const restoreScroll = () => {
     top: value,
     behavior: "smooth",
   });
-};
-const scrollTop = () => {
+}
+function scrollTop() {
   window.scrollTo({
     top: 0,
     behavior: "smooth",
   });
-};
+}
 
 export const disclosure = {
   open: (key: DisclosureKey, { closeAll = false } = {}) => {
@@ -87,9 +97,10 @@ export const disclosure = {
     disclosureStore.setState(defaultValues);
     restoreScroll();
   },
+  rehydrate: () => disclosureStore.persist.rehydrate(),
 };
 
-export const useDisclosureKey = (key: DisclosureKey) => {
+export function useDisclosureKey(key: DisclosureKey) {
   const state = disclosureStore((state) => state[key]);
   const actions = {
     open: ({ closeAll = false } = {}) => disclosure.open(key, { closeAll }),
@@ -98,9 +109,9 @@ export const useDisclosureKey = (key: DisclosureKey) => {
     set: (value: boolean) => disclosure.set(key, value),
   };
   return [state, actions] as const;
-};
+}
 
-export const useJsonDisclosure = () => {
+export function useJsonDisclosure() {
   const state = disclosureStore((state) => state.json);
   const actions = {
     open: (json: NonNullable<DisclosureStore["json"]>) => {
@@ -111,4 +122,8 @@ export const useJsonDisclosure = () => {
     },
   };
   return [state, actions] as const;
-};
+}
+
+export function useAnyDisclosureOpen() {
+  return disclosureStore((state) => Object.values(state).some(Boolean));
+}

@@ -1,4 +1,4 @@
-import { Chain } from "@/api/queries";
+import { Chain } from "@/hooks/useChains";
 
 // chains whose logo provided by the Skip API is not suitable for our UI.
 const chainsToUseChainListLogo = [

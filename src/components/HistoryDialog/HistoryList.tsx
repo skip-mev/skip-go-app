@@ -86,7 +86,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
         <Accordion.Header
           className={clsx(
             "flex flex-col items-stretch space-y-2 relative",
-            "rounded-md hover:bg-gray-100 p-2 transition-colors",
+            "rounded-md hover:bg-neutral-100 p-2 transition-colors",
           )}
           ref={headingRef}
         >
@@ -117,7 +117,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
             <div
               className={clsx("text-sm flex items-center space-x-1", {
                 "text-green-600": data.status === "success",
-                "text-gray-600": data.status === "pending",
+                "text-neutral-600": data.status === "pending",
                 "text-red-600": data.status === "failed",
               })}
             >
@@ -220,7 +220,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
           <div className="flex space-x-1">
             <button
               className={clsx(
-                "text-xs px-2 py-1 border rounded-md bg-gray-100 hover:bg-gray-200 transition-colors",
+                "text-xs px-2 py-1 border rounded-md bg-neutral-100 hover:bg-neutral-200 transition-colors",
                 "flex items-center justify-center space-x-1 flex-grow",
               )}
               onClick={() => {

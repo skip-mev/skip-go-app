@@ -1,12 +1,13 @@
 import { BigNumberish, formatUnits } from "ethers";
 import { useMemo } from "react";
 
-import { ChainIdOrName } from "@/chains";
+import { ChainId } from "@/chains/types";
 import { useAssets } from "@/context/assets";
 import { raise } from "@/utils/assert";
+import { formatMaxFraction } from "@/utils/intl";
 
 interface Props {
-  chainId: ChainIdOrName;
+  chainId: ChainId;
   denom: string;
   value: BigNumberish;
 }
@@ -20,7 +21,7 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
 
   const formattedValue = useMemo(() => {
     let v = formatUnits(value, decimals);
-    v = format(parseFloat(v));
+    v = formatMaxFraction(parseFloat(v), 2);
     return v;
   }, [decimals, value]);
 
@@ -30,5 +31,3 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
     </span>
   );
 };
-
-const { format } = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
