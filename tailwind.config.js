@@ -73,6 +73,9 @@ module.exports = {
     },
   },
   plugins: [
+    require("@tailwindcss/forms")({
+      strategy: "class",
+    }),
     plugin(({ addUtilities }) => {
       addUtilities({
         ".HistoryListTrigger[data-state='open'] > .HistoryListTriggerText::before":

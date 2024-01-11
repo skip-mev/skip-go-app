@@ -11,6 +11,7 @@ import { WagmiConfig } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
 import { DefaultSeo } from "@/components/DefaultSeo";
+import { Footer } from "@/components/Footer";
 import Header from "@/components/Header";
 import SkipBanner from "@/components/SkipBanner";
 import { metadata } from "@/constants/seo";
@@ -60,6 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   <SkipBanner className="z-50 top-0 inset-x-0 sm:fixed w-screen" />
                   <Header />
                   <Component {...pageProps} />
+                  <Footer />
                 </main>
                 <Toaster
                   position="bottom-center"
