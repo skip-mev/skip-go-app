@@ -5,7 +5,7 @@ type TrackAccountStore = Record<string, string>;
 
 const defaultValues: TrackAccountStore = {};
 
-export const store = create(
+const store = create(
   persist(() => defaultValues, {
     name: "TrackAccountState",
     version: 1,
@@ -22,6 +22,10 @@ export const trackAccount = {
   },
 };
 
-export function useTrackAccount(chainID?: string) {
+export function useTrackAccount(chainID?: string): string | undefined {
   return store((state) => state[chainID || ""]);
+}
+
+export function getTrackAccount(chainID?: string): string | undefined {
+  return store.getState()[chainID || ""];
 }

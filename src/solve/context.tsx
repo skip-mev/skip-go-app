@@ -1,28 +1,52 @@
-import { useWalletClient } from "@cosmos-kit/react";
+import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
 import { getWalletClient } from "@wagmi/core";
-import { createContext, FC, PropsWithChildren } from "react";
-import { useNetwork } from "wagmi";
+import { createContext, ReactNode } from "react";
+import { useNetwork as useWagmiNetwork } from "wagmi";
 
+import { chainIdToName } from "@/chains";
 import { API_URL } from "@/constants/api";
+import { getTrackAccount } from "@/context/account";
 import { getNodeProxyEndpoint } from "@/utils/api";
-import { getOfflineSigner } from "@/utils/signer";
+import { isWalletClientUsingLedger } from "@/utils/wallet";
 
 export const SkipContext = createContext<
   { skipClient: SkipRouter } | undefined
 >(undefined);
 
-export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { client: walletClient } = useWalletClient();
-  const { chains } = useNetwork();
+export function SkipProvider({ children }: { children: ReactNode }) {
+  const { chains } = useWagmiNetwork();
+  const { getWalletRepo } = useManager();
 
   const skipClient = new SkipRouter({
     apiURL: API_URL,
     getCosmosSigner: async (chainID) => {
-      if (!walletClient) {
-        throw new Error("No offline signer available");
+      const chainName = chainIdToName[chainID];
+      if (!chainName) {
+        throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
-      return getOfflineSigner(walletClient, chainID);
+
+      const walletName = getTrackAccount(chainID);
+      const wallet = getWalletRepo(chainName).wallets.find((w) => {
+        return w.walletName === walletName;
+      });
+
+      if (!wallet) {
+        throw new Error(
+          `getCosmosSigner error: unknown walletName '${walletName}'`,
+        );
+      }
+
+      const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
+      await wallet.initOfflineSigner(isLedger ? "amino" : "direct");
+
+      if (!wallet.offlineSigner) {
+        throw new Error(
+          `getCosmosSigner error: no offlineSigner for walletName '${walletName}'`,
+        );
+      }
+
+      return wallet.offlineSigner;
     },
     getEVMSigner: async (chainID) => {
       const result = await getWalletClient({
@@ -74,4 +98,4 @@ export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
       {children}
     </SkipContext.Provider>
   );
-};
+}

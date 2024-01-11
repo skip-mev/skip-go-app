@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
+import { getTrackAccount } from "@/context/account";
 import { useSettingsStore } from "@/context/settings";
 import {
   addTxHistory,
@@ -16,8 +17,6 @@ import {
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
-import { raise } from "@/utils/assert";
-import { enableChains } from "@/utils/chain";
 import { getChainExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
@@ -52,17 +51,14 @@ function TransactionDialogContent({
   const [transacting, setTransacting] = useState(false);
 
   const [txComplete, setTxComplete] = useState(false);
-  const [numberOfBroadcastedTransactions, setNumberOfBroadcastedTransactions] =
-    useState(0);
+  const [broadcastedTxs, setBroadcastedTxs] = useState(0);
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
-    Array.from({ length: transactionCount }, () => {
-      return {
-        status: "INIT",
-        explorerLink: null,
-        txHash: null,
-      };
-    }),
+    Array.from({ length: transactionCount }, () => ({
+      status: "INIT",
+      explorerLink: null,
+      txHash: null,
+    })),
   );
 
   const { getWalletRepo } = useManager();
@@ -76,31 +72,36 @@ function TransactionDialogContent({
       const userAddresses: Record<string, string> = {};
 
       for (const chainID of route.chainIDs) {
-        const chain =
-          chains.find((c) => c.chainID === chainID) ||
-          raise(`executeRoute error: cannot find chain '${chainID}'`);
+        const chain = chains.find((c) => c.chainID === chainID);
+        if (!chain) {
+          throw new Error(`executeRoute error: cannot find chain '${chainID}'`);
+        }
 
         if (chain.chainType === "cosmos") {
           const { wallets } = getWalletRepo(chain.chainName);
 
-          const wallet =
-            wallets.find((w) => w.isActive) ||
-            raise(
+          const walletName = getTrackAccount(chainID);
+          const wallet = wallets.find((w) => w.walletName === walletName);
+          if (!wallet) {
+            throw new Error(
               `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
             );
-          await enableChains(wallet.client, [chainID]);
+          }
+          if (wallet.isWalletDisconnected) {
+            await wallet.connect();
+          }
 
-          const address =
-            wallet.address ||
-            raise(
+          if (!wallet.address) {
+            throw new Error(
               `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
             );
-          userAddresses[chainID] = address;
+          }
+          userAddresses[chainID] = wallet.address;
         }
 
         if (chain.chainType === "evm") {
           if (!evmAddress) {
-            throw new Error(`EVM wallet not connected`);
+            throw new Error(`executeRoute error: evm wallet not connected`);
           }
 
           userAddresses[chainID] = evmAddress;
@@ -121,27 +122,6 @@ function TransactionDialogContent({
         userAddresses,
         validateGasBalance: true,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getCosmosSigner: async (chainID) => {
-          const chain =
-            chains.find((c) => c.chainID === chainID) ||
-            raise(`executeRoute error: cannot find chain '${chainID}'`);
-
-          const { wallets } = getWalletRepo(chain.chainName);
-
-          const wallet =
-            wallets.find((w) => w.isActive) ||
-            raise(
-              `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
-            );
-          await wallet.initOfflineSigner();
-
-          return (
-            wallet.offlineSigner ||
-            raise(
-              `executeRoute error: offline signer not initialized for ${wallet.walletName}`,
-            )
-          );
-        },
         onTransactionBroadcast: async (txStatus) => {
           const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
@@ -152,7 +132,7 @@ function TransactionDialogContent({
             explorerLink: explorerLink || "#",
           });
 
-          setNumberOfBroadcastedTransactions(
+          setBroadcastedTxs(
             (numberOfBroadcastedTransactions) =>
               numberOfBroadcastedTransactions + 1,
           );
@@ -218,7 +198,7 @@ function TransactionDialogContent({
     } finally {
       successTxHistory(historyId);
       setTransacting(false);
-      setNumberOfBroadcastedTransactions(0);
+      setBroadcastedTxs(0);
     }
   }
 
@@ -327,9 +307,9 @@ function TransactionDialogContent({
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onClose}
-            disabled={route.txsRequired !== numberOfBroadcastedTransactions}
+            disabled={route.txsRequired !== broadcastedTxs}
           >
-            {route.txsRequired !== numberOfBroadcastedTransactions ? (
+            {route.txsRequired !== broadcastedTxs ? (
               <svg
                 className="animate-spin h-4 w-4 inline-block text-white"
                 xmlns="http://www.w3.org/2000/svg"
