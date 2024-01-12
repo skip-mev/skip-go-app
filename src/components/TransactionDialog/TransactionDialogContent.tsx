@@ -391,7 +391,7 @@ function TransactionDialogContent({
                 />
               </svg>
             ) : (
-              <span>{route.doesSwap ? "Swap" : "Transfer"} Again</span>
+              <span>Create New {route.doesSwap ? "Swap" : "Transfer"}</span>
             )}
           </button>
         ) : (
