@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 const defaultValues = {
+  confirmSwapDialog: false,
   contactDialog: false,
   historyDialog: false,
   priceImpactDialog: false,
@@ -11,7 +12,6 @@ const defaultValues = {
   // TODO: port dialogs to new system
   // assetSelect: false,
   // chainSelect: false,
-  // txDialog: false,
 };
 
 export type DisclosureStore = typeof defaultValues & {
