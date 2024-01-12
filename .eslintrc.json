@@ -20,7 +20,19 @@
         "plugin:prettier/recommended"
       ],
       "parser": "@typescript-eslint/parser",
-      "plugins": ["@typescript-eslint"]
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "@typescript-eslint/ban-types": [
+          "error",
+          {
+            "types": {
+              // un-ban a type that's banned by default
+              "{}": false
+            },
+            "extendDefaults": true
+          }
+        ]
+      }
     }
   ],
   "root": true
