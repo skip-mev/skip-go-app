@@ -6,7 +6,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { getTrackAccount } from "@/context/account";
+import { getTrackAccount, trackAccount } from "@/context/account";
 import { useSettingsStore } from "@/context/settings";
 import {
   addTxHistory,
@@ -71,6 +71,9 @@ function TransactionDialogContent({
     try {
       const userAddresses: Record<string, string> = {};
 
+      const [sourceChainID] = route.chainIDs;
+      const sourceWalletName = getTrackAccount(sourceChainID)!;
+
       for (const chainID of route.chainIDs) {
         const chain = chains.find((c) => c.chainID === chainID);
         if (!chain) {
@@ -80,7 +83,7 @@ function TransactionDialogContent({
         if (chain.chainType === "cosmos") {
           const { wallets } = getWalletRepo(chain.chainName);
 
-          const walletName = getTrackAccount(chainID);
+          const walletName = getTrackAccount(chainID) || sourceWalletName;
           const wallet = wallets.find((w) => w.walletName === walletName);
           if (!wallet) {
             throw new Error(
@@ -89,6 +92,7 @@ function TransactionDialogContent({
           }
           if (wallet.isWalletDisconnected) {
             await wallet.connect();
+            trackAccount.track(chainID, walletName);
           }
 
           if (!wallet.address) {
