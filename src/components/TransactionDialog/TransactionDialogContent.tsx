@@ -6,7 +6,6 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { trackAccount } from "@/context/account";
 import { useSettingsStore } from "@/context/settings";
 import {
   addTxHistory,
@@ -75,6 +74,13 @@ function TransactionDialogContent({
     try {
       const userAddresses: Record<string, string> = {};
 
+      const srcChain = chains.find((c) => {
+        return c.chainID === route.sourceAssetChainID;
+      });
+      const dstChain = chains.find((c) => {
+        return c.chainID === route.destAssetChainID;
+      });
+
       for (const chainID of route.chainIDs) {
         const chain = chains.find((c) => c.chainID === chainID);
         if (!chain) {
@@ -83,13 +89,6 @@ function TransactionDialogContent({
 
         if (chain.chainType === "cosmos") {
           const { wallets } = getWalletRepo(chain.chainName);
-
-          const srcChain = chains.find(
-            (c) => c.chainID === route.sourceAssetChainID,
-          );
-          const dstChain = chains.find(
-            (c) => c.chainID === route.destAssetChainID,
-          );
 
           const walletName = (() => {
             // if `chainID` is the source or destination chain
@@ -114,6 +113,7 @@ function TransactionDialogContent({
               `executeRoute error: cannot find wallet for '${chain.chainName}'`,
             );
           }
+
           const wallet = wallets.find((w) => w.walletName === walletName);
           if (!wallet) {
             throw new Error(
@@ -122,9 +122,7 @@ function TransactionDialogContent({
           }
           if (wallet.isWalletDisconnected || !wallet.isWalletConnected) {
             await wallet.connect();
-            trackAccount.track(chainID, walletName);
           }
-
           if (!wallet.address) {
             throw new Error(
               `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
@@ -137,7 +135,6 @@ function TransactionDialogContent({
           if (!evmAddress) {
             throw new Error(`executeRoute error: evm wallet not connected`);
           }
-
           userAddresses[chainID] = evmAddress;
         }
       }
