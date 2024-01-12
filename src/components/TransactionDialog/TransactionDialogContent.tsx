@@ -1,5 +1,6 @@
 import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
+import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 import { useState } from "react";
@@ -17,6 +18,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
+import { isUserRejectedRequestError } from "@/utils/error";
 import { getChainExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
@@ -204,6 +206,33 @@ function TransactionDialogContent({
         console.error(err);
       }
       if (err instanceof Error) {
+        if (!isUserRejectedRequestError(err)) {
+          Sentry.withScope((scope) => {
+            scope.setUser({
+              id: srcAccount?.address,
+            });
+            scope.setTransactionName("Swap.onSubmit");
+            scope.setTags({
+              sourceChain: route.sourceAssetChainID,
+              destinationChain: route.destAssetChainID,
+              sourceAssetDenom: route.sourceAssetDenom,
+              destinationAssetDenom: route.destAssetDenom,
+              doesSwap: route.doesSwap,
+            });
+            scope.setExtras({
+              sourceAddress: srcAccount?.address,
+              destinationAddress: dstAccount?.address,
+              sourceChain: route.sourceAssetChainID,
+              destinationChain: route.destAssetChainID,
+              sourceAssetDenom: route.sourceAssetDenom,
+              destinationAssetDenom: route.destAssetDenom,
+              amountIn: route.amountIn,
+              amountOut: route.amountOut,
+            });
+            Sentry.captureException(err);
+          });
+        }
+
         toast.error(
           <p>
             <strong>Swap Failed!</strong>
