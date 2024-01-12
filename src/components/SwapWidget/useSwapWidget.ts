@@ -11,6 +11,7 @@ import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
@@ -47,6 +48,8 @@ export function useSwapWidget() {
     sourceChain,
   } = useFormValuesStore();
 
+  const isAnyDisclosureOpen = useAnyDisclosureOpen();
+
   const {
     data: routeResponse,
     fetchStatus: routeFetchStatus,
@@ -59,7 +62,7 @@ export function useSwapWidget() {
     sourceAssetChainID: sourceAsset?.chainID,
     destinationAsset: destinationAsset?.denom,
     destinationAssetChainID: destinationAsset?.chainID,
-    enabled: true,
+    enabled: !isAnyDisclosureOpen,
   });
 
   const errorMessage = useMemo(() => {

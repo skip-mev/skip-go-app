@@ -183,6 +183,25 @@ function WalletModalWithContext() {
         logo: w.walletInfo.logo,
       },
       connect: async () => {
+        await w.client.addChain?.({
+          chain: {
+            bech32_prefix: w.chain.bech32_prefix,
+            chain_id: w.chain.chain_id,
+            chain_name: w.chain.chain_name,
+            network_type: w.chain.network_type,
+            pretty_name: w.chain.pretty_name,
+            slip44: w.chain.slip44,
+            status: w.chain.status,
+            apis: w.chain.apis,
+            bech32_config: w.chain.bech32_config,
+            explorers: w.chain.explorers,
+            extra_codecs: w.chain.extra_codecs,
+            fees: w.chain.fees,
+            peers: w.chain.peers,
+          },
+          name: w.chainName,
+          assetList: w.assetList,
+        });
         await w.connect();
         trackAccount.track(chainID, w.walletName);
       },

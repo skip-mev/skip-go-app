@@ -29,7 +29,7 @@ function TransactionDialog({
   routeWarningTitle,
 }: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, { set: setIsOpen }] = useDisclosureKey("confirmSwapDialog");
 
   const [, control] = useDisclosureKey("priceImpactDialog");
 

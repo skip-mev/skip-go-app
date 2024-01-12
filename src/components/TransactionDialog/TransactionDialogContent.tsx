@@ -1,12 +1,12 @@
 import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
+import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { getTrackAccount, trackAccount } from "@/context/account";
 import { useSettingsStore } from "@/context/settings";
 import {
   addTxHistory,
@@ -14,9 +14,11 @@ import {
   failTxHistory,
   successTxHistory,
 } from "@/context/tx-history";
+import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
+import { isUserRejectedRequestError } from "@/utils/error";
 import { getChainExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
@@ -63,6 +65,9 @@ function TransactionDialogContent({
 
   const { getWalletRepo } = useManager();
 
+  const srcAccount = useAccount(route.sourceAssetChainID);
+  const dstAccount = useAccount(route.destAssetChainID);
+
   async function onSubmit() {
     setTransacting(true);
 
@@ -71,8 +76,12 @@ function TransactionDialogContent({
     try {
       const userAddresses: Record<string, string> = {};
 
-      const [sourceChainID] = route.chainIDs;
-      const sourceWalletName = getTrackAccount(sourceChainID)!;
+      const srcChain = chains.find((c) => {
+        return c.chainID === route.sourceAssetChainID;
+      });
+      const dstChain = chains.find((c) => {
+        return c.chainID === route.destAssetChainID;
+      });
 
       for (const chainID of route.chainIDs) {
         const chain = chains.find((c) => c.chainID === chainID);
@@ -83,18 +92,39 @@ function TransactionDialogContent({
         if (chain.chainType === "cosmos") {
           const { wallets } = getWalletRepo(chain.chainName);
 
-          const walletName = getTrackAccount(chainID) || sourceWalletName;
+          const walletName = (() => {
+            // if `chainID` is the source or destination chain
+            if (srcChain?.chainID === chainID) {
+              return srcAccount?.wallet?.walletName;
+            }
+            if (dstChain?.chainID === chainID) {
+              return dstAccount?.wallet?.walletName;
+            }
+
+            // if `chainID` isn't the source or destination chain
+            if (srcChain?.chainType === "cosmos") {
+              return srcAccount?.wallet?.walletName;
+            }
+            if (dstChain?.chainType === "cosmos") {
+              return dstAccount?.wallet?.walletName;
+            }
+          })();
+
+          if (!walletName) {
+            throw new Error(
+              `executeRoute error: cannot find wallet for '${chain.chainName}'`,
+            );
+          }
+
           const wallet = wallets.find((w) => w.walletName === walletName);
           if (!wallet) {
             throw new Error(
-              `executeRoute error: cannot find active wallet for '${chain.chainName}'`,
+              `executeRoute error: cannot find wallet for '${chain.chainName}'`,
             );
           }
-          if (wallet.isWalletDisconnected) {
+          if (wallet.isWalletDisconnected || !wallet.isWalletConnected) {
             await wallet.connect();
-            trackAccount.track(chainID, walletName);
           }
-
           if (!wallet.address) {
             throw new Error(
               `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
@@ -107,7 +137,6 @@ function TransactionDialogContent({
           if (!evmAddress) {
             throw new Error(`executeRoute error: evm wallet not connected`);
           }
-
           userAddresses[chainID] = evmAddress;
         }
       }
@@ -177,6 +206,33 @@ function TransactionDialogContent({
         console.error(err);
       }
       if (err instanceof Error) {
+        if (!isUserRejectedRequestError(err)) {
+          Sentry.withScope((scope) => {
+            scope.setUser({
+              id: srcAccount?.address,
+            });
+            scope.setTransactionName("Swap.onSubmit");
+            scope.setTags({
+              sourceChain: route.sourceAssetChainID,
+              destinationChain: route.destAssetChainID,
+              sourceAssetDenom: route.sourceAssetDenom,
+              destinationAssetDenom: route.destAssetDenom,
+              doesSwap: route.doesSwap,
+            });
+            scope.setExtras({
+              sourceAddress: srcAccount?.address,
+              destinationAddress: dstAccount?.address,
+              sourceChain: route.sourceAssetChainID,
+              destinationChain: route.destAssetChainID,
+              sourceAssetDenom: route.sourceAssetDenom,
+              destinationAssetDenom: route.destAssetDenom,
+              amountIn: route.amountIn,
+              amountOut: route.amountOut,
+            });
+            Sentry.captureException(err);
+          });
+        }
+
         toast.error(
           <p>
             <strong>Swap Failed!</strong>
@@ -335,7 +391,7 @@ function TransactionDialogContent({
                 />
               </svg>
             ) : (
-              <span>{route.doesSwap ? "Swap" : "Transfer"} Again</span>
+              <span>Create New {route.doesSwap ? "Swap" : "Transfer"}</span>
             )}
           </button>
         ) : (
