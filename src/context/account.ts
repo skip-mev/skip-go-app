@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type TrackAccountStore = Record<string, string>;
 
@@ -9,6 +9,7 @@ const store = create(
   persist(() => defaultValues, {
     name: "TrackAccountState",
     version: 1,
+    storage: createJSONStorage(() => window.sessionStorage),
   }),
 );
 

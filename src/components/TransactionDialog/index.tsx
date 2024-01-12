@@ -70,7 +70,7 @@ function TransactionDialog({
           Preview Route
         </button>
         {isOpen && (
-          <div className="absolute inset-0 bg-white rounded-3xl">
+          <div className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
             {route && (
               <TransactionDialogContent
                 route={route}

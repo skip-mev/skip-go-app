@@ -292,8 +292,10 @@ const useFormValuesStore = create(
     persist(() => defaultValues, {
       name: "SwapWidgetState",
       version: 1,
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => window.sessionStorage),
       partialize: (state): Partial<FormValues> => ({
+        amountIn: state.amountIn,
+        amountOut: state.amountOut,
         sourceChain: state.sourceChain,
         sourceAsset: state.sourceAsset,
         destinationChain: state.destinationChain,
