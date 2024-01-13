@@ -31,7 +31,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
         .map((chain): Chain => {
           return {
             ...chain,
-            chainName: chainIdToName[chain.chainID],
+            chainName: chainIdToName[chain.chainID] || chain.chainName,
             prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
             registryChainName: chainIdToName[chain.chainID],
           };
