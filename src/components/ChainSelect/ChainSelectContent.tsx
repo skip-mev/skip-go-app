@@ -23,7 +23,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
   const filteredChains = useMemo(() => {
     if (!searchValue) return chains;
     return matchSorter(chains, searchValue, {
-      keys: ["chainID", "chainName"],
+      keys: ["chainID", "chainName", "prettyName"],
     });
   }, [chains, searchValue]);
 
