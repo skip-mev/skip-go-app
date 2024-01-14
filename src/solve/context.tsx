@@ -6,7 +6,7 @@ import { useNetwork as useWagmiNetwork } from "wagmi";
 
 import { chainIdToName } from "@/chains";
 import { API_URL } from "@/constants/api";
-import { getTrackAccount } from "@/context/account";
+import { getTrackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
 import { isWalletClientUsingLedger } from "@/utils/wallet";
 
@@ -26,7 +26,7 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
 
-      const walletName = getTrackAccount(chainID);
+      const walletName = getTrackWallet().source?.walletName;
       const wallet = getWalletRepo(chainName).wallets.find((w) => {
         return w.walletName === walletName;
       });

@@ -65,8 +65,8 @@ export function SwapWidget() {
       parseFloat(route.usdAmountIn);
   }
 
-  const srcAccount = useAccount(sourceChain?.chainID);
-  const destAccount = useAccount(destinationChain?.chainID);
+  const srcAccount = useAccount("source");
+  const destAccount = useAccount("destination");
 
   const isWalletConnected =
     srcAccount?.isWalletConnected && destAccount?.isWalletConnected;

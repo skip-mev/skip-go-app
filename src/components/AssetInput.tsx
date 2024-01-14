@@ -62,7 +62,7 @@ function AssetInput({
 
   const showChainInfo = chain ? false : true;
 
-  const account = useAccount(chain?.chainID);
+  const account = useAccount(context === "src" ? "source" : "destination");
 
   const { data: balances } = useBalancesByChain(
     account?.address,
