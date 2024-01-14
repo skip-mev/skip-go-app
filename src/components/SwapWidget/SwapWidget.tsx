@@ -1,3 +1,4 @@
+import { useManager } from "@cosmos-kit/react-lite";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
@@ -34,6 +35,8 @@ export function SwapWidget() {
   const { openWalletModal } = useWalletModal();
 
   const { data: chains } = useSkipChains();
+
+  const { getWalletRepo } = useManager();
 
   const {
     amountIn,
@@ -275,13 +278,54 @@ export function SwapWidget() {
           {!isWalletConnected && (
             <button
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
-              onClick={() => {
+              onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
                   openWalletModal(sourceChain.chainID, "src");
                   return;
                 }
                 if (!destinationChain) {
                   promptDestAsset();
+                  return;
+                }
+                if (
+                  sourceChain?.chainType === "cosmos" &&
+                  destinationChain.chainType === "cosmos" &&
+                  srcAccount?.isWalletConnected &&
+                  !destAccount?.isWalletConnected
+                ) {
+                  const { wallets } = getWalletRepo(destinationChain.chainName);
+                  const wallet = wallets.find(
+                    (item) => item.walletName === srcAccount.wallet?.walletName,
+                  );
+                  if (!wallet) {
+                    openWalletModal(destinationChain.chainID, "dest");
+                    return;
+                  }
+                  await wallet.client.addChain?.({
+                    chain: {
+                      bech32_prefix: wallet.chain.bech32_prefix,
+                      chain_id: wallet.chain.chain_id,
+                      chain_name: wallet.chain.chain_name,
+                      network_type: wallet.chain.network_type,
+                      pretty_name: wallet.chain.pretty_name,
+                      slip44: wallet.chain.slip44,
+                      status: wallet.chain.status,
+                      apis: wallet.chain.apis,
+                      bech32_config: wallet.chain.bech32_config,
+                      explorers: wallet.chain.explorers,
+                      extra_codecs: wallet.chain.extra_codecs,
+                      fees: wallet.chain.fees,
+                      peers: wallet.chain.peers,
+                    },
+                    name: wallet.chainName,
+                    assetList: wallet.assetList,
+                  });
+                  await wallet.connect();
+                  trackWallet.track(
+                    "destination",
+                    destinationChain.chainID,
+                    wallet.walletName,
+                  );
                   return;
                 }
                 if (destinationChain && !destAccount?.isWalletConnected) {
