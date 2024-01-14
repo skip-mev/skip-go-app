@@ -40,8 +40,12 @@ export const trackWallet = {
   },
 };
 
-export function useTrackWallet(ctx: TrackWalletCtx) {
+export function useTrackWalletByCtx(ctx: TrackWalletCtx) {
   return store((state) => state[ctx]);
+}
+
+export function useTrackWallet() {
+  return store((state) => state);
 }
 
 export function getTrackWallet() {

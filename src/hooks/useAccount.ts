@@ -3,11 +3,10 @@ import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
-import { TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
+import { TrackWalletCtx, useTrackWalletByCtx } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
-
 export function useAccount(context: TrackWalletCtx) {
-  const trackedWallet = useTrackWallet(context);
+  const trackedWallet = useTrackWalletByCtx(context);
 
   const { data: chain } = useChainByID(trackedWallet?.chainID);
 
