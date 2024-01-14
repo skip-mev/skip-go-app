@@ -6,6 +6,7 @@ import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
+import { trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
 
@@ -170,6 +171,20 @@ export function SwapWidget() {
                     amountOut: amountIn,
                     direction: direction === "swap-in" ? "swap-out" : "swap-in",
                   });
+                  if (destAccount?.wallet?.walletName) {
+                    trackWallet.track(
+                      "source",
+                      destinationChain.chainID,
+                      destAccount.wallet.walletName,
+                    );
+                  }
+                  if (sourceChain?.chainID && srcAccount?.wallet?.walletName) {
+                    trackWallet.track(
+                      "destination",
+                      sourceChain.chainID,
+                      srcAccount?.wallet?.walletName,
+                    );
+                  }
                 }}
                 data-testid="swap-button"
                 ref={invertButtonRef}
