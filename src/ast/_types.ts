@@ -1,4 +1,4 @@
-import { Asset, AssetList, Chain, Explorer } from "@graz-sh/types";
+import { Asset, AssetList, Chain, ChainInfo, Explorer } from "@graz-sh/types";
 
 export interface Variables {
   assetlists: AssetList[];
@@ -14,4 +14,5 @@ export interface Variables {
   chainRecord: Record<string, Chain>;
   assetsRecord: Record<string, Asset[]>;
   explorersRecord: Record<string, Explorer[]>;
+  chainInfosRecord: Record<string, ChainInfo>;
 }

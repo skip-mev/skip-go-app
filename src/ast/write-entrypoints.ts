@@ -78,4 +78,17 @@ export const assetsRecord: Record<ChainId, Asset[]> = ${JSON.stringify(
 
   const assetsTarget = path.resolve(destPath, "assets.ts");
   await fs.writeFile(assetsTarget, assetsTs, "utf-8");
+
+  const chainInfosTs = `/* eslint-disable */
+// @ts-nocheck
+import { ChainInfo } from "@graz-sh/types";
+import { ChainId } from "./types";
+
+export const chainInfosRecord: Record<ChainId, ChainInfo> = ${JSON.stringify(
+    v.chainInfosRecord,
+  )};
+`;
+
+  const chainInfosTarget = path.resolve(destPath, "chain-infos.ts");
+  await fs.writeFile(chainInfosTarget, chainInfosTs, "utf-8");
 }
