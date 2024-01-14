@@ -3,20 +3,21 @@ import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
-import { useTrackAccount } from "@/context/account";
+import { TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 
-export function useAccount(chainID?: string) {
-  const { data: chain } = useChainByID(chainID);
+export function useAccount(context: TrackWalletCtx) {
+  const trackedWallet = useTrackWallet(context);
+
+  const { data: chain } = useChainByID(trackedWallet?.chainID);
 
   const { walletRepo } = useCosmosChain(
     chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub",
     true,
   );
 
-  const walletName = useTrackAccount(chainID);
   const cosmosWallet = walletRepo.wallets.find((w) => {
-    return w.walletName === walletName;
+    return w.walletName === trackedWallet?.walletName;
   });
 
   const wagmiAccount = useWagmiAccount();
@@ -26,7 +27,8 @@ export function useAccount(chainID?: string) {
     if (chain.chainType === "cosmos" && cosmosWallet) {
       return {
         address: cosmosWallet.address,
-        isWalletConnected: cosmosWallet.isWalletConnected,
+        isWalletConnected:
+          cosmosWallet.isWalletConnected && !cosmosWallet.isWalletDisconnected,
         wallet: cosmosWallet
           ? {
               walletName: cosmosWallet.walletInfo.name,

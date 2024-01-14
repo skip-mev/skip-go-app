@@ -131,7 +131,7 @@ export function useSwapWidget() {
     destinationAsset?.decimals,
   ]);
 
-  const account = useAccount(sourceChain?.chainID);
+  const account = useAccount("source");
 
   const { assetsByChainID } = useAssets();
 

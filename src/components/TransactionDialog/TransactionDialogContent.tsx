@@ -65,8 +65,8 @@ function TransactionDialogContent({
 
   const { getWalletRepo } = useManager();
 
-  const srcAccount = useAccount(route.sourceAssetChainID);
-  const dstAccount = useAccount(route.destAssetChainID);
+  const srcAccount = useAccount("source");
+  const dstAccount = useAccount("destination");
 
   async function onSubmit() {
     setTransacting(true);

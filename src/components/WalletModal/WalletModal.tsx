@@ -9,7 +9,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { chainIdToName } from "@/chains/types";
 import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
-import { trackAccount } from "@/context/account";
+import { trackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 
 import { AdaptiveLink } from "../AdaptiveLink";
@@ -156,7 +156,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 
 function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
-  const { chainID } = useWalletModal();
+  const { chainID, context } = useWalletModal();
   const { disconnect } = useDisconnect();
   const { connectors, connect } = useConnect();
   const { getWalletRepo } = useManager();
@@ -203,11 +203,15 @@ function WalletModalWithContext() {
           assetList: w.assetList,
         });
         await w.connect();
-        trackAccount.track(chainID, w.walletName);
+        trackWallet.track(
+          context === "src" ? "source" : "destination",
+          chainID,
+          w.walletName,
+        );
       },
       disconnect: async () => {
         await w.disconnect();
-        trackAccount.untrack(chainID);
+        trackWallet.untrack(context === "src" ? "source" : "destination");
       },
       isWalletConnected: w.isWalletConnected,
     }));
