@@ -28,10 +28,14 @@ export default async function handler(req: NextRequest) {
     .filter(Boolean);
 
   const { data, error } = await resend.emails.send({
-    from: `${payload.name} <${payload.email}>`,
+    from: `<support+ingest@skip.money>`,
+    reply_to: `<${payload.email}>`,
     to: emails,
     subject: `ibc.fun issue on ${payload.submitChain}`,
-    text: `Transaction Hash: ${payload.txHash}
+    text: `
+Name: ${payload.name}
+Email: ${payload.email}
+Transaction Hash: ${payload.txHash}
 Signer Account Address: ${payload.signerAddress}
 Message: ${!payload.message ? "-" : ""}
 
