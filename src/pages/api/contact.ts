@@ -28,7 +28,7 @@ export default async function handler(req: NextRequest) {
     .filter(Boolean);
 
   const { data, error } = await resend.emails.send({
-    from: `<support+ingest@skip.money>`,
+    from: `support+ingest@skip.money`,
     reply_to: `<${payload.email}>`,
     to: emails,
     subject: `ibc.fun issue on ${payload.submitChain}`,
