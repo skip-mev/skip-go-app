@@ -43,12 +43,6 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 
   const totalWallets = useTotalWallets();
 
-  const contextText = useMemo(() => {
-    if (context === "src") return "Source";
-    if (context === "dest") return "Destination";
-    return "";
-  }, [context]);
-
   return (
     <div className="flex flex-col h-full px-6 pt-6 pb-2">
       <div className="relative">
@@ -62,7 +56,8 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
         <p className="font-bold text-xl text-center">
-          Connect {contextText} Wallet
+          Connect {context && <span className="capitalize">{context}</span>}{" "}
+          Wallet
         </p>
       </div>
       {totalWallets < 1 && (
@@ -203,15 +198,11 @@ function WalletModalWithContext() {
           assetList: w.assetList,
         });
         await w.connect();
-        trackWallet.track(
-          context === "src" ? "source" : "destination",
-          chainID,
-          w.walletName,
-        );
+        context && trackWallet.track(context, chainID, w.walletName);
       },
       disconnect: async () => {
         await w.disconnect();
-        trackWallet.untrack(context === "src" ? "source" : "destination");
+        context && trackWallet.untrack(context);
       },
       isWalletConnected: w.isWalletConnected,
     }));

@@ -10,7 +10,7 @@ interface WalletModalContext {
     chainID: string,
     context: NonNullable<WalletModalContext["context"]>,
   ) => void;
-  context?: "src" | "dest";
+  context?: "source" | "destination";
 }
 
 const WalletModalContext = createContext<WalletModalContext | undefined>(
