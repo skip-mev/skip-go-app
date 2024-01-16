@@ -442,6 +442,12 @@ function TransactionDialogContent({
             Insufficient Balance
           </p>
         )}
+        {route.txsRequired === broadcastedTxs.length && (
+          <p className="text-center font-semibold text-sm">
+            You can safely navigate away from this page while your transaction
+            is pending
+          </p>
+        )}
       </div>
     </div>
   );
