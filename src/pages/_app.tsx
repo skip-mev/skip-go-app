@@ -14,6 +14,7 @@ import { DefaultSeo } from "@/components/DefaultSeo";
 import { Footer } from "@/components/Footer";
 import Header from "@/components/Header";
 import SkipBanner from "@/components/SkipBanner";
+import { VersionCheck } from "@/components/VersionCheck";
 import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
@@ -63,6 +64,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   <Component {...pageProps} />
                   <Footer />
                 </main>
+                <VersionCheck />
                 <Toaster
                   position="bottom-center"
                   toastOptions={{ duration: 1000 * 10 }}
