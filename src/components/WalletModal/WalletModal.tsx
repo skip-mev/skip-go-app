@@ -152,8 +152,8 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
   const { chainID, context } = useWalletModal();
-  const { disconnect } = useDisconnect();
-  const { connectors, connect } = useConnect();
+  const { disconnectAsync } = useDisconnect();
+  const { connectors, connectAsync } = useConnect();
   const { getWalletRepo } = useManager();
 
   const { setIsOpen } = useWalletModal();
@@ -197,12 +197,14 @@ function WalletModalWithContext() {
           name: w.chainName,
           assetList: w.assetList,
         });
-        await w.connect();
-        context && trackWallet.track(context, chainID, w.walletName);
+        w.connect().then(() => {
+          context && trackWallet.track(context, chainID, w.walletName);
+        });
       },
       disconnect: async () => {
-        await w.disconnect();
-        context && trackWallet.untrack(context);
+        w.disconnect().then(() => {
+          context && trackWallet.untrack(context);
+        });
       },
       isWalletConnected: w.isWalletConnected,
     }));
@@ -228,10 +230,15 @@ function WalletModalWithContext() {
           logo: logoUrl,
         },
         connect: async () => {
-          await connect({ connector });
+          if (connector.id === currentConnector?.id) return;
+          connectAsync({ connector, chainId: Number(chainID) }).then(() => {
+            context && trackWallet.track(context, chainID, connector.id);
+          });
         },
         disconnect: async () => {
-          await disconnect();
+          disconnectAsync().then(() => {
+            context && trackWallet.untrack(context);
+          });
         },
         isWalletConnected: connector.id === currentConnector?.id,
       };

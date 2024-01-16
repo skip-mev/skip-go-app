@@ -1,4 +1,4 @@
-import { useManager } from "@cosmos-kit/react-lite";
+import { useManager } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
@@ -7,7 +7,7 @@ import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import { getTrackWallet, trackWallet } from "@/context/track-wallet";
+import { trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
 
@@ -78,33 +78,6 @@ export function SwapWidget() {
   function promptDestAsset() {
     document.querySelector("[data-testid='destination'] button")?.click();
   }
-
-  useEffect(() => {
-    const { source, destination } = getTrackWallet();
-    if (sourceChain && source && source.chainID !== sourceChain.chainID) {
-      trackWallet.track("source", sourceChain.chainID, source.walletName);
-      const wallet = getWalletRepo(sourceChain.chainName).wallets.find((w) => {
-        return w.walletName === source.walletName;
-      });
-      wallet?.connect();
-    }
-
-    if (
-      destinationChain &&
-      destination &&
-      destination.chainID !== destinationChain.chainID
-    ) {
-      trackWallet.track(
-        "destination",
-        destinationChain.chainID,
-        destination.walletName,
-      );
-      const wallet = getWalletRepo(destinationChain.chainName).wallets.find(
-        (w) => w.walletName === destination.walletName,
-      );
-      wallet?.connect();
-    }
-  }, [sourceChain, destinationChain]);
 
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();

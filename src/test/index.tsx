@@ -1,5 +1,5 @@
 import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
-import { ChainProvider } from "@cosmos-kit/react-lite";
+import { ChainProvider } from "@cosmos-kit/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   Queries,
