@@ -14,7 +14,7 @@ export default function handler() {
   }
   return new Response(version, {
     headers: {
-      "cache-control": "public, max-age=86400",
+      "cache-control": "s-maxage=1, stale-while-revalidate",
       "content-type": "text/plain",
     },
   });
