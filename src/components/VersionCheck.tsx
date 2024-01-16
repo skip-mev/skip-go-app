@@ -1,3 +1,4 @@
+import { ArrowDownOnSquareIcon } from "@heroicons/react/20/solid";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -19,26 +20,40 @@ export function VersionCheck() {
     enabled: !!version,
   });
 
+  console.log(data);
+
   useEffect(() => {
+    window.__DEBUG_TRIGGER_VERSION_TOAST = triggerToast;
     if (!data) return;
     if (!data.isCurrent) {
-      toast(
-        <div>
-          <p>A new version of ibc.fun is available.</p> <br />
-          <button
-            className="text-red-500 hover:underline"
-            onClick={() => window.location.reload()}
-          >
-            Refresh page
-          </button>
-        </div>,
-        {
-          id: "update",
-          duration: Infinity,
-        },
-      );
+      triggerToast();
     }
   }, [data]);
 
   return null;
+}
+
+function triggerToast() {
+  toast(
+    <div>
+      <p>A new version of ibc.fun is available.</p>
+      <button
+        className="text-red-500 hover:underline before:absolute before:inset-0 before:content-['']"
+        onClick={() => window.location.reload()}
+      >
+        Click here to reload page
+      </button>
+    </div>,
+    {
+      id: "update",
+      icon: <ArrowDownOnSquareIcon className="w-6 h-6 fill-red-500" />,
+      duration: Infinity,
+    },
+  );
+}
+
+declare global {
+  interface Window {
+    __DEBUG_TRIGGER_VERSION_TOAST: () => void;
+  }
 }
