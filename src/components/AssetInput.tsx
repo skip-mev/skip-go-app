@@ -172,14 +172,11 @@ function AssetInput({
 
             let latest = e.target.value;
 
-            // Remove non-numeric and non-decimal characters
-            latest = latest.replace(/[^\d.]/g, "");
-
-            // if there is more than one period or comma,
-            // remove all periods except the first one for decimals
-            if ((latest.match(/[.]/g)?.length ?? 0) > 1) {
-              latest = latest.replace(/([.].*)[.]/g, "$1");
-            }
+            if (latest.match(/^[.,]/)) latest = `0.${latest}`; // Handle first character being a period or comma
+            latest = latest.replace(/^[0]{2,}/, "0"); // Remove leading zeros
+            latest = latest.replace(/[^\d.,]/g, ""); // Remove non-numeric and non-decimal characters
+            latest = latest.replace(/[.]{2,}/g, "."); // Remove multiple decimals
+            latest = latest.replace(/[,]{2,}/g, ","); // Remove multiple commas
 
             onAmountChange?.(formatNumberWithoutCommas(latest));
           }}
