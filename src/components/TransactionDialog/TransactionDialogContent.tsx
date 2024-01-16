@@ -54,6 +54,7 @@ function TransactionDialogContent({
 
   const [txComplete, setTxComplete] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState(0);
+  const [isRouteExpanded, setIsRouteExpanded] = useState(false);
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => ({
@@ -70,7 +71,7 @@ function TransactionDialogContent({
 
   async function onSubmit() {
     setTransacting(true);
-
+    setIsRouteExpanded(true);
     const [historyId] = addTxHistory({ route });
 
     try {
@@ -288,7 +289,11 @@ function TransactionDialogContent({
         </div>
       </div>
       <div className="border border-neutral-300 rounded-xl p-4">
-        <RouteDisplay route={route} />
+        <RouteDisplay
+          route={route}
+          isRouteExpanded={isRouteExpanded}
+          setIsRouteExpanded={setIsRouteExpanded}
+        />
       </div>
 
       <div className="flex-1 space-y-6">
