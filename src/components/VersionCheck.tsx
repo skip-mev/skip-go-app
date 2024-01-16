@@ -25,7 +25,12 @@ export function VersionCheck() {
       toast(
         <div>
           <p>A new version of ibc.fun is available.</p> <br />
-          <button className="text-red-500 hover:underline">Refresh page</button>
+          <button
+            className="text-red-500 hover:underline"
+            onClick={() => window.location.reload()}
+          >
+            Refresh page
+          </button>
         </div>,
         {
           id: "update",
