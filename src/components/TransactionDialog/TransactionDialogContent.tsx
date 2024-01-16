@@ -53,8 +53,14 @@ function TransactionDialogContent({
   const [transacting, setTransacting] = useState(false);
 
   const [txComplete, setTxComplete] = useState(false);
-  const [broadcastedTxs, setBroadcastedTxs] = useState(0);
   const [isRouteExpanded, setIsRouteExpanded] = useState(false);
+  const [broadcastedTxs, setBroadcastedTxs] = useState<
+    {
+      chainId: string;
+      txHash: string;
+      explorerLink: string;
+    }[]
+  >([]);
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => ({
@@ -166,10 +172,14 @@ function TransactionDialogContent({
             explorerLink: explorerLink || "#",
           });
 
-          setBroadcastedTxs(
-            (numberOfBroadcastedTransactions) =>
-              numberOfBroadcastedTransactions + 1,
-          );
+          setBroadcastedTxs((v) => [
+            ...v,
+            {
+              chainId: txStatus.chainID,
+              txHash: txStatus.txHash,
+              explorerLink: explorerLink || "#",
+            },
+          ]);
         },
         onTransactionCompleted: async (chainID, txHash) => {
           const makeExplorerUrl = await getChainExplorerUrl(chainID);
@@ -259,7 +269,7 @@ function TransactionDialogContent({
     } finally {
       successTxHistory(historyId);
       setTransacting(false);
-      setBroadcastedTxs(0);
+      setBroadcastedTxs([]);
     }
   }
 
@@ -312,6 +322,20 @@ function TransactionDialogContent({
               <p className="font-semibold">Transaction {i + 1}</p>
             </div>
             <div>
+              {broadcastedTxs[i] && (
+                <a
+                  className="text-sm font-bold text-[#FF486E] hover:underline"
+                  href={broadcastedTxs[i].explorerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    {broadcastedTxs[i].txHash.slice(0, 6)}
+                    ...
+                    {broadcastedTxs[i].txHash.slice(-6)}
+                  </span>
+                </a>
+              )}
               {txHash && explorerLink && (
                 <a
                   className="text-sm font-bold text-[#FF486E] hover:underline"
@@ -372,9 +396,9 @@ function TransactionDialogContent({
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onClose}
-            disabled={route.txsRequired !== broadcastedTxs}
+            disabled={route.txsRequired !== broadcastedTxs.length}
           >
-            {route.txsRequired !== broadcastedTxs ? (
+            {route.txsRequired !== broadcastedTxs.length ? (
               <svg
                 className="animate-spin h-4 w-4 inline-block text-white"
                 xmlns="http://www.w3.org/2000/svg"
