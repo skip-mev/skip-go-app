@@ -1,4 +1,4 @@
-import { useManager } from "@cosmos-kit/react-lite";
+import { useManager } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
@@ -119,7 +119,7 @@ export function SwapWidget() {
                   address={srcAccount.address}
                   onClick={() =>
                     sourceChain?.chainID &&
-                    openWalletModal(sourceChain.chainID, "src")
+                    openWalletModal(sourceChain.chainID, "source")
                   }
                   walletName={srcAccount.wallet?.walletPrettyName}
                   walletLogo={
@@ -203,7 +203,10 @@ export function SwapWidget() {
                     address={destAccount.address}
                     onClick={() => {
                       destinationChain?.chainID &&
-                        openWalletModal(destinationChain.chainID, "dest");
+                        openWalletModal(
+                          destinationChain.chainID,
+                          "destination",
+                        );
                     }}
                     walletName={destAccount.wallet?.walletPrettyName}
                     walletLogo={
@@ -280,7 +283,7 @@ export function SwapWidget() {
               className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
               onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
-                  openWalletModal(sourceChain.chainID, "src");
+                  openWalletModal(sourceChain.chainID, "source");
                   return;
                 }
                 if (!destinationChain) {
@@ -298,7 +301,7 @@ export function SwapWidget() {
                     (item) => item.walletName === srcAccount.wallet?.walletName,
                   );
                   if (!wallet) {
-                    openWalletModal(destinationChain.chainID, "dest");
+                    openWalletModal(destinationChain.chainID, "destination");
                     return;
                   }
                   await wallet.client.addChain?.({
@@ -329,7 +332,7 @@ export function SwapWidget() {
                   return;
                 }
                 if (destinationChain && !destAccount?.isWalletConnected) {
-                  openWalletModal(destinationChain.chainID, "dest");
+                  openWalletModal(destinationChain.chainID, "destination");
                   return;
                 }
               }}

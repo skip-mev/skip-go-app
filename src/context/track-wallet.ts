@@ -44,10 +44,6 @@ export function useTrackWalletByCtx(ctx: TrackWalletCtx) {
   return store((state) => state[ctx]);
 }
 
-export function useTrackWallet() {
-  return store((state) => state);
-}
-
 export function getTrackWallet() {
   return store.getState();
 }

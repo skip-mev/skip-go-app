@@ -20,8 +20,6 @@ export function VersionCheck() {
     enabled: !!version,
   });
 
-  console.log(data);
-
   useEffect(() => {
     window.__DEBUG_TRIGGER_VERSION_TOAST = triggerToast;
     if (!data) return;

@@ -1,7 +1,8 @@
+import { useManager } from "@cosmos-kit/react";
 import { BigNumber } from "bignumber.js";
 import { ethers, formatUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount as useWagmiAccount, useSwitchNetwork } from "wagmi";
 import {
   createJSONStorage,
   persist,
@@ -12,6 +13,7 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
+import { getTrackWallet, trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
@@ -43,9 +45,9 @@ export function useSwapWidget() {
     amountOut,
     direction,
     destinationAsset,
-    destinationChain,
+    destinationChain: dstChain,
     sourceAsset,
-    sourceChain,
+    sourceChain: srcChain,
   } = useFormValuesStore();
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
@@ -131,15 +133,50 @@ export function useSwapWidget() {
     destinationAsset?.decimals,
   ]);
 
-  const account = useAccount("source");
+  const srcAccount = useAccount("source");
+
+  const { getWalletRepo } = useManager();
+
+  // wallet switcher for cosmos
+  useEffect(() => {
+    const { source: srcTrack, destination: dstTrack } = getTrackWallet();
+
+    if (
+      srcChain &&
+      srcChain.chainType === "cosmos" &&
+      srcTrack &&
+      srcTrack.chainID !== srcChain.chainID
+    ) {
+      const wallet = getWalletRepo(srcChain.chainName).wallets.find((w) => {
+        return w.walletName === srcTrack.walletName || w.isWalletConnected;
+      });
+      if (!wallet) return;
+      wallet.connect();
+      trackWallet.track("source", srcChain.chainID, wallet.walletName);
+    }
+
+    if (
+      dstChain &&
+      dstChain.chainType === "cosmos" &&
+      dstTrack &&
+      dstTrack.chainID !== dstChain.chainID
+    ) {
+      const wallet = getWalletRepo(dstChain.chainName).wallets.find((w) => {
+        return w.walletName === dstTrack.walletName || w.isWalletConnected;
+      });
+      if (!wallet) return;
+      wallet.connect();
+      trackWallet.track("destination", dstChain.chainID, wallet.walletName);
+    }
+  }, [srcChain, dstChain]);
 
   const { assetsByChainID } = useAssets();
 
-  const sourceChainAssets = assetsByChainID(sourceChain?.chainID);
+  const sourceChainAssets = assetsByChainID(srcChain?.chainID);
 
   const { data: balances } = useBalancesByChain(
-    account?.address,
-    sourceChain,
+    srcAccount?.address,
+    srcChain,
     sourceChainAssets,
   );
 
@@ -158,25 +195,21 @@ export function useSwapWidget() {
     return parsedAmount > balance;
   }, [amountIn, balances, sourceAsset]);
 
-  const { chain: currentEvmChain } = useNetwork();
-
   const { switchNetwork } = useSwitchNetwork();
+  const { connector } = useWagmiAccount();
 
+  // wallet switcher for evm
   useEffect(() => {
-    if (!sourceChain || sourceChain.chainType === "cosmos") {
-      return;
+    if (srcChain && srcChain.chainType === "evm" && connector) {
+      switchNetwork?.(+srcChain.chainID);
+      trackWallet.track("source", srcChain.chainID, connector.id);
     }
 
-    if (!currentEvmChain || !switchNetwork) {
-      return;
+    if (dstChain && dstChain.chainType === "evm" && connector) {
+      switchNetwork?.(+dstChain.chainID);
+      trackWallet.track("destination", dstChain.chainID, connector.id);
     }
-
-    const chainID = parseInt(sourceChain.chainID);
-
-    if (currentEvmChain.id !== chainID) {
-      switchNetwork(chainID);
-    }
-  }, [currentEvmChain, sourceChain, switchNetwork]);
+  }, [srcChain, dstChain]);
 
   const swapPriceImpactPercent = useMemo(() => {
     if (!routeResponse?.swapPriceImpactPercent) return undefined;
@@ -253,9 +286,9 @@ export function useSwapWidget() {
     amountOut,
     direction,
     destinationAsset,
-    destinationChain,
+    destinationChain: dstChain,
     sourceAsset,
-    sourceChain,
+    sourceChain: srcChain,
     setFormValues: useFormValuesStore.setState,
     routeLoading,
     numberOfTransactions: numberOfTransactions ?? 0,

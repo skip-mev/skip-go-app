@@ -3,7 +3,6 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { clsx } from "clsx";
-import { useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
@@ -43,12 +42,6 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 
   const totalWallets = useTotalWallets();
 
-  const contextText = useMemo(() => {
-    if (context === "src") return "Source";
-    if (context === "dest") return "Destination";
-    return "";
-  }, [context]);
-
   return (
     <div className="flex flex-col h-full px-6 pt-6 pb-2">
       <div className="relative">
@@ -62,7 +55,8 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
         <p className="font-bold text-xl text-center">
-          Connect {contextText} Wallet
+          Connect {context && <span className="capitalize">{context}</span>}{" "}
+          Wallet
         </p>
       </div>
       {totalWallets < 1 && (
@@ -133,6 +127,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
                   onClick={async (event) => {
                     event.stopPropagation();
                     await wallet.disconnect();
+                    context && trackWallet.untrack(context);
                     onClose();
                   }}
                 >
@@ -157,8 +152,8 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
   const { chainID, context } = useWalletModal();
-  const { disconnect } = useDisconnect();
-  const { connectors, connect } = useConnect();
+  const { disconnectAsync } = useDisconnect();
+  const { connectors, connectAsync } = useConnect();
   const { getWalletRepo } = useManager();
 
   const { setIsOpen } = useWalletModal();
@@ -202,16 +197,14 @@ function WalletModalWithContext() {
           name: w.chainName,
           assetList: w.assetList,
         });
-        await w.connect();
-        trackWallet.track(
-          context === "src" ? "source" : "destination",
-          chainID,
-          w.walletName,
-        );
+        w.connect().then(() => {
+          context && trackWallet.track(context, chainID, w.walletName);
+        });
       },
       disconnect: async () => {
-        await w.disconnect();
-        trackWallet.untrack(context === "src" ? "source" : "destination");
+        w.disconnect().then(() => {
+          context && trackWallet.untrack(context);
+        });
       },
       isWalletConnected: w.isWalletConnected,
     }));
@@ -237,10 +230,15 @@ function WalletModalWithContext() {
           logo: logoUrl,
         },
         connect: async () => {
-          await connect({ connector });
+          if (connector.id === currentConnector?.id) return;
+          connectAsync({ connector, chainId: Number(chainID) }).then(() => {
+            context && trackWallet.track(context, chainID, connector.id);
+          });
         },
         disconnect: async () => {
-          await disconnect();
+          disconnectAsync().then(() => {
+            context && trackWallet.untrack(context);
+          });
         },
         isWalletConnected: connector.id === currentConnector?.id,
       };
