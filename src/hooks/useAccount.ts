@@ -5,6 +5,7 @@ import { useAccount as useWagmiAccount } from "wagmi";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { TrackWalletCtx, useTrackWalletByCtx } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
+
 export function useAccount(context: TrackWalletCtx) {
   const trackedWallet = useTrackWalletByCtx(context);
 
