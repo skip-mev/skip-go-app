@@ -3,7 +3,6 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { clsx } from "clsx";
-import { useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
@@ -128,6 +127,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
                   onClick={async (event) => {
                     event.stopPropagation();
                     await wallet.disconnect();
+                    context && trackWallet.untrack(context);
                     onClose();
                   }}
                 >
