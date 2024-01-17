@@ -145,28 +145,22 @@ export function useSwapWidget() {
   useEffect(() => {
     const { source: srcTrack, destination: dstTrack } = getTrackWallet();
 
-    if (
-      srcChain &&
-      srcChain.chainType === "cosmos" &&
-      srcTrack &&
-      srcTrack.chainID !== srcChain.chainID
-    ) {
+    if (srcChain && srcChain.chainType === "cosmos") {
       const wallet = getWalletRepo(srcChain.chainName).wallets.find((w) => {
-        return w.walletName === srcTrack.walletName || w.isWalletConnected;
+        return srcTrack
+          ? w.walletName === srcTrack.walletName
+          : w.isWalletConnected;
       });
       if (!wallet) return;
       wallet.connect();
       trackWallet.track("source", srcChain.chainID, wallet.walletName);
     }
 
-    if (
-      dstChain &&
-      dstChain.chainType === "cosmos" &&
-      dstTrack &&
-      dstTrack.chainID !== dstChain.chainID
-    ) {
+    if (dstChain && dstChain.chainType === "cosmos") {
       const wallet = getWalletRepo(dstChain.chainName).wallets.find((w) => {
-        return w.walletName === dstTrack.walletName || w.isWalletConnected;
+        return dstTrack
+          ? w.walletName === dstTrack.walletName
+          : w.isWalletConnected;
       });
       if (!wallet) return;
       wallet.connect();
