@@ -3,7 +3,6 @@ import { useMemo } from "react";
 
 import { ChainId } from "@/chains/types";
 import { useChainByID } from "@/hooks/useChains";
-import { getChainLogo } from "@/lib/cosmos";
 
 interface Props {
   chainId: ChainId;
@@ -14,7 +13,7 @@ export const ChainSymbol = ({ chainId }: Props) => {
 
   const src = useMemo(() => {
     if (!chain) return;
-    return getChainLogo(chain);
+    return chain.logoURI;
   }, [chain]);
 
   const alt = chain?.prettyName || chain?.chainName || "UNKNOWN";

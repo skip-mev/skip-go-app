@@ -5,7 +5,6 @@ import { matchSorter } from "match-sorter";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/hooks/useChains";
-import { getChainLogo } from "@/lib/cosmos";
 
 interface Props {
   chains: Chain[];
@@ -89,7 +88,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
                 <img
                   alt={chain.prettyName}
                   className="w-12 h-12 rounded-full"
-                  src={getChainLogo(chain)}
+                  src={chain.logoURI}
                   onError={(e) =>
                     (e.currentTarget.src =
                       "https://api.dicebear.com/6.x/shapes/svg")

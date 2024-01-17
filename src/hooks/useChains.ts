@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { chainIdToName } from "@/chains";
 import { chainIdToPrettyName } from "@/chains/pretty";
 import { useSkipClient } from "@/solve";
+import { getChainLogo } from "@/utils/chain";
 
 export type Chain = SkipChain & {
   prettyName: string;
@@ -32,6 +33,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
             ...chain,
             chainName: chainIdToName[chain.chainID] || chain.chainName,
             prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
+            logoURI: getChainLogo(chain),
           };
         })
         .sort((chainA, chainB) => {

@@ -5,7 +5,6 @@ import { Dispatch, FC, Fragment, SetStateAction, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
 import { useChainByID } from "@/hooks/useChains";
-import { getChainLogo } from "@/lib/cosmos";
 
 export interface SwapVenueConfig {
   name: string;
@@ -100,7 +99,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
             Transfer to{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
-              src={getChainLogo(destinationChain)}
+              src={destinationChain.logoURI}
               alt=""
             />{" "}
             <span className="font-semibold text-black">
@@ -131,7 +130,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           from{" "}
           <img
             className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={getChainLogo(sourceChain)}
+            src={sourceChain.logoURI}
             alt=""
             onError={(e) =>
               (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
@@ -143,7 +142,7 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
           to{" "}
           <img
             className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={getChainLogo(destinationChain)}
+            src={destinationChain.logoURI}
             alt=""
             onError={(e) =>
               (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
