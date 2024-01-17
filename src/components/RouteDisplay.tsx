@@ -125,7 +125,10 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
             src={asset.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
+          <span className="font-semibold text-black">
+            {asset.recommendedSymbol}
+          </span>{" "}
+          from{" "}
           <img
             className="inline-block w-4 h-4 -mt-1 rounded-full"
             src={getChainLogo(sourceChain)}
@@ -182,7 +185,9 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
               }
               src={assetOut.logoURI}
             />{" "}
-            <span className="font-semibold text-black">{assetOut.symbol}</span>{" "}
+            <span className="font-semibold text-black">
+              {assetOut.recommendedSymbol}
+            </span>{" "}
             on{" "}
             <img
               alt=""
@@ -214,7 +219,9 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
               src={assetIn.logoURI}
               alt=""
             />{" "}
-            <span className="font-semibold text-black">{assetIn.symbol}</span>{" "}
+            <span className="font-semibold text-black">
+              {assetIn.recommendedSymbol}
+            </span>{" "}
             on{" "}
             <img
               className="inline-block w-4 h-4 -mt-1"
@@ -245,13 +252,19 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
             src={assetIn.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{assetIn.symbol}</span> for{" "}
+          <span className="font-semibold text-black">
+            {assetIn.recommendedSymbol}
+          </span>{" "}
+          for{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={assetOut.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{assetOut.symbol}</span> on{" "}
+          <span className="font-semibold text-black">
+            {assetOut.recommendedSymbol}
+          </span>{" "}
+          on{" "}
           <img
             className="inline-block w-4 h-4 -mt-1"
             src={venue.imageURL}
@@ -412,7 +425,7 @@ const RouteDisplay: FC<Props> = ({
         <div className="flex items-center justify-between pr-4">
           <RouteEnd
             amount={amountIn}
-            symbol={sourceAsset?.symbol ?? "UNKNOWN"}
+            symbol={sourceAsset?.recommendedSymbol ?? "UNKNOWN"}
             logo={sourceAsset?.logoURI ?? "UNKNOWN"}
             chain={sourceChain?.prettyName ?? ""}
           />
@@ -455,7 +468,7 @@ const RouteDisplay: FC<Props> = ({
         )}
         <RouteEnd
           amount={amountOut}
-          symbol={destinationAsset?.symbol ?? "UNKNOWN"}
+          symbol={destinationAsset?.recommendedSymbol ?? "UNKNOWN"}
           logo={destinationAsset?.logoURI ?? "UNKNOWN"}
           chain={destinationChain?.prettyName ?? ""}
         />

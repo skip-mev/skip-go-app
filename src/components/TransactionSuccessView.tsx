@@ -59,11 +59,11 @@ const TransactionSuccessView: FC<{
       <p className="font-medium text-neutral-400 pb-8 text-center">
         {route.doesSwap &&
           `Successfully swapped ${
-            sourceAsset?.symbol ?? route.sourceAssetDenom
-          } for ${destinationAsset?.symbol ?? route.destAssetDenom}`}
+            sourceAsset?.recommendedSymbol ?? route.sourceAssetDenom
+          } for ${destinationAsset?.recommendedSymbol ?? route.destAssetDenom}`}
         {!route.doesSwap &&
           `Successfully transfered ${
-            sourceAsset?.symbol ?? route.sourceAssetDenom
+            sourceAsset?.recommendedSymbol ?? route.sourceAssetDenom
           } from ${sourceChain.prettyName} to ${destinationChain.prettyName}`}
       </p>
       <div className="flex-1 space-y-6 w-full">

@@ -32,10 +32,10 @@ function AssetSelectContent({
   const sortedAssets = useMemo(() => {
     return assets
       ?.sort((a, b) => {
-        if (!a.symbol) return 1;
-        if (!b.symbol) return -1;
-        if (a.symbol > b.symbol) return 1;
-        if (a.symbol < b.symbol) return -1;
+        if (!a.recommendedSymbol) return 1;
+        if (!b.recommendedSymbol) return -1;
+        if (a.recommendedSymbol > b.recommendedSymbol) return 1;
+        if (a.recommendedSymbol < b.recommendedSymbol) return -1;
         return 0;
       })
       .filter((asset) => {
@@ -99,7 +99,7 @@ function AssetSelectContent({
               onClick={() => (onClose(), onChange?.(asset))}
             >
               <img
-                alt={asset.symbol}
+                alt={asset.recommendedSymbol}
                 className="w-12 h-12 rounded-full"
                 src={asset.logoURI}
                 onError={(e) =>
@@ -108,7 +108,9 @@ function AssetSelectContent({
                 }
               />
               <div className="flex-1">
-                <p className="font-semibold text-lg">{asset.symbol}</p>
+                <p className="font-semibold text-lg">
+                  {asset.recommendedSymbol}
+                </p>
                 {showChainInfo && (
                   <p className="text-sm text-neutral-400">{asset.chainID}</p>
                 )}

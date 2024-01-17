@@ -239,7 +239,9 @@ function AssetInput({
           {showBalance && account?.address && asset && (
             <div className="text-neutral-400 text-sm flex items-center animate-slide-left-and-fade">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip label={`${selectedAssetBalance} ${asset.symbol}`}>
+              <SimpleTooltip
+                label={`${selectedAssetBalance} ${asset.recommendedSymbol}`}
+              >
                 <div
                   className={clsx(
                     "max-w-[16ch] truncate mr-2 tabular-nums",

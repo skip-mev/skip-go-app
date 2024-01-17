@@ -37,7 +37,7 @@ function AssetSelect({
         >
           {asset && (
             <img
-              alt={asset.symbol}
+              alt={asset.recommendedSymbol}
               className="w-6 h-6 rounded-full"
               src={asset.logoURI}
               onError={(event) =>
@@ -48,7 +48,7 @@ function AssetSelect({
           )}
           <div className="flex-1 min-w-0">
             {!asset && <span>Select Token</span>}
-            {asset && <div className="truncate">{asset.symbol}</div>}
+            {asset && <div className="truncate">{asset.recommendedSymbol}</div>}
           </div>
           <div>
             <ChevronDownIcon className="h-4 w-4" />

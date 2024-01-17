@@ -82,11 +82,11 @@ export const SwapDetails = ({
           {({ left, right, conversion, toggle }) => (
             <div>
               <button className="mr-2 tabular-nums" onClick={toggle}>
-                1 {(left.symbol ?? "").replace(/\sEthereum$/, "")} ={" "}
+                1 {(left.recommendedSymbol ?? "").replace(/\sEthereum$/, "")} ={" "}
                 {conversion.toLocaleString("en-US", {
                   maximumFractionDigits: 4,
                 })}{" "}
-                {(right.symbol ?? "").replace(/\sEthereum$/, "")}
+                {(right.recommendedSymbol ?? "").replace(/\sEthereum$/, "")}
               </button>
               <span className="text-neutral-400 tabular-nums">
                 <UsdValue
