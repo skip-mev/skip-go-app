@@ -25,7 +25,7 @@ export function useBalancesByChain(
   const skipClient = useSkipClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain, assets],
+    queryKey: ["USE_BALANCES_BY_CHAIN", address, chain, assets],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
