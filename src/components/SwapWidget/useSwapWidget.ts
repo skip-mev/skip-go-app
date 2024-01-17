@@ -2,7 +2,11 @@ import { useManager } from "@cosmos-kit/react";
 import { BigNumber } from "bignumber.js";
 import { ethers, formatUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount as useWagmiAccount, useSwitchNetwork } from "wagmi";
+import {
+  useAccount as useWagmiAccount,
+  useNetwork,
+  useSwitchNetwork,
+} from "wagmi";
 import {
   createJSONStorage,
   persist,
@@ -195,18 +199,23 @@ export function useSwapWidget() {
     return parsedAmount > balance;
   }, [amountIn, balances, sourceAsset]);
 
+  const { chain: evmChain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { connector } = useWagmiAccount();
 
   // wallet switcher for evm
   useEffect(() => {
     if (srcChain && srcChain.chainType === "evm" && connector) {
-      switchNetwork?.(+srcChain.chainID);
+      if (evmChain && evmChain.id !== +srcChain.chainID) {
+        switchNetwork?.(+srcChain.chainID);
+      }
       trackWallet.track("source", srcChain.chainID, connector.id);
     }
 
     if (dstChain && dstChain.chainType === "evm" && connector) {
-      switchNetwork?.(+dstChain.chainID);
+      if (evmChain && evmChain.id !== +dstChain.chainID) {
+        switchNetwork?.(+dstChain.chainID);
+      }
       trackWallet.track("destination", dstChain.chainID, connector.id);
     }
   }, [srcChain, dstChain]);
