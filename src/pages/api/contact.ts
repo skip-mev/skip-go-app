@@ -4,7 +4,7 @@ import { Resend } from "resend";
 
 import { contactFormSchema } from "@/schemas/contact";
 
-export const page: PageConfig = {
+export const config: PageConfig = {
   runtime: "edge",
 };
 
