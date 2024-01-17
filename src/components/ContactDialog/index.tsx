@@ -13,7 +13,7 @@ export function ContactDialog() {
       <Dialog.Content className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
         <form
           className={clsx(
-            "flex flex-col h-full px-4 py-6 text-sm",
+            "flex flex-col h-full p-6 text-sm",
             "[&_input]:border-neutral-300 [&_input]:rounded-md [&_input]:text-sm",
             "[&_textarea]:border-neutral-300 [&_textarea]:rounded-md [&_textarea]:text-sm",
           )}
@@ -95,7 +95,8 @@ export function ContactDialog() {
           <div className="flex-grow" />
           <button
             type="submit"
-            className="flex items-center gap-2 bg-[#FF486E] rounded-md font-medium p-2 text-white justify-center text-base"
+            // className="flex items-center gap-2 bg-[#FF486E] rounded-md font-medium p-2 text-white justify-center text-base"
+            className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full outline-none flex items-center justify-center gap-2 text-base"
           >
             <EnvelopeIcon className="w-5 h-5" />
             <span>Send Message</span>
