@@ -1,5 +1,9 @@
 import { useManager } from "@cosmos-kit/react";
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -172,14 +176,30 @@ function TransactionDialogContent({
             explorerLink: explorerLink || "#",
           });
 
-          setBroadcastedTxs((v) => [
-            ...v,
-            {
-              chainId: txStatus.chainID,
-              txHash: txStatus.txHash,
-              explorerLink: explorerLink || "#",
-            },
-          ]);
+          setBroadcastedTxs((v) => {
+            const txs = [
+              ...v,
+              {
+                chainId: txStatus.chainID,
+                txHash: txStatus.txHash,
+                explorerLink: explorerLink || "#",
+              },
+            ];
+            if (route.txsRequired === txs.length) {
+              toast.success(
+                <p>
+                  You can safely navigate away from this page while your
+                  transaction is pending
+                </p>,
+                {
+                  icon: (
+                    <InformationCircleIcon className="h-10 w-10 text-blue-500" />
+                  ),
+                },
+              );
+            }
+            return txs;
+          });
         },
         onTransactionCompleted: async (chainID, txHash) => {
           const makeExplorerUrl = await getChainExplorerUrl(chainID);
@@ -440,12 +460,6 @@ function TransactionDialogContent({
         {insufficentBalance && !transacting && !txComplete && (
           <p className="text-center font-semibold text-sm text-red-500">
             Insufficient Balance
-          </p>
-        )}
-        {route.txsRequired === broadcastedTxs.length && (
-          <p className="text-center font-semibold text-sm">
-            You can safely navigate away from this page while your transaction
-            is pending
           </p>
         )}
       </div>
