@@ -7,7 +7,6 @@ import {
 
 export function getChainLogo(chain: Chain) {
   if (chain.logoURI && chain.logoURI.match("-light")) {
-    console.log(chain.logoURI);
     return chain.logoURI.replace("-light", "-dark");
   }
 
