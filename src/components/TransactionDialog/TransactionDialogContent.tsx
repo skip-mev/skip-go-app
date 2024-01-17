@@ -164,7 +164,7 @@ function TransactionDialogContent({
       await skipClient.executeRoute({
         route,
         userAddresses,
-        validateGasBalance: true,
+        validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         onTransactionBroadcast: async (txStatus) => {
           const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
