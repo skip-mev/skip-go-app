@@ -5,6 +5,7 @@ import { useDisclosureKey } from "@/context/disclosures";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { GasSetting } from "./GasSetting";
+import { PurgeSetting } from "./PurgeSetting";
 import { SaveIndicator } from "./SaveIndicator";
 import { SlippageSetting } from "./SlippageSetting";
 
@@ -43,6 +44,11 @@ export const SettingsDialog = () => {
             <AdaptiveLink href="https://medium.com/onomy-protocol/what-is-slippage-in-defi-62a0d068feb3">
               Learn more
             </AdaptiveLink>
+          </p>
+          <PurgeSetting />
+          <p className="p-2 text-sm text-neutral-500 [&_a]:text-red-500 [&_a:hover]:underline text-balance">
+            Removes all of your data from the app, which includes connected
+            wallets state, transaction history, and settings.
           </p>
         </div>
       </Dialog.Content>
