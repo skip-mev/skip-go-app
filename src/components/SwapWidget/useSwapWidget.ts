@@ -223,18 +223,26 @@ export function useSwapWidget() {
 
   // wallet switcher for evm
   useEffect(() => {
-    if (srcChain && srcChain.chainType === "evm" && connector) {
+    if (srcChain && srcChain.chainType === "evm") {
       if (evmChain && evmChain.id !== +srcChain.chainID) {
         switchNetwork?.(+srcChain.chainID);
       }
-      trackWallet.track("source", srcChain.chainID, connector.id);
+      if (connector) {
+        trackWallet.track("source", srcChain.chainID, connector.id);
+      } else {
+        trackWallet.untrack("source");
+      }
     }
 
-    if (dstChain && dstChain.chainType === "evm" && connector) {
+    if (dstChain && dstChain.chainType === "evm") {
       if (evmChain && evmChain.id !== +dstChain.chainID) {
         switchNetwork?.(+dstChain.chainID);
       }
-      trackWallet.track("destination", dstChain.chainID, connector.id);
+      if (connector) {
+        trackWallet.track("destination", dstChain.chainID, connector.id);
+      } else {
+        trackWallet.untrack("destination");
+      }
     }
   }, [srcChain, dstChain]);
 
