@@ -19,6 +19,7 @@ export function SkipProvider({ children }: { children: ReactNode }) {
   const { getWalletRepo } = useManager();
 
   const skipClient = new SkipRouter({
+    clientID: process.env.NEXT_PUBLIC_CLIENT_ID,
     apiURL: API_URL,
     getCosmosSigner: async (chainID) => {
       const chainName = chainIdToName[chainID];
