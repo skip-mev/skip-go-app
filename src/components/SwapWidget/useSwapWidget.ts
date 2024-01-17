@@ -17,14 +17,16 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
-import { getTrackWallet, trackWallet } from "@/context/track-wallet";
+import {
+  getTrackWallet,
+  trackWallet,
+  useTrackWalletByCtx,
+} from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
 import { formatPercent, formatUSD } from "@/utils/intl";
-
-export const LAST_SOURCE_CHAIN_KEY = "IBC_DOT_FUN_LAST_SOURCE_CHAIN";
 
 export const PRICE_IMPACT_THRESHOLD = 0.1;
 
@@ -138,6 +140,7 @@ export function useSwapWidget() {
   ]);
 
   const srcAccount = useAccount("source");
+  const dstAccount = useAccount("destination");
 
   const { getWalletRepo } = useManager();
 
@@ -146,27 +149,48 @@ export function useSwapWidget() {
     const { source: srcTrack, destination: dstTrack } = getTrackWallet();
 
     if (srcChain && srcChain.chainType === "cosmos") {
-      const wallet = getWalletRepo(srcChain.chainName).wallets.find((w) => {
+      const srcWallet = getWalletRepo(srcChain.chainName).wallets.find((w) => {
         return srcTrack
           ? w.walletName === srcTrack.walletName
           : w.isWalletConnected;
       });
-      if (!wallet) return;
-      wallet.connect();
-      trackWallet.track("source", srcChain.chainID, wallet.walletName);
+      if (!srcWallet) return;
+      srcWallet.connect();
+      trackWallet.track("source", srcChain.chainID, srcWallet.walletName);
     }
 
     if (dstChain && dstChain.chainType === "cosmos") {
-      const wallet = getWalletRepo(dstChain.chainName).wallets.find((w) => {
+      const dstWallet = getWalletRepo(dstChain.chainName).wallets.find((w) => {
         return dstTrack
           ? w.walletName === dstTrack.walletName
           : w.isWalletConnected;
       });
-      if (!wallet) return;
-      wallet.connect();
-      trackWallet.track("destination", dstChain.chainID, wallet.walletName);
+      if (!dstWallet) return;
+      dstWallet.connect();
+      trackWallet.track("destination", dstChain.chainID, dstWallet.walletName);
     }
   }, [srcChain, dstChain]);
+
+  const sourceTrack = useTrackWalletByCtx("source");
+  useEffect(() => {
+    const { source: srcTrack, destination: dstTrack } = getTrackWallet();
+
+    if (
+      srcAccount &&
+      srcAccount.chainType == "cosmos" &&
+      !dstAccount &&
+      dstChain &&
+      srcTrack &&
+      !dstTrack
+    ) {
+      const dstWallet = getWalletRepo(dstChain.chainName).wallets.find((w) => {
+        return srcTrack ? w.walletName === srcTrack.walletName : false;
+      });
+      if (!dstWallet) return;
+      dstWallet.connect();
+      trackWallet.track("destination", dstChain.chainID, dstWallet.walletName);
+    }
+  }, [sourceTrack]);
 
   const { assetsByChainID } = useAssets();
 
