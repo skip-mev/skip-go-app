@@ -7,7 +7,7 @@ import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import { trackWallet } from "@/context/track-wallet";
+import { getTrackWallet, trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
 
@@ -131,6 +131,7 @@ export function SwapWidget() {
                       : ""
                   }
                   className="animate-slide-left-and-fade"
+                  key={srcAccount.address}
                 />
               </SimpleTooltip>
             ) : null}
@@ -174,19 +175,24 @@ export function SwapWidget() {
                     amountOut: amountIn,
                     direction: direction === "swap-in" ? "swap-out" : "swap-in",
                   });
-                  if (destAccount?.wallet?.walletName) {
-                    trackWallet.track(
-                      "source",
-                      destinationChain.chainID,
-                      destAccount.wallet.walletName,
-                    );
-                  }
-                  if (sourceChain?.chainID && srcAccount?.wallet?.walletName) {
+                  const { source, destination } = getTrackWallet();
+                  if (source && !destination) {
                     trackWallet.track(
                       "destination",
-                      sourceChain.chainID,
-                      srcAccount?.wallet?.walletName,
+                      source.chainID,
+                      source.walletName,
                     );
+                    trackWallet.untrack("source");
+                    return;
+                  }
+                  if (!source && destination) {
+                    trackWallet.track(
+                      "source",
+                      destination.chainID,
+                      destination.walletName,
+                    );
+                    trackWallet.untrack("destination");
+                    return;
                   }
                 }}
                 data-testid="swap-button"
@@ -218,6 +224,7 @@ export function SwapWidget() {
                         : ""
                     }
                     className="animate-slide-left-and-fade"
+                    key={destAccount.address}
                   />
                 </SimpleTooltip>
               ) : null}
