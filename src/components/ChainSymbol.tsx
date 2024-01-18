@@ -23,7 +23,10 @@ export const ChainSymbol = ({ chainId }: Props) => {
 
   return (
     <div className="flex items-center space-x-1">
-      <Icon className="w-4 h-4" {...iconProps} />
+      <Icon
+        className="h-4 w-4"
+        {...iconProps}
+      />
       <span className="font-semibold">{alt}</span>
     </div>
   );

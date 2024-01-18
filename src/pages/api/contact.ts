@@ -23,9 +23,7 @@ export default async function handler(req: NextRequest) {
   const entries = Object.fromEntries(formData.entries());
   const payload = await contactFormSchema.parseAsync(entries);
 
-  const emails = (process.env.CONTACT_FORM_DEST || "support@skip.money")
-    .split(",")
-    .filter(Boolean);
+  const emails = (process.env.CONTACT_FORM_DEST || "support@skip.money").split(",").filter(Boolean);
 
   const { data, error } = await resend.emails.send({
     from: `support+ingest@skip.money`,

@@ -19,11 +19,11 @@ export const SaveIndicator = () => {
   return (
     <div
       className={clsx(
-        "text-green-500 text-sm font-medium flex items-center space-x-1 transition pointer-events-none",
+        "pointer-events-none flex items-center space-x-1 text-sm font-medium text-green-500 transition",
         show ? "opacity-100" : "opacity-0",
       )}
     >
-      <span>Settings saved!</span> <CheckIcon className="w-4 h-4" />
+      <span>Settings saved!</span> <CheckIcon className="h-4 w-4" />
     </div>
   );
 };

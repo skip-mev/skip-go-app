@@ -31,9 +31,7 @@ export const ConversionRate = ({
 
   const toggle = useCallback(() => {
     setState((prev) => {
-      return prev === ConvDirection.DEST_SRC
-        ? ConvDirection.SRC_DEST
-        : ConvDirection.DEST_SRC;
+      return prev === ConvDirection.DEST_SRC ? ConvDirection.SRC_DEST : ConvDirection.DEST_SRC;
     });
   }, []);
 

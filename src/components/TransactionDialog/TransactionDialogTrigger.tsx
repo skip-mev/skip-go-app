@@ -10,7 +10,7 @@ const TransactionDialogTrigger = forwardRef(function TransactionDialogTrigger(
 ) {
   return (
     <button
-      className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+      className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-transform enabled:hover:rotate-1 enabled:hover:scale-105 disabled:cursor-not-allowed disabled:opacity-75"
       ref={ref}
       disabled={disabled}
       {...props}

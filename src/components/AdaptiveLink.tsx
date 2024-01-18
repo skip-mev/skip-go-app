@@ -1,16 +1,9 @@
 import Link, { LinkProps } from "next/link";
 import { ComponentPropsWithoutRef, useMemo } from "react";
 
-export type AdaptiveLinkProps = LinkProps &
-  Omit<ComponentPropsWithoutRef<"a">, "href"> & { isExternal?: boolean };
+export type AdaptiveLinkProps = LinkProps & Omit<ComponentPropsWithoutRef<"a">, "href"> & { isExternal?: boolean };
 
-export function AdaptiveLink({
-  href,
-  isExternal,
-  rel = "",
-  target,
-  ...props
-}: AdaptiveLinkProps) {
+export function AdaptiveLink({ href, isExternal, rel = "", target, ...props }: AdaptiveLinkProps) {
   const isActuallyExternal = useMemo(() => {
     if (typeof isExternal === "boolean") {
       return isExternal;
@@ -31,7 +24,13 @@ export function AdaptiveLink({
     };
   }, [isActuallyExternal, rel, target]);
 
-  return <Link href={href} {...externalProps} {...props} />;
+  return (
+    <Link
+      href={href}
+      {...externalProps}
+      {...props}
+    />
+  );
 }
 
 function mergeRelAttributes(...args: string[]) {

@@ -15,34 +15,24 @@ const TransactionSuccessView: FC<{
   const { getAsset } = useAssets();
   const { data: chains } = useChains();
 
-  const sourceAsset = getAsset(
-    route.sourceAssetDenom,
-    route.sourceAssetChainID,
-  );
-  const destinationAsset = getAsset(
-    route.destAssetDenom,
-    route.destAssetChainID,
-  );
+  const sourceAsset = getAsset(route.sourceAssetDenom, route.sourceAssetChainID);
+  const destinationAsset = getAsset(route.destAssetDenom, route.destAssetChainID);
 
   if (!chains) {
     return null;
   }
 
-  const sourceChain = chains.find(
-    (c) => c.chainID === route.sourceAssetChainID,
-  ) as Chain;
-  const destinationChain = chains.find(
-    (c) => c.chainID === route.destAssetChainID,
-  ) as Chain;
+  const sourceChain = chains.find((c) => c.chainID === route.sourceAssetChainID) as Chain;
+  const destinationChain = chains.find((c) => c.chainID === route.destAssetChainID) as Chain;
 
   return (
-    <div className="flex flex-col items-center h-full px-4 py-6 pt-28 overflow-y-auto scrollbar-hide">
+    <div className="flex h-full flex-col items-center overflow-y-auto px-4 py-6 pt-28 scrollbar-hide">
       <div className="text-emerald-400">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="w-[100px] h-[100px]"
+          className="h-[100px] w-[100px]"
         >
           <path
             fillRule="evenodd"
@@ -52,11 +42,9 @@ const TransactionSuccessView: FC<{
         </svg>
       </div>
       <div>
-        <p className="font-bold text-3xl mb-4">
-          {route.doesSwap ? "Swap" : "Transfer"} Successful
-        </p>
+        <p className="mb-4 text-3xl font-bold">{route.doesSwap ? "Swap" : "Transfer"} Successful</p>
       </div>
-      <p className="font-medium text-neutral-400 pb-8 text-center">
+      <p className="pb-8 text-center font-medium text-neutral-400">
         {route.doesSwap &&
           `Successfully swapped ${
             sourceAsset?.recommendedSymbol ?? route.sourceAssetDenom
@@ -66,10 +54,13 @@ const TransactionSuccessView: FC<{
             sourceAsset?.recommendedSymbol ?? route.sourceAssetDenom
           } from ${sourceChain.prettyName} to ${destinationChain.prettyName}`}
       </p>
-      <div className="flex-1 space-y-6 w-full">
+      <div className="w-full flex-1 space-y-6">
         {transactions.map(({ explorerLink, txHash }, i) => (
-          <div key={`tx-${i}`} className="flex items-center gap-4">
-            <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
+          <div
+            key={`tx-${i}`}
+            className="flex items-center gap-4"
+          >
+            <CheckCircleIcon className="h-7 w-7 text-emerald-400" />
             <div className="flex-1">
               <p className="font-semibold">Transaction {i + 1}</p>
             </div>
@@ -96,7 +87,7 @@ const TransactionSuccessView: FC<{
       </div>
       <div className="w-full">
         <button
-          className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform enabled:hover:scale-105 enabled:hover:rotate-1 disabled:cursor-not-allowed disabled:opacity-75 outline-none"
+          className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-transform enabled:hover:rotate-1 enabled:hover:scale-105 disabled:cursor-not-allowed disabled:opacity-75"
           onClick={onClose}
         >
           {route.doesSwap ? "Swap" : "Transfer"} Again

@@ -13,7 +13,10 @@ export function Dialog({ children, open, onOpenChange }: Props) {
 
   return (
     <DialogContext.Provider value={{ open, onOpenChange, container: ref }}>
-      <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
+      <RadixDialog.Root
+        open={open}
+        onOpenChange={onOpenChange}
+      >
         {children}
         <div ref={ref} />
       </RadixDialog.Root>

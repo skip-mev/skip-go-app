@@ -1,9 +1,5 @@
 import { create } from "zustand";
-import {
-  createJSONStorage,
-  persist,
-  subscribeWithSelector,
-} from "zustand/middleware";
+import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 
 export type TrackWalletCtx = "source" | "destination";
 
@@ -36,12 +32,7 @@ const useStore = create(
 );
 
 export const trackWallet = {
-  track: (
-    ctx: TrackWalletCtx,
-    chainID: string,
-    walletName: string,
-    chainType: string,
-  ) => {
+  track: (ctx: TrackWalletCtx, chainID: string, walletName: string, chainType: string) => {
     useStore.setState({
       [ctx]: { chainID, walletName, chainType },
     });

@@ -17,11 +17,7 @@ const customJestConfig = {
   setupFiles: ["<rootDir>/jest.polyfills.js"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jest-environment-jsdom",
-  testPathIgnorePatterns: [
-    "<rootDir>/.next/",
-    "<rootDir>/node_modules/",
-    "<rootDir>/tests/",
-  ],
+  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/", "<rootDir>/tests/"],
   transform: {
     "^.+\\.[tj]sx?$": ["ts-jest", { useESM: true }],
   },

@@ -1,20 +1,9 @@
 import { Asset } from "@skip-router/core";
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
+import { createContext, FC, PropsWithChildren, useCallback, useContext, useEffect, useMemo } from "react";
 
 import { useChains } from "@/hooks/useChains";
 
-import {
-  filterAssetsWithMetadata,
-  useAssets as useSolveAssets,
-} from "../solve";
+import { filterAssetsWithMetadata, useAssets as useSolveAssets } from "../solve";
 
 export type AssetWithMetadata = Required<Asset>;
 

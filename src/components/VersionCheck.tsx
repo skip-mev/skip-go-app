@@ -36,7 +36,7 @@ function triggerToast() {
     <div>
       <p>A new version of ibc.fun is available.</p>
       <button
-        className="text-red-500 hover:underline before:absolute before:inset-0 before:content-['']"
+        className="text-red-500 before:absolute before:inset-0 before:content-[''] hover:underline"
         onClick={() => window.location.reload()}
       >
         Click here to reload page
@@ -44,7 +44,7 @@ function triggerToast() {
     </div>,
     {
       id: "update",
-      icon: <ArrowDownOnSquareIcon className="w-6 h-6 fill-red-500" />,
+      icon: <ArrowDownOnSquareIcon className="h-6 w-6 fill-red-500" />,
       duration: Infinity,
     },
   );

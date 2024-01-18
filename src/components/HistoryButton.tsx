@@ -6,23 +6,20 @@ import { disclosure } from "@/context/disclosures";
 import { HistoryIcon } from "./HistoryIcon";
 import { SimpleTooltip } from "./SimpleTooltip";
 
-export const HistoryButton = ({
-  className,
-  ...props
-}: ComponentProps<"button">) => {
+export const HistoryButton = ({ className, ...props }: ComponentProps<"button">) => {
   return (
     <SimpleTooltip label="Transaction History">
       <button
         className={clsx(
-          "p-2 rounded-full text-black/80 hover:text-black/100 hover:bg-neutral-100",
-          "focus:outline-none transition-colors",
+          "rounded-full p-2 text-black/80 hover:bg-neutral-100 hover:text-black/100",
+          "transition-colors focus:outline-none",
           className,
         )}
         onClick={() => disclosure.open("historyDialog")}
         role="group"
         {...props}
       >
-        <HistoryIcon className="w-4 h-4" />
+        <HistoryIcon className="h-4 w-4" />
       </button>
     </SimpleTooltip>
   );

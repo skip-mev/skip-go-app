@@ -16,13 +16,7 @@ interface Props {
   showChainInfo?: boolean;
 }
 
-function AssetSelectContent({
-  assets = [],
-  balances,
-  onChange,
-  onClose,
-  showChainInfo,
-}: Props) {
+function AssetSelectContent({ assets = [], balances, onChange, onClose, showChainInfo }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => inputRef.current?.focus(), []);
@@ -39,10 +33,7 @@ function AssetSelectContent({
         return 0;
       })
       .filter((asset) => {
-        if (
-          asset.originChainID === "sifchain-1" &&
-          asset.originDenom !== "rowan"
-        ) {
+        if (asset.originChainID === "sifchain-1" && asset.originDenom !== "rowan") {
           return false;
         }
         return true;
@@ -64,18 +55,18 @@ function AssetSelectContent({
   }, [searchValue, sortedAssets]);
 
   return (
-    <div className="flex flex-col h-full p-6 pb-2 isolate">
-      <div className="flex items-center gap-4 mb-4">
+    <div className="isolate flex h-full flex-col p-6 pb-2">
+      <div className="mb-4 flex items-center gap-4">
         <button
-          className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+          className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
           onClick={onClose}
         >
-          <ArrowLeftIcon className="w-6 h-6" />
+          <ArrowLeftIcon className="h-6 w-6" />
         </button>
-        <p className="font-bold text-xl">Select Token</p>
+        <p className="text-xl font-bold">Select Token</p>
       </div>
       <input
-        className="w-full border px-4 py-2 rounded-md z-20"
+        className="z-20 w-full rounded-md border px-4 py-2"
         type="text"
         placeholder="Search name or paste address"
         onChange={(e) => setSearchValue(e.target.value)}
@@ -84,45 +75,34 @@ function AssetSelectContent({
       />
       <ScrollArea.Root
         className={clsx(
-          "overflow-hidden relative flex-grow isolate",
-          "before:absolute before:top-0 before:inset-x-0 before:h-2 before:z-10",
+          "relative isolate flex-grow overflow-hidden",
+          "before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-2",
           "before:bg-gradient-to-b before:from-white before:to-transparent",
-          "after:absolute after:bottom-0 after:inset-x-0 after:h-2 after:z-10",
-          "after:bg-gradient-to-t after:from-white before:to-transparent",
+          "after:absolute after:inset-x-0 after:bottom-0 after:z-10 after:h-2",
+          "before:to-transparent after:bg-gradient-to-t after:from-white",
         )}
       >
-        <ScrollArea.Viewport className="w-full h-full py-4">
+        <ScrollArea.Viewport className="h-full w-full py-4">
           {filteredAssets.map((asset) => (
             <button
               key={`${asset.chainID}-${asset.denom}`}
-              className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-xl transition-colors focus:-outline-offset-2"
+              className="flex w-full items-center gap-4 rounded-xl p-4 text-left transition-colors hover:bg-[#ECD9D9] focus:-outline-offset-2"
               onClick={() => (onClose(), onChange?.(asset))}
             >
               <img
                 alt={asset.recommendedSymbol}
-                className="w-12 h-12 rounded-full"
+                className="h-12 w-12 rounded-full"
                 src={asset.logoURI}
-                onError={(e) =>
-                  (e.currentTarget.src =
-                    "https://api.dicebear.com/6.x/shapes/svg")
-                }
+                onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               />
               <div className="flex-1">
-                <p className="font-semibold text-lg">
-                  {asset.recommendedSymbol}
-                </p>
-                {showChainInfo && (
-                  <p className="text-sm text-neutral-400">{asset.chainID}</p>
-                )}
+                <p className="text-lg font-semibold">{asset.recommendedSymbol}</p>
+                {showChainInfo && <p className="text-sm text-neutral-400">{asset.chainID}</p>}
               </div>
               <div>
                 {balances[asset.denom] && (
-                  <p className="font-medium text-sm text-neutral-400">
-                    {formatMaxFraction(
-                      parseFloat(
-                        formatUnits(balances[asset.denom], asset.decimals),
-                      ),
-                    )}
+                  <p className="text-sm font-medium text-neutral-400">
+                    {formatMaxFraction(parseFloat(formatUnits(balances[asset.denom], asset.decimals)))}
                   </p>
                 )}
               </div>
@@ -130,10 +110,10 @@ function AssetSelectContent({
           ))}
         </ScrollArea.Viewport>
         <ScrollArea.Scrollbar
-          className="z-20 flex select-none touch-none py-4 transition-colors duration-[160ms] ease-out data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2"
+          className="z-20 flex touch-none select-none py-4 transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
           orientation="vertical"
         >
-          <ScrollArea.Thumb className="transition-colors flex-1 bg-neutral-500/50 hover:bg-neutral-500 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2 before:h-2" />
+          <ScrollArea.Thumb className="relative flex-1 rounded-[10px] bg-neutral-500/50 transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-2 before:w-2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-neutral-500" />
         </ScrollArea.Scrollbar>
         <ScrollArea.Corner />
       </ScrollArea.Root>

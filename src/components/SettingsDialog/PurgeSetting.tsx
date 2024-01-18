@@ -1,11 +1,11 @@
 export function PurgeSetting() {
   return (
-    <div className="flex items-center p-2 space-x-2">
+    <div className="flex items-center space-x-2 p-2">
       <h3>Purge Settings</h3>
       <div className="flex-grow" />
-      <div className="flex flex-col items-stretch gap-1 w-full max-w-32 text-sm">
+      <div className="flex w-full max-w-32 flex-col items-stretch gap-1 text-sm">
         <button
-          className="border border-transparent rounded-lg px-2 py-1 bg-red-500 text-white w-full font-semibold hover:bg-red-600 transition"
+          className="w-full rounded-lg border border-transparent bg-red-500 px-2 py-1 font-semibold text-white transition hover:bg-red-600"
           onClick={purge}
         >
           Purge

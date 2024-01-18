@@ -10,12 +10,7 @@ type UsdValueProps = Args & {
   context?: "src" | "dest";
 };
 
-export const UsdValue = ({
-  error = "Price not available",
-  loading = "...",
-  context,
-  ...args
-}: UsdValueProps) => {
+export const UsdValue = ({ error = "Price not available", loading = "...", context, ...args }: UsdValueProps) => {
   const { data: usdValue = 0, isError, isLoading } = useUsdValue(args);
 
   const prevValue = useRef(usdValue);
@@ -96,7 +91,13 @@ export const UsdDiff = {
       return <>{props.onUndefined ?? null}</>;
     }
 
-    return <UsdDiffValue src={src} dest={dest} {...props} />;
+    return (
+      <UsdDiffValue
+        src={src}
+        dest={dest}
+        {...props}
+      />
+    );
   },
 };
 

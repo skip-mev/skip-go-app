@@ -15,38 +15,32 @@ interface Props {
   showChainInfo?: boolean;
 }
 
-function AssetSelect({
-  asset,
-  assets,
-  balances,
-  onChange,
-  showChainInfo,
-}: Props) {
+function AssetSelect({ asset, assets, balances, onChange, showChainInfo }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={setIsOpen}
+    >
       <DialogTrigger>
         <button
           className={clsx(
-            "font-semibold text-left whitespace-nowrap",
-            "bg-neutral-100 rounded-md flex items-center gap-2 px-4 py-2 sm:py-4 w-full transition-colors",
+            "whitespace-nowrap text-left font-semibold",
+            "flex w-full items-center gap-2 rounded-md bg-neutral-100 px-4 py-2 transition-colors sm:py-4",
             "border border-neutral-200 hover:border-neutral-300",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           disabled={!assets || assets.length === 0}
         >
           {asset && (
             <img
               alt={asset.recommendedSymbol}
-              className="w-6 h-6 rounded-full"
+              className="h-6 w-6 rounded-full"
               src={asset.logoURI}
-              onError={(event) =>
-                (event.currentTarget.src =
-                  "https://api.dicebear.com/6.x/shapes/svg")
-              }
+              onError={(event) => (event.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
             />
           )}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             {!asset && <span>Select Token</span>}
             {asset && <div className="truncate">{asset.recommendedSymbol}</div>}
           </div>

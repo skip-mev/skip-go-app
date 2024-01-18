@@ -9,9 +9,7 @@ export const config: PageConfig = {
 
 export default async function handler(req: NextRequest) {
   const chainName = req.nextUrl.searchParams.get("chainName") || "";
-  let response = await fetch(
-    chainName ? getChainlistURI(chainName) : FALLBACK_URI,
-  );
+  let response = await fetch(chainName ? getChainlistURI(chainName) : FALLBACK_URI);
   if (!response.ok) {
     response = await fetch(FALLBACK_URI);
   }

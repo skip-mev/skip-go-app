@@ -1,10 +1,7 @@
 import { ChainId } from "@/chains";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 
-export async function isWalletClientUsingLedger<T extends MergedWalletClient>(
-  walletClient: T,
-  chainID: ChainId,
-) {
+export async function isWalletClientUsingLedger<T extends MergedWalletClient>(walletClient: T, chainID: ChainId) {
   if (!("client" in walletClient)) {
     return false;
   }

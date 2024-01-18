@@ -68,15 +68,7 @@ export function useRoute({
         destinationAssetChainID,
         swapVenue,
       ] as const,
-    [
-      amount,
-      destinationAsset,
-      destinationAssetChainID,
-      direction,
-      sourceAsset,
-      sourceAssetChainID,
-      swapVenue,
-    ],
+    [amount, destinationAsset, destinationAssetChainID, direction, sourceAsset, sourceAssetChainID, swapVenue],
   );
 
   const query = useQuery({
@@ -93,12 +85,7 @@ export function useRoute({
         swapVenue,
       ],
     }) => {
-      if (
-        !sourceAsset ||
-        !sourceAssetChainID ||
-        !destinationAsset ||
-        !destinationAssetChainID
-      ) {
+      if (!sourceAsset || !sourceAssetChainID || !destinationAsset || !destinationAssetChainID) {
         return;
       }
 
@@ -165,10 +152,7 @@ export const useBroadcastedTxsStatus = (
     | undefined
   >(undefined);
 
-  const queryKey = useMemo(
-    () => ["solve-tx-status", txsRequired, txs] as const,
-    [txs, txsRequired],
-  );
+  const queryKey = useMemo(() => ["solve-tx-status", txsRequired, txs] as const, [txs, txsRequired]);
 
   return useQuery({
     queryKey,
@@ -181,40 +165,37 @@ export const useBroadcastedTxsStatus = (
             txHash: tx.txHash,
           });
 
-          const cleanTransferSequence = _res.transferSequence.map(
-            (transfer) => {
-              if ("ibcTransfer" in transfer) {
-                return {
-                  srcChainID: transfer.ibcTransfer.srcChainID,
-                  destChainID: transfer.ibcTransfer.dstChainID,
-                  explorerLink:
-                    transfer.ibcTransfer.packetTXs.sendTx?.explorerLink,
-                  state: transfer.ibcTransfer.state,
-                };
-              }
-              const axelarState: TransferState = (() => {
-                switch (transfer.axelarTransfer.state) {
-                  case "AXELAR_TRANSFER_PENDING_RECEIPT":
-                    return "TRANSFER_PENDING";
-                  case "AXELAR_TRANSFER_PENDING_CONFIRMATION":
-                    return "TRANSFER_PENDING";
-                  case "AXELAR_TRANSFER_FAILURE":
-                    return "TRANSFER_FAILURE";
-                  case "AXELAR_TRANSFER_SUCCESS":
-                    return "TRANSFER_SUCCESS";
-                  default:
-                    return "TRANSFER_UNKNOWN";
-                }
-              })();
-
+          const cleanTransferSequence = _res.transferSequence.map((transfer) => {
+            if ("ibcTransfer" in transfer) {
               return {
-                srcChainID: transfer.axelarTransfer.srcChainID,
-                destChainID: transfer.axelarTransfer.dstChainID,
-                explorerLink: transfer.axelarTransfer.axelarScanLink,
-                state: axelarState,
+                srcChainID: transfer.ibcTransfer.srcChainID,
+                destChainID: transfer.ibcTransfer.dstChainID,
+                explorerLink: transfer.ibcTransfer.packetTXs.sendTx?.explorerLink,
+                state: transfer.ibcTransfer.state,
               };
-            },
-          );
+            }
+            const axelarState: TransferState = (() => {
+              switch (transfer.axelarTransfer.state) {
+                case "AXELAR_TRANSFER_PENDING_RECEIPT":
+                  return "TRANSFER_PENDING";
+                case "AXELAR_TRANSFER_PENDING_CONFIRMATION":
+                  return "TRANSFER_PENDING";
+                case "AXELAR_TRANSFER_FAILURE":
+                  return "TRANSFER_FAILURE";
+                case "AXELAR_TRANSFER_SUCCESS":
+                  return "TRANSFER_SUCCESS";
+                default:
+                  return "TRANSFER_UNKNOWN";
+              }
+            })();
+
+            return {
+              srcChainID: transfer.axelarTransfer.srcChainID,
+              destChainID: transfer.axelarTransfer.dstChainID,
+              explorerLink: transfer.axelarTransfer.axelarScanLink,
+              state: axelarState,
+            };
+          });
 
           return {
             state: _res.state,
@@ -233,12 +214,9 @@ export const useBroadcastedTxsStatus = (
         setIsSettled(true);
       }
 
-      const mergedTransferSequence = result.reduce<TransferSequence[]>(
-        (acc, tx) => {
-          return acc.concat(...tx.transferSequence);
-        },
-        [],
-      );
+      const mergedTransferSequence = result.reduce<TransferSequence[]>((acc, tx) => {
+        return acc.concat(...tx.transferSequence);
+      }, []);
 
       const resData = {
         transferSequence: mergedTransferSequence,

@@ -1,12 +1,7 @@
 import { wallets as keplrWallets } from "@cosmos-kit/keplr-extension";
 import { ChainProvider } from "@cosmos-kit/react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import {
-  Queries,
-  queries,
-  render,
-  RenderOptions,
-} from "@testing-library/react";
+import { Queries, queries, render, RenderOptions } from "@testing-library/react";
 import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
 import { WagmiConfig } from "wagmi";
 
@@ -51,10 +46,7 @@ function customRender<
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,
   BaseElement extends Element | DocumentFragment = Container,
->(
-  ui: React.ReactElement,
-  options: RenderOptions<Q, Container, BaseElement> = {},
-) {
+>(ui: React.ReactElement, options: RenderOptions<Q, Container, BaseElement> = {}) {
   return render(ui, { wrapper: AllTheProviders, ...options });
 }
 

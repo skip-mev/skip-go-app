@@ -10,13 +10,7 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  Fragment,
-  useMemo,
-  useRef,
-} from "react";
+import { ComponentPropsWithoutRef, forwardRef, Fragment, useMemo, useRef } from "react";
 
 import { disclosure } from "@/context/disclosures";
 import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
@@ -29,19 +23,17 @@ import { RenderDate } from "./RenderDate";
 
 type RootProps = Omit<Accordion.AccordionSingleProps, "type">;
 
-export const Root = forwardRef<HTMLDivElement, RootProps>(
-  function Root(props, ref) {
-    return (
-      <Accordion.Root
-        className={clsx("py-2 space-y-2 flex flex-col items-stretch")}
-        collapsible
-        type="single"
-        {...props}
-        ref={ref}
-      />
-    );
-  },
-);
+export const Root = forwardRef<HTMLDivElement, RootProps>(function Root(props, ref) {
+  return (
+    <Accordion.Root
+      className={clsx("flex flex-col items-stretch space-y-2 py-2")}
+      collapsible
+      type="single"
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 const iconMap = {
   success: CheckCircleIcon,
@@ -63,186 +55,170 @@ type ItemProps = Omit<Accordion.AccordionItemProps, "value"> & {
   data: TxHistoryItem;
 };
 
-export const Item = forwardRef<HTMLDivElement, ItemProps>(
-  function Item(props, ref) {
-    const { id, data, className, ...rest } = props;
-    const headingRef = useRef<HTMLHeadingElement>(null);
+export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, ref) {
+  const { id, data, className, ...rest } = props;
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
-    const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
+  const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
 
-    return (
-      <Accordion.Item
+  return (
+    <Accordion.Item
+      className={clsx(
+        "p-1",
+        "rounded-lg border border-neutral-200 transition-all",
+        "data-[state=open]:shadow-md",
+        "data-[state=open]:-mx-1 data-[state=open]:p-2",
+        className,
+      )}
+      value={id}
+      {...rest}
+      ref={ref}
+    >
+      <Accordion.Header
         className={clsx(
-          "p-1",
-          "border border-neutral-200 rounded-lg transition-all",
-          "data-[state=open]:shadow-md",
-          "data-[state=open]:p-2 data-[state=open]:-mx-1",
-          className,
+          "relative flex flex-col items-stretch space-y-2",
+          "rounded-md p-2 transition-colors hover:bg-neutral-100",
         )}
-        value={id}
-        {...rest}
-        ref={ref}
+        ref={headingRef}
       >
-        <Accordion.Header
-          className={clsx(
-            "flex flex-col items-stretch space-y-2 relative",
-            "rounded-md hover:bg-neutral-100 p-2 transition-colors",
-          )}
-          ref={headingRef}
-        >
-          <div className="flex items-center space-x-4 text-start">
-            <time className="uppercase text-center text-sm opacity-60 tabular-nums whitespace-nowrap">
-              <RenderDate date={data.timestamp} />
-            </time>
-            <div className="flex-grow">
-              <div className="font-medium text-sm flex items-center">
-                <ChainSymbol chainId={data.route.sourceAssetChainID} />
-                <ArrowRightIcon className="w-4 h-4 mx-1" />
-                <ChainSymbol chainId={data.route.destAssetChainID} />
-              </div>
-              <div className="opacity-60 text-sm flex items-center">
-                <AssetValue
-                  chainId={data.route.sourceAssetChainID}
-                  denom={data.route.sourceAssetDenom}
-                  value={data.route.amountIn}
-                />
-                <ArrowRightIcon className="w-3 h-3 mx-1" />
-                <AssetValue
-                  chainId={data.route.destAssetChainID}
-                  denom={data.route.destAssetDenom}
-                  value={data.route.amountOut}
-                />
-              </div>
+        <div className="flex items-center space-x-4 text-start">
+          <time className="whitespace-nowrap text-center text-sm uppercase tabular-nums opacity-60">
+            <RenderDate date={data.timestamp} />
+          </time>
+          <div className="flex-grow">
+            <div className="flex items-center text-sm font-medium">
+              <ChainSymbol chainId={data.route.sourceAssetChainID} />
+              <ArrowRightIcon className="mx-1 h-4 w-4" />
+              <ChainSymbol chainId={data.route.destAssetChainID} />
             </div>
-            <div
-              className={clsx("text-sm flex items-center space-x-1", {
-                "text-green-600": data.status === "success",
-                "text-neutral-600": data.status === "pending",
-                "text-red-600": data.status === "failed",
-              })}
-            >
-              <span className="capitalize">{data.status}</span>
-              <StatusIcon
-                status={data.status}
-                className={clsx(
-                  "w-4 h-4",
-                  data.status === "pending" && "animate-spin",
-                )}
+            <div className="flex items-center text-sm opacity-60">
+              <AssetValue
+                chainId={data.route.sourceAssetChainID}
+                denom={data.route.sourceAssetDenom}
+                value={data.route.amountIn}
+              />
+              <ArrowRightIcon className="mx-1 h-3 w-3" />
+              <AssetValue
+                chainId={data.route.destAssetChainID}
+                denom={data.route.destAssetDenom}
+                value={data.route.amountOut}
               />
             </div>
           </div>
-
-          <Accordion.Trigger
-            className={clsx(
-              "flex items-center text-xs text-black/60 justify-center self-center outline-none group",
-              "HistoryListTrigger hover:underline",
-              "before:absolute before:content-[''] before:inset-0",
-            )}
-            onClick={() => {
-              if (!headingRef.current) return;
-              const rect = headingRef.current.getBoundingClientRect();
-              const top = rect.top + window.scrollY;
-              const offset = rect.height / 2;
-              const y = top - offset;
-              window.scrollTo({ top: y, behavior: "smooth" });
-            }}
+          <div
+            className={clsx("flex items-center space-x-1 text-sm", {
+              "text-green-600": data.status === "success",
+              "text-neutral-600": data.status === "pending",
+              "text-red-600": data.status === "failed",
+            })}
           >
-            <span className="HistoryListTriggerText" />
-            <ChevronDownIcon
-              className={clsx(
-                "w-4 h-4",
-                "transition-transform group-data-[state=open]:rotate-180",
-              )}
-              aria-hidden
+            <span className="capitalize">{data.status}</span>
+            <StatusIcon
+              status={data.status}
+              className={clsx("h-4 w-4", data.status === "pending" && "animate-spin")}
             />
-          </Accordion.Trigger>
-        </Accordion.Header>
+          </div>
+        </div>
 
-        <Accordion.Content
+        <Accordion.Trigger
           className={clsx(
-            "overflow-hidden space-y-2",
-            "data-[state=open]:animate-accordion-open",
-            "data-[state=closed]:animate-accordion-closed",
+            "group flex items-center justify-center self-center text-xs text-black/60 outline-none",
+            "HistoryListTrigger hover:underline",
+            "before:absolute before:inset-0 before:content-['']",
           )}
+          onClick={() => {
+            if (!headingRef.current) return;
+            const rect = headingRef.current.getBoundingClientRect();
+            const top = rect.top + window.scrollY;
+            const offset = rect.height / 2;
+            const y = top - offset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+          }}
         >
-          <DescriptionList.Root className="pt-2">
-            <DescriptionList.Row>
-              <DescriptionList.Dt>Chain Route</DescriptionList.Dt>
-              <DescriptionList.Dd className="flex flex-wrap items-center">
-                {data.route.chainIDs.map((chainId, i) => (
-                  <Fragment key={i}>
-                    {i > 0 && <ArrowRightIcon className="w-4 h-4 mx-1" />}
-                    <ChainSymbol chainId={chainId} />
-                  </Fragment>
-                ))}
-              </DescriptionList.Dd>
-            </DescriptionList.Row>
-            {data.txStatus.map((stat, i) => (
-              <DescriptionList.Row key={i}>
-                <DescriptionList.Dt className="tabular-nums">
-                  Transaction {i + 1}
-                </DescriptionList.Dt>
-                <DescriptionList.Dd className="space-y-1">
+          <span className="HistoryListTriggerText" />
+          <ChevronDownIcon
+            className={clsx("h-4 w-4", "transition-transform group-data-[state=open]:rotate-180")}
+            aria-hidden
+          />
+        </Accordion.Trigger>
+      </Accordion.Header>
+
+      <Accordion.Content
+        className={clsx(
+          "space-y-2 overflow-hidden",
+          "data-[state=open]:animate-accordion-open",
+          "data-[state=closed]:animate-accordion-closed",
+        )}
+      >
+        <DescriptionList.Root className="pt-2">
+          <DescriptionList.Row>
+            <DescriptionList.Dt>Chain Route</DescriptionList.Dt>
+            <DescriptionList.Dd className="flex flex-wrap items-center">
+              {data.route.chainIDs.map((chainId, i) => (
+                <Fragment key={i}>
+                  {i > 0 && <ArrowRightIcon className="mx-1 h-4 w-4" />}
+                  <ChainSymbol chainId={chainId} />
+                </Fragment>
+              ))}
+            </DescriptionList.Dd>
+          </DescriptionList.Row>
+          {data.txStatus.map((stat, i) => (
+            <DescriptionList.Row key={i}>
+              <DescriptionList.Dt className="tabular-nums">Transaction {i + 1}</DescriptionList.Dt>
+              <DescriptionList.Dd className="space-y-1">
+                <a
+                  href={stat.explorerLink}
+                  target="_blank"
+                  className="flex items-center space-x-px hover:underline"
+                >
+                  <span className="max-w-[24ch] truncate tabular-nums">{stat.txHash}</span>
+                  <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+                </a>
+                {stat.axelarscanLink ? (
                   <a
-                    href={stat.explorerLink}
+                    href={stat.axelarscanLink}
                     target="_blank"
                     className="flex items-center space-x-px hover:underline"
                   >
-                    <span className="truncate tabular-nums max-w-[24ch]">
-                      {stat.txHash}
-                    </span>
-                    <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                    <span className="max-w-[24ch] truncate tabular-nums">Axelarscan</span>
+                    <ArrowTopRightOnSquareIcon className="h-3 w-3" />
                   </a>
-                  {stat.axelarscanLink ? (
-                    <a
-                      href={stat.axelarscanLink}
-                      target="_blank"
-                      className="flex items-center space-x-px hover:underline"
-                    >
-                      <span className="truncate tabular-nums max-w-[24ch]">
-                        Axelarscan
-                      </span>
-                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                    </a>
-                  ) : null}
-                </DescriptionList.Dd>
-              </DescriptionList.Row>
-            ))}
-            <DescriptionList.Row>
-              <DescriptionList.Dt>Completion Time</DescriptionList.Dt>
-              <DescriptionList.Dd>
-                {estimatedFinalityTime === ""
-                  ? "2 minutes"
-                  : estimatedFinalityTime}
+                ) : null}
               </DescriptionList.Dd>
             </DescriptionList.Row>
-          </DescriptionList.Root>
-          <div className="flex space-x-1">
-            <button
-              className={clsx(
-                "text-xs px-2 py-1 border rounded-md bg-neutral-100 hover:bg-neutral-200 transition-colors",
-                "flex items-center justify-center space-x-1 flex-grow",
-              )}
-              onClick={() => {
-                disclosure.openJson({ title: "Tx History JSON", data });
-              }}
-            >
-              <EyeIcon className="w-3 h-3" />
-              <span>View Raw Route</span>
-            </button>
-            <button
-              className={clsx(
-                "text-xs px-2 py-1 rounded-md transition-colors",
-                "flex items-center justify-center space-x-1",
-                "text-[#FF486E] bg-[#FF486E]/20 hover:bg-[#FF486E]/30",
-              )}
-              onClick={() => removeTxHistory(id)}
-            >
-              <TrashIcon className="w-3 h-3" />
-            </button>
-          </div>
-        </Accordion.Content>
-      </Accordion.Item>
-    );
-  },
-);
+          ))}
+          <DescriptionList.Row>
+            <DescriptionList.Dt>Completion Time</DescriptionList.Dt>
+            <DescriptionList.Dd>
+              {estimatedFinalityTime === "" ? "2 minutes" : estimatedFinalityTime}
+            </DescriptionList.Dd>
+          </DescriptionList.Row>
+        </DescriptionList.Root>
+        <div className="flex space-x-1">
+          <button
+            className={clsx(
+              "rounded-md border bg-neutral-100 px-2 py-1 text-xs transition-colors hover:bg-neutral-200",
+              "flex flex-grow items-center justify-center space-x-1",
+            )}
+            onClick={() => {
+              disclosure.openJson({ title: "Tx History JSON", data });
+            }}
+          >
+            <EyeIcon className="h-3 w-3" />
+            <span>View Raw Route</span>
+          </button>
+          <button
+            className={clsx(
+              "rounded-md px-2 py-1 text-xs transition-colors",
+              "flex items-center justify-center space-x-1",
+              "bg-[#FF486E]/20 text-[#FF486E] hover:bg-[#FF486E]/30",
+            )}
+            onClick={() => removeTxHistory(id)}
+          >
+            <TrashIcon className="h-3 w-3" />
+          </button>
+        </div>
+      </Accordion.Content>
+    </Accordion.Item>
+  );
+});

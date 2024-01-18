@@ -10,9 +10,7 @@ import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
 import { isWalletClientUsingLedger } from "@/utils/wallet";
 
-export const SkipContext = createContext<
-  { skipClient: SkipRouter } | undefined
->(undefined);
+export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
 export function SkipProvider({ children }: { children: ReactNode }) {
   const { chains } = useWagmiNetwork();
@@ -33,18 +31,14 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       });
 
       if (!wallet) {
-        throw new Error(
-          `getCosmosSigner error: unknown walletName '${walletName}'`,
-        );
+        throw new Error(`getCosmosSigner error: unknown walletName '${walletName}'`);
       }
 
       const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
       await wallet.initOfflineSigner(isLedger ? "amino" : "direct");
 
       if (!wallet.offlineSigner) {
-        throw new Error(
-          `getCosmosSigner error: no offlineSigner for walletName '${walletName}'`,
-        );
+        throw new Error(`getCosmosSigner error: no offlineSigner for walletName '${walletName}'`);
       }
 
       return wallet.offlineSigner;
@@ -94,9 +88,5 @@ export function SkipProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  return (
-    <SkipContext.Provider value={{ skipClient }}>
-      {children}
-    </SkipContext.Provider>
-  );
+  return <SkipContext.Provider value={{ skipClient }}>{children}</SkipContext.Provider>;
 }

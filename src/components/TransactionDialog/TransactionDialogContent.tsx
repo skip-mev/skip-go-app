@@ -1,9 +1,5 @@
 import { useManager } from "@cosmos-kit/react";
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  InformationCircleIcon,
-} from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon } from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
@@ -12,12 +8,7 @@ import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { useSettingsStore } from "@/context/settings";
-import {
-  addTxHistory,
-  addTxStatus,
-  failTxHistory,
-  successTxHistory,
-} from "@/context/tx-history";
+import { addTxHistory, addTxStatus, failTxHistory, successTxHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
@@ -49,12 +40,7 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({
-  route,
-  onClose,
-  insufficentBalance,
-  transactionCount,
-}: Props) {
+function TransactionDialogContent({ route, onClose, insufficentBalance, transactionCount }: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -122,24 +108,18 @@ function TransactionDialogContent({
           })();
 
           if (!walletName) {
-            throw new Error(
-              `executeRoute error: cannot find wallet for '${chain.chainName}'`,
-            );
+            throw new Error(`executeRoute error: cannot find wallet for '${chain.chainName}'`);
           }
 
           const wallet = wallets.find((w) => w.walletName === walletName);
           if (!wallet) {
-            throw new Error(
-              `executeRoute error: cannot find wallet for '${chain.chainName}'`,
-            );
+            throw new Error(`executeRoute error: cannot find wallet for '${chain.chainName}'`);
           }
           if (wallet.isWalletDisconnected || !wallet.isWalletConnected) {
             await wallet.connect();
           }
           if (!wallet.address) {
-            throw new Error(
-              `executeRoute error: cannot resolve wallet address for '${chain.chainName}'`,
-            );
+            throw new Error(`executeRoute error: cannot resolve wallet address for '${chain.chainName}'`);
           }
           userAddresses[chainID] = wallet.address;
         }
@@ -186,17 +166,9 @@ function TransactionDialogContent({
               },
             ];
             if (route.txsRequired === txs.length) {
-              toast.success(
-                <p>
-                  You can safely navigate away from this page while your
-                  transaction is pending
-                </p>,
-                {
-                  icon: (
-                    <InformationCircleIcon className="h-10 w-10 text-blue-500" />
-                  ),
-                },
-              );
+              toast.success(<p>You can safely navigate away from this page while your transaction is pending</p>, {
+                icon: <InformationCircleIcon className="h-10 w-10 text-blue-500" />,
+              });
             }
             return txs;
           });
@@ -208,9 +180,7 @@ function TransactionDialogContent({
           setTxStatuses((statuses) => {
             const newStatuses = [...statuses];
 
-            const pendingIndex = newStatuses.findIndex(
-              (status) => status.status === "PENDING",
-            );
+            const pendingIndex = newStatuses.findIndex((status) => status.status === "PENDING");
 
             newStatuses[pendingIndex] = {
               status: "SUCCESS",
@@ -306,19 +276,19 @@ function TransactionDialogContent({
   }
 
   return (
-    <div className="flex flex-col h-full p-6 space-y-6 overflow-y-auto scrollbar-hide">
+    <div className="flex h-full flex-col space-y-6 overflow-y-auto p-6 scrollbar-hide">
       <div>
         <div className="flex items-center gap-4">
           <button
-            className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
             onClick={onClose}
           >
-            <ArrowLeftIcon className="w-6 h-6" />
+            <ArrowLeftIcon className="h-6 w-6" />
           </button>
-          <p className="font-bold text-xl">Transaction Preview</p>
+          <p className="text-xl font-bold">Transaction Preview</p>
         </div>
       </div>
-      <div className="border border-neutral-300 rounded-xl p-4">
+      <div className="rounded-xl border border-neutral-300 p-4">
         <RouteDisplay
           route={route}
           isRouteExpanded={isRouteExpanded}
@@ -329,16 +299,13 @@ function TransactionDialogContent({
 
       <div className="flex-1 space-y-6">
         {txStatuses.map(({ status }, i) => (
-          <div key={`tx-${i}`} className="flex items-center gap-4">
-            {status === "INIT" && (
-              <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
-            )}
-            {status === "PENDING" && (
-              <SpinnerIcon className="animate-spin h-7 w-7 inline-block text-neutral-300" />
-            )}
-            {status === "SUCCESS" && (
-              <CheckCircleIcon className="text-emerald-400 w-7 h-7" />
-            )}
+          <div
+            key={`tx-${i}`}
+            className="flex items-center gap-4"
+          >
+            {status === "INIT" && <CheckCircleIcon className="h-7 w-7 text-neutral-300" />}
+            {status === "PENDING" && <SpinnerIcon className="inline-block h-7 w-7 animate-spin text-neutral-300" />}
+            {status === "SUCCESS" && <CheckCircleIcon className="h-7 w-7 text-emerald-400" />}
             <div className="flex-1">
               <p className="font-semibold">Transaction {i + 1}</p>
             </div>
@@ -364,13 +331,10 @@ function TransactionDialogContent({
       <div className="space-y-4">
         {estimatedFinalityTime !== "" && (
           <AlertCollapse.Root type="info">
-            <AlertCollapse.Trigger>
-              EVM bridging finality time is {estimatedFinalityTime}
-            </AlertCollapse.Trigger>
+            <AlertCollapse.Trigger>EVM bridging finality time is {estimatedFinalityTime}</AlertCollapse.Trigger>
             <AlertCollapse.Content>
               <p>
-                This swap contains at least one EVM chain, so it might take
-                longer. Read more about{" "}
+                This swap contains at least one EVM chain, so it might take longer. Read more about{" "}
                 <a
                   href={HREF_COMMON_FINALITY_TIMES}
                   className="underline"
@@ -384,7 +348,7 @@ function TransactionDialogContent({
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
-        <div className="bg-black text-white/50 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+        <div className="flex w-full items-center rounded-md bg-black p-3 text-left text-xs font-medium uppercase text-white/50">
           <p className="flex-1">
             This route requires{" "}
             <span className="text-white">
@@ -397,9 +361,9 @@ function TransactionDialogContent({
         {transacting ? (
           <button
             className={clsx(
-              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
-              "transition-transform outline-none",
-              "enabled:hover:scale-105 enabled:hover:rotate-1",
+              "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
+              "outline-none transition-transform",
+              "enabled:hover:rotate-1 enabled:hover:scale-105",
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onClose}
@@ -407,7 +371,7 @@ function TransactionDialogContent({
           >
             {route.txsRequired !== broadcastedTxs.length ? (
               <svg
-                className="animate-spin h-4 w-4 inline-block text-white"
+                className="inline-block h-4 w-4 animate-spin text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -433,9 +397,9 @@ function TransactionDialogContent({
         ) : (
           <button
             className={clsx(
-              "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full",
-              "transition-transform outline-none",
-              "enabled:hover:scale-105 enabled:hover:rotate-1",
+              "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
+              "outline-none transition-transform",
+              "enabled:hover:rotate-1 enabled:hover:scale-105",
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
@@ -445,9 +409,7 @@ function TransactionDialogContent({
           </button>
         )}
         {insufficentBalance && !transacting && !txComplete && (
-          <p className="text-center font-semibold text-sm text-red-500">
-            Insufficient Balance
-          </p>
+          <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
         )}
       </div>
     </div>

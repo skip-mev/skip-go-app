@@ -10,10 +10,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
 import { formatPercent, formatUSD } from "@/utils/intl";
-import {
-  formatNumberWithCommas,
-  formatNumberWithoutCommas,
-} from "@/utils/number";
+import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -63,11 +60,7 @@ function AssetInput({
 
   const account = useAccount(context === "src" ? "source" : "destination");
 
-  const { data: balances } = useBalancesByChain(
-    account?.address,
-    chain,
-    assets,
-  );
+  const { data: balances } = useBalancesByChain(account?.address, chain, assets);
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return 0;
@@ -105,13 +98,9 @@ function AssetInput({
     if (feeDenom && feeDenom.denom === asset.denom) {
       const { gas } = useSettingsStore.getState();
 
-      const { gasPrice } = chain.feeAssets.find(
-        (a) => a.denom === feeDenom.denom,
-      )!;
+      const { gasPrice } = chain.feeAssets.find((a) => a.denom === feeDenom.denom)!;
 
-      const fee = new BigNumber(gasPrice.average)
-        .multipliedBy(gas)
-        .shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
+      const fee = new BigNumber(gasPrice.average).multipliedBy(gas).shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
 
       amount = amount.minus(fee);
       if (amount.isNegative()) {
@@ -132,14 +121,18 @@ function AssetInput({
   return (
     <div
       className={clsx(
-        "space-y-4 border border-neutral-200 p-4 rounded-lg transition-[border,shadow]",
+        "space-y-4 rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
         "hover:border-neutral-300 hover:shadow-sm",
       )}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
         <div>
-          <ChainSelect chain={chain} chains={chains} onChange={onChainChange} />
+          <ChainSelect
+            chain={chain}
+            chains={chains}
+            onChange={onChainChange}
+          />
         </div>
         <div>
           <AssetSelect
@@ -152,14 +145,12 @@ function AssetInput({
         </div>
       </div>
       <div className="relative isolate">
-        {isLoading && (
-          <SpinnerIcon className="absolute right-3 top-3 animate-spin h-4 w-4 text-neutral-300 z-10" />
-        )}
+        {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
         <input
           data-testid="amount"
           className={clsx(
-            "w-full text-3xl font-medium h-10 tabular-nums",
-            "focus:outline-none placeholder:text-neutral-300",
+            "h-10 w-full text-3xl font-medium tabular-nums",
+            "placeholder:text-neutral-300 focus:outline-none",
             isLoading && "animate-pulse text-neutral-500",
           )}
           type="text"
@@ -188,9 +179,7 @@ function AssetInput({
             }
 
             if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-              let value = new BigNumber(
-                formatNumberWithoutCommas(event.currentTarget.value) || "0",
-              );
+              let value = new BigNumber(formatNumberWithoutCommas(event.currentTarget.value) || "0");
               if (event.key === "ArrowUp") {
                 event.preventDefault();
                 if (event.shiftKey) {
@@ -218,33 +207,22 @@ function AssetInput({
             }
           }}
         />
-        <div className="flex items-center space-x-2 tabular-nums h-8">
-          <p className="text-neutral-400 text-sm tabular-nums">
-            {amountUSD ? formatUSD(amountUSD) : null}
-          </p>
-          {amountUSD !== undefined &&
-          diffPercentage !== 0 &&
-          context === "dest" ? (
-            <p
-              className={clsx(
-                "text-sm tabular-nums",
-                diffPercentage >= 0 ? "text-green-500" : "text-red-500",
-              )}
-            >
+        <div className="flex h-8 items-center space-x-2 tabular-nums">
+          <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
+          {amountUSD !== undefined && diffPercentage !== 0 && context === "dest" ? (
+            <p className={clsx("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>
           ) : null}
           <div className="flex-grow" />
           {showBalance && account?.address && asset && (
-            <div className="text-neutral-400 text-sm flex items-center animate-slide-left-and-fade">
+            <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip
-                label={`${selectedAssetBalance} ${asset.recommendedSymbol}`}
-              >
+              <SimpleTooltip label={`${selectedAssetBalance} ${asset.recommendedSymbol}`}>
                 <div
                   className={clsx(
-                    "max-w-[16ch] truncate mr-2 tabular-nums",
-                    "underline decoration-dotted underline-offset-4 cursor-help",
+                    "mr-2 max-w-[16ch] truncate tabular-nums",
+                    "cursor-help underline decoration-dotted underline-offset-4",
                   )}
                 >
                   {formattedSelectedAssetBalance}
@@ -252,8 +230,8 @@ function AssetInput({
               </SimpleTooltip>
               <button
                 className={clsx(
-                  "px-2 py-1 rounded-md uppercase font-semibold text-xs bg-[#FF486E] disabled:bg-red-200 text-white",
-                  "transition-[transform,background] enabled:hover:scale-110 enabled:hover:rotate-2 disabled:cursor-not-allowed",
+                  "rounded-md bg-[#FF486E] px-2 py-1 text-xs font-semibold uppercase text-white disabled:bg-red-200",
+                  "transition-[transform,background] enabled:hover:rotate-2 enabled:hover:scale-110 disabled:cursor-not-allowed",
                 )}
                 disabled={maxButtonDisabled}
                 onClick={handleMax}

@@ -6,23 +6,20 @@ import { disclosure } from "@/context/disclosures";
 
 import { SimpleTooltip } from "./SimpleTooltip";
 
-export const SettingsButton = ({
-  className,
-  ...props
-}: ComponentProps<"button">) => {
+export const SettingsButton = ({ className, ...props }: ComponentProps<"button">) => {
   return (
     <SimpleTooltip label="Swap Settings">
       <button
         className={clsx(
-          "p-2 rounded-full text-black/80 hover:text-black/100 hover:bg-neutral-100",
-          "focus:outline-none transition-colors",
+          "rounded-full p-2 text-black/80 hover:bg-neutral-100 hover:text-black/100",
+          "transition-colors focus:outline-none",
           className,
         )}
         onClick={() => disclosure.open("settingsDialog")}
         role="group"
         {...props}
       >
-        <Cog6ToothIcon className="w-4 h-4" />
+        <Cog6ToothIcon className="h-4 w-4" />
       </button>
     </SimpleTooltip>
   );

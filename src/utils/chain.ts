@@ -1,9 +1,6 @@
 import { Chain } from "@skip-router/core";
 
-import {
-  CHAIN_NAME_TO_CHAINLIST_ID,
-  CHAINLIST_LOGO_CHAIN_IDS,
-} from "@/constants/chainlist";
+import { CHAIN_NAME_TO_CHAINLIST_ID, CHAINLIST_LOGO_CHAIN_IDS } from "@/constants/chainlist";
 
 export function getChainLogo(chain: Chain) {
   if (chain.logoURI && chain.logoURI.match("-light")) {

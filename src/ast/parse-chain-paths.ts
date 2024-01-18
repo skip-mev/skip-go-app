@@ -12,10 +12,7 @@ interface Args {
   chainPaths: string[];
 }
 
-export async function parseChainPaths({
-  registryPath,
-  chainPaths,
-}: Args): Promise<Variables> {
+export async function parseChainPaths({ registryPath, chainPaths }: Args): Promise<Variables> {
   const chains: Chain[] = [];
   const assetlists: AssetList[] = [];
 

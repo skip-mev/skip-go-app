@@ -9,24 +9,27 @@ import { useDisclosureKey } from "@/context/disclosures";
 export function ContactDialog() {
   const [isOpen, { close }] = useDisclosureKey("contactDialog");
   return (
-    <Dialog.Root modal={false} open={isOpen}>
-      <Dialog.Content className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
+    <Dialog.Root
+      modal={false}
+      open={isOpen}
+    >
+      <Dialog.Content className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
         <form
           className={clsx(
-            "flex flex-col h-full p-6 text-sm",
-            "[&_input]:border-neutral-300 [&_input]:rounded-md [&_input]:text-sm",
-            "[&_textarea]:border-neutral-300 [&_textarea]:rounded-md [&_textarea]:text-sm",
+            "flex h-full flex-col p-6 text-sm",
+            "[&_input]:rounded-md [&_input]:border-neutral-300 [&_input]:text-sm",
+            "[&_textarea]:rounded-md [&_textarea]:border-neutral-300 [&_textarea]:text-sm",
           )}
           onSubmit={handleSubmit}
         >
           <div className="flex items-center gap-4 pb-4">
             <button
-              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
               onClick={close}
             >
-              <ArrowLeftIcon className="w-6 h-6" />
+              <ArrowLeftIcon className="h-6 w-6" />
             </button>
-            <h3 className="font-bold text-xl">Contact Us</h3>
+            <h3 className="text-xl font-bold">Contact Us</h3>
           </div>
           <label htmlFor="txHash">
             Transaction Hash <span className="text-red-500">*</span>
@@ -36,7 +39,7 @@ export function ContactDialog() {
             id="txHash"
             name="txHash"
             placeholder="C1CEA71D07932CEE8F4DC691..."
-            className="form-input rounded mb-2"
+            className="form-input mb-2 rounded"
             required
           />
           <label htmlFor="submitChain">
@@ -47,7 +50,7 @@ export function ContactDialog() {
             id="submitChain"
             name="submitChain"
             placeholder="cosmoshub-4"
-            className="form-input rounded mb-2"
+            className="form-input mb-2 rounded"
             required
           />
           <label htmlFor="signerAddress">
@@ -58,10 +61,10 @@ export function ContactDialog() {
             id="signerAddress"
             name="signerAddress"
             placeholder="cosmos1kpzxx2lxg05xxn8mf..."
-            className="form-input rounded mb-2"
+            className="form-input mb-2 rounded"
             required
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 mb-2">
+          <div className="mb-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
             <div className="grid grid-flow-row">
               <label htmlFor="Name">
                 Name <span className="text-red-500">*</span>
@@ -71,7 +74,7 @@ export function ContactDialog() {
                 id="name"
                 name="name"
                 placeholder="Skippy McSkipper"
-                className="form-input rounded mb-2"
+                className="form-input mb-2 rounded"
                 required
               />
             </div>
@@ -84,21 +87,25 @@ export function ContactDialog() {
                 id="email"
                 name="email"
                 placeholder="example@domain.com"
-                className="form-input rounded mb-2"
+                className="form-input mb-2 rounded"
                 required
               />
             </div>
           </div>
 
           <label htmlFor="message">Describe your issue</label>
-          <textarea name="message" id="message" className="form-textarea" />
+          <textarea
+            name="message"
+            id="message"
+            className="form-textarea"
+          />
           <div className="flex-grow" />
           <button
             type="submit"
             // className="flex items-center gap-2 bg-[#FF486E] rounded-md font-medium p-2 text-white justify-center text-base"
-            className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full outline-none flex items-center justify-center gap-2 text-base"
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-[#FF486E] py-4 text-base font-semibold text-white outline-none"
           >
-            <EnvelopeIcon className="w-5 h-5" />
+            <EnvelopeIcon className="h-5 w-5" />
             <span>Send Message</span>
           </button>
         </form>

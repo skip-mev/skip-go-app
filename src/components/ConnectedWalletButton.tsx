@@ -13,17 +13,21 @@ export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
     return (
       <button
         className={clsx(
-          "flex items-center gap-2 focus:outline-none transition-colors",
-          "border border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 rounded-lg px-2 py-1.5",
+          "flex items-center gap-2 transition-colors focus:outline-none",
+          "rounded-lg border border-neutral-200 px-2 py-1.5 hover:border-neutral-300 hover:bg-neutral-50",
           className,
         )}
         {...rest}
         ref={ref}
       >
         {walletLogo && (
-          <img alt={walletName} className="w-4 h-4" src={walletLogo} />
+          <img
+            alt={walletName}
+            className="h-4 w-4"
+            src={walletLogo}
+          />
         )}
-        <span className="text-xs font-semibold tabular-nums font-mono">
+        <span className="font-mono text-xs font-semibold tabular-nums">
           {address.slice(0, 8)}...{address.slice(-5)}
         </span>
       </button>

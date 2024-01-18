@@ -8,16 +8,7 @@ import { wallets as station } from "@cosmos-kit/station";
 import { wallets as vectis } from "@cosmos-kit/vectis";
 import { wallets as xdefi } from "@cosmos-kit/xdefi";
 
-export const wallets = [
-  ...keplr,
-  ...cosmostation,
-  ...initia,
-  ...leap,
-  ...okxwallet,
-  ...station,
-  ...vectis,
-  ...xdefi,
-];
+export const wallets = [...keplr, ...cosmostation, ...initia, ...leap, ...okxwallet, ...station, ...vectis, ...xdefi];
 
 export type MergedWalletClient =
   | import("@cosmos-kit/cosmostation-extension/cjs/extension/client").CosmostationClient

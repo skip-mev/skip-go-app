@@ -6,15 +6,15 @@ export const GasSetting = () => {
   const currentValue = useSettingsStore((state) => state.gas);
 
   return (
-    <div className="flex items-center p-2 space-x-2">
+    <div className="flex items-center space-x-2 p-2">
       <h3>Gas</h3>
       <div className="flex-grow" />
-      <div className="flex flex-col items-stretch gap-1 w-full max-w-32">
+      <div className="flex w-full max-w-32 flex-col items-stretch gap-1">
         <div className="relative text-sm">
           <input
             className={clsx(
-              "border rounded-lg px-2 py-1 tabular-nums transition text-end",
-              "number-input-arrows-hide w-full",
+              "rounded-lg border px-2 py-1 text-end tabular-nums transition",
+              "w-full number-input-arrows-hide",
             )}
             type="number"
             value={currentValue}

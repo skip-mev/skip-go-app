@@ -60,16 +60,13 @@ export function SwapWidget() {
 
   let usdDiffPercent = 0.0;
   if (route?.usdAmountIn && route?.usdAmountOut) {
-    usdDiffPercent =
-      (parseFloat(route.usdAmountOut) - parseFloat(route.usdAmountIn)) /
-      parseFloat(route.usdAmountIn);
+    usdDiffPercent = (parseFloat(route.usdAmountOut) - parseFloat(route.usdAmountIn)) / parseFloat(route.usdAmountIn);
   }
 
   const srcAccount = useAccount("source");
   const destAccount = useAccount("destination");
 
-  const isWalletConnected =
-    srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
+  const isWalletConnected = srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
 
   function promptDestAsset() {
     document.querySelector("[data-testid='destination'] button")?.click();
@@ -101,10 +98,13 @@ export function SwapWidget() {
 
   return (
     <UsdDiff.Provider>
-      <Tooltip.Provider delayDuration={0} disableHoverableContent>
+      <Tooltip.Provider
+        delayDuration={0}
+        disableHoverableContent
+      >
         <div className="space-y-4">
-          <div className="flex items-center h-8">
-            <p className="font-semibold text-2xl">From</p>
+          <div className="flex h-8 items-center">
+            <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
             <HistoryButton />
             <SettingsButton />
@@ -113,17 +113,13 @@ export function SwapWidget() {
               <SimpleTooltip label="Change Source Wallet">
                 <ConnectedWalletButton
                   address={srcAccount.address}
-                  onClick={() =>
-                    sourceChain?.chainID &&
-                    openWalletModal(sourceChain.chainID, "source")
-                  }
+                  onClick={() => sourceChain?.chainID && openWalletModal(sourceChain.chainID, "source")}
                   walletName={srcAccount.wallet?.walletPrettyName}
                   walletLogo={
                     srcAccount.wallet.walletInfo
                       ? typeof srcAccount.wallet.walletInfo.logo === "string"
                         ? srcAccount.wallet.walletInfo.logo
-                        : srcAccount.wallet.walletInfo.logo?.major ||
-                          srcAccount.wallet.walletInfo.logo?.minor
+                        : srcAccount.wallet.walletInfo.logo?.major || srcAccount.wallet.walletInfo.logo?.minor
                       : ""
                   }
                   className="animate-slide-left-and-fade"
@@ -150,13 +146,13 @@ export function SwapWidget() {
             />
           </div>
           <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <button
                 className={clsx(
-                  "bg-neutral-900 text-white w-8 h-8 rounded-md flex items-center justify-center pointer-events-auto",
-                  "enabled:hover:scale-105 enabled:hover:rotate-3 transition-transform",
-                  "disabled:hover:scale-100 disabled:bg-neutral-500 disabled:cursor-not-allowed",
-                  "data-[swap=true]:animate-spin-swap data-[swap=true]:pointer-events-none",
+                  "pointer-events-auto flex h-8 w-8 items-center justify-center rounded-md bg-neutral-900 text-white",
+                  "transition-transform enabled:hover:rotate-3 enabled:hover:scale-105",
+                  "disabled:cursor-not-allowed disabled:bg-neutral-500 disabled:hover:scale-100",
+                  "data-[swap=true]:pointer-events-none data-[swap=true]:animate-spin-swap",
                 )}
                 disabled={!destinationChain}
                 onClick={() => {
@@ -175,29 +171,24 @@ export function SwapWidget() {
                 data-testid="swap-button"
                 ref={invertButtonRef}
               >
-                <ArrowsUpDownIcon className="w-4 h-4" />
+                <ArrowsUpDownIcon className="h-4 w-4" />
               </button>
             </div>
-            <p className="font-semibold text-2xl">To</p>
+            <p className="text-2xl font-semibold">To</p>
             <div className="absolute inset-y-0 right-0 flex items-center">
               {destAccount?.address && destAccount?.wallet ? (
                 <SimpleTooltip label="Change Destination Wallet">
                   <ConnectedWalletButton
                     address={destAccount.address}
                     onClick={() => {
-                      destinationChain?.chainID &&
-                        openWalletModal(
-                          destinationChain.chainID,
-                          "destination",
-                        );
+                      destinationChain?.chainID && openWalletModal(destinationChain.chainID, "destination");
                     }}
                     walletName={destAccount.wallet?.walletPrettyName}
                     walletLogo={
                       destAccount.wallet.walletInfo
                         ? typeof destAccount.wallet.walletInfo.logo === "string"
                           ? destAccount.wallet.walletInfo.logo
-                          : destAccount.wallet.walletInfo.logo?.major ||
-                            destAccount.wallet.walletInfo.logo?.minor
+                          : destAccount.wallet.walletInfo.logo?.major || destAccount.wallet.walletInfo.logo?.minor
                         : ""
                     }
                     className="animate-slide-left-and-fade"
@@ -239,31 +230,24 @@ export function SwapWidget() {
             />
           )}
           {routeLoading && <RouteLoadingBanner />}
-          {route && !routeLoading && (
-            <RouteTransactionCountBanner
-              numberOfTransactions={numberOfTransactions}
-            />
-          )}
+          {route && !routeLoading && <RouteTransactionCountBanner numberOfTransactions={numberOfTransactions} />}
           {!!routeError && (
-            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+            <div className="flex w-full items-center rounded-md bg-red-50 p-3 text-left text-xs font-medium uppercase text-red-500">
               <p className="flex-1">{routeError}</p>
             </div>
           )}
           {destinationChain?.chainID === "dydx-mainnet-1" && (
-            <div className="bg-red-50 text-red-500 font-medium uppercase text-xs p-3 rounded-md flex items-center w-full text-left">
+            <div className="flex w-full items-center rounded-md bg-red-50 p-3 text-left text-xs font-medium uppercase text-red-500">
               <p className="flex-1 [&_a]:underline">
-                This transaction will let you transfer and stake tokens on dydx,
-                it will not allow you to trade. Follow the{" "}
-                <AdaptiveLink href="https://dydx.exchange">
-                  dydx frontend
-                </AdaptiveLink>{" "}
-                directions to set up a trading account
+                This transaction will let you transfer and stake tokens on dydx, it will not allow you to trade. Follow
+                the <AdaptiveLink href="https://dydx.exchange">dydx frontend</AdaptiveLink> directions to set up a
+                trading account
               </p>
             </div>
           )}
           {!isWalletConnected && (
             <button
-              className="bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full transition-transform hover:scale-105 hover:rotate-1"
+              className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white transition-transform hover:rotate-1 hover:scale-105"
               onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
                   openWalletModal(sourceChain.chainID, "source");
@@ -279,16 +263,13 @@ export function SwapWidget() {
                 }
               }}
             >
-              <div key={accountStateKey} className="animate-slide-up-and-fade">
-                {!srcAccount?.isWalletConnected &&
-                  !destAccount?.isWalletConnected &&
-                  "Connect Wallet"}
-                {!srcAccount?.isWalletConnected &&
-                  destAccount?.isWalletConnected &&
-                  "Connect Source Wallet"}
-                {srcAccount?.isWalletConnected &&
-                  !destAccount?.isWalletConnected &&
-                  "Connect Destination Wallet"}
+              <div
+                key={accountStateKey}
+                className="animate-slide-up-and-fade"
+              >
+                {!srcAccount?.isWalletConnected && !destAccount?.isWalletConnected && "Connect Wallet"}
+                {!srcAccount?.isWalletConnected && destAccount?.isWalletConnected && "Connect Source Wallet"}
+                {srcAccount?.isWalletConnected && !destAccount?.isWalletConnected && "Connect Destination Wallet"}
               </div>
             </button>
           )}
@@ -299,16 +280,12 @@ export function SwapWidget() {
                 route={route}
                 transactionCount={numberOfTransactions}
                 insufficientBalance={insufficientBalance}
-                shouldShowPriceImpactWarning={
-                  !!routeWarningTitle && !!routeWarningMessage
-                }
+                shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}
               />
               {insufficientBalance && (
-                <p className="text-center font-semibold text-sm text-red-500">
-                  Insufficient Balance
-                </p>
+                <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
               )}
             </div>
           )}

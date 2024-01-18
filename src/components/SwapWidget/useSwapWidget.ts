@@ -7,11 +7,7 @@ import {
   useNetwork as useWagmiNetwork,
   useSwitchNetwork as useWagmiSwitchNetwork,
 } from "wagmi";
-import {
-  createJSONStorage,
-  persist,
-  subscribeWithSelector,
-} from "zustand/middleware";
+import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
@@ -92,11 +88,7 @@ export function useSwapWidget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [srcChain?.chainID]);
 
-  const { data: balances } = useBalancesByChain(
-    srcAccount?.address,
-    srcChain,
-    srcAssets,
-  );
+  const { data: balances } = useBalancesByChain(srcAccount?.address, srcChain, srcAssets);
 
   // #endregion
 
@@ -161,14 +153,8 @@ export function useSwapWidget() {
       return [undefined, undefined];
     }
 
-    if (
-      !route.swapPriceImpactPercent &&
-      (!route.usdAmountIn || !route.usdAmountOut)
-    ) {
-      return [
-        "Low Information Trade",
-        "We were unable to calculate the price impact of this route.",
-      ];
+    if (!route.swapPriceImpactPercent && (!route.usdAmountIn || !route.usdAmountOut)) {
+      return ["Low Information Trade", "We were unable to calculate the price impact of this route."];
     }
 
     if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
@@ -183,10 +169,7 @@ export function useSwapWidget() {
       ];
     }
 
-    if (
-      swapPriceImpactPercent &&
-      swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD
-    ) {
+    if (swapPriceImpactPercent && swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD) {
       const formattedPriceImpact = formatPercent(swapPriceImpactPercent);
       return [
         "Bad Trade Warning",
@@ -308,11 +291,7 @@ export function useSwapWidget() {
       ? parseAmountWei(newAmount, dstAsset?.decimals)
       : parseAmountWei(newAmount, srcAsset?.decimals);
 
-    useSwapFormStore.setState(
-      isSwapIn
-        ? { amountOut: formattedNewAmount }
-        : { amountIn: formattedNewAmount },
-    );
+    useSwapFormStore.setState(isSwapIn ? { amountOut: formattedNewAmount } : { amountIn: formattedNewAmount });
   }, [route, direction, srcAsset?.decimals, dstAsset?.decimals]);
 
   /**
@@ -415,12 +394,7 @@ export function useSwapWidget() {
                 assetList: wallet.assetList,
               });
               await wallet.connect();
-              trackWallet.track(
-                "source",
-                srcChain.chainID,
-                wallet.walletName,
-                srcChain.chainType,
-              );
+              trackWallet.track("source", srcChain.chainID, wallet.walletName, srcChain.chainType);
             } catch (error) {
               console.error(error);
               trackWallet.untrack("source");
@@ -435,12 +409,7 @@ export function useSwapWidget() {
               if (switchNetworkAsync && evmChain.id !== +srcChain.chainID) {
                 await switchNetworkAsync(+srcChain.chainID);
               }
-              trackWallet.track(
-                "source",
-                srcChain.chainID,
-                connector.id,
-                srcChain.chainType,
-              );
+              trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
             } catch (error) {
               console.error(error);
               trackWallet.untrack("source");
@@ -505,12 +474,7 @@ export function useSwapWidget() {
                 assetList: wallet.assetList,
               });
               await wallet.connect();
-              trackWallet.track(
-                "destination",
-                dstChain.chainID,
-                wallet.walletName,
-                dstChain.chainType,
-              );
+              trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
               trackWallet.untrack("destination");
@@ -525,12 +489,7 @@ export function useSwapWidget() {
               if (switchNetworkAsync && evmChain.id !== +dstChain.chainID) {
                 await switchNetworkAsync(+dstChain.chainID);
               }
-              trackWallet.track(
-                "destination",
-                dstChain.chainID,
-                connector.id,
-                dstChain.chainType,
-              );
+              trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
             } catch (error) {
               console.error(error);
               trackWallet.untrack("destination");
@@ -555,8 +514,7 @@ export function useSwapWidget() {
     return trackWallet.subscribe(
       (state) => state.source,
       async (srcTrack) => {
-        const { sourceChain: srcChain, destinationChain: dstChain } =
-          useSwapFormStore.getState();
+        const { sourceChain: srcChain, destinationChain: dstChain } = useSwapFormStore.getState();
         const { destination: dstTrack } = trackWallet.get();
         if (
           srcChain?.chainType === "cosmos" &&
@@ -590,23 +548,14 @@ export function useSwapWidget() {
                 assetList: wallet.assetList,
               });
               await wallet.connect();
-              trackWallet.track(
-                "destination",
-                dstChain.chainID,
-                wallet.walletName,
-                dstChain.chainType,
-              );
+              trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
               trackWallet.untrack("destination");
             }
           }
         }
-        if (
-          !srcTrack &&
-          dstChain?.chainType === "cosmos" &&
-          dstTrack?.chainType === "cosmos"
-        ) {
+        if (!srcTrack && dstChain?.chainType === "cosmos" && dstTrack?.chainType === "cosmos") {
           const { wallets } = getWalletRepo(dstChain.chainName);
           const wallet = wallets.find((w) => {
             return w.walletName === dstTrack.walletName;
@@ -697,10 +646,7 @@ const useSwapFormStore = create(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function findEquivalentAsset(
-  asset: AssetWithMetadata,
-  assets: AssetWithMetadata[],
-) {
+function findEquivalentAsset(asset: AssetWithMetadata, assets: AssetWithMetadata[]) {
   return assets.find((a) => {
     const isSameOriginChain = a.originChainID === asset.originChainID;
     const isSameOriginDenom = a.originDenom === asset.originDenom;
@@ -712,9 +658,7 @@ function findEquivalentAsset(
 function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
   if (!asset || !amount) return "0";
   try {
-    return new BigNumber(amount.replace(/,/g, ""))
-      .shiftedBy(asset.decimals ?? 6)
-      .toFixed(0);
+    return new BigNumber(amount.replace(/,/g, "")).shiftedBy(asset.decimals ?? 6).toFixed(0);
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
       console.error(err);
@@ -739,11 +683,7 @@ function getRouteErrorMessage({ message }: { message: string }) {
   if (message.includes("no swap route found after axelar fee of")) {
     return "Amount is too low to cover Axelar fees";
   }
-  if (
-    message.includes(
-      "evm native destination tokens are currently not supported",
-    )
-  ) {
+  if (message.includes("evm native destination tokens are currently not supported")) {
     return "EVM native destination tokens are currently not supported";
   }
   return "Route not found";
