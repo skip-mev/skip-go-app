@@ -43,6 +43,12 @@ interface Props {
   onClose: () => void;
 }
 
+export interface BroadcastedTx {
+  chainID: string;
+  txHash: string;
+  explorerLink: string;
+}
+
 function TransactionDialogContent({
   route,
   onClose,
@@ -58,13 +64,7 @@ function TransactionDialogContent({
 
   const [txComplete, setTxComplete] = useState(false);
   const [isRouteExpanded, setIsRouteExpanded] = useState(false);
-  const [broadcastedTxs, setBroadcastedTxs] = useState<
-    {
-      chainId: string;
-      txHash: string;
-      explorerLink: string;
-    }[]
-  >([]);
+  const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => ({
@@ -180,7 +180,7 @@ function TransactionDialogContent({
             const txs = [
               ...v,
               {
-                chainId: txStatus.chainID,
+                chainID: txStatus.chainID,
                 txHash: txStatus.txHash,
                 explorerLink: explorerLink || "#",
               },
@@ -323,11 +323,12 @@ function TransactionDialogContent({
           route={route}
           isRouteExpanded={isRouteExpanded}
           setIsRouteExpanded={setIsRouteExpanded}
+          broadcastedTxs={broadcastedTxs}
         />
       </div>
 
       <div className="flex-1 space-y-6">
-        {txStatuses.map(({ status, explorerLink, txHash }, i) => (
+        {txStatuses.map(({ status }, i) => (
           <div key={`tx-${i}`} className="flex items-center gap-4">
             {status === "INIT" && (
               <CheckCircleIcon className="text-neutral-300 w-7 h-7" />
@@ -353,20 +354,6 @@ function TransactionDialogContent({
                     {broadcastedTxs[i].txHash.slice(0, 6)}
                     ...
                     {broadcastedTxs[i].txHash.slice(-6)}
-                  </span>
-                </a>
-              )}
-              {txHash && explorerLink && (
-                <a
-                  className="text-sm font-bold text-[#FF486E] hover:underline"
-                  href={explorerLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    {txHash.slice(0, 6)}
-                    ...
-                    {txHash.slice(-6)}
                   </span>
                 </a>
               )}

@@ -1,7 +1,8 @@
 import { Asset } from "@skip-router/core";
 import {
   createContext,
-  ReactNode,
+  FC,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -35,7 +36,7 @@ export const AssetsContext = createContext<AssetsContext>({
   isReady: false,
 });
 
-export function AssetsProvider({ children }: { children: ReactNode }) {
+export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data: chains } = useChains();
   const { data: solveAssets } = useSolveAssets();
 
@@ -113,7 +114,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
         logoURI && load(logoURI);
       });
     });
-  }, [isReady]);
+  }, [assets, chains, isReady]);
 
   return (
     <AssetsContext.Provider
@@ -129,7 +130,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
       {children}
     </AssetsContext.Provider>
   );
-}
+};
 
 export function useAssets() {
   return useContext(AssetsContext);

@@ -1,8 +1,15 @@
-import { AssetsRequest, SwapVenue } from "@skip-router/core";
+import { AssetsRequest, SwapVenue, TransferState } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
 import { useSkipClient } from "./hooks";
+
+interface TransferSequence {
+  srcChainID: string;
+  destChainID: string;
+  explorerLink: string | undefined;
+  state: TransferState;
+}
 
 export function useAssets(options: AssetsRequest = {}) {
   const skipClient = useSkipClient();
@@ -144,3 +151,104 @@ export function useRoute({
 
   return query;
 }
+
+export const useBroadcastedTxsStatus = (
+  txsRequired: number,
+  txs: { chainID: string; txHash: string }[] | undefined,
+) => {
+  const skipClient = useSkipClient();
+  const [isSettled, setIsSettled] = useState(false);
+  const [prevData, setPrevData] = useState<
+    | {
+        transferSequence: TransferSequence[];
+      }
+    | undefined
+  >(undefined);
+
+  const queryKey = useMemo(
+    () => ["solve-tx-status", txsRequired, txs] as const,
+    [txs, txsRequired],
+  );
+
+  return useQuery({
+    queryKey,
+    queryFn: async ({ queryKey: [, txsRequired, txs] }) => {
+      if (!txs) return;
+      const result = await Promise.all(
+        txs.map(async (tx) => {
+          const _res = await skipClient.transactionStatus({
+            chainID: tx.chainID,
+            txHash: tx.txHash,
+          });
+
+          const cleanTransferSequence = _res.transferSequence.map(
+            (transfer) => {
+              if ("ibcTransfer" in transfer) {
+                return {
+                  srcChainID: transfer.ibcTransfer.srcChainID,
+                  destChainID: transfer.ibcTransfer.dstChainID,
+                  explorerLink:
+                    transfer.ibcTransfer.packetTXs.sendTx?.explorerLink,
+                  state: transfer.ibcTransfer.state,
+                };
+              }
+              const axelarState: TransferState = (() => {
+                switch (transfer.axelarTransfer.state) {
+                  case "AXELAR_TRANSFER_PENDING_RECEIPT":
+                    return "TRANSFER_PENDING";
+                  case "AXELAR_TRANSFER_PENDING_CONFIRMATION":
+                    return "TRANSFER_PENDING";
+                  case "AXELAR_TRANSFER_FAILURE":
+                    return "TRANSFER_FAILURE";
+                  case "AXELAR_TRANSFER_SUCCESS":
+                    return "TRANSFER_SUCCESS";
+                  default:
+                    return "TRANSFER_UNKNOWN";
+                }
+              })();
+
+              return {
+                srcChainID: transfer.axelarTransfer.srcChainID,
+                destChainID: transfer.axelarTransfer.dstChainID,
+                explorerLink: transfer.axelarTransfer.axelarScanLink,
+                state: axelarState,
+              };
+            },
+          );
+
+          return {
+            state: _res.state,
+            transferSequence: cleanTransferSequence,
+          };
+        }),
+      );
+      const _isSettled = result.every((tx) => {
+        return (
+          tx.state === "STATE_COMPLETED_SUCCESS" ||
+          tx.state === "STATE_COMPLETED_ERROR" ||
+          tx.state === "STATE_ABANDONED"
+        );
+      });
+      if (result.length > 0 && txsRequired === result.length && _isSettled) {
+        setIsSettled(true);
+      }
+
+      const mergedTransferSequence = result.reduce<TransferSequence[]>(
+        (acc, tx) => {
+          return acc.concat(...tx.transferSequence);
+        },
+        [],
+      );
+
+      const resData = {
+        transferSequence: mergedTransferSequence,
+      };
+      setPrevData(resData);
+      return resData;
+    },
+    enabled: !isSettled && !!txs && txs.length > 0,
+    refetchInterval: 1000 * 2,
+    // to make the data persist when query key changed
+    initialData: prevData,
+  });
+};
