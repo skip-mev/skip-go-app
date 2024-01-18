@@ -1,4 +1,3 @@
-import { useManager } from "@cosmos-kit/react";
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
@@ -7,7 +6,6 @@ import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import { getTrackWallet, trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
 
@@ -36,30 +34,28 @@ export function SwapWidget() {
 
   const { data: chains } = useSkipChains();
 
-  const { getWalletRepo } = useManager();
-
   const {
     amountIn,
     amountOut,
+    destinationAsset,
+    destinationChain,
     direction,
+    insufficientBalance,
+    numberOfTransactions,
+    onDestinationAssetChange,
+    onDestinationChainChange,
+    onSourceAssetChange,
+    onSourceChainChange,
+    priceImpactThresholdReached,
+    route,
+    routeError,
+    routeLoading,
+    routeWarningMessage,
+    routeWarningTitle,
     setFormValues,
     sourceAsset,
     sourceChain,
-    destinationAsset,
-    destinationChain,
-    routeLoading,
-    numberOfTransactions,
-    route,
-    insufficientBalance,
-    onSourceChainChange,
-    onSourceAssetChange,
-    onDestinationChainChange,
-    onDestinationAssetChange,
     swapPriceImpactPercent,
-    priceImpactThresholdReached,
-    routeError,
-    routeWarningTitle,
-    routeWarningMessage,
   } = useSwapWidget();
 
   let usdDiffPercent = 0.0;
@@ -175,25 +171,6 @@ export function SwapWidget() {
                     amountOut: amountIn,
                     direction: direction === "swap-in" ? "swap-out" : "swap-in",
                   });
-                  const { source, destination } = getTrackWallet();
-                  if (source && !destination) {
-                    trackWallet.track(
-                      "destination",
-                      source.chainID,
-                      source.walletName,
-                    );
-                    trackWallet.untrack("source");
-                    return;
-                  }
-                  if (!source && destination) {
-                    trackWallet.track(
-                      "source",
-                      destination.chainID,
-                      destination.walletName,
-                    );
-                    trackWallet.untrack("destination");
-                    return;
-                  }
                 }}
                 data-testid="swap-button"
                 ref={invertButtonRef}
@@ -295,47 +272,6 @@ export function SwapWidget() {
                 }
                 if (!destinationChain) {
                   promptDestAsset();
-                  return;
-                }
-                if (
-                  sourceChain?.chainType === "cosmos" &&
-                  destinationChain.chainType === "cosmos" &&
-                  srcAccount?.isWalletConnected &&
-                  !destAccount?.isWalletConnected
-                ) {
-                  const { wallets } = getWalletRepo(destinationChain.chainName);
-                  const wallet = wallets.find(
-                    (item) => item.walletName === srcAccount.wallet?.walletName,
-                  );
-                  if (!wallet) {
-                    openWalletModal(destinationChain.chainID, "destination");
-                    return;
-                  }
-                  await wallet.client.addChain?.({
-                    chain: {
-                      bech32_prefix: wallet.chain.bech32_prefix,
-                      chain_id: wallet.chain.chain_id,
-                      chain_name: wallet.chain.chain_name,
-                      network_type: wallet.chain.network_type,
-                      pretty_name: wallet.chain.pretty_name,
-                      slip44: wallet.chain.slip44,
-                      status: wallet.chain.status,
-                      apis: wallet.chain.apis,
-                      bech32_config: wallet.chain.bech32_config,
-                      explorers: wallet.chain.explorers,
-                      extra_codecs: wallet.chain.extra_codecs,
-                      fees: wallet.chain.fees,
-                      peers: wallet.chain.peers,
-                    },
-                    name: wallet.chainName,
-                    assetList: wallet.assetList,
-                  });
-                  await wallet.connect();
-                  trackWallet.track(
-                    "destination",
-                    destinationChain.chainID,
-                    wallet.walletName,
-                  );
                   return;
                 }
                 if (destinationChain && !destAccount?.isWalletConnected) {

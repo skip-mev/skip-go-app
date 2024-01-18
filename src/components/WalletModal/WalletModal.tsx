@@ -197,14 +197,12 @@ function WalletModalWithContext() {
           name: w.chainName,
           assetList: w.assetList,
         });
-        w.connect().then(() => {
-          context && trackWallet.track(context, chainID, w.walletName);
-        });
+        await w.connect();
+        context && trackWallet.track(context, chainID, w.walletName, chainType);
       },
       disconnect: async () => {
-        w.disconnect().then(() => {
-          context && trackWallet.untrack(context);
-        });
+        await w.disconnect();
+        context && trackWallet.untrack(context);
       },
       isWalletConnected: w.isWalletConnected,
     }));
@@ -231,14 +229,13 @@ function WalletModalWithContext() {
         },
         connect: async () => {
           if (connector.id === currentConnector?.id) return;
-          connectAsync({ connector, chainId: Number(chainID) }).then(() => {
-            context && trackWallet.track(context, chainID, connector.id);
-          });
+          await connectAsync({ connector, chainId: Number(chainID) });
+          context &&
+            trackWallet.track(context, chainID, connector.id, chainType);
         },
         disconnect: async () => {
-          disconnectAsync().then(() => {
-            context && trackWallet.untrack(context);
-          });
+          await disconnectAsync();
+          context && trackWallet.untrack(context);
         },
         isWalletConnected: connector.id === currentConnector?.id,
       };

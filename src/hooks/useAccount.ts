@@ -6,12 +6,12 @@ import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import {
   trackWallet,
   TrackWalletCtx,
-  useTrackWalletByCtx,
+  useTrackWallet,
 } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 
 export function useAccount(context: TrackWalletCtx) {
-  const trackedWallet = useTrackWalletByCtx(context);
+  const trackedWallet = useTrackWallet(context);
 
   const { data: chain } = useChainByID(trackedWallet?.chainID);
 
@@ -19,13 +19,16 @@ export function useAccount(context: TrackWalletCtx) {
     chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub",
   );
 
-  const cosmosWallet = walletRepo.wallets.find((w) => {
-    return w.walletName === trackedWallet?.walletName;
-  });
+  const cosmosWallet = useMemo(() => {
+    return walletRepo.wallets.find(
+      (w) => w.walletName === trackedWallet?.walletName,
+    );
+  }, [trackedWallet?.walletName, walletRepo.wallets]);
 
   const wagmiAccount = useWagmiAccount();
 
   const account = useMemo(() => {
+    trackedWallet;
     if (!chain) return;
     if (chain.chainType === "cosmos" && cosmosWallet) {
       return {
@@ -44,7 +47,12 @@ export function useAccount(context: TrackWalletCtx) {
         chainType: chain.chainType,
         connect: () => {
           return cosmosWallet.connect().then(() => {
-            trackWallet.track(context, chain.chainID, cosmosWallet.walletName);
+            trackWallet.track(
+              context,
+              chain.chainID,
+              cosmosWallet.walletName,
+              chain.chainType,
+            );
           });
         },
         disconnect: () => {
@@ -77,6 +85,7 @@ export function useAccount(context: TrackWalletCtx) {
               context,
               chain.chainID,
               wagmiAccount.connector!.id,
+              chain.chainType,
             );
           });
         },
@@ -87,7 +96,7 @@ export function useAccount(context: TrackWalletCtx) {
         },
       };
     }
-  }, [chain, cosmosWallet, wagmiAccount]);
+  }, [chain, context, cosmosWallet, trackedWallet, wagmiAccount]);
 
   return account;
 }
