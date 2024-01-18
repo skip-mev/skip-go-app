@@ -31,7 +31,6 @@ interface Props {
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
-  showSlippage?: boolean;
   context?: "src" | "dest";
   isLoading?: boolean;
 }
