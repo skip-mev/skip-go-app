@@ -24,9 +24,7 @@ const buildInfo: [string, ReactNode][] = [
 ];
 
 export const BuildInfo = () => {
-  const [show, setShow] = useState(
-    () => process.env.NEXT_PUBLIC_VERCEL_ENV !== "production",
-  );
+  const [show, setShow] = useState(() => process.env.NEXT_PUBLIC_VERCEL_ENV !== "production");
 
   useEffect(() => {
     return tinykeys(window, {
@@ -37,17 +35,15 @@ export const BuildInfo = () => {
   if (!show) return null;
 
   return (
-    <div
-      className={clsx(
-        "fixed bottom-2 left-2",
-        "bg-white border p-2 rounded shadow-md space-y-2 w-[300px]",
-      )}
-    >
+    <div className={clsx("fixed bottom-2 left-2", "w-[300px] space-y-2 rounded border bg-white p-2 shadow-md")}>
       <dl>
         {buildInfo.map(
           ([k, v], i) =>
             v && (
-              <div key={i} className="grid grid-cols-3 space-x-2 py-px text-sm">
+              <div
+                key={i}
+                className="grid grid-cols-3 space-x-2 py-px text-sm"
+              >
                 <dd className="col-span-1 truncate">{k}</dd>
                 <dt className="col-span-2 truncate">
                   {typeof v === "string" && /^https?:\/\//.test(v) ? (
@@ -69,7 +65,7 @@ export const BuildInfo = () => {
       </dl>
       <hr />
       <button
-        className="text-center text-xs text-neutral-500 w-full relative before:absolute before:-inset-1 before:content-['']"
+        className="relative w-full text-center text-xs text-neutral-500 before:absolute before:-inset-1 before:content-['']"
         onClick={() => setShow((prev) => !prev)}
       >
         shift+esc to toggle, click here to close

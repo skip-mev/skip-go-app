@@ -13,7 +13,7 @@ interface Props {
   isLoading?: boolean;
   route?: RouteResponse;
   transactionCount: number;
-  insufficientBalance?: boolean;
+  insufficientBalance?: boolean | string;
   shouldShowPriceImpactWarning?: boolean;
   routeWarningMessage?: string;
   routeWarningTitle?: string;
@@ -47,22 +47,16 @@ function TransactionDialog({
       control.open();
       setHasDisplayedWarning(true);
     }
-  }, [
-    control,
-    setHasDisplayedWarning,
-    isOpen,
-    hasDisplayedWarning,
-    shouldShowPriceImpactWarning,
-  ]);
+  }, [control, setHasDisplayedWarning, isOpen, hasDisplayedWarning, shouldShowPriceImpactWarning]);
 
   return (
     <Fragment>
       <div>
         <button
           className={clsx(
-            "bg-[#FF486E] text-white font-semibold py-4 rounded-md w-full outline-none transition-[opacity,transform]",
+            "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-[opacity,transform]",
             "disabled:cursor-not-allowed disabled:opacity-75",
-            "enabled:hover:scale-105 enabled:hover:rotate-1",
+            "enabled:hover:rotate-1 enabled:hover:scale-105",
           )}
           disabled={!route || (typeof isLoading === "boolean" && isLoading)}
           onClick={() => setIsOpen(true)}
@@ -70,7 +64,7 @@ function TransactionDialog({
           Preview Route
         </button>
         {isOpen && (
-          <div className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
+          <div className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
             {route && (
               <TransactionDialogContent
                 route={route}

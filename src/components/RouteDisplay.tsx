@@ -1,11 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
-import { FC, Fragment, useMemo, useState } from "react";
+import { Dispatch, FC, Fragment, SetStateAction, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
 import { useChainByID } from "@/hooks/useChains";
-import { getChainLogo } from "@/lib/cosmos";
+import { useBroadcastedTxsStatus } from "@/solve";
+
+import { AdaptiveLink } from "./AdaptiveLink";
+import { BroadcastedTx } from "./TransactionDialog/TransactionDialogContent";
 
 export interface SwapVenueConfig {
   name: string;
@@ -19,18 +23,15 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
   },
   "terra-astroport": {
     name: "Terra Astroport",
-    imageURL:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
+    imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
   },
   "osmosis-poolmanager": {
     name: "Osmosis",
-    imageURL:
-      "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
+    imageURL: "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/osmosis/dappImg/app.png",
   },
   "neutron-lido-satellite": {
     name: "Neutron Lido Satellite",
-    imageURL:
-      "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
+    imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
   },
 };
 
@@ -39,6 +40,7 @@ interface TransferAction {
   asset: string;
   sourceChain: string;
   destinationChain: string;
+  id: string;
 }
 
 interface SwapAction {
@@ -47,6 +49,7 @@ interface SwapAction {
   destinationAsset: string;
   chain: string;
   venue: string;
+  id: string;
 }
 
 type Action = TransferAction | SwapAction;
@@ -59,9 +62,9 @@ const RouteEnd: FC<{
 }> = ({ amount, symbol, logo, chain }) => {
   return (
     <div className="flex items-center gap-2">
-      <div className="bg-white w-14 h-14 border-2 border-neutral-200 p-1.5 rounded-full">
+      <div className="h-14 w-14 rounded-full border-2 border-neutral-200 bg-white p-1.5">
         <img
-          className="w-full h-full rounded-full"
+          className="h-full w-full rounded-full"
           src={logo}
           alt="Osmosis Logo"
         />
@@ -76,9 +79,64 @@ const RouteEnd: FC<{
   );
 };
 
-const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
+const TransferStep: FC<{
+  action: TransferAction;
+  id: string;
+  statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
+}> = ({ action, id, statusData }) => {
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
+
+  // format: operationType-<operationTypeCount>-<operationIndex>
+  const operationCount = Number(id.split("-")[1]);
+  const transfer = statusData?.transferSequence[operationCount];
+
+  // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
+  const transferState = useMemo(() => {
+    switch (transfer?.state) {
+      case "TRANSFER_SUCCESS":
+        return (
+          <div className="rounded bg-white">
+            <CheckCircleIcon className="h-6 w-6 text-green-400" />
+          </div>
+        );
+      case "TRANSFER_RECEIVED":
+        return (
+          <div className="rounded bg-white">
+            <CheckCircleIcon className="h-6 w-6 text-green-400" />
+          </div>
+        );
+      case "TRANSFER_FAILURE":
+        return (
+          <div className="rounded bg-white">
+            <XCircleIcon className="h-6 w-6 text-red-400" />
+          </div>
+        );
+      case "TRANSFER_PENDING":
+        return (
+          <div className="rounded-full border-2 bg-white p-1">
+            <Spinner />
+          </div>
+        );
+
+      default:
+        return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+    }
+  }, [transfer?.state]);
+
+  const renderExplorerLink = () => {
+    if (!transfer?.explorerLink) return null;
+    return (
+      <AdaptiveLink
+        className="text-xs font-semibold text-[#FF486E] underline"
+        href={transfer.explorerLink}
+      >
+        <span>
+          {transfer.explorerLink.split("/").at(-1)?.slice(0, 6)}…{transfer.explorerLink.split("/").at(-1)?.slice(-6)}
+        </span>
+      </AdaptiveLink>
+    );
+  };
 
   const { getAsset } = useAssets();
 
@@ -91,22 +149,19 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 
   if (!asset) {
     return (
-      <div className="flex items-center gap-2 justify-between">
-        <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
-          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
-        </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{transferState}</div>
         <div className="flex-1">
-          <p className="text-sm text-neutral-500 break-all max-w-full">
+          <p className="max-w-full break-all text-sm text-neutral-500">
             Transfer to{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
-              src={getChainLogo(destinationChain)}
+              className="-mt-1 inline-block h-4 w-4"
+              src={destinationChain.logoURI}
               alt=""
             />{" "}
-            <span className="font-semibold text-black">
-              {destinationChain.prettyName}
-            </span>
+            <span className="font-semibold text-black">{destinationChain.prettyName}</span>
           </p>
+          {renderExplorerLink()}
         </div>
       </div>
     );
@@ -114,48 +169,43 @@ const TransferStep: FC<{ action: TransferAction }> = ({ action }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
-        <div className="w-2 h-2 bg-neutral-200 rounded-full" />
-      </div>
+      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{transferState}</div>
       <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Transfer{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="-mt-1 inline-block h-4 w-4"
             src={asset.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{asset.symbol}</span> from{" "}
+          <span className="font-semibold text-black">{asset.recommendedSymbol}</span> from{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={getChainLogo(sourceChain)}
+            className="-mt-1 inline-block h-4 w-4 rounded-full"
+            src={sourceChain.logoURI}
             alt=""
-            onError={(e) =>
-              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
-            }
+            onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
           />{" "}
-          <span className="font-semibold text-black">
-            {sourceChain.prettyName}
-          </span>{" "}
-          to{" "}
+          <span className="font-semibold text-black">{sourceChain.prettyName}</span> to{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1 rounded-full"
-            src={getChainLogo(destinationChain)}
+            className="-mt-1 inline-block h-4 w-4 rounded-full"
+            src={destinationChain.logoURI}
             alt=""
-            onError={(e) =>
-              (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")
-            }
+            onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
           />{" "}
-          <span className="font-semibold text-black">
-            {destinationChain.prettyName}
-          </span>
+          <span className="font-semibold text-black">{destinationChain.prettyName}</span>
         </p>
+        {renderExplorerLink()}
       </div>
     </div>
   );
 };
 
-const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
+const SwapStep: FC<{
+  action: SwapAction;
+  actions: Action[];
+  id: string;
+  statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
+}> = ({ action, actions, id, statusData }) => {
   const { getAsset } = useAssets();
 
   const assetIn = getAsset(action.sourceAsset, action.chain);
@@ -164,37 +214,81 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
 
   const venue = SWAP_VENUES[action.venue];
 
+  // format: operationType-<operationTypeCount>-<operationIndex>
+  const operationIndex = Number(id.split("-")[2]);
+  const operationCount = Number(
+    actions
+      // We can assume that the swap operation by the previous transfer
+      .find((x) => Number(x.id.split("-")[2]) === operationIndex - 1)
+      ?.id.split("-")[1],
+  );
+  const swap = statusData?.transferSequence[operationCount];
+
+  // as for swap operations, we can assume that the swap is successful if the previous transfer state is TRANSFER_SUCCESS
+  const swapState = useMemo(() => {
+    switch (swap?.state) {
+      case "TRANSFER_RECEIVED":
+        return (
+          <div className="rounded-full border-2 bg-white p-1">
+            <Spinner />
+          </div>
+        );
+      case "TRANSFER_SUCCESS":
+        return (
+          <div className="rounded bg-white">
+            <CheckCircleIcon className="h-6 w-6 text-green-400" />
+          </div>
+        );
+      case "TRANSFER_FAILURE":
+        return (
+          <div className="rounded bg-white">
+            <XCircleIcon className="h-6 w-6 text-red-400" />
+          </div>
+        );
+
+      default:
+        return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+    }
+  }, [swap?.state]);
+
+  const renderExplorerLink = () => {
+    if (!swap?.explorerLink) return null;
+    if (swap?.state !== "TRANSFER_SUCCESS") return null;
+    return (
+      <AdaptiveLink
+        className="text-xs font-semibold text-[#FF486E] underline"
+        href={swap.explorerLink}
+      >
+        <span>
+          {swap.explorerLink.split("/").at(-1)?.slice(0, 6)}…{swap.explorerLink.split("/").at(-1)?.slice(-6)}
+        </span>
+      </AdaptiveLink>
+    );
+  };
+
   if (!assetIn && assetOut) {
     return (
       <div className="flex items-center gap-2">
-        <div className="w-14 h-14 flex items-center justify-center">
-          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
-        </div>
+        <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
         <div className="max-w-[18rem]">
           <p className="text-sm text-neutral-500">
             Swap to{" "}
             <img
               alt=""
-              className="inline-block w-4 h-4 -mt-1"
-              onError={(e) =>
-                (e.currentTarget.src =
-                  "https://api.dicebear.com/6.x/shapes/svg")
-              }
+              className="-mt-1 inline-block h-4 w-4"
+              onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               src={assetOut.logoURI}
             />{" "}
-            <span className="font-semibold text-black">{assetOut.symbol}</span>{" "}
-            on{" "}
+            <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span> on{" "}
             <img
               alt=""
-              className="inline-block w-4 h-4 -mt-1"
-              onError={(e) =>
-                (e.currentTarget.src =
-                  "https://api.dicebear.com/6.x/shapes/svg")
-              }
+              className="-mt-1 inline-block h-4 w-4"
+              onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               src={venue.imageURL}
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
+          {renderExplorerLink()}
         </div>
       </div>
     );
@@ -203,26 +297,24 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
   if (assetIn && !assetOut) {
     return (
       <div className="flex items-center gap-2">
-        <div className="w-14 h-14 flex items-center justify-center">
-          <div className="w-2 h-2 bg-neutral-200 rounded-full" />
-        </div>
+        <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
         <div>
           <p className="text-sm text-neutral-500">
             Swap{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
+              className="-mt-1 inline-block h-4 w-4"
               src={assetIn.logoURI}
               alt=""
             />{" "}
-            <span className="font-semibold text-black">{assetIn.symbol}</span>{" "}
-            on{" "}
+            <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span> on{" "}
             <img
-              className="inline-block w-4 h-4 -mt-1"
+              className="-mt-1 inline-block h-4 w-4"
               src={venue.imageURL}
               alt=""
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
+          {renderExplorerLink()}
         </div>
       </div>
     );
@@ -234,31 +326,30 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-14 h-14 flex items-center justify-center">
-        <div className="w-2 h-2 bg-neutral-200 rounded-full" />
-      </div>
+      <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
       <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Swap{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="-mt-1 inline-block h-4 w-4"
             src={assetIn.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{assetIn.symbol}</span> for{" "}
+          <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span> for{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="-mt-1 inline-block h-4 w-4"
             src={assetOut.logoURI}
             alt=""
           />{" "}
-          <span className="font-semibold text-black">{assetOut.symbol}</span> on{" "}
+          <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span> on{" "}
           <img
-            className="inline-block w-4 h-4 -mt-1"
+            className="-mt-1 inline-block h-4 w-4"
             src={venue.imageURL}
             alt=""
           />{" "}
           <span className="font-semibold text-black">{venue.name}</span>
         </p>
+        {renderExplorerLink()}
       </div>
     </div>
   );
@@ -266,22 +357,17 @@ const SwapStep: FC<{ action: SwapAction }> = ({ action }) => {
 
 interface Props {
   route: RouteResponse;
+  isRouteExpanded: boolean;
+  setIsRouteExpanded: Dispatch<SetStateAction<boolean>>;
+  broadcastedTxs?: BroadcastedTx[];
 }
 
-const RouteDisplay: FC<Props> = ({ route }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
+const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, broadcastedTxs }) => {
   const { getAsset } = useAssets();
 
-  const sourceAsset = getAsset(
-    route.sourceAssetDenom,
-    route.sourceAssetChainID,
-  );
+  const sourceAsset = getAsset(route.sourceAssetDenom, route.sourceAssetChainID);
 
-  const destinationAsset = getAsset(
-    route.destAssetDenom,
-    route.destAssetChainID,
-  );
+  const destinationAsset = getAsset(route.destAssetDenom, route.destAssetChainID);
 
   const { data: sourceChain } = useChainByID(route.sourceAssetChainID);
   const { data: destinationChain } = useChainByID(route.destAssetChainID);
@@ -296,10 +382,7 @@ const RouteDisplay: FC<Props> = ({ route }) => {
 
   const amountOut = useMemo(() => {
     try {
-      return ethers.formatUnits(
-        route.estimatedAmountOut ?? 0,
-        destinationAsset?.decimals ?? 6,
-      );
+      return ethers.formatUnits(route.estimatedAmountOut ?? 0, destinationAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
@@ -308,6 +391,8 @@ const RouteDisplay: FC<Props> = ({ route }) => {
   const actions = useMemo(() => {
     const _actions: Action[] = [];
 
+    let swapCount = 0;
+    let transferCount = 0;
     let asset = route.sourceAssetDenom;
 
     route.operations.forEach((operation, i) => {
@@ -317,17 +402,13 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             type: "SWAP",
             sourceAsset: operation.swap.swapIn.swapOperations[0].denomIn,
             destinationAsset:
-              operation.swap.swapIn.swapOperations[
-                operation.swap.swapIn.swapOperations.length - 1
-              ].denomOut,
+              operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut,
             chain: operation.swap.swapIn.swapVenue.chainID,
             venue: operation.swap.swapIn.swapVenue.name,
+            id: `swap-${swapCount}-${i}`,
           });
 
-          asset =
-            operation.swap.swapIn.swapOperations[
-              operation.swap.swapIn.swapOperations.length - 1
-            ].denomOut;
+          asset = operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut;
         }
 
         if ("swapOut" in operation.swap) {
@@ -335,19 +416,15 @@ const RouteDisplay: FC<Props> = ({ route }) => {
             type: "SWAP",
             sourceAsset: operation.swap.swapOut.swapOperations[0].denomIn,
             destinationAsset:
-              operation.swap.swapOut.swapOperations[
-                operation.swap.swapOut.swapOperations.length - 1
-              ].denomOut,
+              operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut,
             chain: operation.swap.swapOut.swapVenue.chainID,
             venue: operation.swap.swapOut.swapVenue.name,
+            id: `swap-${swapCount}-${i}`,
           });
 
-          asset =
-            operation.swap.swapOut.swapOperations[
-              operation.swap.swapOut.swapOperations.length - 1
-            ].denomOut;
+          asset = operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut;
         }
-
+        swapCount++;
         return;
       }
 
@@ -357,10 +434,11 @@ const RouteDisplay: FC<Props> = ({ route }) => {
           asset,
           sourceChain: operation.axelarTransfer.fromChainID,
           destinationChain: operation.axelarTransfer.toChainID,
+          id: `transfer-${transferCount}-${i}`,
         });
 
         asset = operation.axelarTransfer.asset;
-
+        transferCount++;
         return;
       }
 
@@ -391,54 +469,73 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         asset,
         sourceChain,
         destinationChain,
+        id: `transfer-${transferCount}-${i}`,
       });
 
       asset = operation.transfer.destDenom;
+      transferCount++;
     });
 
     return _actions;
   }, [route]);
 
+  const { data: statusData } = useBroadcastedTxsStatus(route.txsRequired, broadcastedTxs);
+
   return (
     <div className="relative h-full">
-      <div className="absolute w-14 inset-y-0 py-7 flex justify-center items-center">
-        <div className="w-0.5 h-full bg-neutral-200"></div>
+      <div className="absolute inset-y-0 flex w-14 items-center justify-center py-7">
+        <div className="h-full w-0.5 bg-neutral-200"></div>
       </div>
-      <div className="relative flex flex-col gap-4 justify-between h-full">
+      <div className="relative flex h-full flex-col justify-between gap-4">
         <div className="flex items-center justify-between pr-4">
           <RouteEnd
             amount={amountIn}
-            symbol={sourceAsset?.symbol ?? "UNKNOWN"}
+            symbol={sourceAsset?.recommendedSymbol ?? "UNKNOWN"}
             logo={sourceAsset?.logoURI ?? "UNKNOWN"}
             chain={sourceChain?.prettyName ?? ""}
           />
-          {isExpanded && (
+          {isRouteExpanded && (
             <button
               className="text-xs font-medium text-[#FF486E] hover:underline"
-              onClick={() => setIsExpanded(false)}
+              onClick={() => setIsRouteExpanded(false)}
             >
               Hide Details
             </button>
           )}
         </div>
-        {isExpanded &&
-          actions.map((action, i) => (
-            <Fragment key={i}>
-              {action.type === "SWAP" && <SwapStep action={action} />}
-              {action.type === "TRANSFER" && <TransferStep action={action} />}
-            </Fragment>
-          ))}
-        {!isExpanded && (
-          <div className="w-14 flex items-center justify-center h-14">
+        {isRouteExpanded &&
+          actions.map((action, i) => {
+            return (
+              <Fragment key={i}>
+                {action.type === "SWAP" && (
+                  <SwapStep
+                    action={action}
+                    actions={actions}
+                    id={action.id}
+                    statusData={statusData}
+                  />
+                )}
+                {action.type === "TRANSFER" && (
+                  <TransferStep
+                    action={action}
+                    id={action.id}
+                    statusData={statusData}
+                  />
+                )}
+              </Fragment>
+            );
+          })}
+        {!isRouteExpanded && (
+          <div className="flex h-14 w-14 items-center justify-center">
             <button
-              className="bg-white text-neutral-400 border-2 border-neutral-200 rounded-full p-1 transition-transform hover:scale-110"
-              onClick={() => setIsExpanded(true)}
+              className="rounded-full border-2 border-neutral-200 bg-white p-1 text-neutral-400 transition-transform hover:scale-110"
+              onClick={() => setIsRouteExpanded(true)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                className="w-4 h-4"
+                className="h-4 w-4"
               >
                 <path
                   fillRule="evenodd"
@@ -451,12 +548,37 @@ const RouteDisplay: FC<Props> = ({ route }) => {
         )}
         <RouteEnd
           amount={amountOut}
-          symbol={destinationAsset?.symbol ?? "UNKNOWN"}
+          symbol={destinationAsset?.recommendedSymbol ?? "UNKNOWN"}
           logo={destinationAsset?.logoURI ?? "UNKNOWN"}
           chain={destinationChain?.prettyName ?? ""}
         />
       </div>
     </div>
+  );
+};
+
+const Spinner = () => {
+  return (
+    <svg
+      className="h-4 w-4 animate-spin text-[#FF486E]"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx={12}
+        cy={12}
+        r={10}
+        stroke="currentColor"
+        strokeWidth={4}
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
   );
 };
 

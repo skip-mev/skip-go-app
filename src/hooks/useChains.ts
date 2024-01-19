@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { chainIdToName } from "@/chains";
 import { chainIdToPrettyName } from "@/chains/pretty";
 import { useSkipClient } from "@/solve";
+import { getChainLogo } from "@/utils/chain";
 
 export type Chain = SkipChain & {
   prettyName: string;
-  registryChainName: string;
 };
 
 export type UseChainsQueryArgs<T = Chain[]> = {
@@ -21,7 +21,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   const skipClient = useSkipClient();
 
   return useQuery({
-    queryKey: ["skip-api-chains"],
+    queryKey: ["USE_CHAINS"],
     queryFn: async () => {
       const chains = await skipClient.chains({
         includeEVM: true,
@@ -33,7 +33,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
             ...chain,
             chainName: chainIdToName[chain.chainID] || chain.chainName,
             prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
-            registryChainName: chainIdToName[chain.chainID],
+            logoURI: getChainLogo(chain),
           };
         })
         .sort((chainA, chainB) => {

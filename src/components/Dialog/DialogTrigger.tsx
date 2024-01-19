@@ -8,7 +8,11 @@ export const DialogTrigger = forwardRef(function DialogTrigger(
   ref: ForwardedRef<HTMLButtonElement>,
 ) {
   return (
-    <RadixDialog.Trigger asChild ref={ref} {...props}>
+    <RadixDialog.Trigger
+      asChild
+      ref={ref}
+      {...props}
+    >
       {children}
     </RadixDialog.Trigger>
   );

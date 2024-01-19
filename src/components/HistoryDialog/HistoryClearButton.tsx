@@ -14,7 +14,10 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
   if (!hasHistory) return null;
 
   return (
-    <SimpleTooltip label="Clear transaction history" type="warning">
+    <SimpleTooltip
+      label="Clear transaction history"
+      type="warning"
+    >
       <button
         className={clsx(
           "text-xs font-semibold text-[#FF486E]",
@@ -27,7 +30,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
         onClick={() => clearTxHistory()}
         {...props}
       >
-        <TrashIcon className="w-4 h-4" />
+        <TrashIcon className="h-4 w-4" />
       </button>
     </SimpleTooltip>
   );

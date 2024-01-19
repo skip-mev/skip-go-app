@@ -6,13 +6,7 @@ import { useState } from "react";
 import { SwapWidget } from "@/components/SwapWidget";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { useAssets } from "@/context/assets";
-import {
-  failTxHistory,
-  successTxHistory,
-  TxHistoryItem,
-  updateTxStatus,
-  useTxHistory,
-} from "@/context/tx-history";
+import { failTxHistory, successTxHistory, TxHistoryItem, updateTxStatus, useTxHistory } from "@/context/tx-history";
 import { getBalancesByChain } from "@/hooks/useBalancesByChain";
 import { useInterval } from "@/hooks/useInterval";
 import { queryClient } from "@/lib/react-query";
@@ -41,9 +35,7 @@ function historyItemIsMissingAxelarlarscanLink(historyItem: TxHistoryItem) {
   return true;
 }
 
-function maybeGetAxelarscanLinkFromTransactionStatus(
-  status: TxStatusResponse,
-): string | undefined {
+function maybeGetAxelarscanLinkFromTransactionStatus(status: TxStatusResponse): string | undefined {
   for (const seqEvent of status.transferSequence) {
     if ("axelarTransfer" in seqEvent) {
       if ("contractCallWithTokenTxs" in seqEvent.axelarTransfer.txs) {
@@ -62,13 +54,8 @@ function maybeGetAxelarscanLinkFromTransactionStatus(
   return undefined;
 }
 
-async function updatePendingRoute(
-  id: string,
-  historyItem: TxHistoryItem,
-  skipClient: SkipRouter,
-) {
-  const firstTx =
-    historyItem.txStatus.length > 0 ? historyItem.txStatus[0] : undefined;
+async function updatePendingRoute(id: string, historyItem: TxHistoryItem, skipClient: SkipRouter) {
+  const firstTx = historyItem.txStatus.length > 0 ? historyItem.txStatus[0] : undefined;
 
   if (!firstTx) {
     return;
@@ -92,11 +79,7 @@ async function updatePendingRoute(
   }
 }
 
-async function updateAxelarscanLink(
-  id: string,
-  historyItem: TxHistoryItem,
-  skipClient: SkipRouter,
-) {
+async function updateAxelarscanLink(id: string, historyItem: TxHistoryItem, skipClient: SkipRouter) {
   for (const tx of historyItem.txStatus) {
     try {
       const status = await skipClient.transactionStatus({
@@ -104,8 +87,7 @@ async function updateAxelarscanLink(
         txHash: tx.txHash,
       });
 
-      const axelarscanLink =
-        maybeGetAxelarscanLinkFromTransactionStatus(status);
+      const axelarscanLink = maybeGetAxelarscanLinkFromTransactionStatus(status);
 
       if (axelarscanLink && !tx.axelarscanLink) {
         if (axelarscanLink) {
@@ -129,16 +111,9 @@ export default function Home() {
 
   async function prefetchBalances(address: string, chainID: string) {
     try {
-      const balances = await getBalancesByChain(
-        address,
-        chainID,
-        assetsByChainID(chainID),
-      );
+      const balances = await getBalancesByChain(address, chainID, assetsByChainID(chainID));
 
-      queryClient.setQueryData(
-        ["balances-by-chain", address, chainID],
-        balances,
-      );
+      queryClient.setQueryData(["balances-by-chain", address, chainID], balances);
     } catch {
       /* empty */
     }
@@ -148,8 +123,7 @@ export default function Home() {
     for (const [id, historyItem] of Object.entries(history)) {
       if (
         skipIfOlderThanMinutes &&
-        differenceInMinutes(new Date(), parseISO(historyItem.timestamp)) >
-          skipIfOlderThanMinutes
+        differenceInMinutes(new Date(), parseISO(historyItem.timestamp)) > skipIfOlderThanMinutes
       ) {
         continue;
       }
@@ -184,8 +158,8 @@ export default function Home() {
   }, 1000 * 2);
 
   return (
-    <div className="flex flex-col items-center flex-grow">
-      <div className="bg-white shadow-xl sm:rounded-3xl p-6 relative w-screen sm:max-w-[450px]">
+    <div className="flex flex-grow flex-col items-center">
+      <div className="relative w-screen bg-white p-6 shadow-xl sm:max-w-[450px] sm:rounded-3xl">
         <WalletModalProvider>
           <SwapWidget />
         </WalletModalProvider>

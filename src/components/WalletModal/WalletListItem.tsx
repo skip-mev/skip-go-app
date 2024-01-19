@@ -17,17 +17,15 @@ type Props = ComponentProps<"div"> & {
   walletName: string;
 };
 
-export const WalletListItem = ({
-  children,
-  chainType,
-  walletName,
-  ...props
-}: Props) => {
+export const WalletListItem = ({ children, chainType, walletName, ...props }: Props) => {
   const Component = useMemo(() => {
     return chainType === "cosmos" ? CosmosWalletListItem : EvmWalletListItem;
   }, [chainType]);
   return (
-    <Component walletName={walletName} {...props}>
+    <Component
+      walletName={walletName}
+      {...props}
+    >
       {children}
     </Component>
   );

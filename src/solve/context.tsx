@@ -6,19 +6,18 @@ import { useNetwork as useWagmiNetwork } from "wagmi";
 
 import { chainIdToName } from "@/chains";
 import { API_URL } from "@/constants/api";
-import { getTrackAccount } from "@/context/account";
+import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
 import { isWalletClientUsingLedger } from "@/utils/wallet";
 
-export const SkipContext = createContext<
-  { skipClient: SkipRouter } | undefined
->(undefined);
+export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
 export function SkipProvider({ children }: { children: ReactNode }) {
   const { chains } = useWagmiNetwork();
   const { getWalletRepo } = useManager();
 
   const skipClient = new SkipRouter({
+    clientID: process.env.NEXT_PUBLIC_CLIENT_ID,
     apiURL: API_URL,
     getCosmosSigner: async (chainID) => {
       const chainName = chainIdToName[chainID];
@@ -26,24 +25,20 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
 
-      const walletName = getTrackAccount(chainID);
+      const walletName = trackWallet.get().source?.walletName;
       const wallet = getWalletRepo(chainName).wallets.find((w) => {
         return w.walletName === walletName;
       });
 
       if (!wallet) {
-        throw new Error(
-          `getCosmosSigner error: unknown walletName '${walletName}'`,
-        );
+        throw new Error(`getCosmosSigner error: unknown walletName '${walletName}'`);
       }
 
       const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
       await wallet.initOfflineSigner(isLedger ? "amino" : "direct");
 
       if (!wallet.offlineSigner) {
-        throw new Error(
-          `getCosmosSigner error: no offlineSigner for walletName '${walletName}'`,
-        );
+        throw new Error(`getCosmosSigner error: no offlineSigner for walletName '${walletName}'`);
       }
 
       return wallet.offlineSigner;
@@ -93,9 +88,5 @@ export function SkipProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  return (
-    <SkipContext.Provider value={{ skipClient }}>
-      {children}
-    </SkipContext.Provider>
-  );
+  return <SkipContext.Provider value={{ skipClient }}>{children}</SkipContext.Provider>;
 }

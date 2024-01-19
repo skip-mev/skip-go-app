@@ -13,16 +13,14 @@ const ChainSelectTrigger = forwardRef<HTMLButtonElement, Props>(
     return (
       <button
         className={clsx(
-          "flex items-center px-4 py-2 sm:py-4 w-full",
-          "font-semibold text-left whitespace-nowrap bg-neutral-100 rounded-md transition-colors",
+          "flex w-full items-center px-4 py-2 sm:py-4",
+          "whitespace-nowrap rounded-md bg-neutral-100 text-left font-semibold transition-colors",
           "border border-neutral-200 hover:border-neutral-300",
         )}
         ref={ref}
         {...props}
       >
-        <span className="flex-1">
-          {chain ? chain.prettyName : "Select Chain"}
-        </span>
+        <span className="flex-1">{chain ? chain.prettyName : "Select Chain"}</span>
         <ChevronDownIcon className="mt-0.5 h-4 w-4" />
       </button>
     );

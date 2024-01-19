@@ -5,15 +5,10 @@ import { publicProvider } from "wagmi/providers/public";
 
 import { EVM_CHAINS } from "@/constants/wagmi";
 
-const { publicClient, chains } = configureChains(EVM_CHAINS, [
-  publicProvider(),
-]);
+const { publicClient, chains } = configureChains(EVM_CHAINS, [publicProvider()]);
 
 export const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: [
-    new MetaMaskConnector({ chains }),
-    new InjectedConnector({ chains }),
-  ],
+  connectors: [new MetaMaskConnector({ chains }), new InjectedConnector({ chains })],
   publicClient,
 });

@@ -7,10 +7,7 @@ import { multicall3ABI } from "@/constants/abis";
 import { AssetWithMetadata } from "@/context/assets";
 import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
-import {
-  getCosmWasmClientForChainID,
-  getStargateClientForChainID,
-} from "@/utils/clients";
+import { getCosmWasmClientForChainID, getStargateClientForChainID } from "@/utils/clients";
 
 export function useBalancesByChain(
   address?: string,
@@ -25,19 +22,14 @@ export function useBalancesByChain(
   const skipClient = useSkipClient();
 
   return useQuery({
-    queryKey: ["balances-by-chain", address, chain, assets],
+    queryKey: ["USE_BALANCES_BY_CHAIN", address, chain, assets],
     queryFn: async () => {
       if (!chain || !address) {
         return {};
       }
 
       if (chain.chainType === "evm") {
-        return getEvmChainBalances(
-          skipClient,
-          publicClient,
-          address,
-          chain.chainID,
-        );
+        return getEvmChainBalances(skipClient, publicClient, address, chain.chainID);
       }
 
       return getBalancesByChain(address, chain.chainID, assets ?? []);
@@ -47,11 +39,7 @@ export function useBalancesByChain(
   });
 }
 
-export async function getBalancesByChain(
-  address: string,
-  chainID: ChainId,
-  assets: AssetWithMetadata[],
-) {
+export async function getBalancesByChain(address: string, chainID: ChainId, assets: AssetWithMetadata[]) {
   const client = await getStargateClientForChainID(chainID);
   const cosmwasmClient = await getCosmWasmClientForChainID(chainID);
 

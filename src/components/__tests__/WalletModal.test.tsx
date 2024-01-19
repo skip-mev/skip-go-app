@@ -12,7 +12,12 @@ describe("WalletModal", () => {
     const wallets: MinimalWallet[] = [];
 
     await act(async () => {
-      render(<WalletModal wallets={wallets} onClose={onClose} />);
+      render(
+        <WalletModal
+          wallets={wallets}
+          onClose={onClose}
+        />,
+      );
     });
   });
 
@@ -35,7 +40,12 @@ describe("WalletModal", () => {
     const wallets: MinimalWallet[] = [keplr];
 
     await act(async () => {
-      render(<WalletModal wallets={wallets} onClose={onClose} />);
+      render(
+        <WalletModal
+          wallets={wallets}
+          onClose={onClose}
+        />,
+      );
     });
 
     await userEvent.click(
@@ -67,7 +77,12 @@ describe("WalletModal", () => {
     const wallets: MinimalWallet[] = [keplr];
 
     await act(async () => {
-      render(<WalletModal wallets={wallets} onClose={onClose} />);
+      render(
+        <WalletModal
+          wallets={wallets}
+          onClose={onClose}
+        />,
+      );
     });
 
     await userEvent.click(

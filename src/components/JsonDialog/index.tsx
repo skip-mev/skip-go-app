@@ -1,8 +1,4 @@
-import {
-  ArrowLeftIcon,
-  CheckIcon,
-  ClipboardDocumentIcon,
-} from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, CheckIcon, ClipboardDocumentIcon } from "@heroicons/react/20/solid";
 import * as Dialog from "@radix-ui/react-dialog";
 import { clsx } from "clsx";
 import { useMemo, useState } from "react";
@@ -29,13 +25,16 @@ export const JsonDialog = () => {
   if (!state) return null;
 
   return (
-    <Dialog.Root modal open>
-      <Dialog.Content className="absolute inset-0 bg-white rounded-3xl overflow-hidden">
+    <Dialog.Root
+      modal
+      open
+    >
+      <Dialog.Content className="absolute inset-0 overflow-hidden rounded-3xl bg-white">
         <button
           className={clsx(
-            "absolute top-5 right-4",
-            "text-sm px-2 py-1 border rounded-lg transition-colors",
-            "flex items-center justify-center space-x-1 flex-grow",
+            "absolute right-4 top-5",
+            "rounded-lg border px-2 py-1 text-sm transition-colors",
+            "flex flex-grow items-center justify-center space-x-1",
             {
               "bg-neutral-100 hover:bg-neutral-200": !copied,
               "bg-green-100 hover:bg-green-200": copied,
@@ -45,22 +44,20 @@ export const JsonDialog = () => {
           onClick={onCopy}
         >
           <span>Copy to clipboard</span>
-          <ClipboardIcon className="w-4 h-4" />
+          <ClipboardIcon className="h-4 w-4" />
         </button>
-        <div className="h-full px-4 py-6 overflow-y-auto scrollbar-hide">
+        <div className="h-full overflow-y-auto px-4 py-6 scrollbar-hide">
           <div className="flex items-center gap-4 pb-2">
             <button
-              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
               onClick={close}
             >
-              <ArrowLeftIcon className="w-6 h-6" />
+              <ArrowLeftIcon className="h-6 w-6" />
             </button>
-            <h3 className="font-bold text-xl">
-              {state.title || "JSON Viewer"}
-            </h3>
+            <h3 className="text-xl font-bold">{state.title || "JSON Viewer"}</h3>
             <div className="flex-grow" />
           </div>
-          <pre className="border font-mono p-2 rounded-lg text-xs overflow-auto">
+          <pre className="overflow-auto rounded-lg border p-2 font-mono text-xs">
             {JSON.stringify(state.data, null, 2)}
           </pre>
         </div>

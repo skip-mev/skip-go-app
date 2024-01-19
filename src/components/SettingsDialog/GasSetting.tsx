@@ -1,27 +1,29 @@
-import { clsx } from "clsx";
-
 import { useSettingsStore } from "@/context/settings";
+import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 
 export const GasSetting = () => {
-  const currentValue = useSettingsStore((state) => state.gas);
+  const currentValue = useSettingsStore((state) => state.gasMultiplier);
 
   return (
-    <div className="flex items-center p-2 space-x-2">
-      <h3>Gas</h3>
+    <div className="flex items-center space-x-2 p-2">
+      <h3>Gas Multiplier</h3>
       <div className="flex-grow" />
-      <div className="flex flex-col items-stretch gap-1 w-full max-w-32">
+      <div className="flex w-full max-w-32 flex-col items-stretch gap-1">
         <div className="relative text-sm">
           <input
-            className={clsx(
-              "border rounded-lg px-2 py-1 tabular-nums transition text-end",
-              "number-input-arrows-hide w-full",
-            )}
-            type="number"
-            value={currentValue}
+            className="w-full rounded-lg border px-2 py-1 text-end tabular-nums transition"
+            type="text"
+            inputMode="numeric"
+            value={formatNumberWithCommas(currentValue)}
             min={0}
             onChange={(event) => {
-              const value = Math.max(0, +event.target.value);
-              useSettingsStore.setState({ gas: value.toString() });
+              let latest = formatNumberWithoutCommas(event.target.value);
+              latest = latest.replace(/^[0]{2,}/, "0"); // Remove leading zeros
+              latest = latest.replace(/[^\d,]/g, ""); // Remove non-numeric and non-decimal characters
+              latest = latest.replace(/[,]{2,}/g, ","); // Remove multiple commas
+
+              const value = Math.max(0, +latest);
+              useSettingsStore.setState({ gasMultiplier: value.toString() });
             }}
           />
         </div>

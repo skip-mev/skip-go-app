@@ -22,49 +22,50 @@ export const HistoryDialog = () => {
   }, [history, isReady]);
 
   return (
-    <Dialog.Root modal open={isOpen}>
-      <Dialog.Content className="absolute inset-0 bg-white rounded-3xl animate-fade-zoom-in">
-        <div className="flex flex-col h-full px-4 py-6 space-y-2">
+    <Dialog.Root
+      modal
+      open={isOpen}
+    >
+      <Dialog.Content className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
+        <div className="flex h-full flex-col space-y-2 px-4 py-6">
           <div className="flex items-center gap-4 pb-2">
             <button
-              className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
               onClick={close}
             >
-              <ArrowLeftIcon className="w-6 h-6" />
+              <ArrowLeftIcon className="h-6 w-6" />
             </button>
-            <h3 className="font-bold text-xl">Transaction History</h3>
+            <h3 className="text-xl font-bold">Transaction History</h3>
             <div className="flex-grow" />
             <HistoryClearButton />
           </div>
           <ScrollArea.Root
             className={clsx(
-              "overflow-hidden -mx-4 relative isolate",
-              "before:absolute before:bottom-0 before:inset-x-0 before:h-2 before:z-10",
+              "relative isolate -mx-4 overflow-hidden",
+              "before:absolute before:inset-x-0 before:bottom-0 before:z-10 before:h-2",
               "before:bg-gradient-to-t before:from-white before:to-transparent",
             )}
           >
-            <ScrollArea.Viewport className="w-full h-full px-4">
+            <ScrollArea.Viewport className="h-full w-full px-4">
               <HistoryList.Root>
                 {entries && entries.length < 1 && (
-                  <span className="text-center text-sm opacity-60 p-2">
-                    No recent transactions.
-                  </span>
+                  <span className="p-2 text-center text-sm opacity-60">No recent transactions.</span>
                 )}
                 {entries?.map(([id, data]) => (
-                  <HistoryList.Item key={id} id={id} data={data} />
+                  <HistoryList.Item
+                    key={id}
+                    id={id}
+                    data={data}
+                  />
                 ))}
-                {!isReady && (
-                  <div className="text-center p-4 opacity-60">
-                    Loading transaction history...
-                  </div>
-                )}
+                {!isReady && <div className="p-4 text-center opacity-60">Loading transaction history...</div>}
               </HistoryList.Root>
             </ScrollArea.Viewport>
             <ScrollArea.Scrollbar
-              className="z-20 flex select-none touch-none transition-colors duration-[160ms] ease-out data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2"
+              className="z-20 flex touch-none select-none transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
               orientation="vertical"
             >
-              <ScrollArea.Thumb className="transition-colors flex-1 bg-neutral-500/50 hover:bg-neutral-500 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2 before:h-2" />
+              <ScrollArea.Thumb className="relative flex-1 rounded-[10px] bg-neutral-500/50 transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-2 before:w-2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-neutral-500" />
             </ScrollArea.Scrollbar>
             <ScrollArea.Corner />
           </ScrollArea.Root>

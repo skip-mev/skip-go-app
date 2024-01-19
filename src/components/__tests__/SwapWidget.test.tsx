@@ -31,8 +31,7 @@ const handlers = [
               channel: "channel-569",
               chain_id: "cosmoshub-4",
               pfm_enabled: true,
-              dest_denom:
-                "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
+              dest_denom: "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
               supports_memo: true,
             },
           },
@@ -46,8 +45,7 @@ const handlers = [
                 swap_operations: [
                   {
                     pool: "neutron1e22zh5p8meddxjclevuhjmfj69jxfsa8uu3jvht72rv9d8lkhves6t8veq",
-                    denom_in:
-                      "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
+                    denom_in: "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
                     denom_out: "untrn",
                   },
                 ],
@@ -95,13 +93,11 @@ describe.skip("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
 
     // Source chain should be Cosmos Hub by default
-    const sourceChainButton =
-      await within(sourceAssetSection).findByText("Cosmos Hub");
+    const sourceChainButton = await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton =
-      await within(sourceAssetSection).findByText("ATOM");
+    const sourceAssetButton = await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     // Update amount in
@@ -119,9 +115,7 @@ describe.skip("SwapWidget", () => {
     // expect(localStorage.getItem(LAST_SOURCE_CHAIN_KEY)).toEqual("osmosis-1");
 
     // Source asset is now OSMO
-    expect(
-      await within(sourceAssetSection).findByText("OSMO"),
-    ).toBeInTheDocument();
+    expect(await within(sourceAssetSection).findByText("OSMO")).toBeInTheDocument();
 
     // Amount in is now empty
     expect(inputAmountElement).toHaveValue("");
@@ -135,8 +129,7 @@ describe.skip("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
 
     // Source asset should be ATOM initially
-    const sourceAssetButton =
-      await within(sourceAssetSection).findByText("ATOM");
+    const sourceAssetButton = await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
     // Select new asset
@@ -155,41 +148,29 @@ describe.skip("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Destination chain should be undefined initially
-    const destinationChainButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Chain");
+    const destinationChainButton = await within(destinationAssetSection).findByText("Select Chain");
     expect(destinationChainButton).toBeInTheDocument();
 
     // Select new destination chain
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Neutron"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Neutron"));
 
     // Destination chain is now Neutron
     expect(destinationChainButton).toHaveTextContent("Neutron");
 
     // Destination asset should be selected
-    const destinationAssetButton = await within(
-      destinationAssetSection,
-    ).findByText("NTRN");
+    const destinationAssetButton = await within(destinationAssetSection).findByText("NTRN");
     expect(destinationAssetButton).toBeInTheDocument();
 
     // Select new destination chain
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Osmosis"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Osmosis"));
 
     // Destination chain is now Osmosis
     expect(destinationChainButton).toHaveTextContent("Osmosis");
 
     // Destination asset should now be OSMO
-    await waitFor(async () =>
-      expect(
-        await within(destinationAssetSection).findByText("OSMO"),
-      ).toBeInTheDocument(),
-    );
+    await waitFor(async () => expect(await within(destinationAssetSection).findByText("OSMO")).toBeInTheDocument());
   });
 
   it("can select destination asset", async () => {
@@ -199,21 +180,15 @@ describe.skip("SwapWidget", () => {
 
     const destinationAssetSection = await screen.findByTestId("destination");
 
-    const destinationChainButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Chain");
+    const destinationChainButton = await within(destinationAssetSection).findByText("Select Chain");
     expect(destinationChainButton).toBeInTheDocument();
 
     // Select Osmosis as destination chain
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Osmosis"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Osmosis"));
 
     // Destination asset should be OSMO initially
-    const destinationAssetButton = await within(
-      destinationAssetSection,
-    ).findByText("OSMO");
+    const destinationAssetButton = await within(destinationAssetSection).findByText("OSMO");
     expect(destinationAssetButton).toBeInTheDocument();
 
     // Select new asset
@@ -221,9 +196,7 @@ describe.skip("SwapWidget", () => {
     fireEvent.click(await within(destinationAssetSection).findByText("CMDX"));
 
     // Destination asset is now CMDX
-    await waitFor(() =>
-      expect(destinationAssetButton).toHaveTextContent("CMDX"),
-    );
+    await waitFor(() => expect(destinationAssetButton).toHaveTextContent("CMDX"));
   });
 
   it("can select destination asset before selecting destination chain", async () => {
@@ -234,14 +207,10 @@ describe.skip("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Destination chain should be undefined
-    const destinationChainButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Chain");
+    const destinationChainButton = await within(destinationAssetSection).findByText("Select Chain");
     expect(destinationChainButton).toBeInTheDocument();
 
-    const destinationAssetButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Token");
+    const destinationAssetButton = await within(destinationAssetSection).findByText("Select Token");
     expect(destinationAssetButton).toBeInTheDocument();
 
     // Select destination asset
@@ -249,18 +218,14 @@ describe.skip("SwapWidget", () => {
     fireEvent.click(await within(destinationAssetSection).findByText("ATOM"));
 
     // Destination chain is now Cosmos Hub
-    await waitFor(() =>
-      expect(destinationChainButton).toHaveTextContent("Cosmos Hub"),
-    );
+    await waitFor(() => expect(destinationChainButton).toHaveTextContent("Cosmos Hub"));
 
     // Destination asset is now ATOM
     await waitFor(() => within(destinationAssetSection).findByText("ATOM"));
 
     // Select new destination chain
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Osmosis"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Osmosis"));
 
     // Destination chain is now Osmosis
     expect(destinationChainButton).toHaveTextContent("Osmosis");
@@ -278,31 +243,23 @@ describe.skip("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Source chain should be selected
-    const sourceChainButton =
-      await within(sourceAssetSection).findByText("Cosmos Hub");
+    const sourceChainButton = await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton =
-      await within(sourceAssetSection).findByText("ATOM");
+    const sourceAssetButton = await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
-    const destinationChainButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Chain");
+    const destinationChainButton = await within(destinationAssetSection).findByText("Select Chain");
 
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Neutron"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Neutron"));
 
     // Destination chain should be selected
     expect(destinationChainButton).toHaveTextContent("Neutron");
 
     // Destination asset should be selected
-    const destinationAssetButton = await within(
-      destinationAssetSection,
-    ).findByText("NTRN");
+    const destinationAssetButton = await within(destinationAssetSection).findByText("NTRN");
     expect(destinationAssetButton).toBeInTheDocument();
 
     const swapButton = await screen.findByTestId("swap-button");
@@ -330,44 +287,32 @@ describe.skip("SwapWidget", () => {
     const destinationAssetSection = await screen.findByTestId("destination");
 
     // Source chain should be selected
-    const sourceChainButton =
-      await within(sourceAssetSection).findByText("Cosmos Hub");
+    const sourceChainButton = await within(sourceAssetSection).findByText("Cosmos Hub");
     expect(sourceChainButton).toBeInTheDocument();
 
     // Source asset should be selected
-    const sourceAssetButton =
-      await within(sourceAssetSection).findByText("ATOM");
+    const sourceAssetButton = await within(sourceAssetSection).findByText("ATOM");
     expect(sourceAssetButton).toBeInTheDocument();
 
-    const destinationChainButton = await within(
-      destinationAssetSection,
-    ).findByText("Select Chain");
+    const destinationChainButton = await within(destinationAssetSection).findByText("Select Chain");
 
     fireEvent.click(destinationChainButton);
-    fireEvent.click(
-      await within(destinationAssetSection).findByText("Neutron"),
-    );
+    fireEvent.click(await within(destinationAssetSection).findByText("Neutron"));
 
     // Destination chain should be selected
     expect(destinationChainButton).toHaveTextContent("Neutron");
 
     // Destination asset should be selected
-    const destinationAssetButton = await within(
-      destinationAssetSection,
-    ).findByText("NTRN");
+    const destinationAssetButton = await within(destinationAssetSection).findByText("NTRN");
     expect(destinationAssetButton).toBeInTheDocument();
 
     // Update amount in
     const inputAmountElement = within(sourceAssetSection).getByRole("textbox");
     fireEvent.change(inputAmountElement, { target: { value: "1" } });
 
-    const outputAmountElement = within(destinationAssetSection).getByTestId(
-      "amount",
-    );
+    const outputAmountElement = within(destinationAssetSection).getByTestId("amount");
 
-    await waitFor(() =>
-      expect(outputAmountElement).toHaveTextContent("25.329854"),
-    );
+    await waitFor(() => expect(outputAmountElement).toHaveTextContent("25.329854"));
   });
 
   it("does not show the connect destination wallet button if the source chain and destination chain are the same chain type", async () => {
@@ -378,12 +323,9 @@ describe.skip("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
     const destinationAssetSection = await screen.findByTestId("destination");
 
-    const sourceChainButton =
-      within(sourceAssetSection).getByText("Cosmos Hub");
+    const sourceChainButton = within(sourceAssetSection).getByText("Cosmos Hub");
 
-    const destinationChainButton = within(destinationAssetSection).getByText(
-      "Select Chain",
-    );
+    const destinationChainButton = within(destinationAssetSection).getByText("Select Chain");
 
     // select Cosmos Hub and Neutron
     await act(() => {
@@ -404,9 +346,7 @@ describe.skip("SwapWidget", () => {
       }),
     );
 
-    expect(
-      screen.queryByTestId("destination-wallet-btn"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("destination-wallet-btn")).not.toBeInTheDocument();
   });
 
   it("displays the connect destination wallet button if the source chain and destination chain are not the same chain type", async () => {
@@ -417,12 +357,9 @@ describe.skip("SwapWidget", () => {
     const sourceAssetSection = await screen.findByTestId("source");
     const destinationAssetSection = await screen.findByTestId("destination");
 
-    const sourceChainButton =
-      within(sourceAssetSection).getByText("Cosmos Hub");
+    const sourceChainButton = within(sourceAssetSection).getByText("Cosmos Hub");
 
-    const destinationChainButton = within(destinationAssetSection).getByText(
-      "Select Chain",
-    );
+    const destinationChainButton = within(destinationAssetSection).getByText("Select Chain");
 
     // select Arbitrum and Osmosis
     await act(() => {

@@ -58,25 +58,11 @@ export async function assignWindows() {
   for (const page of pages) {
     if (page.url().includes("specs/runner")) {
       _mainWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(`chrome-extension://${keplrExtensionData.id}/register.html`)
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/register.html`)) {
       _keplrWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(
-          `chrome-extension://${keplrExtensionData.id}/notification.html`,
-        )
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/notification.html`)) {
       //     metamaskNotificationWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(`chrome-extension://${keplrExtensionData.id}/popup.html`)
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/popup.html`)) {
       _keplrPopupWindow = page;
     }
   }
@@ -103,22 +89,14 @@ export async function getExtensionsData() {
 
   for (const extensionData of extensionDataItems) {
     const extensionName = (
-      (await extensionData
-        .locator("#name-and-version")
-        .locator("#name")
-        .textContent()) as string
+      (await extensionData.locator("#name-and-version").locator("#name").textContent()) as string
     ).toLowerCase();
 
     const extensionVersion = (
-      (await extensionData
-        .locator("#name-and-version")
-        .locator("#version")
-        .textContent()) as string
+      (await extensionData.locator("#name-and-version").locator("#version").textContent()) as string
     ).replace(/(\n| )/g, "");
 
-    const extensionId = (
-      (await extensionData.locator("#extension-id").textContent()) as string
-    ).replace("ID: ", "");
+    const extensionId = ((await extensionData.locator("#extension-id").textContent()) as string).replace("ID: ", "");
 
     extensionsData[extensionName] = {
       version: extensionVersion,

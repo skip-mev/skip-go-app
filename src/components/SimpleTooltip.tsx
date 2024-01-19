@@ -11,14 +11,7 @@ type Props = Tooltip.TooltipProps & {
 };
 
 export const SimpleTooltip = (props: Props) => {
-  const {
-    type = "default",
-    enabled = true,
-    label,
-    children,
-    _content,
-    ...tooltipProps
-  } = props;
+  const { type = "default", enabled = true, label, children, _content, ...tooltipProps } = props;
   if (!enabled) {
     return <>{children}</>;
   }
@@ -40,12 +33,7 @@ export const SimpleTooltip = (props: Props) => {
           )}
         >
           {label}
-          <Tooltip.Arrow
-            className={clsx(
-              "fill-white drop-shadow",
-              type === "warning" && "fill-[#fbeef1]",
-            )}
-          />
+          <Tooltip.Arrow className={clsx("fill-white drop-shadow", type === "warning" && "fill-[#fbeef1]")} />
         </Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>

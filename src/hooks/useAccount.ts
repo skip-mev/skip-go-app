@@ -3,30 +3,29 @@ import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
-import { useTrackAccount } from "@/context/account";
+import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 
-export function useAccount(chainID?: string) {
-  const { data: chain } = useChainByID(chainID);
+export function useAccount(context: TrackWalletCtx) {
+  const trackedWallet = useTrackWallet(context);
 
-  const { walletRepo } = useCosmosChain(
-    chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub",
-    true,
-  );
+  const { data: chain } = useChainByID(trackedWallet?.chainID);
 
-  const walletName = useTrackAccount(chainID);
-  const cosmosWallet = walletRepo.wallets.find((w) => {
-    return w.walletName === walletName;
-  });
+  const { walletRepo } = useCosmosChain(chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub");
+
+  const cosmosWallet = useMemo(() => {
+    return walletRepo.wallets.find((w) => w.walletName === trackedWallet?.walletName);
+  }, [trackedWallet?.walletName, walletRepo.wallets]);
 
   const wagmiAccount = useWagmiAccount();
 
   const account = useMemo(() => {
+    trackedWallet;
     if (!chain) return;
     if (chain.chainType === "cosmos" && cosmosWallet) {
       return {
         address: cosmosWallet.address,
-        isWalletConnected: cosmosWallet.isWalletConnected,
+        isWalletConnected: cosmosWallet.isWalletConnected && !cosmosWallet.isWalletDisconnected,
         wallet: cosmosWallet
           ? {
               walletName: cosmosWallet.walletInfo.name,
@@ -36,6 +35,17 @@ export function useAccount(chainID?: string) {
               },
             }
           : undefined,
+        chainType: chain.chainType,
+        connect: () => {
+          return cosmosWallet.connect().then(() => {
+            trackWallet.track(context, chain.chainID, cosmosWallet.walletName, chain.chainType);
+          });
+        },
+        disconnect: () => {
+          return cosmosWallet.disconnect().then(() => {
+            trackWallet.untrack(context);
+          });
+        },
       };
     }
     if (chain.chainType === "evm") {
@@ -54,9 +64,20 @@ export function useAccount(chainID?: string) {
               },
             }
           : undefined,
+        chainType: chain.chainType,
+        connect: () => {
+          return wagmiAccount.connector?.connect().then(() => {
+            trackWallet.track(context, chain.chainID, wagmiAccount.connector!.id, chain.chainType);
+          });
+        },
+        disconnect: () => {
+          return wagmiAccount.connector?.disconnect().then(() => {
+            trackWallet.untrack(context);
+          });
+        },
       };
     }
-  }, [chain, cosmosWallet, wagmiAccount]);
+  }, [chain, context, cosmosWallet, trackedWallet, wagmiAccount]);
 
   return account;
 }

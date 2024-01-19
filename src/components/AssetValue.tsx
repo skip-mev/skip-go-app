@@ -15,7 +15,7 @@ interface Props {
 export const AssetValue = ({ chainId, denom, value }: Props) => {
   const { getAsset } = useAssets();
 
-  const { decimals, symbol } = useMemo(() => {
+  const { decimals, recommendedSymbol } = useMemo(() => {
     return getAsset(denom, chainId) || raise(`No asset found for ${denom}`);
   }, [chainId, denom, getAsset]);
 
@@ -27,7 +27,7 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
 
   return (
     <span className="tabular-nums">
-      {formattedValue} {symbol}
+      {formattedValue} {recommendedSymbol}
     </span>
   );
 };

@@ -14,6 +14,7 @@ import { DefaultSeo } from "@/components/DefaultSeo";
 import { Footer } from "@/components/Footer";
 import Header from "@/components/Header";
 import SkipBanner from "@/components/SkipBanner";
+import { VersionCheck } from "@/components/VersionCheck";
 import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
 import { wallets } from "@/lib/cosmos-kit";
@@ -57,12 +58,13 @@ export default function App({ Component, pageProps }: AppProps) {
           <WagmiConfig config={wagmiConfig}>
             <SkipProvider>
               <AssetsProvider>
-                <main className="min-h-screen flex flex-col items-center relative sm:pt-11">
-                  <SkipBanner className="z-50 top-0 inset-x-0 sm:fixed w-screen" />
+                <main className="relative flex min-h-screen flex-col items-center sm:pt-11">
+                  <SkipBanner className="inset-x-0 top-0 z-50 w-screen sm:fixed" />
                   <Header />
                   <Component {...pageProps} />
                   <Footer />
                 </main>
+                <VersionCheck />
                 <Toaster
                   position="bottom-center"
                   toastOptions={{ duration: 1000 * 10 }}

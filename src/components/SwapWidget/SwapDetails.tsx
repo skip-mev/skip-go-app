@@ -33,7 +33,7 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { gas, slippage } = useSettingsStore();
+  const { gasComputed, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -58,13 +58,12 @@ export const SwapDetails = ({
     return null;
   }
 
-  const isEvm =
-    sourceChain?.chainType === "evm" || destinationChain?.chainType === "evm";
+  const isEvm = sourceChain?.chainType === "evm" || destinationChain?.chainType === "evm";
 
   return (
     <Collapsible.Root
       className={clsx(
-        "px-4 py-2 rounded-lg text-sm group",
+        "group rounded-lg px-4 py-2 text-sm",
         "border border-neutral-200 transition-[border,shadow]",
         "hover:border-neutral-300 hover:shadow-sm",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
@@ -72,7 +71,7 @@ export const SwapDetails = ({
       open={open}
       onOpenChange={control.set}
     >
-      <div className="flex items-center text-center gap-1 relative text-xs">
+      <div className="relative flex items-center gap-1 text-center text-xs">
         <ConversionRate
           srcAsset={sourceAsset}
           destAsset={destinationAsset}
@@ -81,14 +80,17 @@ export const SwapDetails = ({
         >
           {({ left, right, conversion, toggle }) => (
             <div>
-              <button className="mr-2 tabular-nums" onClick={toggle}>
-                1 {(left.symbol ?? "").replace(/\sEthereum$/, "")} ={" "}
+              <button
+                className="mr-2 tabular-nums"
+                onClick={toggle}
+              >
+                1 {(left.recommendedSymbol ?? "").replace(/\sEthereum$/, "")} ={" "}
                 {conversion.toLocaleString("en-US", {
                   maximumFractionDigits: 4,
                 })}{" "}
-                {(right.symbol ?? "").replace(/\sEthereum$/, "")}
+                {(right.recommendedSymbol ?? "").replace(/\sEthereum$/, "")}
               </button>
-              <span className="text-neutral-400 tabular-nums">
+              <span className="tabular-nums text-neutral-400">
                 <UsdValue
                   error={null}
                   chainId={right.chainID}
@@ -103,25 +105,20 @@ export const SwapDetails = ({
         <div className="flex-grow" />
         <Collapsible.Trigger
           className={clsx(
-            "flex items-center text-xs relative gap-1",
+            "relative flex items-center gap-1 text-xs",
             "before:absolute before:-inset-2 before:content-['']",
             "text-neutral-400",
           )}
         >
           <span
             className={clsx(
-              "text-neutral-400 tabular-nums transition-opacity animate-slide-left-and-fade",
+              "animate-slide-left-and-fade tabular-nums text-neutral-400 transition-opacity",
               open && "hidden",
             )}
           >
             Slippage: {slippage}%
           </span>
-          <ChevronDownIcon
-            className={clsx(
-              "w-4 h-4 transition",
-              open ? "rotate-180" : "rotate-0",
-            )}
-          />
+          <ChevronDownIcon className={clsx("h-4 w-4 transition", open ? "rotate-180" : "rotate-0")} />
         </Collapsible.Trigger>
       </div>
 
@@ -134,19 +131,15 @@ export const SwapDetails = ({
       >
         <dl
           className={clsx(
-            "grid grid-cols-2 gap-2 mt-4 mb-2",
-            "[&_dt]:text-neutral-400 [&_dt]:text-start",
+            "mb-2 mt-4 grid grid-cols-2 gap-2",
+            "[&_dt]:text-start [&_dt]:text-neutral-400",
             "[&_dd]:text-end [&_dd]:tabular-nums",
           )}
         >
           {priceImpactPercent ? (
             <Fragment>
-              <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>
-                Price Impact
-              </dt>
-              <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>
-                {formatPercent(priceImpactPercent)}
-              </dd>
+              <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>Price Impact</dt>
+              <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>{formatPercent(priceImpactPercent)}</dd>
             </Fragment>
           ) : null}
           <dt>Slippage</dt>
@@ -154,13 +147,13 @@ export const SwapDetails = ({
             <SimpleTooltip label="Click to change maximum slippage">
               <button
                 className={clsx(
-                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "mr-1 inline-flex items-center gap-1 p-1 text-xs transition-colors",
                   "text-red-500 hover:bg-neutral-100",
                   "rounded",
                 )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <PencilSquareIcon className="w-3 h-3" />
+                <PencilSquareIcon className="h-3 w-3" />
               </button>
             </SimpleTooltip>
             {slippage}%
@@ -170,16 +163,19 @@ export const SwapDetails = ({
             <SimpleTooltip label="Click to change gas adjusment">
               <button
                 className={clsx(
-                  "p-1 text-xs inline-flex items-center gap-1 transition-colors mr-1",
+                  "mr-1 inline-flex items-center gap-1 p-1 text-xs transition-colors",
                   "text-red-500 hover:bg-neutral-100",
                   "rounded",
                 )}
                 onClick={() => disclosure.open("settingsDialog")}
               >
-                <PencilSquareIcon className="w-3 h-3" />
+                <PencilSquareIcon className="h-3 w-3" />
               </button>
             </SimpleTooltip>
-            {parseFloat(gas).toLocaleString()}
+            {gasComputed &&
+              parseFloat(gasComputed).toLocaleString("en-US", {
+                maximumFractionDigits: 8,
+              })}
           </dd>
           <dt>Bridging Fee</dt>
           <dd>

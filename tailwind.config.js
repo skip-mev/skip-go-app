@@ -78,14 +78,12 @@ module.exports = {
     }),
     plugin(({ addUtilities }) => {
       addUtilities({
-        ".HistoryListTrigger[data-state='open'] > .HistoryListTriggerText::before":
-          {
-            content: "'Hide Details'",
-          },
-        ".HistoryListTrigger[data-state='closed'] > .HistoryListTriggerText::before":
-          {
-            content: "'Show Details'",
-          },
+        ".HistoryListTrigger[data-state='open'] > .HistoryListTriggerText::before": {
+          content: "'Hide Details'",
+        },
+        ".HistoryListTrigger[data-state='closed'] > .HistoryListTriggerText::before": {
+          content: "'Show Details'",
+        },
         ".number-input-arrows-hide": {
           "&, &::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
             "-moz-appearance": "textfield",

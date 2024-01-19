@@ -1,4 +1,5 @@
-import { Asset, AssetList, Chain, Explorer } from "@graz-sh/types";
+import { Asset, AssetList, Chain, ChainInfo, Explorer } from "@graz-sh/types";
+import { chainToChainInfo } from "@graz-sh/types/convert";
 import pMap from "p-map";
 
 import { concurrency } from "./_constants";
@@ -11,10 +12,7 @@ interface Args {
   chainPaths: string[];
 }
 
-export async function parseChainPaths({
-  registryPath,
-  chainPaths,
-}: Args): Promise<Variables> {
+export async function parseChainPaths({ registryPath, chainPaths }: Args): Promise<Variables> {
   const chains: Chain[] = [];
   const assetlists: AssetList[] = [];
 
@@ -27,6 +25,7 @@ export async function parseChainPaths({
   const chainRecord: Record<string, Chain> = {};
   const assetsRecord: Record<string, Asset[]> = {};
   const explorersRecord: Record<string, Explorer[]> = {};
+  const chainInfosRecord: Record<string, ChainInfo> = {};
 
   async function loadChainPath(chainPath: string) {
     const [assetlist, chain] = await Promise.all([
@@ -48,6 +47,11 @@ export async function parseChainPaths({
     chainRecord[chain.chain_id] = chain;
     assetsRecord[chain.chain_id] = assetlist.assets;
     explorersRecord[chain.chain_id] = chain.explorers || [];
+    if (assetlist.assets.length > 0)
+      chainInfosRecord[chain.chain_id] = chainToChainInfo({
+        chain,
+        assetlist,
+      });
   }
 
   await pMap(chainPaths, loadChainPath, { concurrency });
@@ -63,5 +67,6 @@ export async function parseChainPaths({
     chainRecord,
     assetsRecord,
     explorersRecord,
+    chainInfosRecord,
   };
 }

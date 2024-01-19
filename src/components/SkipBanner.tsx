@@ -7,22 +7,19 @@ function SkipBanner({ className, ...props }: Omit<AdaptiveLinkProps, "href">) {
   return (
     <AdaptiveLink
       href="https://skip.money/docs/frontends"
-      className={clsx(
-        "bg-[#FF486E] font-semibold text-sm text-white py-2 overflow-hidden",
-        className,
-      )}
+      className={clsx("overflow-hidden bg-[#FF486E] py-2 text-sm font-semibold text-white", className)}
       {...props}
     >
-      <div className="w-[5000px] flex items-center animate-banner-rotate">
+      <div className="flex w-[5000px] animate-banner-rotate items-center">
         {Array.from({ length: 6 }, (_, i) => (
           <div
-            className="w-[1000px] inline-flex items-center justify-around uppercase"
+            className="inline-flex w-[1000px] items-center justify-around uppercase"
             key={i}
           >
             <span>Powered by the Skip API</span>
-            <div className="px-2 py-1 pr-1 rounded inline-flex items-center gap-1">
+            <div className="inline-flex items-center gap-1 rounded px-2 py-1 pr-1">
               <span>Learn more & integrate</span>
-              <ArrowRightIcon className="w-4 h-4" />
+              <ArrowRightIcon className="h-4 w-4" />
             </div>
           </div>
         ))}

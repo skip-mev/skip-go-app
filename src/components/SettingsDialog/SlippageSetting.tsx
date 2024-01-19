@@ -8,15 +8,15 @@ export const SlippageSetting = () => {
   const currentValue = useSettingsStore((state) => state.slippage);
 
   return (
-    <div className="flex items-center p-2 space-x-2">
+    <div className="flex items-center space-x-2 p-2">
       <h3>Slippage</h3>
       <div className="flex-grow" />
-      <div className="flex flex-col items-stretch gap-1 w-full max-w-32">
+      <div className="flex w-full max-w-32 flex-col items-stretch gap-1">
         <div className="relative text-sm">
           <input
             className={clsx(
-              "border rounded-lg px-2 py-1 tabular-nums transition text-end",
-              "number-input-arrows-hide pe-5 w-full",
+              "rounded-lg border px-2 py-1 text-end tabular-nums transition",
+              "w-full pe-5 number-input-arrows-hide",
             )}
             type="number"
             value={currentValue}
@@ -27,16 +27,14 @@ export const SlippageSetting = () => {
               useSettingsStore.setState({ slippage: value.toString() });
             }}
           />
-          <div className="absolute right-2 inset-y-0 flex items-center pointer-events-none">
-            %
-          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">%</div>
         </div>
         <div className="grid grid-flow-col gap-1">
           {OPTION_VALUES.map((value, i) => (
             <button
               key={i}
               className={clsx(
-                "border rounded-lg px-2 py-px tabular-nums text-xs transition",
+                "rounded-lg border px-2 py-px text-xs tabular-nums transition",
                 "text-neutral-600 hover:bg-neutral-100",
               )}
               onClick={() => useSettingsStore.setState({ slippage: value })}

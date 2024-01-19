@@ -4,9 +4,7 @@
 const APP_URL =
   process.env.APP_URL ||
   (process.env.VERCEL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`) ||
-  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${
-    process.env.PORT || 3000
-  }`;
+  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${process.env.PORT || 3000}`;
 
 /**
  * @type {import('next').NextConfig}
@@ -92,9 +90,7 @@ function checkEnv() {
   const log = require("next/dist/build/output/log");
 
   if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
-    log.warn(
-      "env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work",
-    );
+    log.warn("env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work");
   }
 
   checkEnv.once = true;
