@@ -33,7 +33,7 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { gas, slippage } = useSettingsStore();
+  const { gasComputed, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -172,7 +172,10 @@ export const SwapDetails = ({
                 <PencilSquareIcon className="h-3 w-3" />
               </button>
             </SimpleTooltip>
-            {parseFloat(gas).toLocaleString()}
+            {gasComputed &&
+              parseFloat(gasComputed).toLocaleString("en-US", {
+                maximumFractionDigits: 8,
+              })}
           </dd>
           <dt>Bridging Fee</dt>
           <dd>

@@ -13,6 +13,7 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
+import { useSettingsStore } from "@/context/settings";
 import { trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
@@ -90,6 +91,9 @@ export function useSwapWidget() {
 
   const { data: balances } = useBalancesByChain(srcAccount?.address, srcChain, srcAssets);
 
+  const gasComputed = useSettingsStore((state) => state.gasComputed);
+  const gasMultiplier = useSettingsStore((state) => state.gasMultiplier);
+
   // #endregion
 
   /////////////////////////////////////////////////////////////////////////////
@@ -116,8 +120,12 @@ export function useSwapWidget() {
     const balanceStr = balances[asset.denom] ?? "0";
     const balance = parseFloat(formatUnits(balanceStr, asset.decimals));
 
+    if (gasComputed && parsedAmount + +gasComputed > balance) {
+      return `You need to have at least more than ≈${gasComputed} to accommodate gas fees.`;
+    }
+
     return parsedAmount > balance;
-  }, [amountIn, balances, srcAsset]);
+  }, [amountIn, balances, gasComputed, srcAsset]);
 
   const swapPriceImpactPercent = useMemo(() => {
     if (!route?.swapPriceImpactPercent) return undefined;
@@ -278,6 +286,33 @@ export function useSwapWidget() {
   // #region -- side effects
 
   /**
+   * compute gas amount on source chain change
+   */
+  useEffect(() => {
+    return useSwapFormStore.subscribe(
+      (state) => state.sourceChain,
+      (srcChain) => {
+        if (!srcChain) return;
+        const feeDenom = getFeeDenom(srcChain.chainID);
+        if (!feeDenom) return;
+        const { gasPrice } = srcChain.feeAssets.find(({ denom }) => {
+          return denom === feeDenom.denom;
+        })!;
+        useSettingsStore.setState({
+          gasComputed: new BigNumber(gasPrice.average)
+            .multipliedBy(gasMultiplier)
+            .shiftedBy(-(feeDenom.decimals ?? 6))
+            .toString(),
+        });
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, [gasMultiplier, getFeeDenom]);
+
+  /**
    * sync either amount in or out depending on {@link direction}
    */
   useEffect(() => {
@@ -374,7 +409,7 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client.addChain?.({
+              await wallet.client?.addChain?.({
                 chain: {
                   bech32_prefix: wallet.chain.bech32_prefix,
                   chain_id: wallet.chain.chain_id,
@@ -454,7 +489,7 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client.addChain?.({
+              await wallet.client?.addChain?.({
                 chain: {
                   bech32_prefix: wallet.chain.bech32_prefix,
                   chain_id: wallet.chain.chain_id,
@@ -528,7 +563,7 @@ export function useSwapWidget() {
           });
           if (wallet) {
             try {
-              await wallet.client.addChain?.({
+              await wallet.client?.addChain?.({
                 chain: {
                   bech32_prefix: wallet.chain.bech32_prefix,
                   chain_id: wallet.chain.chain_id,

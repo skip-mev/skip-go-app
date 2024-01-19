@@ -13,7 +13,7 @@ interface Props {
   isLoading?: boolean;
   route?: RouteResponse;
   transactionCount: number;
-  insufficientBalance?: boolean;
+  insufficientBalance?: boolean | string;
   shouldShowPriceImpactWarning?: boolean;
   routeWarningMessage?: string;
   routeWarningTitle?: string;

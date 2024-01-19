@@ -285,7 +285,13 @@ export function SwapWidget() {
                 routeWarningMessage={routeWarningMessage}
               />
               {insufficientBalance && (
-                <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
+                <p className="animate-slide-up-and-fade text-center text-sm font-semibold text-red-500">
+                  {typeof insufficientBalance === "string" ? (
+                    <>Insufficient Balance: {insufficientBalance}</>
+                  ) : (
+                    <>Insufficient Balance</>
+                  )}
+                </p>
               )}
             </div>
           )}

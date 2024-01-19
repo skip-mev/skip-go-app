@@ -30,7 +30,7 @@ export interface RouteTransaction {
 interface Props {
   route: RouteResponse;
   transactionCount: number;
-  insufficentBalance?: boolean;
+  insufficentBalance?: boolean | string;
   onClose: () => void;
 }
 
@@ -403,7 +403,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={transacting || insufficentBalance}
+            disabled={transacting || !!insufficentBalance}
           >
             Submit
           </button>

@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
-import toast from "react-hot-toast";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useSettingsStore } from "@/context/settings";
@@ -46,7 +45,7 @@ function AssetInput({
   context,
   isLoading,
 }: Props) {
-  const { assetsByChainID, getNativeAssets, getFeeDenom } = useAssets();
+  const { assetsByChainID, getNativeAssets } = useAssets();
 
   const assets = useMemo(() => {
     if (!chain) {
@@ -85,37 +84,17 @@ function AssetInput({
   const handleMax: MouseEventHandler<HTMLButtonElement> = (event) => {
     if (!selectedAssetBalance || !chain || !asset) return;
 
-    let amount = new BigNumber(selectedAssetBalance);
+    let balance = new BigNumber(selectedAssetBalance);
 
     if (event.shiftKey) {
-      onAmountChange?.(amount.toString());
+      onAmountChange?.(balance.toString());
       return;
     }
 
-    const feeDenom = getFeeDenom(chain.chainID);
+    const { gasComputed } = useSettingsStore.getState();
+    gasComputed && (balance = balance.minus(gasComputed));
 
-    // if selected asset is the fee denom, subtract the fee
-    if (feeDenom && feeDenom.denom === asset.denom) {
-      const { gas } = useSettingsStore.getState();
-
-      const { gasPrice } = chain.feeAssets.find((a) => a.denom === feeDenom.denom)!;
-
-      const fee = new BigNumber(gasPrice.average).multipliedBy(gas).shiftedBy(-(feeDenom.decimals ?? 6)); // denom decimals
-
-      amount = amount.minus(fee);
-      if (amount.isNegative()) {
-        amount = new BigNumber(0);
-        toast.error(
-          <p>
-            <strong>Insufficient Balance</strong>
-            <br />
-            You need to have at least ≈{fee.toString()} to accommodate gas fees.
-          </p>,
-        );
-      }
-    }
-
-    onAmountChange?.(amount.toString());
+    onAmountChange?.(balance.toString());
   };
 
   return (
