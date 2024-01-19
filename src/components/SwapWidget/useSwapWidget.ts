@@ -292,7 +292,10 @@ export function useSwapWidget() {
     return useSwapFormStore.subscribe(
       (state) => state.sourceChain,
       (srcChain) => {
-        if (!srcChain) return;
+        if (srcChain?.chainType !== "cosmos") {
+          useSettingsStore.setState({ gasComputed: undefined });
+          return;
+        }
         const feeDenom = getFeeDenom(srcChain.chainID);
         if (!feeDenom) return;
         const { gasPrice } = srcChain.feeAssets.find(({ denom }) => {
