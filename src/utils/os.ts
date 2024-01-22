@@ -1,21 +1,25 @@
-export const isMobile = () => {
-  if (typeof window !== "undefined") {
-    return Boolean(
-      window.matchMedia("(pointer:coarse)").matches ||
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini/u.test(navigator.userAgent),
-    );
+const isBrowser = typeof window !== "undefined" && typeof window.navigator !== "undefined";
+
+export function isAndroid() {
+  if (!isBrowser) {
+    return false;
   }
+  return isMobile() && window.navigator.userAgent.toLowerCase().includes("android");
+}
 
-  return false;
-};
+export function isIos() {
+  if (!isBrowser) {
+    return false;
+  }
+  return isMobile() && window.navigator.userAgent.toLowerCase().match(/iphone|ipad/u);
+}
 
-export const isAndroid = () => {
-  return isMobile() && navigator.userAgent.toLowerCase().includes("android");
-};
-
-export const isIos = () => {
+export function isMobile() {
+  if (!isBrowser) {
+    return false;
+  }
   return (
-    isMobile() &&
-    (navigator.userAgent.toLowerCase().includes("iphone") || navigator.userAgent.toLowerCase().includes("ipad"))
+    window.matchMedia("(pointer:coarse)").matches ||
+    !!window.navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini/u)
   );
-};
+}
