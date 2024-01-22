@@ -66,7 +66,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 </main>
                 <VersionCheck />
                 <Toaster
-                  position="bottom-center"
+                  position="top-right"
                   toastOptions={{ duration: 1000 * 10 }}
                 />
               </AssetsProvider>
