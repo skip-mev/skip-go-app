@@ -247,7 +247,12 @@ export function SwapWidget() {
           )}
           {!isWalletConnected && (
             <button
-              className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white transition-transform hover:rotate-1 hover:scale-105"
+              className={clsx(
+                "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-[opacity,transform]",
+                "disabled:cursor-not-allowed disabled:opacity-75",
+                "enabled:hover:rotate-1 enabled:hover:scale-105",
+              )}
+              disabled={!sourceChain}
               onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
                   openWalletModal(sourceChain.chainID, "source");
