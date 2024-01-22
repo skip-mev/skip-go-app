@@ -20,6 +20,7 @@ import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
 import { formatPercent, formatUSD } from "@/utils/intl";
+import { gracefullyConnect } from "@/utils/wallet";
 
 const DEFAULT_SRC_CHAIN_ID = "cosmoshub-4";
 const PRICE_IMPACT_THRESHOLD = 0.1;
@@ -412,30 +413,10 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("source", srcChain.chainID, wallet.walletName, srcChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("source");
             }
           } else {
             trackWallet.untrack("source");
@@ -450,7 +431,6 @@ export function useSwapWidget() {
               trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("source");
             }
           } else {
             trackWallet.untrack("source");
@@ -492,30 +472,10 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           } else {
             trackWallet.untrack("destination");
@@ -530,7 +490,6 @@ export function useSwapWidget() {
               trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           } else {
             trackWallet.untrack("destination");
@@ -566,30 +525,10 @@ export function useSwapWidget() {
           });
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           }
         }
