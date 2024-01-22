@@ -141,6 +141,7 @@ export default function Home() {
   useInterval(() => {
     for (const repo of walletRepos) {
       if (repo.current && repo.current.address) {
+        if (!repo.chainRecord.chain) continue;
         prefetchBalances(repo.current.address, repo.chainRecord.chain.chain_id);
       }
     }
