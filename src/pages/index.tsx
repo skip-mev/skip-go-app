@@ -113,7 +113,7 @@ export default function Home() {
     try {
       const balances = await getBalancesByChain(address, chainID, assetsByChainID(chainID));
 
-      queryClient.setQueryData(["balances-by-chain", address, chainID], balances);
+      queryClient.setQueryData(["USE_BALANCES_BY_CHAIN", address, chainID], balances);
     } catch {
       /* empty */
     }
