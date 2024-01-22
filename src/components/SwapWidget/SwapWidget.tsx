@@ -141,7 +141,7 @@ export function SwapWidget() {
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
-              context="src"
+              context="source"
               isLoading={direction === "swap-out" && routeLoading}
             />
           </div>
@@ -211,7 +211,7 @@ export function SwapWidget() {
               }}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
-              context="dest"
+              context="destination"
               isLoading={direction === "swap-in" && routeLoading}
             />
           </div>

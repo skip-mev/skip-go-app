@@ -27,7 +27,7 @@ interface Props {
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
-  context?: "src" | "dest";
+  context: "source" | "destination";
   isLoading?: boolean;
 }
 
@@ -57,7 +57,7 @@ function AssetInput({
 
   const showChainInfo = chain ? false : true;
 
-  const account = useAccount(context === "src" ? "source" : "destination");
+  const account = useAccount(context);
 
   const { data: balances } = useBalancesByChain(account?.address, chain, assets);
 
@@ -188,7 +188,7 @@ function AssetInput({
         />
         <div className="flex h-8 items-center space-x-2 tabular-nums">
           <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
-          {amountUSD !== undefined && diffPercentage !== 0 && context === "dest" ? (
+          {amountUSD !== undefined && diffPercentage !== 0 && context === "destination" ? (
             <p className={clsx("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>
