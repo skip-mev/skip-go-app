@@ -1,5 +1,6 @@
 import "@fontsource/jost/latin.css";
 import "@/styles/globals.css";
+import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
