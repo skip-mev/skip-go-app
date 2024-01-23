@@ -34,7 +34,7 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { gasMultiplier, slippage } = useSettingsStore();
+  const { gasAmount, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -153,9 +153,9 @@ export const SwapDetails = ({
             </SimpleTooltip>
             {slippage}%
           </dd>
-          <dt>Estimated Gas</dt>
+          <dt>Estimated Fee</dt>
           <dd>{gasRequired ?? "-"}</dd>
-          <dt>Gas Multiplier</dt>
+          <dt>Gas Amount</dt>
           <dd>
             <SimpleTooltip label="Click to change gas multiplier">
               <button
@@ -169,7 +169,7 @@ export const SwapDetails = ({
                 <PencilSquareIcon className="h-3 w-3" />
               </button>
             </SimpleTooltip>
-            {parseFloat(gasMultiplier).toLocaleString()}
+            {parseFloat(gasAmount).toLocaleString()}
           </dd>
           <dt>Bridging Fee</dt>
           <dd>{bridgingFee ?? "-"}</dd>

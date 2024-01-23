@@ -40,7 +40,7 @@ export function SwapWidget() {
     destinationAsset,
     destinationChain,
     direction,
-    insufficientBalance,
+    isAmountError,
     numberOfTransactions,
     onDestinationAssetChange,
     onDestinationChainChange,
@@ -48,6 +48,7 @@ export function SwapWidget() {
     onSourceAssetChange,
     onSourceChainChange,
     onSourceAmountChange,
+    onSourceAmountMax,
     onInvertDirection,
     priceImpactThresholdReached,
     route,
@@ -57,7 +58,6 @@ export function SwapWidget() {
     routeWarningTitle,
     sourceAsset,
     sourceChain,
-    sourceFeeAsset,
     sourceFeeAmount,
     swapPriceImpactPercent,
   } = useSwapWidget();
@@ -137,17 +137,16 @@ export function SwapWidget() {
               amount={amountIn}
               amountUSD={route?.usdAmountIn}
               asset={sourceAsset}
-              feeAsset={sourceFeeAsset}
-              feeAmount={sourceFeeAmount}
               chain={sourceChain}
               chains={chains ?? []}
               onAmountChange={onSourceAmountChange}
+              onAmountMax={onSourceAmountMax}
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
               context="source"
               isLoading={direction === "swap-out" && routeLoading}
-              isError={insufficientBalance}
+              isError={isAmountError}
             />
           </div>
           <div className="relative">
@@ -280,7 +279,7 @@ export function SwapWidget() {
                 isLoading={routeLoading}
                 route={route}
                 transactionCount={numberOfTransactions}
-                insufficientBalance={insufficientBalance}
+                isAmountError={isAmountError}
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}

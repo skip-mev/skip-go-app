@@ -13,7 +13,7 @@ interface Props {
   isLoading?: boolean;
   route?: RouteResponse;
   transactionCount: number;
-  insufficientBalance?: boolean | string;
+  isAmountError?: boolean | string;
   shouldShowPriceImpactWarning?: boolean;
   routeWarningMessage?: string;
   routeWarningTitle?: string;
@@ -22,7 +22,7 @@ interface Props {
 function TransactionDialog({
   isLoading,
   route,
-  insufficientBalance,
+  isAmountError,
   transactionCount,
   shouldShowPriceImpactWarning,
   routeWarningMessage,
@@ -69,7 +69,7 @@ function TransactionDialog({
               <TransactionDialogContent
                 route={route}
                 onClose={() => setIsOpen(false)}
-                insufficentBalance={insufficientBalance}
+                isAmountError={isAmountError}
                 transactionCount={transactionCount}
               />
             )}

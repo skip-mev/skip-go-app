@@ -20,9 +20,8 @@ interface Props {
   amountUSD?: string;
   diffPercentage?: number;
   onAmountChange?: (amount: string) => void;
+  onAmountMax?: MouseEventHandler<HTMLButtonElement>;
   asset?: AssetWithMetadata;
-  feeAsset?: AssetWithMetadata;
-  feeAmount?: string;
   onAssetChange?: (asset: AssetWithMetadata) => void;
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
@@ -38,9 +37,8 @@ function AssetInput({
   amountUSD,
   diffPercentage = 0,
   onAmountChange,
+  onAmountMax,
   asset,
-  feeAsset,
-  feeAmount,
   onAssetChange,
   chain,
   chains,
@@ -53,57 +51,22 @@ function AssetInput({
   const { assetsByChainID, getNativeAssets } = useAssets();
 
   const assets = useMemo(() => {
-    if (!chain) {
-      return getNativeAssets();
-    }
-
+    if (!chain) return getNativeAssets();
     return assetsByChainID(chain.chainID);
   }, [assetsByChainID, chain, getNativeAssets]);
-
-  const showChainInfo = chain ? false : true;
 
   const account = useAccount(context);
 
   const { data: balances } = useBalancesByChain(account?.address, chain, assets);
 
   const selectedAssetBalance = useMemo(() => {
-    if (!asset || !balances) return 0;
-
-    const balanceWei = balances[asset.denom];
-    if (!balanceWei) return 0;
-
-    return parseFloat(formatUnits(balanceWei, asset.decimals));
+    if (!asset || !balances) return "0";
+    return formatUnits(balances[asset.denom] ?? "0", asset.decimals ?? 6);
   }, [asset, balances]);
 
-  const formattedSelectedAssetBalance = useMemo(() => {
-    return selectedAssetBalance.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    });
-  }, [selectedAssetBalance]);
-
   const maxButtonDisabled = useMemo(() => {
-    return selectedAssetBalance <= 0;
+    return parseFloat(selectedAssetBalance) <= 0;
   }, [selectedAssetBalance]);
-
-  const handleMax: MouseEventHandler<HTMLButtonElement> = (event) => {
-    if (!selectedAssetBalance || !chain || !asset) return;
-
-    let balance = new BigNumber(selectedAssetBalance);
-
-    if (event.ctrlKey || event.metaKey) {
-      onAmountChange?.(balance.div(2).toString());
-      return;
-    }
-
-    if (event.shiftKey || (feeAsset && asset.denom !== feeAsset.denom)) {
-      onAmountChange?.(balance.toString());
-      return;
-    }
-
-    balance = balance.minus(feeAmount ?? "0");
-    onAmountChange?.(balance.toString());
-  };
 
   return (
     <div
@@ -128,7 +91,7 @@ function AssetInput({
             assets={assets}
             balances={balances}
             onChange={onAssetChange}
-            showChainInfo={showChainInfo}
+            showChainInfo={!!chain}
           />
         </div>
       </div>
@@ -206,14 +169,17 @@ function AssetInput({
           {showBalance && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip label={`${formattedSelectedAssetBalance} ${asset.recommendedSymbol}`}>
+              <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
                 <div
                   className={clsx(
                     "mr-2 max-w-[16ch] truncate tabular-nums",
                     "cursor-help underline decoration-dotted underline-offset-4",
                   )}
                 >
-                  {formattedSelectedAssetBalance}
+                  {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 6,
+                  })}
                 </div>
               </SimpleTooltip>
               <button
@@ -222,7 +188,7 @@ function AssetInput({
                   "transition-[transform,background] enabled:hover:rotate-2 enabled:hover:scale-110 disabled:cursor-not-allowed",
                 )}
                 disabled={maxButtonDisabled}
-                onClick={handleMax}
+                onClick={onAmountMax}
               >
                 Max
               </button>
@@ -231,7 +197,9 @@ function AssetInput({
         </div>
       </div>
       {typeof isError === "string" && (
-        <div className="animate-slide-up-and-fade text-center text-xs font-medium text-red-500">{isError}</div>
+        <div className="animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
+          {isError}
+        </div>
       )}
     </div>
   );

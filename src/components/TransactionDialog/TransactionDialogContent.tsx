@@ -30,7 +30,7 @@ export interface RouteTransaction {
 interface Props {
   route: RouteResponse;
   transactionCount: number;
-  insufficentBalance?: boolean | string;
+  isAmountError?: boolean | string;
   onClose: () => void;
 }
 
@@ -40,7 +40,7 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({ route, onClose, insufficentBalance, transactionCount }: Props) {
+function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -411,12 +411,12 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={transacting || !!insufficentBalance}
+            disabled={transacting || !!isAmountError}
           >
             Submit
           </button>
         )}
-        {insufficentBalance && !transacting && !txComplete && (
+        {isAmountError && !transacting && !txComplete && (
           <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
         )}
       </div>

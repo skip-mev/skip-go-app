@@ -1,7 +1,7 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { BigNumber } from "bignumber.js";
 import { formatUnits } from "ethers";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import {
   useAccount as useWagmiAccount,
@@ -73,6 +73,12 @@ export function useSwapWidget() {
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
 
+  const enabled = useMemo(() => {
+    const wei = parseFloat(direction === "swap-in" ? amountInWei : amountOutWei);
+    const isValidWei = !isNaN(wei);
+    return !isAnyDisclosureOpen && isValidWei;
+  }, [amountInWei, amountOutWei, direction, isAnyDisclosureOpen]);
+
   const {
     data: route,
     error: routeError,
@@ -85,7 +91,7 @@ export function useSwapWidget() {
     sourceAssetChainID: srcAsset?.chainID,
     destinationAsset: dstAsset?.denom,
     destinationAssetChainID: dstAsset?.chainID,
-    enabled: !isAnyDisclosureOpen,
+    enabled,
   });
 
   const srcAssets = useMemo(() => {
@@ -97,7 +103,7 @@ export function useSwapWidget() {
 
   const { data: balances } = useBalancesByChain(srcAccount?.address, srcChain, srcAssets);
 
-  const gasMultiplier = useSettingsStore((state) => state.gasMultiplier);
+  const gasAmount = useSettingsStore((state) => state.gasAmount);
 
   // #endregion
 
@@ -113,29 +119,28 @@ export function useSwapWidget() {
     return String(routeError);
   }, [routeError]);
 
-  const insufficientBalance = useMemo(() => {
-    if (!srcAsset || !balances) return false;
-
-    const parsedAmount = parseFloat(amountIn);
-
-    if (isNaN(parsedAmount)) return false;
-
-    function getParsedBalance(denom: string, decimals = 6) {
-      return parseFloat(formatUnits(balances![denom] || "0", decimals));
+  const isAmountError = useMemo(() => {
+    if (!amountIn || !balances || !srcAsset) {
+      return false;
     }
 
-    const parsedGasRequired = parseFloat(gasRequired ?? "0");
+    const parsedAmount = BigNumber(amountIn || "0");
+    const parsedBalance = BigNumber(balances[srcAsset.denom] ?? "0").shiftedBy(-(srcAsset.decimals ?? 6));
 
     if (srcFeeAsset) {
-      const balance = getParsedBalance(srcFeeAsset.denom, srcFeeAsset.decimals);
-      if (parsedGasRequired > balance) {
-        return `You need to have at least ≈${parsedGasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
+      const parsedFeeBalance = BigNumber(balances[srcFeeAsset.denom] ?? "0").shiftedBy(-(srcFeeAsset.decimals ?? 6));
+      const compensated = parsedFeeBalance.minus(gasRequired || "0");
+
+      if (compensated.lt(parsedAmount)) {
+        return `Insufficient balance. You need ≈${gasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
       }
     }
-    const balance = getParsedBalance(srcAsset.denom, srcAsset.decimals);
-    if (parsedAmount > balance) {
+
+    if (parsedBalance.lt(parsedAmount)) {
       return `Insufficient balance.`;
     }
+
+    return false;
   }, [amountIn, balances, gasRequired, srcAsset, srcFeeAsset]);
 
   const swapPriceImpactPercent = useMemo(() => {
@@ -150,7 +155,7 @@ export function useSwapWidget() {
 
   const txsRequired = useMemo(() => {
     return route?.txsRequired ?? 0;
-  }, [route]);
+  }, [route?.txsRequired]);
 
   const usdDiffPercent = useMemo(() => {
     if (!route) {
@@ -334,6 +339,57 @@ export function useSwapWidget() {
     });
   }, [getFeeAsset]);
 
+  /**
+   * Handle maxing amount in
+   */
+  const onSourceAmountMax = useCallback(
+    <T extends HTMLElement>(event: MouseEvent<T>) => {
+      if (!balances || !srcChain || !srcAsset) return false;
+
+      const decimals = srcAsset.decimals ?? 6;
+      const balance = balances[srcAsset.denom];
+
+      /**
+       * if no balance, set amount in to zero
+       * (would be impossible since max button is disabled if no balance)
+       */
+      if (!balance) {
+        useSwapWidgetStore.setState({ amountIn: "0" });
+        return;
+      }
+
+      const isDifferentAsset = srcFeeAsset && srcFeeAsset.denom !== srcAsset.denom;
+      const isNotCosmos = srcChain.chainType !== "cosmos";
+
+      /**
+       * override to max balances on these cases:
+       * - shift key is pressed
+       * - fee asset is different from source asset
+       * - source chain is not cosmos
+       */
+      if (event.shiftKey || isDifferentAsset || isNotCosmos) {
+        const newAmountIn = formatUnits(balance, decimals);
+        useSwapWidgetStore.setState({ amountIn: newAmountIn });
+        return;
+      }
+
+      /**
+       * compensate gas fees if source asset is same as fee asset
+       */
+      if (gasRequired && srcFeeAsset && srcFeeAsset.denom === srcAsset.denom) {
+        let newAmountIn = BigNumber(balance).shiftedBy(-decimals).minus(gasRequired);
+        newAmountIn = newAmountIn.isNegative() ? BigNumber(0) : newAmountIn;
+        useSwapWidgetStore.setState({ amountIn: newAmountIn.toFixed(decimals) });
+        return;
+      }
+
+      // otherwise, max balance
+      const newAmountIn = formatUnits(balance, decimals);
+      useSwapWidgetStore.setState({ amountIn: newAmountIn });
+    },
+    [balances, gasRequired, srcAsset, srcChain, srcFeeAsset],
+  );
+
   // #endregion
 
   /////////////////////////////////////////////////////////////////////////////
@@ -371,10 +427,12 @@ export function useSwapWidget() {
           return;
         }
 
+        const decimals = srcFeeAsset.decimals ?? 6;
+
         useSwapWidgetStore.setState({
-          gasRequired: new BigNumber(feeDenomPrices.gasPrice.average)
-            .multipliedBy(gasMultiplier)
-            .shiftedBy(-(srcFeeAsset.decimals ?? 6))
+          gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
+            .multipliedBy(gasAmount)
+            .shiftedBy(-decimals)
             .toString(),
           sourceFeeAsset: srcFeeAsset,
         });
@@ -384,7 +442,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [gasMultiplier, getFeeAsset]);
+  }, [gasAmount, getFeeAsset]);
 
   /**
    * sync either amount in or out depending on {@link direction}
@@ -630,7 +688,7 @@ export function useSwapWidget() {
     destinationAsset: dstAsset,
     destinationChain: dstChain,
     direction,
-    insufficientBalance,
+    isAmountError,
     noRouteFound: routeIsError,
     numberOfTransactions: txsRequired ?? 0,
     onDestinationAssetChange,
@@ -640,6 +698,7 @@ export function useSwapWidget() {
     onSourceChainChange,
     onSourceAmountChange,
     onInvertDirection,
+    onSourceAmountMax,
     priceImpactThresholdReached,
     route,
     routeError: errorMessage,
