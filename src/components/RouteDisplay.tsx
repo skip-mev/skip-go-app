@@ -2,13 +2,14 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
-import { Dispatch, FC, Fragment, SetStateAction, useMemo } from "react";
+import { Dispatch, Fragment, SetStateAction, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
 
 import { AdaptiveLink } from "./AdaptiveLink";
+import { SimpleTooltip } from "./SimpleTooltip";
 import { BroadcastedTx } from "./TransactionDialog/TransactionDialogContent";
 
 export interface SwapVenueConfig {
@@ -54,12 +55,14 @@ interface SwapAction {
 
 type Action = TransferAction | SwapAction;
 
-const RouteEnd: FC<{
+interface RouteEndProps {
   amount: string;
   symbol: string;
   chain: string;
   logo: string;
-}> = ({ amount, symbol, logo, chain }) => {
+}
+
+function RouteEnd({ amount, symbol, logo, chain }: RouteEndProps) {
   return (
     <div className="flex items-center gap-2">
       <div className="h-14 w-14 rounded-full border-2 border-neutral-200 bg-white p-1.5">
@@ -71,19 +74,28 @@ const RouteEnd: FC<{
       </div>
       <div className="font-semibold">
         <p>
-          {amount} {symbol}
+          <SimpleTooltip label={`${amount} ${symbol}`}>
+            <span className="cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4">
+              {parseFloat(amount).toLocaleString("en-US", {
+                maximumFractionDigits: 8,
+              })}
+            </span>
+          </SimpleTooltip>{" "}
+          {symbol}
         </p>
         <p className="text-sm text-neutral-400">On {chain}</p>
       </div>
     </div>
   );
-};
+}
 
-const TransferStep: FC<{
+interface TransferStepProps {
   action: TransferAction;
   id: string;
   statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
-}> = ({ action, id, statusData }) => {
+}
+
+function TransferStep({ action, id, statusData }: TransferStepProps) {
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
@@ -92,7 +104,7 @@ const TransferStep: FC<{
   const transfer = statusData?.transferSequence[operationCount];
 
   // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
-  const transferState = useMemo(() => {
+  const renderTransferState = useMemo(() => {
     switch (transfer?.state) {
       case "TRANSFER_SUCCESS":
         return (
@@ -124,7 +136,7 @@ const TransferStep: FC<{
     }
   }, [transfer?.state]);
 
-  const renderExplorerLink = () => {
+  const renderExplorerLink = useMemo(() => {
     if (!transfer?.explorerLink) return null;
     return (
       <AdaptiveLink
@@ -136,7 +148,7 @@ const TransferStep: FC<{
         </span>
       </AdaptiveLink>
     );
-  };
+  }, [transfer?.explorerLink]);
 
   const { getAsset } = useAssets();
 
@@ -150,7 +162,7 @@ const TransferStep: FC<{
   if (!asset) {
     return (
       <div className="flex items-center justify-between gap-2">
-        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{transferState}</div>
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
         <div className="flex-1">
           <p className="max-w-full break-all text-sm text-neutral-500">
             Transfer to{" "}
@@ -161,7 +173,7 @@ const TransferStep: FC<{
             />{" "}
             <span className="font-semibold text-black">{destinationChain.prettyName}</span>
           </p>
-          {renderExplorerLink()}
+          {renderExplorerLink}
         </div>
       </div>
     );
@@ -169,7 +181,7 @@ const TransferStep: FC<{
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{transferState}</div>
+      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
       <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Transfer{" "}
@@ -194,18 +206,20 @@ const TransferStep: FC<{
           />{" "}
           <span className="font-semibold text-black">{destinationChain.prettyName}</span>
         </p>
-        {renderExplorerLink()}
+        {renderExplorerLink}
       </div>
     </div>
   );
-};
+}
 
-const SwapStep: FC<{
+interface SwapStepProps {
   action: SwapAction;
   actions: Action[];
   id: string;
   statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
-}> = ({ action, actions, id, statusData }) => {
+}
+
+function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
   const { getAsset } = useAssets();
 
   const assetIn = getAsset(action.sourceAsset, action.chain);
@@ -225,7 +239,7 @@ const SwapStep: FC<{
   const swap = statusData?.transferSequence[operationCount];
 
   // as for swap operations, we can assume that the swap is successful if the previous transfer state is TRANSFER_SUCCESS
-  const swapState = useMemo(() => {
+  const renderSwapState = useMemo(() => {
     switch (swap?.state) {
       case "TRANSFER_RECEIVED":
         return (
@@ -251,7 +265,7 @@ const SwapStep: FC<{
     }
   }, [swap?.state]);
 
-  const renderExplorerLink = () => {
+  const renderExplorerLink = useMemo(() => {
     if (!swap?.explorerLink) return null;
     if (swap?.state !== "TRANSFER_SUCCESS") return null;
     return (
@@ -264,12 +278,12 @@ const SwapStep: FC<{
         </span>
       </AdaptiveLink>
     );
-  };
+  }, [swap?.explorerLink, swap?.state]);
 
   if (!assetIn && assetOut) {
     return (
       <div className="flex items-center gap-2">
-        <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
+        <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
         <div className="max-w-[18rem]">
           <p className="text-sm text-neutral-500">
             Swap to{" "}
@@ -288,7 +302,7 @@ const SwapStep: FC<{
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
-          {renderExplorerLink()}
+          {renderExplorerLink}
         </div>
       </div>
     );
@@ -297,7 +311,7 @@ const SwapStep: FC<{
   if (assetIn && !assetOut) {
     return (
       <div className="flex items-center gap-2">
-        <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
+        <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
         <div>
           <p className="text-sm text-neutral-500">
             Swap{" "}
@@ -314,7 +328,7 @@ const SwapStep: FC<{
             />{" "}
             <span className="font-semibold text-black">{venue.name}</span>
           </p>
-          {renderExplorerLink()}
+          {renderExplorerLink}
         </div>
       </div>
     );
@@ -326,7 +340,7 @@ const SwapStep: FC<{
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex h-14 w-14 items-center justify-center">{swapState}</div>
+      <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
       <div className="max-w-[18rem]">
         <p className="text-sm text-neutral-500">
           Swap{" "}
@@ -349,20 +363,20 @@ const SwapStep: FC<{
           />{" "}
           <span className="font-semibold text-black">{venue.name}</span>
         </p>
-        {renderExplorerLink()}
+        {renderExplorerLink}
       </div>
     </div>
   );
-};
+}
 
-interface Props {
+interface RouteDisplayProps {
   route: RouteResponse;
   isRouteExpanded: boolean;
   setIsRouteExpanded: Dispatch<SetStateAction<boolean>>;
   broadcastedTxs?: BroadcastedTx[];
 }
 
-const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, broadcastedTxs }) => {
+function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedTxs }: RouteDisplayProps) {
   const { getAsset } = useAssets();
 
   const sourceAsset = getAsset(route.sourceAssetDenom, route.sourceAssetChainID);
@@ -507,7 +521,7 @@ const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, b
           />
           {isRouteExpanded && (
             <button
-              className="text-xs font-medium text-[#FF486E] hover:underline"
+              className="animate-slide-up-and-fade text-xs font-medium text-[#FF486E] hover:underline"
               onClick={() => setIsRouteExpanded(false)}
             >
               Hide Details
@@ -515,27 +529,25 @@ const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, b
           )}
         </div>
         {isRouteExpanded &&
-          actions.map((action, i) => {
-            return (
-              <Fragment key={i}>
-                {action.type === "SWAP" && (
-                  <SwapStep
-                    action={action}
-                    actions={actions}
-                    id={action.id}
-                    statusData={statusData}
-                  />
-                )}
-                {action.type === "TRANSFER" && (
-                  <TransferStep
-                    action={action}
-                    id={action.id}
-                    statusData={statusData}
-                  />
-                )}
-              </Fragment>
-            );
-          })}
+          actions.map((action, i) => (
+            <Fragment key={i}>
+              {action.type === "SWAP" && (
+                <SwapStep
+                  action={action}
+                  actions={actions}
+                  id={action.id}
+                  statusData={statusData}
+                />
+              )}
+              {action.type === "TRANSFER" && (
+                <TransferStep
+                  action={action}
+                  id={action.id}
+                  statusData={statusData}
+                />
+              )}
+            </Fragment>
+          ))}
         {!isRouteExpanded && (
           <div className="flex h-14 w-14 items-center justify-center">
             <button
@@ -566,9 +578,9 @@ const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, b
       </div>
     </div>
   );
-};
+}
 
-const Spinner = () => {
+function Spinner() {
   return (
     <svg
       className="h-4 w-4 animate-spin text-[#FF486E]"
@@ -591,6 +603,6 @@ const Spinner = () => {
       />
     </svg>
   );
-};
+}
 
 export default RouteDisplay;
