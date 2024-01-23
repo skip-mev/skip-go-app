@@ -13,7 +13,7 @@ import { clsx } from "clsx";
 import { ComponentPropsWithoutRef, forwardRef, Fragment, useEffect, useMemo, useRef } from "react";
 
 import { disclosure } from "@/context/disclosures";
-import { failTxHistory, removeTxHistory, successTxHistory, TxHistoryItem } from "@/context/tx-history";
+import { txHistory, TxHistoryItem } from "@/context/tx-history";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useBroadcastedTxsStatus } from "@/solve";
 
@@ -73,10 +73,10 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
   useEffect(() => {
     if (txsStatus?.isSettled) {
       if (txsStatus.isSuccess) {
-        successTxHistory(id);
+        txHistory.success(id);
       }
       if (!txsStatus.isSuccess) {
-        failTxHistory(id);
+        txHistory.fail(id);
       }
     }
   }, [id, txsStatus]);
@@ -233,7 +233,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
               "flex items-center justify-center space-x-1",
               "bg-[#FF486E]/20 text-[#FF486E] hover:bg-[#FF486E]/30",
             )}
-            onClick={() => removeTxHistory(id)}
+            onClick={() => txHistory.remove(id)}
           >
             <TrashIcon className="h-3 w-3" />
           </button>

@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { useSettingsStore } from "@/context/settings";
-import { addTxHistory, addTxStatus, failTxHistory, successTxHistory } from "@/context/tx-history";
+import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
@@ -151,13 +151,13 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
           const hId = (() => {
             if (!historyId) {
-              const [_historyId] = addTxHistory({ route });
+              const [_historyId] = txHistory.add({ route });
               setHistoryId(_historyId);
               return _historyId;
             }
             return historyId;
           })();
-          addTxStatus(hId, {
+          txHistory.addStatus(hId, {
             chainId: txStatus.chainID,
             txHash: txStatus.txHash,
             explorerLink: explorerLink || "#",
@@ -208,7 +208,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
         },
       });
 
-      historyId && successTxHistory(historyId);
+      historyId && txHistory.success(historyId);
       setTxComplete(true);
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
@@ -250,7 +250,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
           </p>,
         );
       }
-      historyId && failTxHistory(historyId);
+      historyId && txHistory.fail(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
