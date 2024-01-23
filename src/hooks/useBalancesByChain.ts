@@ -9,12 +9,14 @@ import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
 import { getCosmWasmClientForChainID, getStargateClientForChainID } from "@/utils/clients";
 
-export function useBalancesByChain(
-  address?: string,
-  chain?: Chain,
-  assets?: AssetWithMetadata[],
-  enabled: boolean = true,
-) {
+interface Args {
+  address?: string;
+  chain?: Chain;
+  assets?: AssetWithMetadata[];
+  enabled?: boolean;
+}
+
+export function useBalancesByChain({ address, chain, assets, enabled = true }: Args) {
   const publicClient = usePublicClient({
     chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
   });

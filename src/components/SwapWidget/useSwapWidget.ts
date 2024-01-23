@@ -73,7 +73,7 @@ export function useSwapWidget() {
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
 
-  const enabled = useMemo(() => {
+  const shouldRouteLoad = useMemo(() => {
     const wei = parseFloat(direction === "swap-in" ? amountInWei : amountOutWei);
     const isValidWei = !isNaN(wei);
     return !isAnyDisclosureOpen && isValidWei;
@@ -91,7 +91,7 @@ export function useSwapWidget() {
     sourceAssetChainID: srcAsset?.chainID,
     destinationAsset: dstAsset?.denom,
     destinationAssetChainID: dstAsset?.chainID,
-    enabled,
+    enabled: shouldRouteLoad,
   });
 
   const srcAssets = useMemo(() => {
@@ -101,7 +101,12 @@ export function useSwapWidget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [srcChain?.chainID]);
 
-  const { data: balances } = useBalancesByChain(srcAccount?.address, srcChain, srcAssets);
+  const { data: balances } = useBalancesByChain({
+    address: srcAccount?.address,
+    chain: srcChain,
+    assets: srcAssets,
+    enabled: !isAnyDisclosureOpen,
+  });
 
   const gasAmount = useSettingsStore((state) => state.gasAmount);
 

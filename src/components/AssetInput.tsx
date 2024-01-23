@@ -4,6 +4,7 @@ import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
@@ -57,7 +58,14 @@ function AssetInput({
 
   const account = useAccount(context);
 
-  const { data: balances } = useBalancesByChain(account?.address, chain, assets);
+  const isAnyDisclosureOpen = useAnyDisclosureOpen();
+
+  const { data: balances } = useBalancesByChain({
+    address: account?.address,
+    chain,
+    assets,
+    enabled: !isAnyDisclosureOpen,
+  });
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return "0";
@@ -177,8 +185,7 @@ function AssetInput({
                   )}
                 >
                   {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 6,
+                    maximumFractionDigits: 2,
                   })}
                 </div>
               </SimpleTooltip>
