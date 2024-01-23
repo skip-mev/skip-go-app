@@ -185,7 +185,7 @@ function AssetInput({
                   )}
                 >
                   {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
+                    maximumFractionDigits: 4,
                   })}
                 </div>
               </SimpleTooltip>
