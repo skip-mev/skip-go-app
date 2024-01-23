@@ -1,9 +1,13 @@
 import type { ExperimentalFeature } from "@skip-router/core";
 import { createClient } from "@vercel/edge-config";
 
+function getClient() {
+  return createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
+}
+
 export async function getCorsDomains(): Promise<string[]> {
   try {
-    const client = createClient(process.env.CORS_EDGE_CONFIG!);
+    const client = getClient();
     const value = await client.get<string[]>("domains");
     if (Array.isArray(value)) return value;
     return [];
@@ -19,7 +23,7 @@ export async function getClientFlags(): Promise<ExperimentalFeature[]> {
       const value = process.env.NEXT_PUBLIC_FLAGS_OVERRIDE.split(",").filter(Boolean) as ExperimentalFeature[];
       return value;
     }
-    const client = createClient(process.env.NEXT_PUBLIC_FLAGS_EDGE_CONFIG!);
+    const client = getClient();
     const value = await client.get<ExperimentalFeature[]>("experimentalFeatures");
     if (Array.isArray(value)) return value;
     return [];
