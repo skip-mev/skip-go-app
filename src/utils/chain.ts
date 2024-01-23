@@ -3,9 +3,10 @@ import { Chain, FeeAsset } from "@skip-router/core";
 import { ChainId } from "@/chains/types";
 import { CHAIN_NAME_TO_CHAINLIST_ID, CHAINLIST_LOGO_CHAIN_IDS } from "@/constants/chainlist";
 
-export async function getChainFeeAssets(chainID: ChainId) {
+export async function getChainFeeAssets(chainID: ChainId): Promise<FeeAsset[]> {
   const response = await fetch(`/api/gas/${chainID}`);
-  const feeAssets = (await response.json()) as FeeAsset[];
+  if (!response.ok) return [];
+  const feeAssets = await response.json();
   return feeAssets;
 }
 
