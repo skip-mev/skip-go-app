@@ -98,6 +98,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              experimentalFeatures: ["cctp"],
             }
           : {
               amountOut: amount,
@@ -106,6 +107,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              experimentalFeatures: ["cctp"],
             },
       );
 
