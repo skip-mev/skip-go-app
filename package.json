@@ -60,7 +60,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-stately/table": "^3.11.4",
     "@sentry/nextjs": "^7.93.0",
-    "@skip-router/core": "^1.2.3",
+    "@skip-router/core": "^1.2.7",
     "@tailwindcss/forms": "^0.5.7",
     "@tanstack/query-sync-storage-persister": "^5.17.15",
     "@tanstack/react-query": "^5.17.15",
