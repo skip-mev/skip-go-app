@@ -8,8 +8,11 @@ declare namespace NodeJS {
     readonly POLKACHU_PASSWORD?: string;
 
     readonly CORS_EDGE_CONFIG?: string;
-    readonly RESEND_API_KEY?: string;
+    readonly FLAGS_OVERRIDE?: string;
+    readonly NEXT_PUBLIC_FLAGS_EDGE_CONFIG?: string;
+    readonly NEXT_PUBLIC_FLAGS_OVERRIDE?: string;
     readonly NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?: string;
+    readonly RESEND_API_KEY?: string;
     readonly WALLETCONNECT_VERIFY_KEY?: string;
   }
 }
