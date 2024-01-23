@@ -34,7 +34,6 @@ export function useBalancesByChain(
 
       return getBalancesByChain(address, chain.chainID, assets ?? []);
     },
-    refetchInterval: 1000 * 5,
     enabled: !!chain && !!address && enabled,
   });
 }
@@ -54,7 +53,7 @@ export async function getBalancesByChain(address: string, chainID: ChainId, asse
       return cosmwasm.queryContractSmart(asset.tokenContract!, {
         balance: { address },
       });
-      }),
+    }),
   );
 
   const allBalances = balances.reduce<Record<string, string>>(
