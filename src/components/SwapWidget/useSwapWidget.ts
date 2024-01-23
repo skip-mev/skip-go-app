@@ -134,9 +134,7 @@ export function useSwapWidget() {
 
     if (srcFeeAsset) {
       const parsedFeeBalance = BigNumber(balances[srcFeeAsset.denom] ?? "0").shiftedBy(-(srcFeeAsset.decimals ?? 6));
-      const compensated = parsedFeeBalance.minus(gasRequired || "0");
-
-      if (compensated.lt(parsedAmount)) {
+      if (parsedFeeBalance.lt(gasRequired || "0")) {
         return `Insufficient balance. You need ≈${gasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
       }
     }
