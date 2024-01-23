@@ -118,7 +118,6 @@ export function useRoute({
       return route;
     },
     refetchInterval: refetchCount < 10 ? 1000 * 5 : false,
-    retry: false,
     enabled:
       enabled &&
       !!sourceAsset &&
@@ -141,20 +140,27 @@ export function useRoute({
   return query;
 }
 
-export const useBroadcastedTxsStatus = (
-  txsRequired: number,
-  txs: { chainID: string; txHash: string }[] | undefined,
-) => {
+export const useBroadcastedTxsStatus = ({
+  txs,
+  txsRequired,
+  enabled,
+}: {
+  txsRequired: number;
+  txs: { chainID: string; txHash: string }[] | undefined;
+  enabled?: boolean;
+}) => {
   const skipClient = useSkipClient();
   const [isSettled, setIsSettled] = useState(false);
   const [prevData, setPrevData] = useState<
     | {
+        isSuccess: boolean;
+        isSettled: boolean;
         transferSequence: TransferSequence[];
       }
     | undefined
   >(undefined);
 
-  const queryKey = useMemo(() => ["solve-tx-status", txsRequired, txs] as const, [txs, txsRequired]);
+  const queryKey = useMemo(() => ["solve-txs-status", txsRequired, txs] as const, [txs, txsRequired]);
 
   return useQuery({
     queryKey,
@@ -212,6 +218,11 @@ export const useBroadcastedTxsStatus = (
           tx.state === "STATE_ABANDONED"
         );
       });
+
+      const _isSuccess = result.every((tx) => {
+        return tx.state === "STATE_COMPLETED_SUCCESS";
+      });
+
       if (result.length > 0 && txsRequired === result.length && _isSettled) {
         setIsSettled(true);
       }
@@ -221,12 +232,14 @@ export const useBroadcastedTxsStatus = (
       }, []);
 
       const resData = {
+        isSuccess: _isSuccess,
+        isSettled: _isSettled,
         transferSequence: mergedTransferSequence,
       };
       setPrevData(resData);
       return resData;
     },
-    enabled: !isSettled && !!txs && txs.length > 0,
+    enabled: !isSettled && !!txs && txs.length > 0 && enabled !== undefined ? enabled : true,
     refetchInterval: 1000 * 2,
     // to make the data persist when query key changed
     initialData: prevData,

@@ -1,10 +1,11 @@
-import { useWalletClient as useCosmosWalletClient } from "@cosmos-kit/react";
+import { useWallet, useWalletClient as useCosmosWalletClient } from "@cosmos-kit/react";
 import { ComponentProps, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useConnect } from "wagmi";
 import { create } from "zustand";
 
 import { MergedWalletClient } from "@/lib/cosmos-kit";
+import { isMobile } from "@/utils/os";
 
 const useStore = create<Record<string, true>>(() => ({}));
 
@@ -39,15 +40,25 @@ const CosmosWalletListItem = ({
   walletName: string;
 }) => {
   const { client } = useCosmosWalletClient(walletName);
+  const { wallet } = useWallet(walletName);
+
   const walletClient = client as MergedWalletClient | undefined;
+  const isWalletConnect = wallet?.mode === "wallet-connect";
+  const _isMobile = isMobile();
 
   const show = useMemo(() => {
     if (!walletClient) return false;
     if ("snapInstalled" in walletClient) {
       return walletClient.snapInstalled;
     }
+    if (_isMobile) {
+      return isWalletConnect || walletClient;
+    }
+    if (!_isMobile) {
+      return !isWalletConnect;
+    }
     return true;
-  }, [walletClient]);
+  }, [_isMobile, isWalletConnect, walletClient]);
 
   useEffect(() => {
     const unregister = () => {

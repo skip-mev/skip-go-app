@@ -40,21 +40,25 @@ export function SwapWidget() {
     destinationAsset,
     destinationChain,
     direction,
-    insufficientBalance,
+    isAmountError,
     numberOfTransactions,
     onDestinationAssetChange,
     onDestinationChainChange,
+    onDestinationAmountChange,
     onSourceAssetChange,
     onSourceChainChange,
+    onSourceAmountChange,
+    onSourceAmountMax,
+    onInvertDirection,
     priceImpactThresholdReached,
     route,
     routeError,
     routeLoading,
     routeWarningMessage,
     routeWarningTitle,
-    setFormValues,
     sourceAsset,
     sourceChain,
+    sourceFeeAmount,
     swapPriceImpactPercent,
   } = useSwapWidget();
 
@@ -135,14 +139,14 @@ export function SwapWidget() {
               asset={sourceAsset}
               chain={sourceChain}
               chains={chains ?? []}
-              onAmountChange={(amount) => {
-                setFormValues({ amountIn: amount, direction: "swap-in" });
-              }}
+              onAmountChange={onSourceAmountChange}
+              onAmountMax={onSourceAmountMax}
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
-              context="src"
+              context="source"
               isLoading={direction === "swap-out" && routeLoading}
+              isError={isAmountError}
             />
           </div>
           <div className="relative">
@@ -158,15 +162,7 @@ export function SwapWidget() {
                 onClick={() => {
                   if (!destinationChain || !invertButtonRef.current) return;
                   invertButtonRef.current.setAttribute("data-swap", "true");
-                  setFormValues({
-                    sourceChain: destinationChain,
-                    sourceAsset: destinationAsset,
-                    destinationChain: sourceChain,
-                    destinationAsset: sourceAsset,
-                    amountIn: amountOut,
-                    amountOut: amountIn,
-                    direction: direction === "swap-in" ? "swap-out" : "swap-in",
-                  });
+                  onInvertDirection();
                 }}
                 data-testid="swap-button"
                 ref={invertButtonRef}
@@ -206,12 +202,10 @@ export function SwapWidget() {
               asset={destinationAsset}
               chain={destinationChain}
               chains={chains ?? []}
-              onAmountChange={(amount) => {
-                setFormValues({ amountOut: amount, direction: "swap-out" });
-              }}
+              onAmountChange={onDestinationAmountChange}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
-              context="dest"
+              context="destination"
               isLoading={direction === "swap-in" && routeLoading}
             />
           </div>
@@ -222,6 +216,7 @@ export function SwapWidget() {
               amountOut={amountOut}
               sourceChain={sourceChain}
               sourceAsset={sourceAsset}
+              gasRequired={sourceFeeAmount}
               destinationChain={destinationChain}
               destinationAsset={destinationAsset}
               route={route}
@@ -247,7 +242,12 @@ export function SwapWidget() {
           )}
           {!isWalletConnected && (
             <button
-              className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white transition-transform hover:rotate-1 hover:scale-105"
+              className={clsx(
+                "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-[opacity,transform]",
+                "disabled:cursor-not-allowed disabled:opacity-75",
+                "enabled:hover:rotate-1 enabled:hover:scale-105",
+              )}
+              disabled={!sourceChain}
               onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
                   openWalletModal(sourceChain.chainID, "source");
@@ -279,20 +279,11 @@ export function SwapWidget() {
                 isLoading={routeLoading}
                 route={route}
                 transactionCount={numberOfTransactions}
-                insufficientBalance={insufficientBalance}
+                isAmountError={isAmountError}
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}
               />
-              {insufficientBalance && (
-                <p className="animate-slide-up-and-fade text-center text-sm font-semibold text-red-500">
-                  {typeof insufficientBalance === "string" ? (
-                    <>Insufficient Balance: {insufficientBalance}</>
-                  ) : (
-                    <>Insufficient Balance</>
-                  )}
-                </p>
-              )}
             </div>
           )}
         </div>

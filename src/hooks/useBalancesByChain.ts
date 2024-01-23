@@ -34,25 +34,26 @@ export function useBalancesByChain(
 
       return getBalancesByChain(address, chain.chainID, assets ?? []);
     },
-    refetchInterval: 1000 * 5,
     enabled: !!chain && !!address && enabled,
   });
 }
 
 export async function getBalancesByChain(address: string, chainID: ChainId, assets: AssetWithMetadata[]) {
-  const client = await getStargateClientForChainID(chainID);
-  const cosmwasmClient = await getCosmWasmClientForChainID(chainID);
+  const [stargate, cosmwasm] = await Promise.all([
+    getStargateClientForChainID(chainID),
+    getCosmWasmClientForChainID(chainID),
+  ]);
 
-  const balances = await client.getAllBalances(address);
+  const balances = await stargate.getAllBalances(address);
 
   const cw20Assets = assets.filter((asset) => asset.isCW20);
 
   const cw20Balances = await Promise.all(
-    cw20Assets.map((asset) =>
-      cosmwasmClient.queryContractSmart(asset.tokenContract!, {
+    cw20Assets.map((asset) => {
+      return cosmwasm.queryContractSmart(asset.tokenContract!, {
         balance: { address },
-      }),
-    ),
+      });
+    }),
   );
 
   const allBalances = balances.reduce<Record<string, string>>(

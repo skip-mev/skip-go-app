@@ -1,6 +1,14 @@
-import { Chain } from "@skip-router/core";
+import { Chain, FeeAsset } from "@skip-router/core";
 
+import { ChainId } from "@/chains/types";
 import { CHAIN_NAME_TO_CHAINLIST_ID, CHAINLIST_LOGO_CHAIN_IDS } from "@/constants/chainlist";
+
+export async function getChainFeeAssets(chainID: ChainId): Promise<FeeAsset[]> {
+  const response = await fetch(`/api/gas/${chainID}`);
+  if (!response.ok) return [];
+  const feeAssets = await response.json();
+  return feeAssets;
+}
 
 export function getChainLogo(chain: Chain) {
   if (chain.logoURI && chain.logoURI.match("-light")) {

@@ -479,7 +479,7 @@ const RouteDisplay: FC<Props> = ({ route, isRouteExpanded, setIsRouteExpanded, b
     return _actions;
   }, [route]);
 
-  const { data: statusData } = useBroadcastedTxsStatus(route.txsRequired, broadcastedTxs);
+  const { data: statusData } = useBroadcastedTxsStatus({ txsRequired: route.txsRequired, txs: broadcastedTxs });
 
   return (
     <div className="relative h-full">

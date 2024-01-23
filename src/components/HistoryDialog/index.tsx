@@ -10,6 +10,7 @@ import { useTxHistory } from "@/context/tx-history";
 
 import { HistoryClearButton } from "./HistoryClearButton";
 import * as HistoryList from "./HistoryList";
+import { useSyncState } from "./SyncState";
 
 export const HistoryDialog = () => {
   const [isOpen, { close }] = useDisclosureKey("historyDialog");
@@ -20,6 +21,8 @@ export const HistoryDialog = () => {
   const entries = useMemo(() => {
     return isReady ? Object.entries(history).reverse() : undefined;
   }, [history, isReady]);
+
+  useSyncState();
 
   return (
     <Dialog.Root
