@@ -4,7 +4,6 @@ import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
@@ -22,12 +21,15 @@ interface Props {
   diffPercentage?: number;
   onAmountChange?: (amount: string) => void;
   asset?: AssetWithMetadata;
+  feeAsset?: AssetWithMetadata;
+  feeAmount?: string;
   onAssetChange?: (asset: AssetWithMetadata) => void;
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
   context: "source" | "destination";
+  isError?: string | boolean;
   isLoading?: boolean;
 }
 
@@ -37,12 +39,15 @@ function AssetInput({
   diffPercentage = 0,
   onAmountChange,
   asset,
+  feeAsset,
+  feeAmount,
   onAssetChange,
   chain,
   chains,
   onChainChange,
   showBalance,
   context,
+  isError,
   isLoading,
 }: Props) {
   const { assetsByChainID, getNativeAssets } = useAssets();
@@ -86,26 +91,30 @@ function AssetInput({
 
     let balance = new BigNumber(selectedAssetBalance);
 
-    if (event.shiftKey) {
+    if (event.ctrlKey || event.metaKey) {
+      onAmountChange?.(balance.div(2).toString());
+      return;
+    }
+
+    if (event.shiftKey || (feeAsset && asset.denom !== feeAsset.denom)) {
       onAmountChange?.(balance.toString());
       return;
     }
 
-    const { gasComputed } = useSettingsStore.getState();
-    gasComputed && (balance = balance.minus(gasComputed));
-
+    balance = balance.minus(feeAmount ?? "0");
     onAmountChange?.(balance.toString());
   };
 
   return (
     <div
       className={clsx(
-        "space-y-4 rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
+        "rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
         "hover:border-neutral-300 hover:shadow-sm",
+        !!isError && "border-red-400 focus-within:border-red-500 hover:border-red-500",
       )}
     >
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+      <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
         <div>
           <ChainSelect
             chain={chain}
@@ -123,7 +132,7 @@ function AssetInput({
           />
         </div>
       </div>
-      <div className="relative isolate">
+      <div className="relative isolate mb-2">
         {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
         <input
           data-testid="amount"
@@ -197,7 +206,7 @@ function AssetInput({
           {showBalance && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip label={`${selectedAssetBalance} ${asset.recommendedSymbol}`}>
+              <SimpleTooltip label={`${formattedSelectedAssetBalance} ${asset.recommendedSymbol}`}>
                 <div
                   className={clsx(
                     "mr-2 max-w-[16ch] truncate tabular-nums",
@@ -221,6 +230,9 @@ function AssetInput({
           )}
         </div>
       </div>
+      {typeof isError === "string" && (
+        <div className="animate-slide-up-and-fade text-center text-xs font-medium text-red-500">{isError}</div>
+      )}
     </div>
   );
 }

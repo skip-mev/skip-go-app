@@ -2,18 +2,18 @@ import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
-import { Fragment, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import { formatMaxFraction, formatPercent } from "@/utils/intl";
+import { formatPercent } from "@/utils/intl";
 
 import { ConversionRate } from "../ConversionRate";
 import { SimpleTooltip } from "../SimpleTooltip";
 import { UsdValue } from "../UsdValue";
-import { FormValues } from "./useSwapWidget";
+import { SwapWidgetStore } from "./useSwapWidget";
 
-type Props = FormValues & {
+type Props = SwapWidgetStore & {
   amountOut: string;
   route: RouteResponse;
   priceImpactPercent: number;
@@ -25,6 +25,7 @@ export const SwapDetails = ({
   amountOut,
   sourceChain,
   sourceAsset,
+  gasRequired,
   destinationChain,
   destinationAsset,
   route,
@@ -33,32 +34,26 @@ export const SwapDetails = ({
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { gasComputed, slippage } = useSettingsStore();
+  const { gasMultiplier, slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
       if ("axelarTransfer" in op) return op;
     }
-    return null;
   }, [route]);
 
   const bridgingFee = useMemo(() => {
-    if (!axelarTransferOperation) return 0;
-    const { feeAmount } = axelarTransferOperation.axelarTransfer;
-    return +feeAmount / Math.pow(10, 18);
+    if (!axelarTransferOperation) return;
+    const { feeAmount, asset } = axelarTransferOperation.axelarTransfer;
+    const computed = (+feeAmount / Math.pow(10, 18)).toLocaleString("en-US", {
+      maximumFractionDigits: 6,
+    });
+    return `${computed} ${asset}`;
   }, [axelarTransferOperation]);
-
-  useEffect(() => {
-    if (priceImpactThresholdReached) {
-      control.open();
-    }
-  }, [control, priceImpactThresholdReached]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
   }
-
-  const isEvm = sourceChain?.chainType === "evm" || destinationChain?.chainType === "evm";
 
   return (
     <Collapsible.Root
@@ -68,7 +63,7 @@ export const SwapDetails = ({
         "hover:border-neutral-300 hover:shadow-sm",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
       )}
-      open={open}
+      open={open || priceImpactThresholdReached}
       onOpenChange={control.set}
     >
       <div className="relative flex items-center gap-1 text-center text-xs">
@@ -137,10 +132,10 @@ export const SwapDetails = ({
           )}
         >
           {priceImpactPercent ? (
-            <Fragment>
+            <>
               <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>Price Impact</dt>
               <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>{formatPercent(priceImpactPercent)}</dd>
-            </Fragment>
+            </>
           ) : null}
           <dt>Slippage</dt>
           <dd>
@@ -158,9 +153,11 @@ export const SwapDetails = ({
             </SimpleTooltip>
             {slippage}%
           </dd>
-          <dt>Gas Adjustment</dt>
+          <dt>Estimated Gas</dt>
+          <dd>{gasRequired ?? "-"}</dd>
+          <dt>Gas Multiplier</dt>
           <dd>
-            <SimpleTooltip label="Click to change gas adjusment">
+            <SimpleTooltip label="Click to change gas multiplier">
               <button
                 className={clsx(
                   "mr-1 inline-flex items-center gap-1 p-1 text-xs transition-colors",
@@ -172,15 +169,10 @@ export const SwapDetails = ({
                 <PencilSquareIcon className="h-3 w-3" />
               </button>
             </SimpleTooltip>
-            {gasComputed &&
-              parseFloat(gasComputed).toLocaleString("en-US", {
-                maximumFractionDigits: 8,
-              })}
+            {parseFloat(gasMultiplier).toLocaleString()}
           </dd>
           <dt>Bridging Fee</dt>
-          <dd>
-            {formatMaxFraction(bridgingFee)} {isEvm ? "ETH" : ""}
-          </dd>
+          <dd>{bridgingFee ?? "-"}</dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>

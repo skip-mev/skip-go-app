@@ -44,17 +44,21 @@ export function SwapWidget() {
     numberOfTransactions,
     onDestinationAssetChange,
     onDestinationChainChange,
+    onDestinationAmountChange,
     onSourceAssetChange,
     onSourceChainChange,
+    onSourceAmountChange,
+    onInvertDirection,
     priceImpactThresholdReached,
     route,
     routeError,
     routeLoading,
     routeWarningMessage,
     routeWarningTitle,
-    setFormValues,
     sourceAsset,
     sourceChain,
+    sourceFeeAsset,
+    sourceFeeAmount,
     swapPriceImpactPercent,
   } = useSwapWidget();
 
@@ -133,16 +137,17 @@ export function SwapWidget() {
               amount={amountIn}
               amountUSD={route?.usdAmountIn}
               asset={sourceAsset}
+              feeAsset={sourceFeeAsset}
+              feeAmount={sourceFeeAmount}
               chain={sourceChain}
               chains={chains ?? []}
-              onAmountChange={(amount) => {
-                setFormValues({ amountIn: amount, direction: "swap-in" });
-              }}
+              onAmountChange={onSourceAmountChange}
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
               showBalance
               context="source"
               isLoading={direction === "swap-out" && routeLoading}
+              isError={insufficientBalance}
             />
           </div>
           <div className="relative">
@@ -158,15 +163,7 @@ export function SwapWidget() {
                 onClick={() => {
                   if (!destinationChain || !invertButtonRef.current) return;
                   invertButtonRef.current.setAttribute("data-swap", "true");
-                  setFormValues({
-                    sourceChain: destinationChain,
-                    sourceAsset: destinationAsset,
-                    destinationChain: sourceChain,
-                    destinationAsset: sourceAsset,
-                    amountIn: amountOut,
-                    amountOut: amountIn,
-                    direction: direction === "swap-in" ? "swap-out" : "swap-in",
-                  });
+                  onInvertDirection();
                 }}
                 data-testid="swap-button"
                 ref={invertButtonRef}
@@ -206,9 +203,7 @@ export function SwapWidget() {
               asset={destinationAsset}
               chain={destinationChain}
               chains={chains ?? []}
-              onAmountChange={(amount) => {
-                setFormValues({ amountOut: amount, direction: "swap-out" });
-              }}
+              onAmountChange={onDestinationAmountChange}
               onAssetChange={onDestinationAssetChange}
               onChainChange={onDestinationChainChange}
               context="destination"
@@ -222,6 +217,7 @@ export function SwapWidget() {
               amountOut={amountOut}
               sourceChain={sourceChain}
               sourceAsset={sourceAsset}
+              gasRequired={sourceFeeAmount}
               destinationChain={destinationChain}
               destinationAsset={destinationAsset}
               route={route}
@@ -289,15 +285,6 @@ export function SwapWidget() {
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}
               />
-              {insufficientBalance && (
-                <p className="animate-slide-up-and-fade text-center text-sm font-semibold text-red-500">
-                  {typeof insufficientBalance === "string" ? (
-                    <>Insufficient Balance: {insufficientBalance}</>
-                  ) : (
-                    <>Insufficient Balance</>
-                  )}
-                </p>
-              )}
             </div>
           )}
         </div>
