@@ -10,6 +10,7 @@ import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
+import { gracefullyConnect } from "@/utils/wallet";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
@@ -168,40 +169,26 @@ function WalletModalWithContext() {
   if (chainType === "cosmos") {
     const chainName = chainIdToName[chainID];
     const walletRepo = getWalletRepo(chainName);
-    wallets = walletRepo.wallets.map((w) => ({
-      walletName: w.walletName,
-      walletPrettyName: w.walletPrettyName,
+    wallets = walletRepo.wallets.map((wallet) => ({
+      walletName: wallet.walletName,
+      walletPrettyName: wallet.walletPrettyName,
       walletInfo: {
-        logo: w.walletInfo.logo,
+        logo: wallet.walletInfo.logo,
       },
       connect: async () => {
-        await w.client.addChain?.({
-          chain: {
-            bech32_prefix: w.chain.bech32_prefix,
-            chain_id: w.chain.chain_id,
-            chain_name: w.chain.chain_name,
-            network_type: w.chain.network_type,
-            pretty_name: w.chain.pretty_name,
-            slip44: w.chain.slip44,
-            status: w.chain.status,
-            apis: w.chain.apis,
-            bech32_config: w.chain.bech32_config,
-            explorers: w.chain.explorers,
-            extra_codecs: w.chain.extra_codecs,
-            fees: w.chain.fees,
-            peers: w.chain.peers,
-          },
-          name: w.chainName,
-          assetList: w.assetList,
-        });
-        await w.connect();
-        context && trackWallet.track(context, chainID, w.walletName, chainType);
+        try {
+          await gracefullyConnect(wallet);
+          context && trackWallet.track(context, chainID, wallet.walletName, chainType);
+        } catch (error) {
+          console.error(error);
+          context && trackWallet.untrack(context);
+        }
       },
       disconnect: async () => {
-        await w.disconnect();
+        await wallet.disconnect();
         context && trackWallet.untrack(context);
       },
-      isWalletConnected: w.isWalletConnected,
+      isWalletConnected: wallet.isWalletConnected,
     }));
   }
 

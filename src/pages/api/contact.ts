@@ -2,7 +2,7 @@ import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 import { Resend } from "resend";
 
-import { contactFormSchema } from "@/schemas/contact";
+import { contactFormSchema } from "@/schemas/api";
 
 export const config: PageConfig = {
   runtime: "edge",

@@ -1,5 +1,5 @@
 import { Asset } from "@skip-router/core";
-import { createContext, FC, PropsWithChildren, useCallback, useContext, useEffect, useMemo } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 
 import { useChains } from "@/hooks/useChains";
 
@@ -11,7 +11,7 @@ interface AssetsContext {
   assets: Record<string, AssetWithMetadata[]>;
   assetsByChainID: (chainID?: string) => AssetWithMetadata[];
   getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
-  getFeeDenom(chainID: string): AssetWithMetadata | undefined;
+  getFeeAsset(chainID: string): AssetWithMetadata | undefined;
   getNativeAssets(): AssetWithMetadata[];
   isReady: boolean;
 }
@@ -20,12 +20,12 @@ export const AssetsContext = createContext<AssetsContext>({
   assets: {},
   assetsByChainID: () => [],
   getAsset: () => undefined,
-  getFeeDenom: () => undefined,
+  getFeeAsset: () => undefined,
   getNativeAssets: () => [],
   isReady: false,
 });
 
-export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
+export function AssetsProvider({ children }: { children: ReactNode }) {
   const { data: chains } = useChains();
   const { data: solveAssets } = useSolveAssets();
 
@@ -56,20 +56,21 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     [assets],
   );
 
-  const getFeeDenom = useCallback(
+  const getFeeAsset = useCallback(
     (chainID: string) => {
       const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
 
-      if (!chain || chain.feeAssets.length === 0) return undefined;
+      if (!chain || chain.feeAssets.length === 0) return;
 
-      // prioritize non-ibc assets
-      const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
-        if (a.denom.includes("ibc/")) return 1;
-        if (b.denom.includes("ibc/")) return -1;
+      // deprio denoms start with 'ibc/' and 'factory/'
+      const [firstFeeAsset] = chain.feeAssets.sort((a, b) => {
+        if (a.denom.match(/^(ibc|factory)\//)) return 1;
+        if (b.denom.match(/^(ibc|factory)\//)) return -1;
         return 0;
       });
+      if (!firstFeeAsset) return;
 
-      return getAsset(sortedFeeDenoms[0].denom, chainID);
+      return getAsset(firstFeeAsset.denom, chainID);
     },
     [chains, getAsset],
   );
@@ -111,7 +112,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
         assets,
         assetsByChainID,
         getAsset,
-        getFeeDenom,
+        getFeeAsset,
         getNativeAssets,
         isReady,
       }}
@@ -119,7 +120,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       {children}
     </AssetsContext.Provider>
   );
-};
+}
 
 export function useAssets() {
   return useContext(AssetsContext);

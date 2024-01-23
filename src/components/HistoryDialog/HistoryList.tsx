@@ -10,11 +10,12 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
 import { clsx } from "clsx";
-import { ComponentPropsWithoutRef, forwardRef, Fragment, useMemo, useRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef, Fragment, useEffect, useMemo, useRef } from "react";
 
 import { disclosure } from "@/context/disclosures";
-import { removeTxHistory, TxHistoryItem } from "@/context/tx-history";
+import { txHistory, TxHistoryItem } from "@/context/tx-history";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
+import { useBroadcastedTxsStatus } from "@/solve";
 
 import { AssetValue } from "../AssetValue";
 import { ChainSymbol } from "../ChainSymbol";
@@ -60,6 +61,25 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
+  const { data: txsStatus, isLoading } = useBroadcastedTxsStatus({
+    txsRequired: data.route.txsRequired,
+    txs: data.txStatus.map((item) => ({
+      chainID: item.chainId,
+      txHash: item.txHash,
+    })),
+    enabled: !(data.status === "success" || data.status === "failed"),
+  });
+
+  useEffect(() => {
+    if (txsStatus?.isSettled) {
+      if (txsStatus.isSuccess) {
+        txHistory.success(id);
+      }
+      if (!txsStatus.isSuccess) {
+        txHistory.fail(id);
+      }
+    }
+  }, [id, txsStatus]);
 
   return (
     <Accordion.Item
@@ -112,10 +132,10 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
               "text-red-600": data.status === "failed",
             })}
           >
-            <span className="capitalize">{data.status}</span>
+            {!isLoading && <span className="capitalize">{data.status}</span>}
             <StatusIcon
               status={data.status}
-              className={clsx("h-4 w-4", data.status === "pending" && "animate-spin")}
+              className={clsx("h-4 w-4", !txsStatus?.isSettled && "animate-spin")}
             />
           </div>
         </div>
@@ -213,7 +233,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
               "flex items-center justify-center space-x-1",
               "bg-[#FF486E]/20 text-[#FF486E] hover:bg-[#FF486E]/30",
             )}
-            onClick={() => removeTxHistory(id)}
+            onClick={() => txHistory.remove(id)}
           >
             <TrashIcon className="h-3 w-3" />
           </button>

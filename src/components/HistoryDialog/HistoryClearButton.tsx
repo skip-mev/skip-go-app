@@ -2,7 +2,7 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
-import { clearTxHistory, useTxHistory } from "@/context/tx-history";
+import { txHistory, useTxHistory } from "@/context/tx-history";
 
 import { SimpleTooltip } from "../SimpleTooltip";
 
@@ -27,7 +27,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
           "transition-colors focus:outline-none",
           className,
         )}
-        onClick={() => clearTxHistory()}
+        onClick={() => txHistory.clear()}
         {...props}
       >
         <TrashIcon className="h-4 w-4" />

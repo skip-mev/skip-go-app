@@ -1,5 +1,6 @@
 import "@fontsource/jost/latin.css";
 import "@/styles/globals.css";
+import "@interchain-ui/react/styles";
 
 import { ChainProvider } from "@cosmos-kit/react";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -66,7 +67,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 </main>
                 <VersionCheck />
                 <Toaster
-                  position="bottom-center"
+                  position="top-right"
                   toastOptions={{ duration: 1000 * 10 }}
                 />
               </AssetsProvider>

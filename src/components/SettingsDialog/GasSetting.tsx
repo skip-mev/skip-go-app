@@ -2,7 +2,7 @@ import { useSettingsStore } from "@/context/settings";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 
 export const GasSetting = () => {
-  const currentValue = useSettingsStore((state) => state.gasMultiplier);
+  const currentValue = useSettingsStore((state) => state.gasAmount);
 
   return (
     <div className="flex items-center space-x-2 p-2">
@@ -23,7 +23,7 @@ export const GasSetting = () => {
               latest = latest.replace(/[,]{2,}/g, ","); // Remove multiple commas
 
               const value = Math.max(0, +latest);
-              useSettingsStore.setState({ gasMultiplier: value.toString() });
+              useSettingsStore.setState({ gasAmount: value.toString() });
             }}
           />
         </div>

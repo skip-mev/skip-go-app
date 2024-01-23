@@ -4,7 +4,7 @@ import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
 import { AssetWithMetadata, useAssets } from "@/context/assets";
-import { useSettingsStore } from "@/context/settings";
+import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
@@ -21,13 +21,15 @@ interface Props {
   amountUSD?: string;
   diffPercentage?: number;
   onAmountChange?: (amount: string) => void;
+  onAmountMax?: MouseEventHandler<HTMLButtonElement>;
   asset?: AssetWithMetadata;
   onAssetChange?: (asset: AssetWithMetadata) => void;
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
   showBalance?: boolean;
-  context?: "src" | "dest";
+  context: "source" | "destination";
+  isError?: string | boolean;
   isLoading?: boolean;
 }
 
@@ -36,6 +38,7 @@ function AssetInput({
   amountUSD,
   diffPercentage = 0,
   onAmountChange,
+  onAmountMax,
   asset,
   onAssetChange,
   chain,
@@ -43,69 +46,46 @@ function AssetInput({
   onChainChange,
   showBalance,
   context,
+  isError,
   isLoading,
 }: Props) {
   const { assetsByChainID, getNativeAssets } = useAssets();
 
   const assets = useMemo(() => {
-    if (!chain) {
-      return getNativeAssets();
-    }
-
+    if (!chain) return getNativeAssets();
     return assetsByChainID(chain.chainID);
   }, [assetsByChainID, chain, getNativeAssets]);
 
-  const showChainInfo = chain ? false : true;
+  const account = useAccount(context);
 
-  const account = useAccount(context === "src" ? "source" : "destination");
+  const isAnyDisclosureOpen = useAnyDisclosureOpen();
 
-  const { data: balances } = useBalancesByChain(account?.address, chain, assets);
+  const { data: balances } = useBalancesByChain({
+    address: account?.address,
+    chain,
+    assets,
+    enabled: !isAnyDisclosureOpen,
+  });
 
   const selectedAssetBalance = useMemo(() => {
-    if (!asset || !balances) return 0;
-
-    const balanceWei = balances[asset.denom];
-    if (!balanceWei) return 0;
-
-    return parseFloat(formatUnits(balanceWei, asset.decimals));
+    if (!asset || !balances) return "0";
+    return formatUnits(balances[asset.denom] ?? "0", asset.decimals ?? 6);
   }, [asset, balances]);
 
-  const formattedSelectedAssetBalance = useMemo(() => {
-    return selectedAssetBalance.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    });
-  }, [selectedAssetBalance]);
-
   const maxButtonDisabled = useMemo(() => {
-    return selectedAssetBalance <= 0;
+    return parseFloat(selectedAssetBalance) <= 0;
   }, [selectedAssetBalance]);
-
-  const handleMax: MouseEventHandler<HTMLButtonElement> = (event) => {
-    if (!selectedAssetBalance || !chain || !asset) return;
-
-    let balance = new BigNumber(selectedAssetBalance);
-
-    if (event.shiftKey) {
-      onAmountChange?.(balance.toString());
-      return;
-    }
-
-    const { gasComputed } = useSettingsStore.getState();
-    gasComputed && (balance = balance.minus(gasComputed));
-
-    onAmountChange?.(balance.toString());
-  };
 
   return (
     <div
       className={clsx(
-        "space-y-4 rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
+        "rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
         "hover:border-neutral-300 hover:shadow-sm",
+        !!isError && "border-red-400 focus-within:border-red-500 hover:border-red-500",
       )}
     >
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+      <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
         <div>
           <ChainSelect
             chain={chain}
@@ -119,11 +99,11 @@ function AssetInput({
             assets={assets}
             balances={balances}
             onChange={onAssetChange}
-            showChainInfo={showChainInfo}
+            showChainInfo={!!chain}
           />
         </div>
       </div>
-      <div className="relative isolate">
+      <div className="relative isolate mb-2">
         {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
         <input
           data-testid="amount"
@@ -188,7 +168,7 @@ function AssetInput({
         />
         <div className="flex h-8 items-center space-x-2 tabular-nums">
           <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
-          {amountUSD !== undefined && diffPercentage !== 0 && context === "dest" ? (
+          {amountUSD !== undefined && diffPercentage !== 0 && context === "destination" ? (
             <p className={clsx("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>
@@ -197,14 +177,16 @@ function AssetInput({
           {showBalance && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
-              <SimpleTooltip label={`${selectedAssetBalance} ${asset.recommendedSymbol}`}>
+              <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
                 <div
                   className={clsx(
                     "mr-2 max-w-[16ch] truncate tabular-nums",
                     "cursor-help underline decoration-dotted underline-offset-4",
                   )}
                 >
-                  {formattedSelectedAssetBalance}
+                  {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
+                    maximumFractionDigits: 4,
+                  })}
                 </div>
               </SimpleTooltip>
               <button
@@ -213,7 +195,7 @@ function AssetInput({
                   "transition-[transform,background] enabled:hover:rotate-2 enabled:hover:scale-110 disabled:cursor-not-allowed",
                 )}
                 disabled={maxButtonDisabled}
-                onClick={handleMax}
+                onClick={onAmountMax}
               >
                 Max
               </button>
@@ -221,6 +203,11 @@ function AssetInput({
           )}
         </div>
       </div>
+      {typeof isError === "string" && (
+        <div className="animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
+          {isError}
+        </div>
+      )}
     </div>
   );
 }

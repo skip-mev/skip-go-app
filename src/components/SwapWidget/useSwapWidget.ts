@@ -1,7 +1,8 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { BigNumber } from "bignumber.js";
-import { ethers, formatUnits } from "ethers";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { formatUnits } from "ethers";
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import {
   useAccount as useWagmiAccount,
   useNetwork as useWagmiNetwork,
@@ -19,7 +20,10 @@ import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute } from "@/solve";
+import { getChainFeeAssets } from "@/utils/chain";
 import { formatPercent, formatUSD } from "@/utils/intl";
+import { getAmountWei, parseAmountWei } from "@/utils/number";
+import { gracefullyConnect } from "@/utils/wallet";
 
 const DEFAULT_SRC_CHAIN_ID = "cosmoshub-4";
 const PRICE_IMPACT_THRESHOLD = 0.1;
@@ -27,15 +31,15 @@ const PRICE_IMPACT_THRESHOLD = 0.1;
 export function useSwapWidget() {
   /**
    * intentional manual hydration to prevent ssr mismatch
-   * @see {useSwapFormStore}
+   * @see {useSwapWidgetStore}
    */
-  useEffect(() => void useSwapFormStore.persist.rehydrate(), []);
+  useEffect(() => void useSwapWidgetStore.persist.rehydrate(), []);
 
   /////////////////////////////////////////////////////////////////////////////
 
-  // #region -- core states and callbacks
+  // #region -- core states
 
-  const { assetsByChainID, getFeeDenom } = useAssets();
+  const { assetsByChainID, getFeeAsset } = useAssets();
   const { data: chains } = useChains();
 
   const srcAccount = useAccount("source");
@@ -55,17 +59,25 @@ export function useSwapWidget() {
     destinationChain: dstChain,
     sourceAsset: srcAsset,
     sourceChain: srcChain,
-  } = useSwapFormStore();
+    sourceFeeAsset: srcFeeAsset,
+    gasRequired,
+  } = useSwapWidgetStore();
 
-  const amountInWei = useSwapFormStore((state) => {
-    return getAmountWei(state.sourceAsset, state.amountIn);
-  });
+  const amountInWei = useMemo(() => {
+    return getAmountWei(amountIn, srcAsset?.decimals);
+  }, [amountIn, srcAsset?.decimals]);
 
-  const amountOutWei = useSwapFormStore((state) => {
-    return getAmountWei(state.destinationAsset, state.amountOut);
-  });
+  const amountOutWei = useMemo(() => {
+    return getAmountWei(amountOut, dstAsset?.decimals);
+  }, [amountOut, dstAsset?.decimals]);
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
+
+  const shouldRouteLoad = useMemo(() => {
+    const wei = parseFloat(direction === "swap-in" ? amountInWei : amountOutWei);
+    const isValidWei = !isNaN(wei);
+    return !isAnyDisclosureOpen && isValidWei;
+  }, [amountInWei, amountOutWei, direction, isAnyDisclosureOpen]);
 
   const {
     data: route,
@@ -79,7 +91,7 @@ export function useSwapWidget() {
     sourceAssetChainID: srcAsset?.chainID,
     destinationAsset: dstAsset?.denom,
     destinationAssetChainID: dstAsset?.chainID,
-    enabled: !isAnyDisclosureOpen,
+    enabled: shouldRouteLoad,
   });
 
   const srcAssets = useMemo(() => {
@@ -89,10 +101,14 @@ export function useSwapWidget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [srcChain?.chainID]);
 
-  const { data: balances } = useBalancesByChain(srcAccount?.address, srcChain, srcAssets);
+  const { data: balances } = useBalancesByChain({
+    address: srcAccount?.address,
+    chain: srcChain,
+    assets: srcAssets,
+    enabled: !isAnyDisclosureOpen,
+  });
 
-  const gasComputed = useSettingsStore((state) => state.gasComputed);
-  const gasMultiplier = useSettingsStore((state) => state.gasMultiplier);
+  const gasAmount = useSettingsStore((state) => state.gasAmount);
 
   // #endregion
 
@@ -108,24 +124,27 @@ export function useSwapWidget() {
     return String(routeError);
   }, [routeError]);
 
-  const insufficientBalance = useMemo(() => {
-    const asset = srcAsset;
-
-    if (!asset || !balances) return false;
-
-    const parsedAmount = parseFloat(amountIn);
-
-    if (isNaN(parsedAmount)) return false;
-
-    const balanceStr = balances[asset.denom] ?? "0";
-    const balance = parseFloat(formatUnits(balanceStr, asset.decimals));
-
-    if (gasComputed && parsedAmount + +gasComputed > balance) {
-      return `You need to have at least more than ≈${gasComputed} to accommodate gas fees.`;
+  const isAmountError = useMemo(() => {
+    if (!amountIn || !balances || !srcAsset) {
+      return false;
     }
 
-    return parsedAmount > balance;
-  }, [amountIn, balances, gasComputed, srcAsset]);
+    const parsedAmount = BigNumber(amountIn || "0");
+    const parsedBalance = BigNumber(balances[srcAsset.denom] ?? "0").shiftedBy(-(srcAsset.decimals ?? 6));
+
+    if (srcFeeAsset) {
+      const parsedFeeBalance = BigNumber(balances[srcFeeAsset.denom] ?? "0").shiftedBy(-(srcFeeAsset.decimals ?? 6));
+      if (parsedFeeBalance.lt(gasRequired || "0")) {
+        return `Insufficient balance. You need ≈${gasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
+      }
+    }
+
+    if (parsedBalance.lt(parsedAmount)) {
+      return `Insufficient balance.`;
+    }
+
+    return false;
+  }, [amountIn, balances, gasRequired, srcAsset, srcFeeAsset]);
 
   const swapPriceImpactPercent = useMemo(() => {
     if (!route?.swapPriceImpactPercent) return undefined;
@@ -139,7 +158,7 @@ export function useSwapWidget() {
 
   const txsRequired = useMemo(() => {
     return route?.txsRequired ?? 0;
-  }, [route]);
+  }, [route?.txsRequired]);
 
   const usdDiffPercent = useMemo(() => {
     if (!route) {
@@ -201,25 +220,41 @@ export function useSwapWidget() {
    */
   const onSourceChainChange = useCallback(
     (chain: Chain) => {
-      let asset = getFeeDenom(chain.chainID);
+      let feeAsset: AssetWithMetadata | undefined = undefined;
+      if (chain.chainType === "cosmos") {
+        feeAsset = getFeeAsset(chain.chainID);
+      }
+
+      let asset = feeAsset;
       if (!asset) {
         [asset] = assetsByChainID(chain.chainID);
       }
-      useSwapFormStore.setState({
+
+      useSwapWidgetStore.setState({
         sourceChain: chain,
         sourceAsset: asset,
+        sourceFeeAsset: feeAsset,
+        gasRequired: undefined,
       });
     },
-    [assetsByChainID, getFeeDenom],
+    [assetsByChainID, getFeeAsset],
   );
 
   /**
    * Handle source asset change
    */
   const onSourceAssetChange = useCallback((asset: AssetWithMetadata) => {
-    useSwapFormStore.setState({
+    useSwapWidgetStore.setState({
       sourceAsset: asset,
+      gasRequired: undefined,
     });
+  }, []);
+
+  /**
+   * Handle source amount change
+   */
+  const onSourceAmountChange = useCallback((amount: string) => {
+    useSwapWidgetStore.setState({ amountIn: amount, direction: "swap-in" });
   }, []);
 
   /**
@@ -230,10 +265,10 @@ export function useSwapWidget() {
    */
   const onDestinationChainChange = useCallback(
     (chain: Chain) => {
-      const { destinationAsset: currentDstAsset } = useSwapFormStore.getState();
+      const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
-      let asset = getFeeDenom(chain.chainID);
+      let asset = getFeeAsset(chain.chainID);
       if (!asset) {
         [asset] = assets;
       }
@@ -245,13 +280,13 @@ export function useSwapWidget() {
         }
       }
 
-      useSwapFormStore.setState({
+      useSwapWidgetStore.setState({
         destinationChain: chain,
         destinationAsset: asset,
       });
     },
 
-    [assetsByChainID, getFeeDenom, userTouchedDstAsset],
+    [assetsByChainID, getFeeAsset, userTouchedDstAsset],
   );
 
   /**
@@ -262,7 +297,7 @@ export function useSwapWidget() {
   const onDestinationAssetChange = useCallback(
     (asset: AssetWithMetadata) => {
       // If destination asset is defined, but no destination chain, select chain based off asset.
-      let { destinationChain: currentDstChain } = useSwapFormStore.getState();
+      let { destinationChain: currentDstChain } = useSwapWidgetStore.getState();
 
       currentDstChain ??= (chains ?? []).find(({ chainID }) => {
         return chainID === asset.chainID;
@@ -271,12 +306,91 @@ export function useSwapWidget() {
       // If destination asset is user selected, set flag to true.
       setUserTouchedDstAsset(true);
 
-      useSwapFormStore.setState({
+      useSwapWidgetStore.setState({
         destinationChain: currentDstChain,
         destinationAsset: asset,
       });
     },
     [chains],
+  );
+
+  /**
+   * Handle destination amount change
+   */
+  const onDestinationAmountChange = useCallback((amount: string) => {
+    useSwapWidgetStore.setState({ amountOut: amount, direction: "swap-out" });
+  }, []);
+
+  /**
+   * Handle invert source and destination values
+   */
+  const onInvertDirection = useCallback(() => {
+    useSwapWidgetStore.setState((prev) => {
+      if (!prev.destinationChain) return prev;
+      return {
+        sourceChain: prev.destinationChain,
+        sourceAsset: prev.destinationAsset,
+        destinationChain: prev.sourceChain,
+        destinationAsset: prev.sourceAsset,
+        amountIn: prev.amountOut,
+        amountOut: prev.amountIn,
+        direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
+        sourceFeeAsset:
+          prev.destinationChain.chainType === "cosmos" ? getFeeAsset(prev.destinationChain.chainID) : undefined,
+        gasRequired: undefined,
+      };
+    });
+  }, [getFeeAsset]);
+
+  /**
+   * Handle maxing amount in
+   */
+  const onSourceAmountMax = useCallback(
+    <T extends HTMLElement>(event: MouseEvent<T>) => {
+      if (!balances || !srcChain || !srcAsset) return false;
+
+      const decimals = srcAsset.decimals ?? 6;
+      const balance = balances[srcAsset.denom];
+
+      /**
+       * if no balance, set amount in to zero
+       * (would be impossible since max button is disabled if no balance)
+       */
+      if (!balance) {
+        useSwapWidgetStore.setState({ amountIn: "0" });
+        return;
+      }
+
+      const isDifferentAsset = srcFeeAsset && srcFeeAsset.denom !== srcAsset.denom;
+      const isNotCosmos = srcChain.chainType !== "cosmos";
+
+      /**
+       * override to max balances on these cases:
+       * - shift key is pressed
+       * - fee asset is different from source asset
+       * - source chain is not cosmos
+       */
+      if (event.shiftKey || isDifferentAsset || isNotCosmos) {
+        const newAmountIn = formatUnits(balance, decimals);
+        useSwapWidgetStore.setState({ amountIn: newAmountIn });
+        return;
+      }
+
+      /**
+       * compensate gas fees if source asset is same as fee asset
+       */
+      if (gasRequired && srcFeeAsset && srcFeeAsset.denom === srcAsset.denom) {
+        let newAmountIn = BigNumber(balance).shiftedBy(-decimals).minus(gasRequired);
+        newAmountIn = newAmountIn.isNegative() ? BigNumber(0) : newAmountIn;
+        useSwapWidgetStore.setState({ amountIn: newAmountIn.toFixed(decimals) });
+        return;
+      }
+
+      // otherwise, max balance
+      const newAmountIn = formatUnits(balance, decimals);
+      useSwapWidgetStore.setState({ amountIn: newAmountIn });
+    },
+    [balances, gasRequired, srcAsset, srcChain, srcFeeAsset],
   );
 
   // #endregion
@@ -289,20 +403,41 @@ export function useSwapWidget() {
    * compute gas amount on source chain change
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
-      (state) => state.sourceChain,
-      (srcChain) => {
-        if (!srcChain) return;
-        const feeDenom = getFeeDenom(srcChain.chainID);
-        if (!feeDenom) return;
-        const { gasPrice } = srcChain.feeAssets.find(({ denom }) => {
-          return denom === feeDenom.denom;
-        })!;
-        useSettingsStore.setState({
-          gasComputed: new BigNumber(gasPrice.average)
-            .multipliedBy(gasMultiplier)
-            .shiftedBy(-(feeDenom.decimals ?? 6))
+    return useSwapWidgetStore.subscribe(
+      (state) => [state.sourceChain, state.sourceAsset, state.sourceFeeAsset] as const,
+      async ([srcChain, srcAsset, srcFeeAsset]) => {
+        if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
+
+        if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
+          srcFeeAsset = getFeeAsset(srcChain.chainID);
+        }
+
+        if (!srcFeeAsset) {
+          toast.error(`Unable to find gas asset for ${srcChain.chainName}`);
+          return;
+        }
+
+        let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
+          return denom === srcFeeAsset?.denom;
+        });
+
+        feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(({ denom }) => {
+          return denom === srcFeeAsset?.denom;
+        });
+
+        if (!feeDenomPrices) {
+          toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
+          return;
+        }
+
+        const decimals = srcFeeAsset.decimals ?? 6;
+
+        useSwapWidgetStore.setState({
+          gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
+            .multipliedBy(gasAmount)
+            .shiftedBy(-decimals)
             .toString(),
+          sourceFeeAsset: srcFeeAsset,
         });
       },
       {
@@ -310,7 +445,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [gasMultiplier, getFeeDenom]);
+  }, [gasAmount, getFeeAsset]);
 
   /**
    * sync either amount in or out depending on {@link direction}
@@ -326,18 +461,18 @@ export function useSwapWidget() {
       ? parseAmountWei(newAmount, dstAsset?.decimals)
       : parseAmountWei(newAmount, srcAsset?.decimals);
 
-    useSwapFormStore.setState(isSwapIn ? { amountOut: formattedNewAmount } : { amountIn: formattedNewAmount });
+    useSwapWidgetStore.setState(isSwapIn ? { amountOut: formattedNewAmount } : { amountIn: formattedNewAmount });
   }, [route, direction, srcAsset?.decimals, dstAsset?.decimals]);
 
   /**
    * if amount in is empty or zero, reset amount out
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
+    return useSwapWidgetStore.subscribe(
       (state) => state.amountIn,
       (current, prev) => {
         if ((!current || current == "0") && prev) {
-          useSwapFormStore.setState({ amountOut: "" });
+          useSwapWidgetStore.setState({ amountOut: "" });
         }
       },
     );
@@ -347,11 +482,11 @@ export function useSwapWidget() {
    * if amount out is empty or zero, reset amount in
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
+    return useSwapWidgetStore.subscribe(
       (state) => state.amountOut,
       (current, prev) => {
         if ((!current || current == "0") && prev) {
-          useSwapFormStore.setState({ amountIn: "" });
+          useSwapWidgetStore.setState({ amountIn: "" });
         }
       },
     );
@@ -362,7 +497,7 @@ export function useSwapWidget() {
    * {@link onSourceChainChange} to sync source asset
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
+    return useSwapWidgetStore.subscribe(
       (state) => [state.sourceChain, state.sourceAsset] as const,
       ([chain, asset]) => {
         if (!chain) {
@@ -386,7 +521,7 @@ export function useSwapWidget() {
    * @see {srcChain}
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
+    return useSwapWidgetStore.subscribe(
       (state) => state.sourceChain,
       async (srcChain) => {
         const { source: srcTrack, destination: dstTrack } = trackWallet.get();
@@ -409,30 +544,10 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("source", srcChain.chainID, wallet.walletName, srcChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("source");
             }
           } else {
             trackWallet.untrack("source");
@@ -447,7 +562,6 @@ export function useSwapWidget() {
               trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("source");
             }
           } else {
             trackWallet.untrack("source");
@@ -466,7 +580,7 @@ export function useSwapWidget() {
    * @see {dstChain}
    */
   useEffect(() => {
-    return useSwapFormStore.subscribe(
+    return useSwapWidgetStore.subscribe(
       (state) => state.destinationChain,
       async (dstChain) => {
         const { source: srcTrack, destination: dstTrack } = trackWallet.get();
@@ -489,30 +603,10 @@ export function useSwapWidget() {
           }
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           } else {
             trackWallet.untrack("destination");
@@ -527,7 +621,6 @@ export function useSwapWidget() {
               trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           } else {
             trackWallet.untrack("destination");
@@ -549,7 +642,7 @@ export function useSwapWidget() {
     return trackWallet.subscribe(
       (state) => state.source,
       async (srcTrack) => {
-        const { sourceChain: srcChain, destinationChain: dstChain } = useSwapFormStore.getState();
+        const { sourceChain: srcChain, destinationChain: dstChain } = useSwapWidgetStore.getState();
         const { destination: dstTrack } = trackWallet.get();
         if (
           srcChain?.chainType === "cosmos" &&
@@ -563,30 +656,10 @@ export function useSwapWidget() {
           });
           if (wallet) {
             try {
-              await wallet.client?.addChain?.({
-                chain: {
-                  bech32_prefix: wallet.chain.bech32_prefix,
-                  chain_id: wallet.chain.chain_id,
-                  chain_name: wallet.chain.chain_name,
-                  network_type: wallet.chain.network_type,
-                  pretty_name: wallet.chain.pretty_name,
-                  slip44: wallet.chain.slip44,
-                  status: wallet.chain.status,
-                  apis: wallet.chain.apis,
-                  bech32_config: wallet.chain.bech32_config,
-                  explorers: wallet.chain.explorers,
-                  extra_codecs: wallet.chain.extra_codecs,
-                  fees: wallet.chain.fees,
-                  peers: wallet.chain.peers,
-                },
-                name: wallet.chainName,
-                assetList: wallet.assetList,
-              });
-              await wallet.connect();
+              await gracefullyConnect(wallet);
               trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("destination");
             }
           }
         }
@@ -618,21 +691,26 @@ export function useSwapWidget() {
     destinationAsset: dstAsset,
     destinationChain: dstChain,
     direction,
-    insufficientBalance,
+    isAmountError,
     noRouteFound: routeIsError,
     numberOfTransactions: txsRequired ?? 0,
     onDestinationAssetChange,
     onDestinationChainChange,
+    onDestinationAmountChange,
     onSourceAssetChange,
     onSourceChainChange,
+    onSourceAmountChange,
+    onInvertDirection,
+    onSourceAmountMax,
     priceImpactThresholdReached,
     route,
     routeError: errorMessage,
     routeLoading: routeIsFetching,
     routeWarningMessage,
     routeWarningTitle,
-    setFormValues: useSwapFormStore.setState,
     sourceAsset: srcAsset,
+    sourceFeeAsset: srcFeeAsset,
+    sourceFeeAmount: gasRequired,
     sourceChain: srcChain,
     swapPriceImpactPercent,
   };
@@ -642,17 +720,19 @@ export function useSwapWidget() {
 
 // TODO: move to src/context/
 // TODO: include all memoize values
-export interface FormValues {
+export interface SwapWidgetStore {
   amountIn: string;
   amountOut: string;
   sourceChain?: Chain;
   sourceAsset?: AssetWithMetadata;
+  sourceFeeAsset?: AssetWithMetadata;
   destinationChain?: Chain;
   destinationAsset?: AssetWithMetadata;
   direction: "swap-in" | "swap-out";
+  gasRequired?: string;
 }
 
-const defaultValues: FormValues = {
+const defaultValues: SwapWidgetStore = {
   amountIn: "",
   amountOut: "",
   direction: "swap-in",
@@ -660,13 +740,13 @@ const defaultValues: FormValues = {
 
 // TODO: move to src/context/
 // TODO: include all memoize values
-const useSwapFormStore = create(
+const useSwapWidgetStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "SwapWidgetState",
       version: 1,
       storage: createJSONStorage(() => window.sessionStorage),
-      partialize: (state): Partial<FormValues> => ({
+      partialize: (state): Partial<SwapWidgetStore> => ({
         amountIn: state.amountIn,
         amountOut: state.amountOut,
         sourceChain: state.sourceChain,
@@ -685,33 +765,8 @@ function findEquivalentAsset(asset: AssetWithMetadata, assets: AssetWithMetadata
   return assets.find((a) => {
     const isSameOriginChain = a.originChainID === asset.originChainID;
     const isSameOriginDenom = a.originDenom === asset.originDenom;
-
     return isSameOriginChain && isSameOriginDenom;
   });
-}
-
-function getAmountWei(asset?: AssetWithMetadata, amount?: string) {
-  if (!asset || !amount) return "0";
-  try {
-    return new BigNumber(amount.replace(/,/g, "")).shiftedBy(asset.decimals ?? 6).toFixed(0);
-  } catch (err) {
-    if (process.env.NODE_ENV === "development") {
-      console.error(err);
-    }
-    return "0";
-  }
-}
-
-function parseAmountWei(amount?: string, decimals = 6) {
-  if (!amount) return "0";
-  try {
-    return ethers.formatUnits(amount.replace(/,/g, ""), decimals ?? 6);
-  } catch (err) {
-    if (process.env.NODE_ENV === "development") {
-      console.error(err);
-    }
-    return "0";
-  }
 }
 
 function getRouteErrorMessage({ message }: { message: string }) {

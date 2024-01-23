@@ -8,13 +8,13 @@ import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { useSettingsStore } from "@/context/settings";
-import { addTxHistory, addTxStatus, failTxHistory, successTxHistory } from "@/context/tx-history";
+import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
-import { getChainExplorerUrl } from "@/utils/explorer";
+import { getExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
@@ -30,7 +30,7 @@ export interface RouteTransaction {
 interface Props {
   route: RouteResponse;
   transactionCount: number;
-  insufficentBalance?: boolean | string;
+  isAmountError?: boolean | string;
   onClose: () => void;
 }
 
@@ -40,7 +40,7 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({ route, onClose, insufficentBalance, transactionCount }: Props) {
+function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -51,6 +51,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
   const [txComplete, setTxComplete] = useState(false);
   const [isRouteExpanded, setIsRouteExpanded] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
+  const [historyId, setHistoryId] = useState<string>();
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => ({
@@ -68,7 +69,6 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
   async function onSubmit() {
     setTransacting(true);
     setIsRouteExpanded(true);
-    const [historyId] = addTxHistory({ route });
 
     try {
       const userAddresses: Record<string, string> = {};
@@ -147,10 +147,17 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         onTransactionBroadcast: async (txStatus) => {
-          const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
+          const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
-
-          addTxStatus(historyId, {
+          const hId = (() => {
+            if (!historyId) {
+              const [_historyId] = txHistory.add({ route });
+              setHistoryId(_historyId);
+              return _historyId;
+            }
+            return historyId;
+          })();
+          txHistory.addStatus(hId, {
             chainId: txStatus.chainID,
             txHash: txStatus.txHash,
             explorerLink: explorerLink || "#",
@@ -174,7 +181,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
           });
         },
         onTransactionCompleted: async (chainID, txHash) => {
-          const makeExplorerUrl = await getChainExplorerUrl(chainID);
+          const makeExplorerUrl = await getExplorerUrl(chainID);
           const explorerLink = makeExplorerUrl?.(txHash);
 
           setTxStatuses((statuses) => {
@@ -201,6 +208,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
         },
       });
 
+      historyId && txHistory.success(historyId);
       setTxComplete(true);
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
@@ -242,7 +250,7 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
           </p>,
         );
       }
-      failTxHistory(historyId);
+      historyId && txHistory.fail(historyId);
       setTxStatuses((statuses) => {
         const newStatuses = [...statuses];
         return newStatuses.map((status) => {
@@ -257,9 +265,9 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
         });
       });
     } finally {
-      successTxHistory(historyId);
       setTransacting(false);
       setBroadcastedTxs([]);
+      setHistoryId(undefined);
     }
   }
 
@@ -403,12 +411,12 @@ function TransactionDialogContent({ route, onClose, insufficentBalance, transact
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={transacting || !!insufficentBalance}
+            disabled={transacting || !!isAmountError}
           >
             Submit
           </button>
         )}
-        {insufficentBalance && !transacting && !txComplete && (
+        {isAmountError && !transacting && !txComplete && (
           <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
         )}
       </div>
