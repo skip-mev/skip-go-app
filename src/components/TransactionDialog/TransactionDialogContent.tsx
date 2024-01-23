@@ -14,7 +14,7 @@ import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
-import { getChainExplorerUrl } from "@/utils/explorer";
+import { getExplorerUrl } from "@/utils/explorer";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
@@ -147,7 +147,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         onTransactionBroadcast: async (txStatus) => {
-          const makeExplorerUrl = await getChainExplorerUrl(txStatus.chainID);
+          const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
           const hId = (() => {
             if (!historyId) {
@@ -181,7 +181,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
           });
         },
         onTransactionCompleted: async (chainID, txHash) => {
-          const makeExplorerUrl = await getChainExplorerUrl(chainID);
+          const makeExplorerUrl = await getExplorerUrl(chainID);
           const explorerLink = makeExplorerUrl?.(txHash);
 
           setTxStatuses((statuses) => {

@@ -4,7 +4,7 @@ import { getWalletClient } from "@wagmi/core";
 import { createContext, ReactNode } from "react";
 import { useNetwork as useWagmiNetwork } from "wagmi";
 
-import { chainIdToName } from "@/chains";
+import { chainIdToName } from "@/chains/types";
 import { API_URL } from "@/constants/api";
 import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";

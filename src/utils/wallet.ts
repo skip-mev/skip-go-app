@@ -1,6 +1,6 @@
 import { ChainWalletBase } from "@cosmos-kit/core";
 
-import { ChainId } from "@/chains";
+import { ChainId } from "@/chains/types";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 
 import { isMobile } from "./os";
