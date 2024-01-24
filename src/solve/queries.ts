@@ -102,6 +102,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              allowUnsafe: true,
               // experimentalFeatures,
             }
           : {
@@ -111,6 +112,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              allowUnsafe: true,
               // experimentalFeatures,
             },
       );
