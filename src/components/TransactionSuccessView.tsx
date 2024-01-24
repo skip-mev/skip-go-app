@@ -90,7 +90,7 @@ const TransactionSuccessView: FC<{
           className="w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-transform enabled:hover:rotate-1 enabled:hover:scale-105 disabled:cursor-not-allowed disabled:opacity-75"
           onClick={onClose}
         >
-          {route.doesSwap ? "Swap" : "Transfer"} Again
+          Create New {route.doesSwap ? "Swap" : "Transfer"}
         </button>
       </div>
     </div>
