@@ -2,9 +2,9 @@ import { AssetsRequest, SwapVenue, TransferState } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
-import { getClientFlags } from "@/lib/edge-config";
-
 import { useSkipClient } from "./hooks";
+
+// import { getClientFlags } from "@/lib/edge-config";
 
 interface TransferSequence {
   srcChainID: string;
@@ -91,7 +91,7 @@ export function useRoute({
         return;
       }
 
-      const experimentalFeatures = await getClientFlags();
+      // const experimentalFeatures = await getClientFlags();
 
       const route = await skipClient.route(
         direction === "swap-in"
@@ -102,7 +102,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
-              experimentalFeatures,
+              // experimentalFeatures,
             }
           : {
               amountOut: amount,
@@ -111,7 +111,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
-              experimentalFeatures,
+              // experimentalFeatures,
             },
       );
 
