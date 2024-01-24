@@ -1,3 +1,5 @@
+import { BigNumber } from "bignumber.js";
+
 import { useSettingsStore } from "@/context/settings";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 
@@ -24,6 +26,36 @@ export const GasSetting = () => {
 
               const value = Math.max(0, +latest);
               useSettingsStore.setState({ gasAmount: value.toString() });
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.currentTarget.select();
+                return;
+              }
+
+              let value = BigNumber(formatNumberWithoutCommas(event.currentTarget.value) || "0");
+
+              if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                event.preventDefault();
+                if (event.key === "ArrowUp") {
+                  if (event.shiftKey) {
+                    value = value.plus(1_000);
+                  } else {
+                    value = value.plus(1);
+                  }
+                }
+                if (event.key === "ArrowDown") {
+                  if (event.shiftKey) {
+                    value = value.minus(1_000);
+                  } else {
+                    value = value.minus(1);
+                  }
+                }
+                if (value.isNegative()) {
+                  value = BigNumber(0);
+                }
+                useSettingsStore.setState({ gasAmount: value.toString() });
+              }
             }}
           />
         </div>

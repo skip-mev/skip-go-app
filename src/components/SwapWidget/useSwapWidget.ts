@@ -12,6 +12,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
+import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -448,10 +449,11 @@ export function useSwapWidget() {
         }
 
         const decimals = srcFeeAsset.decimals ?? 6;
+        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : gasAmount;
 
         useSwapWidgetStore.setState({
           gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
-            .multipliedBy(gasAmount)
+            .multipliedBy(actualGasAmount)
             .shiftedBy(-decimals)
             .toString(),
           sourceFeeAsset: srcFeeAsset,
