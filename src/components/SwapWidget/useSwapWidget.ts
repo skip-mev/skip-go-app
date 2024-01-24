@@ -411,6 +411,17 @@ export function useSwapWidget() {
     [balances, gasRequired, srcAsset, srcChain, srcFeeAsset],
   );
 
+  /**
+   * Handle clearing amount values when all transactions are complete
+   */
+  const onAllTransactionComplete = useCallback(() => {
+    useSwapWidgetStore.setState({
+      amountIn: "",
+      amountOut: "",
+      direction: "swap-in",
+    });
+  }, []);
+
   // #endregion
 
   /////////////////////////////////////////////////////////////////////////////
@@ -721,6 +732,7 @@ export function useSwapWidget() {
     onSourceAmountChange,
     onInvertDirection,
     onSourceAmountMax,
+    onAllTransactionComplete,
     priceImpactThresholdReached,
     route,
     routeError: errorMessage,

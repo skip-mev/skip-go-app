@@ -32,6 +32,7 @@ interface Props {
   transactionCount: number;
   isAmountError?: boolean | string;
   onClose: () => void;
+  onAllTransactionComplete?: () => void;
 }
 
 export interface BroadcastedTx {
@@ -40,7 +41,13 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
+function TransactionDialogContent({
+  route,
+  onClose,
+  isAmountError,
+  transactionCount,
+  onAllTransactionComplete,
+}: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -210,6 +217,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
 
       historyId && txHistory.success(historyId);
       setTxComplete(true);
+      onAllTransactionComplete?.();
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
         console.error(err);

@@ -17,6 +17,7 @@ interface Props {
   shouldShowPriceImpactWarning?: boolean;
   routeWarningMessage?: string;
   routeWarningTitle?: string;
+  onAllTransactionComplete?: () => void;
 }
 
 function TransactionDialog({
@@ -27,6 +28,7 @@ function TransactionDialog({
   shouldShowPriceImpactWarning,
   routeWarningMessage,
   routeWarningTitle,
+  onAllTransactionComplete,
 }: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
   const [isOpen, { set: setIsOpen }] = useDisclosureKey("confirmSwapDialog");
@@ -71,6 +73,7 @@ function TransactionDialog({
                 onClose={() => setIsOpen(false)}
                 isAmountError={isAmountError}
                 transactionCount={transactionCount}
+                onAllTransactionComplete={onAllTransactionComplete}
               />
             )}
           </div>

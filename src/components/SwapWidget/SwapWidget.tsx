@@ -49,6 +49,7 @@ export function SwapWidget() {
     onSourceAmountChange,
     onSourceAmountMax,
     onInvertDirection,
+    onAllTransactionComplete,
     priceImpactThresholdReached,
     route,
     routeError,
@@ -275,6 +276,7 @@ export function SwapWidget() {
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}
+                onAllTransactionComplete={onAllTransactionComplete}
               />
             </div>
           )}
