@@ -1,3 +1,4 @@
+import type { ExperimentalFeature } from "@skip-router/core";
 import { createClient } from "@vercel/edge-config";
 
 function getClient() {
@@ -15,8 +16,6 @@ export async function getCorsDomains(): Promise<string[]> {
     return [];
   }
 }
-
-type ExperimentalFeature = /* import('@skip-router/core').ExperimentalFeature */ string;
 
 export async function getClientFlags(): Promise<ExperimentalFeature[]> {
   try {
