@@ -5,7 +5,6 @@ import { ElementRef, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
-import { useSettingsStore } from "@/context/settings";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
 
@@ -50,6 +49,7 @@ export function SwapWidget() {
     onSourceAmountChange,
     onSourceAmountMax,
     onInvertDirection,
+    onAllTransactionComplete,
     priceImpactThresholdReached,
     route,
     routeError,
@@ -78,13 +78,6 @@ export function SwapWidget() {
 
   useEffect(() => {
     document.querySelector("[data-testid='source'] input")?.focus();
-    return useSettingsStore.subscribe((state) => {
-      if (+state.slippage < 0 || +state.slippage > 100) {
-        useSettingsStore.setState({
-          slippage: Math.max(0, Math.min(100, +state.slippage)).toString(),
-        });
-      }
-    });
   }, []);
 
   const invertButtonRef = useRef<ElementRef<"button">>(null);
@@ -283,6 +276,7 @@ export function SwapWidget() {
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}
                 routeWarningMessage={routeWarningMessage}
+                onAllTransactionComplete={onAllTransactionComplete}
               />
             </div>
           )}

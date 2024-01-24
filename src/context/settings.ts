@@ -1,13 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { DEFAULT_GAS_AMOUNT } from "@/constants/gas";
+
 interface SettingsStore {
   gasAmount: string;
   slippage: string;
 }
 
 export const defaultValues: SettingsStore = {
-  gasAmount: (200_000).toString(),
+  gasAmount: DEFAULT_GAS_AMOUNT,
   slippage: (3).toString(),
 };
 

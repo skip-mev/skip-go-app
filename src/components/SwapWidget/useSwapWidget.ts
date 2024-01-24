@@ -12,6 +12,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
+import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { AssetWithMetadata, useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -134,12 +135,17 @@ export function useSwapWidget() {
 
     if (srcFeeAsset) {
       const parsedFeeBalance = BigNumber(balances[srcFeeAsset.denom] ?? "0").shiftedBy(-(srcFeeAsset.decimals ?? 6));
-      if (parsedFeeBalance.lt(gasRequired || "0")) {
+      const parsedGasRequired = BigNumber(gasRequired || "0");
+      if (
+        srcFeeAsset.denom === srcAsset.denom
+          ? parsedAmount.isGreaterThan(parsedBalance.minus(parsedGasRequired))
+          : parsedFeeBalance.minus(parsedGasRequired).isLessThanOrEqualTo(0)
+      ) {
         return `Insufficient balance. You need ≈${gasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
       }
     }
 
-    if (parsedBalance.lt(parsedAmount)) {
+    if (parsedAmount.isGreaterThan(parsedBalance)) {
       return `Insufficient balance.`;
     }
 
@@ -357,7 +363,10 @@ export function useSwapWidget() {
        * (would be impossible since max button is disabled if no balance)
        */
       if (!balance) {
-        useSwapWidgetStore.setState({ amountIn: "0" });
+        useSwapWidgetStore.setState({
+          amountIn: "0",
+          direction: "swap-in",
+        });
         return;
       }
 
@@ -372,7 +381,10 @@ export function useSwapWidget() {
        */
       if (event.shiftKey || isDifferentAsset || isNotCosmos) {
         const newAmountIn = formatUnits(balance, decimals);
-        useSwapWidgetStore.setState({ amountIn: newAmountIn });
+        useSwapWidgetStore.setState({
+          amountIn: newAmountIn,
+          direction: "swap-in",
+        });
         return;
       }
 
@@ -382,16 +394,33 @@ export function useSwapWidget() {
       if (gasRequired && srcFeeAsset && srcFeeAsset.denom === srcAsset.denom) {
         let newAmountIn = BigNumber(balance).shiftedBy(-decimals).minus(gasRequired);
         newAmountIn = newAmountIn.isNegative() ? BigNumber(0) : newAmountIn;
-        useSwapWidgetStore.setState({ amountIn: newAmountIn.toFixed(decimals) });
+        useSwapWidgetStore.setState({
+          amountIn: newAmountIn.toFixed(decimals),
+          direction: "swap-in",
+        });
         return;
       }
 
       // otherwise, max balance
       const newAmountIn = formatUnits(balance, decimals);
-      useSwapWidgetStore.setState({ amountIn: newAmountIn });
+      useSwapWidgetStore.setState({
+        amountIn: newAmountIn,
+        direction: "swap-in",
+      });
     },
     [balances, gasRequired, srcAsset, srcChain, srcFeeAsset],
   );
+
+  /**
+   * Handle clearing amount values when all transactions are complete
+   */
+  const onAllTransactionComplete = useCallback(() => {
+    useSwapWidgetStore.setState({
+      amountIn: "",
+      amountOut: "",
+      direction: "swap-in",
+    });
+  }, []);
 
   // #endregion
 
@@ -431,10 +460,11 @@ export function useSwapWidget() {
         }
 
         const decimals = srcFeeAsset.decimals ?? 6;
+        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : gasAmount;
 
         useSwapWidgetStore.setState({
           gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
-            .multipliedBy(gasAmount)
+            .multipliedBy(actualGasAmount)
             .shiftedBy(-decimals)
             .toString(),
           sourceFeeAsset: srcFeeAsset,
@@ -702,6 +732,7 @@ export function useSwapWidget() {
     onSourceAmountChange,
     onInvertDirection,
     onSourceAmountMax,
+    onAllTransactionComplete,
     priceImpactThresholdReached,
     route,
     routeError: errorMessage,
@@ -744,16 +775,8 @@ const useSwapWidgetStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "SwapWidgetState",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => window.sessionStorage),
-      partialize: (state): Partial<SwapWidgetStore> => ({
-        amountIn: state.amountIn,
-        amountOut: state.amountOut,
-        sourceChain: state.sourceChain,
-        sourceAsset: state.sourceAsset,
-        destinationChain: state.destinationChain,
-        destinationAsset: state.destinationAsset,
-      }),
       skipHydration: true,
     }),
   ),

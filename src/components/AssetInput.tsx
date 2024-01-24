@@ -133,7 +133,9 @@ function AssetInput({
             if (!onAmountChange) return;
 
             if (event.key === "Escape") {
-              onAmountChange?.("");
+              if (event.currentTarget.selectionStart === event.currentTarget.selectionEnd) {
+                event.currentTarget.select();
+              }
               return;
             }
 
