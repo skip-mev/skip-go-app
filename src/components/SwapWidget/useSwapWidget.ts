@@ -775,16 +775,8 @@ const useSwapWidgetStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "SwapWidgetState",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => window.sessionStorage),
-      partialize: (state): Partial<SwapWidgetStore> => ({
-        amountIn: state.amountIn,
-        amountOut: state.amountOut,
-        sourceChain: state.sourceChain,
-        sourceAsset: state.sourceAsset,
-        destinationChain: state.destinationChain,
-        destinationAsset: state.destinationAsset,
-      }),
       skipHydration: true,
     }),
   ),
