@@ -1,7 +1,8 @@
+import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 
 import { useSettingsStore } from "@/context/settings";
-
+import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 const OPTION_VALUES = ["1", "3", "5"];
 
 export const SlippageSetting = () => {
@@ -18,13 +19,56 @@ export const SlippageSetting = () => {
               "rounded-lg border px-2 py-1 text-end tabular-nums transition",
               "w-full pe-5 number-input-arrows-hide",
             )}
-            type="number"
-            value={currentValue}
-            min={0}
-            max={100}
+            type="text"
+            inputMode="numeric"
+            value={formatNumberWithCommas(currentValue)}
             onChange={(event) => {
-              const value = Math.max(0, Math.min(100, +event.target.value));
-              useSettingsStore.setState({ slippage: value.toString() });
+              let latest = event.target.value;
+
+              if (latest.match(/^[.,]/)) latest = `0.${latest}`; // Handle first character being a period or comma
+              latest = latest.replace(/^[0]{2,}/, "0"); // Remove leading zeros
+              latest = latest.replace(/[^\d.,]/g, ""); // Remove non-numeric and non-decimal characters
+              latest = latest.replace(/[.]{2,}/g, "."); // Remove multiple decimals
+              latest = latest.replace(/[,]{2,}/g, ","); // Remove multiple commas
+
+              if (!latest.endsWith(".")) {
+                latest = Math.max(0, Math.min(100, +formatNumberWithoutCommas(latest))).toString();
+              }
+              useSettingsStore.setState({ slippage: latest });
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.currentTarget.select();
+                return;
+              }
+
+              let value = BigNumber(formatNumberWithoutCommas(event.currentTarget.value) || "0");
+
+              if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                event.preventDefault();
+                if (event.key === "ArrowUp") {
+                  if (event.shiftKey) {
+                    value = value.plus(10);
+                  } else if (event.altKey || event.ctrlKey || event.metaKey || value.lt(1)) {
+                    value = value.plus(0.1);
+                  } else {
+                    value = value.plus(1);
+                  }
+                }
+                if (event.key === "ArrowDown") {
+                  if (event.shiftKey) {
+                    value = value.minus(10);
+                  } else if (event.altKey || event.ctrlKey || event.metaKey || value.lte(1)) {
+                    value = value.minus(0.1);
+                  } else {
+                    value = value.minus(1);
+                  }
+                }
+                if (value.isNegative()) {
+                  value = BigNumber(0);
+                }
+                useSettingsStore.setState({ slippage: value.toString() });
+              }
             }}
           />
           <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">%</div>
