@@ -362,7 +362,10 @@ export function useSwapWidget() {
        * (would be impossible since max button is disabled if no balance)
        */
       if (!balance) {
-        useSwapWidgetStore.setState({ amountIn: "0" });
+        useSwapWidgetStore.setState({
+          amountIn: "0",
+          direction: "swap-in",
+        });
         return;
       }
 
@@ -377,7 +380,10 @@ export function useSwapWidget() {
        */
       if (event.shiftKey || isDifferentAsset || isNotCosmos) {
         const newAmountIn = formatUnits(balance, decimals);
-        useSwapWidgetStore.setState({ amountIn: newAmountIn });
+        useSwapWidgetStore.setState({
+          amountIn: newAmountIn,
+          direction: "swap-in",
+        });
         return;
       }
 
@@ -387,13 +393,19 @@ export function useSwapWidget() {
       if (gasRequired && srcFeeAsset && srcFeeAsset.denom === srcAsset.denom) {
         let newAmountIn = BigNumber(balance).shiftedBy(-decimals).minus(gasRequired);
         newAmountIn = newAmountIn.isNegative() ? BigNumber(0) : newAmountIn;
-        useSwapWidgetStore.setState({ amountIn: newAmountIn.toFixed(decimals) });
+        useSwapWidgetStore.setState({
+          amountIn: newAmountIn.toFixed(decimals),
+          direction: "swap-in",
+        });
         return;
       }
 
       // otherwise, max balance
       const newAmountIn = formatUnits(balance, decimals);
-      useSwapWidgetStore.setState({ amountIn: newAmountIn });
+      useSwapWidgetStore.setState({
+        amountIn: newAmountIn,
+        direction: "swap-in",
+      });
     },
     [balances, gasRequired, srcAsset, srcChain, srcFeeAsset],
   );
