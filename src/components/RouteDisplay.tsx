@@ -456,12 +456,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
         return;
       }
 
-      let sourceChain = "";
-      if ("cctpTransfer" in operation) {
-        sourceChain = operation.cctpTransfer.fromChainID;
-      } else {
-        sourceChain = operation.transfer.chainID;
-      }
+      const sourceChain = operation.transfer.chainID;
 
       let destinationChain = "";
       if (i === route.operations.length - 1) {
@@ -478,8 +473,6 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
           }
         } else if ("axelarTransfer" in nextOperation) {
           destinationChain = nextOperation.axelarTransfer.toChainID;
-        } else if ("cctpTransfer" in nextOperation) {
-          destinationChain = nextOperation.cctpTransfer.toChainID;
         } else {
           destinationChain = nextOperation.transfer.chainID;
         }
@@ -493,11 +486,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
         id: `transfer-${transferCount}-${i}`,
       });
 
-      if ("cctpTransfer" in operation) {
-        asset = operation.cctpTransfer.burnToken;
-      } else {
-        asset = operation.transfer.destDenom;
-      }
+      asset = operation.transfer.destDenom;
       transferCount++;
     });
 
