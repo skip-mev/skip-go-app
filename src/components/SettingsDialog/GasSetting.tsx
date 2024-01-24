@@ -6,7 +6,7 @@ export const GasSetting = () => {
 
   return (
     <div className="flex items-center space-x-2 p-2">
-      <h3>Gas Multiplier</h3>
+      <h3>Gas Amount</h3>
       <div className="flex-grow" />
       <div className="flex w-full max-w-32 flex-col items-stretch gap-1">
         <div className="relative text-sm">
