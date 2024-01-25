@@ -32,6 +32,7 @@ export default async function handler(req: NextRequest) {
             "access-control-allow-headers": `Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version,X-CSRF-Token,X-Requested-With`,
             "access-control-allow-methods": "GET,DELETE,OPTIONS,PATCH,POST,PUT",
             "access-control-allow-origin": origin,
+            "access-control-max-age": "86400", // 24 hours
           },
           status: 204,
           statusText: "No Content",
