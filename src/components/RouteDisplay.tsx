@@ -90,18 +90,25 @@ function RouteEnd({ amount, symbol, logo, chain }: RouteEndProps) {
 }
 
 interface TransferStepProps {
+  actions: Action[];
   action: TransferAction;
   id: string;
   statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
 }
 
-function TransferStep({ action, id, statusData }: TransferStepProps) {
+function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
   // format: operationType-<operationTypeCount>-<operationIndex>
   const operationCount = Number(id.split("-")[1]);
+  const operationIndex = Number(id.split("-")[2]);
   const transfer = statusData?.transferSequence[operationCount];
+  const isNextOpSwap =
+    actions
+      // We can assume that the swap operation by the previous transfer
+      .find((x) => Number(x.id.split("-")[2]) === operationIndex + 1)
+      ?.id.split("-")[0] === "swap";
 
   // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
   const renderTransferState = useMemo(() => {
@@ -137,18 +144,20 @@ function TransferStep({ action, id, statusData }: TransferStepProps) {
   }, [transfer?.state]);
 
   const renderExplorerLink = useMemo(() => {
-    if (!transfer?.explorerLink) return null;
+    const packetTx =
+      operationIndex === 0 ? transfer?.txs.sendTx : isNextOpSwap ? transfer?.txs.sendTx : transfer?.txs.receiveTx;
+    if (!packetTx?.explorerLink) return null;
     return (
       <AdaptiveLink
         className="text-xs font-semibold text-[#FF486E] underline"
-        href={transfer.explorerLink}
+        href={packetTx.explorerLink}
       >
         <span>
-          {transfer.explorerLink.split("/").at(-1)?.slice(0, 6)}…{transfer.explorerLink.split("/").at(-1)?.slice(-6)}
+          {packetTx.explorerLink.split("/").at(-1)?.slice(0, 6)}…{packetTx.explorerLink.split("/").at(-1)?.slice(-6)}
         </span>
       </AdaptiveLink>
     );
-  }, [transfer?.explorerLink]);
+  }, [isNextOpSwap, operationIndex, transfer?.txs.receiveTx, transfer?.txs.sendTx]);
 
   const { getAsset } = useAssets();
 
@@ -266,19 +275,20 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
   }, [swap?.state]);
 
   const renderExplorerLink = useMemo(() => {
-    if (!swap?.explorerLink) return null;
+    const receiveTx = swap?.txs.receiveTx;
+    if (!receiveTx) return null;
     if (swap?.state !== "TRANSFER_SUCCESS") return null;
     return (
       <AdaptiveLink
         className="text-xs font-semibold text-[#FF486E] underline"
-        href={swap.explorerLink}
+        href={receiveTx.explorerLink}
       >
         <span>
-          {swap.explorerLink.split("/").at(-1)?.slice(0, 6)}…{swap.explorerLink.split("/").at(-1)?.slice(-6)}
+          {receiveTx.explorerLink.split("/").at(-1)?.slice(0, 6)}…{receiveTx.explorerLink.split("/").at(-1)?.slice(-6)}
         </span>
       </AdaptiveLink>
     );
-  }, [swap?.explorerLink, swap?.state]);
+  }, [swap?.state, swap?.txs.receiveTx]);
 
   if (!assetIn && assetOut) {
     return (
@@ -542,6 +552,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
               {action.type === "TRANSFER" && (
                 <TransferStep
                   action={action}
+                  actions={actions}
                   id={action.id}
                   statusData={statusData}
                 />
