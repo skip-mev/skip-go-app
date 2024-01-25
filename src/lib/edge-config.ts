@@ -1,35 +1,45 @@
-import { createClient } from "@vercel/edge-config";
-
-function getClient() {
-  return createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
+if (typeof window !== "undefined") {
+  throw new Error("edge-config.ts should only be imported on the server");
 }
 
-export async function getCorsDomains(): Promise<string[]> {
+import { ExperimentalFeature } from "@skip-router/core";
+import { createClient } from "@vercel/edge-config";
+
+const client = createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
+
+export async function getCorsDomains() {
   try {
-    const client = getClient();
-    const value = await client.get<string[]>("domains");
-    if (Array.isArray(value)) return value;
-    return [];
+    const key = "domains";
+    const value = await client.get<string[]>(key);
+    if (Array.isArray(value)) {
+      return value;
+    }
   } catch (error) {
     console.error(error);
-    return [];
   }
 }
 
-type ExperimentalFeature = /* import('@skip-router/core').ExperimentalFeature */ string;
-
-export async function getClientFlags(): Promise<ExperimentalFeature[]> {
+export async function getExperimentalFeatures() {
   try {
-    if (process.env.NEXT_PUBLIC_FLAGS_OVERRIDE) {
-      const value = process.env.NEXT_PUBLIC_FLAGS_OVERRIDE.split(",").filter(Boolean) as ExperimentalFeature[];
+    const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
+    const key = (() => {
+      switch (branch) {
+        case "main":
+          return "experimental-features";
+        case "staging":
+          return "experimental-features-staging";
+        case "dev":
+          return "experimental-features-dev";
+        default:
+          return "experimental-features";
+      }
+    })();
+
+    const value = await client.get<ExperimentalFeature[]>(key);
+    if (Array.isArray(value)) {
       return value;
     }
-    const client = getClient();
-    const value = await client.get<ExperimentalFeature[]>("experimentalFeatures");
-    if (Array.isArray(value)) return value;
-    return [];
   } catch (error) {
     console.error(error);
-    return [];
   }
 }

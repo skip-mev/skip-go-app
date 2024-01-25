@@ -2,9 +2,9 @@ import { AssetsRequest, ChainTransaction, SwapVenue, TransferState } from "@skip
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
-import { useSkipClient } from "./hooks";
+import { useExperimentalFeatures } from "@/hooks/useExperimentalFeatures";
 
-// import { getClientFlags } from "@/lib/edge-config";
+import { useSkipClient } from "./hooks";
 
 interface TransferSequence {
   srcChainID: string;
@@ -61,6 +61,8 @@ export function useRoute({
 
   const [refetchCount, setRefetchCount] = useState(0);
 
+  const { data: experimentalFeatures } = useExperimentalFeatures();
+
   const queryKey = useMemo(
     () =>
       [
@@ -72,8 +74,18 @@ export function useRoute({
         sourceAssetChainID,
         destinationAssetChainID,
         swapVenue,
+        experimentalFeatures,
       ] as const,
-    [amount, destinationAsset, destinationAssetChainID, direction, sourceAsset, sourceAssetChainID, swapVenue],
+    [
+      amount,
+      destinationAsset,
+      destinationAssetChainID,
+      direction,
+      sourceAsset,
+      sourceAssetChainID,
+      swapVenue,
+      experimentalFeatures,
+    ],
   );
 
   const query = useQuery({
@@ -88,13 +100,12 @@ export function useRoute({
         sourceAssetChainID,
         destinationAssetChainID,
         swapVenue,
+        experimentalFeatures,
       ],
     }) => {
       if (!sourceAsset || !sourceAssetChainID || !destinationAsset || !destinationAssetChainID) {
         return;
       }
-
-      // const experimentalFeatures = await getClientFlags();
 
       const route = await skipClient.route(
         direction === "swap-in"
@@ -106,7 +117,7 @@ export function useRoute({
               destAssetChainID: destinationAssetChainID,
               swapVenue,
               allowUnsafe: true,
-              // experimentalFeatures,
+              experimentalFeatures,
             }
           : {
               amountOut: amount,
@@ -116,7 +127,7 @@ export function useRoute({
               destAssetChainID: destinationAssetChainID,
               swapVenue,
               allowUnsafe: true,
-              // experimentalFeatures,
+              experimentalFeatures,
             },
       );
 
