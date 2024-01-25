@@ -3,7 +3,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo }
 
 import { useChains } from "@/hooks/useChains";
 
-import { filterAssetsWithMetadata, useAssets as useSolveAssets } from "../solve";
+import { isAssetWithMetadata, useAssets as useSolveAssets } from "../solve";
 
 export type AssetWithMetadata = Required<Asset>;
 
@@ -35,7 +35,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
     if (!solveAssets || !chains) return data;
 
     for (const [chainID, assets] of Object.entries(solveAssets)) {
-      data[chainID] = filterAssetsWithMetadata(assets);
+      data[chainID] = assets.filter(isAssetWithMetadata);
     }
 
     return data;
