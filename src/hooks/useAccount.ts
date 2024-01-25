@@ -1,4 +1,4 @@
-import { useChain as useCosmosChain } from "@cosmos-kit/react";
+import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
@@ -10,12 +10,13 @@ export function useAccount(context: TrackWalletCtx) {
   const trackedWallet = useTrackWallet(context);
 
   const { data: chain } = useChainByID(trackedWallet?.chainID);
-
-  const { walletRepo } = useCosmosChain(chain?.chainType === "cosmos" ? chain.chainName : "cosmoshub");
+  const { getWalletRepo } = useCosmosManager();
 
   const cosmosWallet = useMemo(() => {
-    return walletRepo.wallets.find((w) => w.walletName === trackedWallet?.walletName);
-  }, [trackedWallet?.walletName, walletRepo.wallets]);
+    if (chain?.chainType !== "cosmos") return;
+    const { wallets } = getWalletRepo(chain.chainName);
+    return wallets.find((w) => w.walletName === trackedWallet?.walletName);
+  }, [chain?.chainName, chain?.chainType, getWalletRepo, trackedWallet?.walletName]);
 
   const wagmiAccount = useWagmiAccount();
 
