@@ -42,13 +42,7 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({
-  route,
-  onClose,
-  isAmountError,
-  transactionCount,
-  onAllTransactionComplete,
-}: Props) {
+function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
@@ -210,7 +204,6 @@ function TransactionDialogContent({
 
       historyId && txHistory.success(historyId);
       setTxComplete(true);
-      onAllTransactionComplete?.();
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
         console.error(err);
