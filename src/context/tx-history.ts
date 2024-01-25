@@ -46,6 +46,18 @@ export const txHistory = {
 
     return [id, newItem] as const;
   },
+  update: (id: string, input: Partial<TxHistoryItem>) => {
+    useTxHistory.setState((state) => {
+      const current = state[id];
+
+      const latest: TxHistoryItem = {
+        ...current,
+        ...input,
+      };
+
+      return { [id]: latest };
+    });
+  },
   success: (id: string) => {
     useTxHistory.setState((state) => {
       const current = state[id];
@@ -79,10 +91,19 @@ export const txHistory = {
       return newState;
     }, true);
   },
-  addStatus: (id: string, txStatus: TxStatus) => {
+  addStatus: (id: string, route: RouteResponse, txStatus: TxStatus) => {
     useTxHistory.setState((state) => {
       const current = state[id];
-      if (!current) return state;
+      if (!current) {
+        const newItem: TxHistoryItem = {
+          txStatus: [txStatus],
+          timestamp: new Date().toISOString(),
+          status: "pending",
+          route,
+        };
+
+        return { [id]: newItem };
+      }
 
       const newTxStatus = current.txStatus.concat(txStatus);
 

@@ -3,8 +3,6 @@ import { ChainWalletBase } from "@cosmos-kit/core";
 import { ChainId } from "@/chains/types";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 
-import { isMobile } from "./os";
-
 export async function gracefullyConnect(
   wallet: ChainWalletBase,
   {
@@ -14,10 +12,9 @@ export async function gracefullyConnect(
   } = {},
 ) {
   const client = wallet.client as MergedWalletClient;
-  const canAddChain = !isMobile() || !("snapInstalled" in client);
-  if (canAddChain) {
-    await wallet.client
-      .addChain?.({
+  if (client && "addChain" in client) {
+    await client
+      ?.addChain?.({
         chain: {
           bech32_prefix: wallet.chain.bech32_prefix,
           chain_id: wallet.chain.chain_id,

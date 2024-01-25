@@ -15,6 +15,7 @@ import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
+import { randomId } from "@/utils/random";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
@@ -58,7 +59,6 @@ function TransactionDialogContent({
   const [txComplete, setTxComplete] = useState(false);
   const [isRouteExpanded, setIsRouteExpanded] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
-  const [historyId, setHistoryId] = useState<string>();
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
     Array.from({ length: transactionCount }, () => ({
@@ -76,7 +76,7 @@ function TransactionDialogContent({
   async function onSubmit() {
     setTransacting(true);
     setIsRouteExpanded(true);
-
+    const historyId = randomId();
     try {
       const userAddresses: Record<string, string> = {};
 
@@ -156,15 +156,8 @@ function TransactionDialogContent({
         onTransactionBroadcast: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
-          const hId = (() => {
-            if (!historyId) {
-              const [_historyId] = txHistory.add({ route });
-              setHistoryId(_historyId);
-              return _historyId;
-            }
-            return historyId;
-          })();
-          txHistory.addStatus(hId, {
+
+          txHistory.addStatus(historyId, route, {
             chainId: txStatus.chainID,
             txHash: txStatus.txHash,
             explorerLink: explorerLink || "#",
@@ -275,7 +268,6 @@ function TransactionDialogContent({
     } finally {
       setTransacting(false);
       setBroadcastedTxs([]);
-      setHistoryId(undefined);
     }
   }
 

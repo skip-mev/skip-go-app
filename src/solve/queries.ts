@@ -1,4 +1,4 @@
-import { AssetsRequest, SwapVenue, TransferState } from "@skip-router/core";
+import { AssetsRequest, ChainTransaction, SwapVenue, TransferState } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -9,7 +9,10 @@ import { useSkipClient } from "./hooks";
 interface TransferSequence {
   srcChainID: string;
   destChainID: string;
-  explorerLink: string | undefined;
+  txs: {
+    sendTx: ChainTransaction | null;
+    receiveTx: ChainTransaction | null;
+  };
   state: TransferState;
 }
 
@@ -184,7 +187,10 @@ export const useBroadcastedTxsStatus = ({
               return {
                 srcChainID: transfer.ibcTransfer.srcChainID,
                 destChainID: transfer.ibcTransfer.dstChainID,
-                explorerLink: transfer.ibcTransfer.packetTXs.sendTx?.explorerLink,
+                txs: {
+                  sendTx: transfer.ibcTransfer.packetTXs.sendTx,
+                  receiveTx: transfer.ibcTransfer.packetTXs.receiveTx,
+                },
                 state: transfer.ibcTransfer.state,
               };
             }
@@ -202,11 +208,24 @@ export const useBroadcastedTxsStatus = ({
                   return "TRANSFER_UNKNOWN";
               }
             })();
-
+            if ("contractCallWithTokenTxs" in transfer.axelarTransfer.txs) {
+              return {
+                srcChainID: transfer.axelarTransfer.srcChainID,
+                destChainID: transfer.axelarTransfer.dstChainID,
+                txs: {
+                  sendTx: transfer.axelarTransfer.txs.contractCallWithTokenTxs.sendTx,
+                  receiveTx: transfer.axelarTransfer.txs.contractCallWithTokenTxs.executeTx,
+                },
+                state: axelarState,
+              };
+            }
             return {
               srcChainID: transfer.axelarTransfer.srcChainID,
               destChainID: transfer.axelarTransfer.dstChainID,
-              explorerLink: transfer.axelarTransfer.axelarScanLink,
+              txs: {
+                sendTx: transfer.axelarTransfer.txs.sendTokenTxs.sendTx,
+                receiveTx: transfer.axelarTransfer.txs.sendTokenTxs.executeTx,
+              },
               state: axelarState,
             };
           });

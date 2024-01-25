@@ -1,6 +1,7 @@
 import { RouteResponse } from "@skip-router/core";
 import { clsx } from "clsx";
 import { Fragment, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 import { useDisclosureKey } from "@/context/disclosures";
 
@@ -31,9 +32,9 @@ function TransactionDialog({
   onAllTransactionComplete,
 }: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
-  const [isOpen, { set: setIsOpen }] = useDisclosureKey("confirmSwapDialog");
+  const [isOpen, confirmControl] = useDisclosureKey("confirmSwapDialog");
 
-  const [, control] = useDisclosureKey("priceImpactDialog");
+  const [, priceImpactControl] = useDisclosureKey("priceImpactDialog");
 
   useEffect(() => {
     if (!isOpen) {
@@ -46,10 +47,25 @@ function TransactionDialog({
     }
 
     if (shouldShowPriceImpactWarning) {
-      control.open();
+      priceImpactControl.open();
       setHasDisplayedWarning(true);
     }
-  }, [control, setHasDisplayedWarning, isOpen, hasDisplayedWarning, shouldShowPriceImpactWarning]);
+
+    if (isOpen && !route) {
+      priceImpactControl.close();
+      confirmControl.close();
+      toast.error(
+        <p>
+          <strong>Something went wrong!</strong>
+          <br />
+          Your transaction may or may not be processed.
+        </p>,
+      );
+      return;
+    }
+    // reason: ignoring control handlers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasDisplayedWarning, isOpen, route, shouldShowPriceImpactWarning]);
 
   return (
     <Fragment>
@@ -61,26 +77,24 @@ function TransactionDialog({
             "enabled:hover:rotate-1 enabled:hover:scale-105",
           )}
           disabled={!route || (typeof isLoading === "boolean" && isLoading)}
-          onClick={() => setIsOpen(true)}
+          onClick={() => confirmControl.open()}
         >
           Preview Route
         </button>
-        {isOpen && (
+        {isOpen && route && (
           <div className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
-            {route && (
-              <TransactionDialogContent
-                route={route}
-                onClose={() => setIsOpen(false)}
-                isAmountError={isAmountError}
-                transactionCount={transactionCount}
-                onAllTransactionComplete={onAllTransactionComplete}
-              />
-            )}
+            <TransactionDialogContent
+              route={route}
+              onClose={confirmControl.close}
+              isAmountError={isAmountError}
+              transactionCount={transactionCount}
+              onAllTransactionComplete={onAllTransactionComplete}
+            />
           </div>
         )}
       </div>
       <PriceImpactWarning
-        onGoBack={() => setIsOpen(false)}
+        onGoBack={confirmControl.close}
         message={routeWarningMessage}
         title={routeWarningTitle}
       />
