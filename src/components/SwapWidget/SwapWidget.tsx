@@ -36,20 +36,22 @@ export function SwapWidget() {
   const {
     amountIn,
     amountOut,
+    bridges,
     destinationAsset,
     destinationChain,
     direction,
     isAmountError,
     numberOfTransactions,
+    onAllTransactionComplete,
+    onBridgeChange,
+    onDestinationAmountChange,
     onDestinationAssetChange,
     onDestinationChainChange,
-    onDestinationAmountChange,
-    onSourceAssetChange,
-    onSourceChainChange,
+    onInvertDirection,
     onSourceAmountChange,
     onSourceAmountMax,
-    onInvertDirection,
-    onAllTransactionComplete,
+    onSourceAssetChange,
+    onSourceChainChange,
     priceImpactThresholdReached,
     route,
     routeError,
@@ -203,17 +205,19 @@ export function SwapWidget() {
           </div>
           {route && (
             <SwapDetails
-              direction={direction}
               amountIn={amountIn}
               amountOut={amountOut}
-              sourceChain={sourceChain}
-              sourceAsset={sourceAsset}
-              gasRequired={sourceFeeAmount}
-              destinationChain={destinationChain}
+              bridges={bridges}
               destinationAsset={destinationAsset}
-              route={route}
+              destinationChain={destinationChain}
+              direction={direction}
+              gasRequired={sourceFeeAmount}
+              onBridgesChange={onBridgeChange}
               priceImpactPercent={swapPriceImpactPercent ?? 0}
               priceImpactThresholdReached={priceImpactThresholdReached}
+              route={route}
+              sourceAsset={sourceAsset}
+              sourceChain={sourceChain}
             />
           )}
           {routeLoading && <RouteLoadingBanner />}

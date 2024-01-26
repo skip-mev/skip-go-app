@@ -1,4 +1,5 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
+import { BridgeType } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
 import { formatUnits } from "ethers";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -55,13 +56,14 @@ export function useSwapWidget() {
   const {
     amountIn,
     amountOut,
-    direction,
+    bridges,
     destinationAsset: dstAsset,
     destinationChain: dstChain,
+    direction,
+    gasRequired,
     sourceAsset: srcAsset,
     sourceChain: srcChain,
     sourceFeeAsset: srcFeeAsset,
-    gasRequired,
   } = useSwapWidgetStore();
 
   const amountInWei = useMemo(() => {
@@ -218,6 +220,10 @@ export function useSwapWidget() {
   /////////////////////////////////////////////////////////////////////////////
 
   // #region -- chain and asset handlers
+
+  const onBridgeChange = useCallback((bridges: BridgeType[]) => {
+    useSwapWidgetStore.setState({ bridges });
+  }, []);
 
   /**
    * Handle source chain change and update source asset with these cases:
@@ -718,21 +724,23 @@ export function useSwapWidget() {
   return {
     amountIn,
     amountOut,
+    bridges,
     destinationAsset: dstAsset,
     destinationChain: dstChain,
     direction,
     isAmountError,
     noRouteFound: routeIsError,
     numberOfTransactions: txsRequired ?? 0,
+    onAllTransactionComplete,
+    onBridgeChange,
+    onDestinationAmountChange,
     onDestinationAssetChange,
     onDestinationChainChange,
-    onDestinationAmountChange,
+    onInvertDirection,
+    onSourceAmountChange,
+    onSourceAmountMax,
     onSourceAssetChange,
     onSourceChainChange,
-    onSourceAmountChange,
-    onInvertDirection,
-    onSourceAmountMax,
-    onAllTransactionComplete,
     priceImpactThresholdReached,
     route,
     routeError: errorMessage,
@@ -740,9 +748,9 @@ export function useSwapWidget() {
     routeWarningMessage,
     routeWarningTitle,
     sourceAsset: srcAsset,
-    sourceFeeAsset: srcFeeAsset,
-    sourceFeeAmount: gasRequired,
     sourceChain: srcChain,
+    sourceFeeAmount: gasRequired,
+    sourceFeeAsset: srcFeeAsset,
     swapPriceImpactPercent,
   };
 }
@@ -761,12 +769,14 @@ export interface SwapWidgetStore {
   destinationAsset?: AssetWithMetadata;
   direction: "swap-in" | "swap-out";
   gasRequired?: string;
+  bridges: BridgeType[];
 }
 
 const defaultValues: SwapWidgetStore = {
   amountIn: "",
   amountOut: "",
   direction: "swap-in",
+  bridges: [],
 };
 
 // TODO: move to src/context/

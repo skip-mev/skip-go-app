@@ -1,6 +1,6 @@
 import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { RouteResponse } from "@skip-router/core";
+import { BridgeType, RouteResponse } from "@skip-router/core";
 import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
@@ -15,22 +15,25 @@ import { SwapWidgetStore } from "./useSwapWidget";
 
 type Props = SwapWidgetStore & {
   amountOut: string;
-  route: RouteResponse;
+  onBridgesChange: (bridges: BridgeType[]) => void;
   priceImpactPercent: number;
   priceImpactThresholdReached: boolean;
+  route: RouteResponse;
 };
 
 export const SwapDetails = ({
   amountIn,
   amountOut,
-  sourceChain,
-  sourceAsset,
-  gasRequired,
-  destinationChain,
+  // bridges: selectedBridges,
   destinationAsset,
-  route,
+  destinationChain,
+  gasRequired,
+  // onBridgesChange,
   priceImpactPercent,
   priceImpactThresholdReached,
+  route,
+  sourceAsset,
+  sourceChain,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
