@@ -48,10 +48,10 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const skipClient = useSkipClient();
   const { address: evmAddress } = useWagmiAccount();
 
-  const [transacting, setTransacting] = useState(false);
+  const [isOngoing, setOngoing] = useState(false);
 
-  const [txComplete, setTxComplete] = useState(false);
-  const [isRouteExpanded, setIsRouteExpanded] = useState(false);
+  const [isTxComplete, setTxComplete] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
 
   const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
@@ -68,8 +68,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const dstAccount = useAccount("destination");
 
   async function onSubmit() {
-    setTransacting(true);
-    setIsRouteExpanded(true);
+    setOngoing(true);
+    setIsExpanded(true);
     const historyId = randomId();
     try {
       const userAddresses: Record<string, string> = {};
@@ -259,14 +259,14 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         });
       });
     } finally {
-      setTransacting(false);
+      setOngoing(false);
       setBroadcastedTxs([]);
     }
   }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
-  if (txComplete) {
+  if (isTxComplete) {
     return (
       <TransactionSuccessView
         route={route}
@@ -292,8 +292,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
       <div className="rounded-xl border border-neutral-300 p-4">
         <RouteDisplay
           route={route}
-          isRouteExpanded={isRouteExpanded}
-          setIsRouteExpanded={setIsRouteExpanded}
+          isRouteExpanded={isExpanded}
+          setIsRouteExpanded={setIsExpanded}
           broadcastedTxs={broadcastedTxs}
         />
       </div>
@@ -349,6 +349,11 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        {isAmountError && !isOngoing && !isTxComplete && (
+          <p className="text-balance text-center text-sm font-medium text-red-500">
+            {typeof isAmountError === "string" ? isAmountError : "Insufficient balance."}
+          </p>
+        )}
         <div className="flex w-full items-center rounded-md bg-black p-3 text-left text-xs font-medium uppercase text-white/50">
           <p className="flex-1">
             This route requires{" "}
@@ -359,7 +364,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             to complete
           </p>
         </div>
-        {transacting ? (
+        {isOngoing ? (
           <button
             className={clsx(
               "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
@@ -404,13 +409,10 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={transacting || !!isAmountError}
+            disabled={isOngoing || !!isAmountError}
           >
             Submit
           </button>
-        )}
-        {isAmountError && !transacting && !txComplete && (
-          <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
         )}
       </div>
     </div>
