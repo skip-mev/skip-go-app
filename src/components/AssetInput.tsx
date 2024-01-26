@@ -1,3 +1,4 @@
+import { BackspaceIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
 import { clsx } from "clsx";
 import { formatUnits } from "ethers";
@@ -102,7 +103,15 @@ function AssetInput({
         </div>
       </div>
       <div className="relative isolate">
-        {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
+        {isLoading && <SpinnerIcon className="absolute right-2 top-2 z-10 h-4 w-4 animate-spin text-neutral-300" />}
+        {amount && !isLoading && (
+          <button className="absolute right-2 top-2 z-10">
+            <BackspaceIcon
+              className="h-4 w-4 text-neutral-300 transition-colors hover:text-neutral-400"
+              onClick={() => onAmountChange?.("")}
+            />
+          </button>
+        )}
         <input
           data-testid="amount"
           className={clsx(
