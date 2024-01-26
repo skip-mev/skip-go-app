@@ -1,8 +1,8 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
 import { useEffect, useRef, useState } from "react";
 
 import { useSettingsStore } from "@/context/settings";
+import { cn } from "@/utils/ui";
 
 export const SaveIndicator = () => {
   const timeoutRef = useRef<number | null>(null);
@@ -18,7 +18,7 @@ export const SaveIndicator = () => {
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "pointer-events-none flex items-center space-x-1 text-sm font-medium text-green-500 transition",
         show ? "opacity-100" : "opacity-0",
       )}

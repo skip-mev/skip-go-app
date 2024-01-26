@@ -2,7 +2,6 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
-import { clsx } from "clsx";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
@@ -10,6 +9,7 @@ import { DialogContent } from "@/components/Dialog";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
+import { cn } from "@/utils/ui";
 import { gracefullyConnect } from "@/utils/wallet";
 
 import { AdaptiveLink } from "../AdaptiveLink";
@@ -47,7 +47,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
     <div className="flex h-full flex-col px-6 pb-2 pt-6">
       <div className="relative">
         <button
-          className={clsx(
+          className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100",
             "absolute inset-y-0 left-0",
           )}
@@ -81,7 +81,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         </div>
       )}
       <ScrollArea.Root
-        className={clsx(
+        className={cn(
           "relative isolate flex-grow overflow-hidden",
           "before:absolute before:inset-x-0 before:bottom-0 before:z-10 before:h-2",
           "before:bg-gradient-to-t before:from-white before:to-transparent",
@@ -93,7 +93,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
               key={wallet.walletName}
               chainType={chainType}
               walletName={wallet.walletName}
-              className={clsx(
+              className={cn(
                 "group relative mb-2 data-[unsupported=true]:opacity-30",
                 "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
               )}
@@ -136,7 +136,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
           ))}
         </ScrollArea.Viewport>
         <ScrollArea.Scrollbar
-          className="z-20 flex touch-none select-none py-4 transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
+          className="duration-[160ms] z-20 flex touch-none select-none py-4 transition-colors ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
           orientation="vertical"
         >
           <ScrollArea.Thumb className="relative flex-1 rounded-[10px] bg-neutral-500/50 transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-2 before:w-2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-neutral-500" />

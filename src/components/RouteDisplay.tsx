@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { clsx } from "clsx";
 import { ethers } from "ethers";
 import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 
@@ -9,6 +8,7 @@ import { useAssets } from "@/context/assets";
 import { useBridgeByID } from "@/hooks/useBridges";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
+import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "./AdaptiveLink";
 import { SimpleTooltip } from "./SimpleTooltip";
@@ -697,7 +697,7 @@ const Gap = {
   Parent({ className, ...props }: ComponentProps<"div">) {
     return (
       <div
-        className={clsx("flex flex-wrap items-center gap-x-2 gap-y-1", className)}
+        className={cn("flex flex-wrap items-center gap-x-2 gap-y-1", className)}
         {...props}
       />
     );
@@ -705,7 +705,7 @@ const Gap = {
   Child({ className, ...props }: ComponentProps<"div">) {
     return (
       <div
-        className={clsx("flex items-center gap-x-1 gap-y-1", className)}
+        className={cn("flex items-center gap-x-1 gap-y-1", className)}
         {...props}
       />
     );

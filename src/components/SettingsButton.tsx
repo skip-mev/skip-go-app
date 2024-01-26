@@ -1,8 +1,8 @@
 import { Cog6ToothIcon } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
 import { disclosure } from "@/context/disclosures";
+import { cn } from "@/utils/ui";
 
 import { SimpleTooltip } from "./SimpleTooltip";
 
@@ -10,7 +10,7 @@ export const SettingsButton = ({ className, ...props }: ComponentProps<"button">
   return (
     <SimpleTooltip label="Swap Settings">
       <button
-        className={clsx(
+        className={cn(
           "rounded-full p-2 text-black/80 hover:bg-neutral-100 hover:text-black/100",
           "transition-colors focus:outline-none",
           className,

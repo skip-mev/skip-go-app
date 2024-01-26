@@ -1,10 +1,11 @@
-import { clsx } from "clsx";
 import { ComponentProps } from "react";
+
+import { cn } from "@/utils/ui";
 
 export const Root = ({ className, ...props }: ComponentProps<"dl">) => {
   return (
     <dl
-      className={clsx("divide-y text-start text-sm", className)}
+      className={cn("divide-y text-start text-sm", className)}
       {...props}
     />
   );
@@ -13,7 +14,7 @@ export const Root = ({ className, ...props }: ComponentProps<"dl">) => {
 export const Row = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
-      className={clsx("grid grid-cols-3 p-2", className)}
+      className={cn("grid grid-cols-3 p-2", className)}
       {...props}
     />
   );
@@ -22,7 +23,7 @@ export const Row = ({ className, ...props }: ComponentProps<"div">) => {
 export const Dt = ({ className, ...props }: ComponentProps<"dt">) => {
   return (
     <dt
-      className={clsx("col-span-1 flex items-center text-black/60", className)}
+      className={cn("col-span-1 flex items-center text-black/60", className)}
       {...props}
     />
   );
@@ -31,7 +32,7 @@ export const Dt = ({ className, ...props }: ComponentProps<"dt">) => {
 export const Dd = ({ className, ...props }: ComponentProps<"dd">) => {
   return (
     <dd
-      className={clsx("col-span-2", className)}
+      className={cn("col-span-2", className)}
       {...props}
     />
   );

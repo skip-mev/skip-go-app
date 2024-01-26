@@ -1,10 +1,10 @@
 import { ArrowLeftIcon, EnvelopeIcon } from "@heroicons/react/20/solid";
 import * as Dialog from "@radix-ui/react-dialog";
-import { clsx } from "clsx";
 import { FormEvent } from "react";
 import toast from "react-hot-toast";
 
 import { useDisclosureKey } from "@/context/disclosures";
+import { cn } from "@/utils/ui";
 
 export function ContactDialog() {
   const [isOpen, { close }] = useDisclosureKey("contactDialog");
@@ -15,7 +15,7 @@ export function ContactDialog() {
     >
       <Dialog.Content className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
         <form
-          className={clsx(
+          className={cn(
             "flex h-full flex-col p-6 text-sm",
             "[&_input]:rounded-md [&_input]:border-neutral-300 [&_input]:text-sm",
             "[&_textarea]:rounded-md [&_textarea]:border-neutral-300 [&_textarea]:text-sm",

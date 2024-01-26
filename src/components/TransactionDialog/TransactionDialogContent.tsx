@@ -2,7 +2,6 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon } from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
-import { clsx } from "clsx";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
@@ -16,6 +15,7 @@ import { useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
+import { cn } from "@/utils/ui";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
@@ -366,7 +366,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         </div>
         {isOngoing ? (
           <button
-            className={clsx(
+            className={cn(
               "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
               "outline-none transition-transform",
               "enabled:hover:rotate-1 enabled:hover:scale-105",
@@ -402,7 +402,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
           </button>
         ) : (
           <button
-            className={clsx(
+            className={cn(
               "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
               "outline-none transition-transform",
               "enabled:hover:rotate-1 enabled:hover:scale-105",

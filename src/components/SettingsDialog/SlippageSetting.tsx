@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
-import { clsx } from "clsx";
 
 import { useSettingsStore } from "@/context/settings";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
+import { cn } from "@/utils/ui";
 const OPTION_VALUES = ["1", "3", "5"];
 
 export const SlippageSetting = () => {
@@ -15,7 +15,7 @@ export const SlippageSetting = () => {
       <div className="flex w-full max-w-32 flex-col items-stretch gap-1">
         <div className="relative text-sm">
           <input
-            className={clsx(
+            className={cn(
               "rounded-lg border px-2 py-1 text-end tabular-nums transition",
               "w-full pe-5 number-input-arrows-hide",
             )}
@@ -77,7 +77,7 @@ export const SlippageSetting = () => {
           {OPTION_VALUES.map((value, i) => (
             <button
               key={i}
-              className={clsx(
+              className={cn(
                 "rounded-lg border px-2 py-px text-xs tabular-nums transition",
                 "text-neutral-600 hover:bg-neutral-100",
               )}

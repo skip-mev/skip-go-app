@@ -1,6 +1,5 @@
 import { BackspaceIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
-import { clsx } from "clsx";
 import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
@@ -11,6 +10,7 @@ import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
+import { cn } from "@/utils/ui";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -77,7 +77,7 @@ function AssetInput({
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
         "hover:border-neutral-300 hover:shadow-sm",
@@ -114,7 +114,7 @@ function AssetInput({
         )}
         <input
           data-testid="amount"
-          className={clsx(
+          className={cn(
             "h-10 w-full text-3xl font-medium tabular-nums",
             "placeholder:text-neutral-300 focus:outline-none",
             isLoading && "animate-pulse text-neutral-500",
@@ -178,7 +178,7 @@ function AssetInput({
         <div className="flex h-8 items-center space-x-2 tabular-nums">
           <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
           {amountUSD !== undefined && diffPercentage !== 0 && context === "destination" ? (
-            <p className={clsx("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
+            <p className={cn("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>
           ) : null}
@@ -188,7 +188,7 @@ function AssetInput({
               <span className="mr-1">Balance:</span>
               <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
                 <div
-                  className={clsx(
+                  className={cn(
                     "mr-2 max-w-[16ch] truncate tabular-nums",
                     "cursor-help underline decoration-dotted underline-offset-4",
                   )}
@@ -199,7 +199,7 @@ function AssetInput({
                 </div>
               </SimpleTooltip>
               <button
-                className={clsx(
+                className={cn(
                   "rounded-md bg-[#FF486E] px-2 py-1 text-xs font-semibold uppercase text-white disabled:bg-red-200",
                   "transition-[transform,background] enabled:hover:rotate-2 enabled:hover:scale-110 disabled:cursor-not-allowed",
                 )}

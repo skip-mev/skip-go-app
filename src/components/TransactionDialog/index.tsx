@@ -1,9 +1,9 @@
 import { RouteResponse } from "@skip-router/core";
-import { clsx } from "clsx";
 import { Fragment, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useDisclosureKey } from "@/context/disclosures";
+import { cn } from "@/utils/ui";
 
 import { PriceImpactWarning } from "../PriceImpactWarning";
 import TransactionDialogContent from "./TransactionDialogContent";
@@ -71,7 +71,7 @@ function TransactionDialog({
     <Fragment>
       <div>
         <button
-          className={clsx(
+          className={cn(
             "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-[opacity,transform]",
             "disabled:cursor-not-allowed disabled:opacity-75",
             "enabled:hover:rotate-1 enabled:hover:scale-105",
