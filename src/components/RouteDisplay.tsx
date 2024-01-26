@@ -487,9 +487,9 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
             destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
           }
         } else if ("axelarTransfer" in nextOperation) {
-          destinationChain = nextOperation.axelarTransfer.toChainID;
+          destinationChain = nextOperation.axelarTransfer.fromChainID;
         } else if ("cctpTransfer" in nextOperation) {
-          destinationChain = nextOperation.cctpTransfer.toChainID;
+          destinationChain = nextOperation.cctpTransfer.fromChainID;
         } else {
           destinationChain = nextOperation.transfer.chainID;
         }
