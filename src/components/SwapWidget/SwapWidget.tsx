@@ -136,7 +136,6 @@ export function SwapWidget() {
               onAmountMax={onSourceAmountMax}
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
-              showBalance
               context="source"
               isLoading={direction === "swap-out" && routeLoading}
               isError={isAmountError}

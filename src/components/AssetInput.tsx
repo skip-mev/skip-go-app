@@ -27,7 +27,6 @@ interface Props {
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
-  showBalance?: boolean;
   context: "source" | "destination";
   isError?: string | boolean;
   isLoading?: boolean;
@@ -44,7 +43,6 @@ function AssetInput({
   chain,
   chains,
   onChainChange,
-  showBalance,
   context,
   isError,
   isLoading,
@@ -103,7 +101,7 @@ function AssetInput({
           />
         </div>
       </div>
-      <div className="relative isolate mb-2">
+      <div className="relative isolate">
         {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
         <input
           data-testid="amount"
@@ -176,7 +174,7 @@ function AssetInput({
             </p>
           ) : null}
           <div className="flex-grow" />
-          {showBalance && account?.address && asset && (
+          {context === "source" && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
               <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
@@ -206,7 +204,7 @@ function AssetInput({
         </div>
       </div>
       {typeof isError === "string" && (
-        <div className="animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
+        <div className="mt-2 animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
           {isError}
         </div>
       )}
