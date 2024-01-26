@@ -2,6 +2,7 @@ import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 import { Resend } from "resend";
 
+import { configClient } from "@/lib/edge-config";
 import { contactFormSchema } from "@/schemas/api";
 
 export const config: PageConfig = {
@@ -15,7 +16,12 @@ if (!process.env.RESEND_API_KEY) {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req: NextRequest) {
-  if (req.method !== "POST") {
+  if (req.method.toLowerCase() === "head") {
+    const status = !!(await configClient.get("show_contact_form").catch(() => false));
+    return new Response(null, { status: status ? 200 : 404 }); // OK or Not Found
+  }
+
+  if (req.method.toLowerCase() !== "post") {
     return new Response(null, { status: 405 }); // Method Not Allowed
   }
 
