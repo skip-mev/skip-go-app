@@ -260,7 +260,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
       });
     } finally {
       setOngoing(false);
-      setBroadcastedTxs([]);
     }
   }
 
