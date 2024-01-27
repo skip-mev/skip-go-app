@@ -1,5 +1,5 @@
 import { useManager } from "@cosmos-kit/react";
-import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { useState } from "react";
@@ -11,7 +11,7 @@ import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
-import { useSkipClient } from "@/solve";
+import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
@@ -21,12 +21,6 @@ import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
-
-export interface RouteTransaction {
-  status: "INIT" | "PENDING" | "SUCCESS";
-  explorerLink: string | null | undefined;
-  txHash: string | null | undefined;
-}
 
 interface Props {
   route: RouteResponse;
@@ -54,13 +48,10 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const [isExpanded, setIsExpanded] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
 
-  const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
-    Array.from({ length: transactionCount }, () => ({
-      status: "INIT",
-      explorerLink: null,
-      txHash: null,
-    })),
-  );
+  const txStatus = useBroadcastedTxsStatus({
+    txs: broadcastedTxs,
+    txsRequired: route.txsRequired,
+  });
 
   const { getWalletRepo } = useManager();
 
@@ -133,15 +124,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         }
       }
 
-      setTxStatuses([
-        {
-          status: "PENDING",
-          explorerLink: null,
-          txHash: null,
-        },
-        ...txStatuses.slice(1),
-      ]);
-
       await skipClient.executeRoute({
         route,
         userAddresses,
@@ -172,32 +154,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
               });
             }
             return txs;
-          });
-        },
-        onTransactionCompleted: async (chainID, txHash) => {
-          const makeExplorerUrl = await getExplorerUrl(chainID);
-          const explorerLink = makeExplorerUrl?.(txHash);
-
-          setTxStatuses((statuses) => {
-            const newStatuses = [...statuses];
-
-            const pendingIndex = newStatuses.findIndex((status) => status.status === "PENDING");
-
-            newStatuses[pendingIndex] = {
-              status: "SUCCESS",
-              explorerLink,
-              txHash,
-            };
-
-            if (pendingIndex < statuses.length - 1) {
-              newStatuses[pendingIndex + 1] = {
-                status: "PENDING",
-                explorerLink: null,
-                txHash: null,
-              };
-            }
-
-            return newStatuses;
           });
         },
       });
@@ -245,19 +201,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         );
       }
       historyId && txHistory.fail(historyId);
-      setTxStatuses((statuses) => {
-        const newStatuses = [...statuses];
-        return newStatuses.map((status) => {
-          if (status.status === "PENDING") {
-            return {
-              status: "INIT",
-              explorerLink: null,
-              txHash: null,
-            };
-          }
-          return status;
-        });
-      });
     } finally {
       setOngoing(false);
     }
@@ -269,7 +212,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
     return (
       <TransactionSuccessView
         route={route}
-        transactions={txStatuses}
+        transactions={broadcastedTxs}
         onClose={onClose}
       />
     );
@@ -298,14 +241,18 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
       </div>
 
       <div className="flex-1 space-y-6">
-        {txStatuses.map(({ status }, i) => (
+        {broadcastedTxs.map(({ txHash }, i) => (
           <div
             key={`tx-${i}`}
             className="flex items-center gap-4"
           >
-            {status === "INIT" && <CheckCircleIcon className="h-7 w-7 text-neutral-300" />}
-            {status === "PENDING" && <SpinnerIcon className="inline-block h-7 w-7 animate-spin text-neutral-300" />}
-            {status === "SUCCESS" && <CheckCircleIcon className="h-7 w-7 text-emerald-400" />}
+            {txStatus.data?.states?.[i] === "STATE_COMPLETED_SUCCESS" ? (
+              <CheckCircleIcon className="h-7 w-7 text-emerald-400" />
+            ) : txStatus.data?.states?.[i] === "STATE_COMPLETED_ERROR" ? (
+              <XMarkIcon className="h-7 w-7 rounded-full bg-red-400 text-white" />
+            ) : (
+              <SpinnerIcon className="inline-block h-7 w-7 animate-spin text-neutral-300" />
+            )}
             <div className="flex-1">
               <p className="font-semibold">Transaction {i + 1}</p>
             </div>
@@ -318,9 +265,9 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
                   rel="noopener noreferrer"
                 >
                   <span>
-                    {broadcastedTxs[i].txHash.slice(0, 6)}
+                    {txHash.slice(0, 6)}
                     ...
-                    {broadcastedTxs[i].txHash.slice(-6)}
+                    {txHash.slice(-6)}
                   </span>
                 </a>
               )}
