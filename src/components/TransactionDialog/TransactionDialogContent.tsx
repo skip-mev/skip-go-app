@@ -158,7 +158,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         },
       });
 
-      historyId && txHistory.success(historyId);
       setTxComplete(true);
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
@@ -200,7 +199,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
           </p>,
         );
       }
-      historyId && txHistory.fail(historyId);
     } finally {
       setOngoing(false);
     }
@@ -208,7 +206,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
-  if (isTxComplete) {
+  if (isTxComplete && txStatus.data?.isSuccess) {
     return (
       <TransactionSuccessView
         route={route}
