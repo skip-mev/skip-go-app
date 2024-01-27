@@ -228,14 +228,17 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
           </Gap.Child>
           {bridge && (
             <>
-              <span>on</span>
+              <span>with</span>
               <Gap.Child>
-                <img
-                  className="inline-block h-4 w-4"
-                  src={bridge.logoURI}
-                  alt={bridge.name}
-                  onError={onImageError}
-                />
+                {bridge.name.toLowerCase() !== "ibc" && (
+                  <img
+                    className="inline-block h-4 w-4"
+                    src={bridge.logoURI}
+                    alt={bridge.name}
+                    onError={onImageError}
+                  />
+                )}
+
                 <span className="font-semibold text-black">{bridge.name}</span>
               </Gap.Child>
             </>
