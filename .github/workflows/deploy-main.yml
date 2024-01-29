@@ -24,7 +24,8 @@ jobs:
 
       - id: fast-forward
         name: Fast forward 'staging' → 'main'
-        run: git merge --ff-only origin/staging
+        run: |
+          git merge --no-ff origin/staging --message="feat: sync staging → main"
 
       - id: push-main
         name: Push latest 'main'
