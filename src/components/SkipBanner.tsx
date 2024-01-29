@@ -1,5 +1,6 @@
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
+
+import { cn } from "@/utils/ui";
 
 import { AdaptiveLink, AdaptiveLinkProps } from "./AdaptiveLink";
 
@@ -7,7 +8,7 @@ function SkipBanner({ className, ...props }: Omit<AdaptiveLinkProps, "href">) {
   return (
     <AdaptiveLink
       href="https://skip.money/docs/frontends"
-      className={clsx("overflow-hidden bg-[#FF486E] py-2 text-sm font-semibold text-white", className)}
+      className={cn("overflow-hidden bg-[#FF486E] py-2 text-sm font-semibold text-white", className)}
       {...props}
     >
       <div className="flex w-[5000px] animate-banner-rotate items-center">

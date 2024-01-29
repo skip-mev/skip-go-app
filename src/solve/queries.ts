@@ -1,4 +1,4 @@
-import { AssetsRequest, ChainTransaction, SwapVenue, TransferState } from "@skip-router/core";
+import { AssetsRequest, ChainTransaction, StatusState, SwapVenue, TransferState } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -176,6 +176,7 @@ export const useBroadcastedTxsStatus = ({
         isSuccess: boolean;
         isSettled: boolean;
         transferSequence: TransferSequence[];
+        states: StatusState[];
       }
     | undefined
   >(undefined);
@@ -271,6 +272,7 @@ export const useBroadcastedTxsStatus = ({
         isSuccess: _isSuccess,
         isSettled: _isSettled,
         transferSequence: mergedTransferSequence,
+        states: result.map((tx) => tx.state),
       };
       setPrevData(resData);
       return resData;

@@ -1,8 +1,8 @@
 import { TrashIcon } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
 import { ComponentProps } from "react";
 
 import { txHistory, useTxHistory } from "@/context/tx-history";
+import { cn } from "@/utils/ui";
 
 import { SimpleTooltip } from "../SimpleTooltip";
 
@@ -19,7 +19,7 @@ export const HistoryClearButton = ({ className, ...props }: Props) => {
       type="warning"
     >
       <button
-        className={clsx(
+        className={cn(
           "text-xs font-semibold text-[#FF486E]",
           "bg-[#FF486E]/20 hover:bg-[#FF486E]/30",
           "rounded-lg p-2",

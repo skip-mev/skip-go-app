@@ -1,4 +1,4 @@
-name: Deploy (dev.ibc.fun)
+name: Deploy (dev)
 on:
   pull_request:
     branches: [main]

@@ -1,9 +1,9 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
 import { AssetWithMetadata } from "@/context/assets";
+import { cn } from "@/utils/ui";
 
 import AssetSelectContent from "./AssetSelectContent";
 
@@ -24,7 +24,7 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo }: Props
     >
       <DialogTrigger>
         <button
-          className={clsx(
+          className={cn(
             "whitespace-nowrap text-left font-semibold",
             "flex w-full items-center gap-2 rounded-md bg-neutral-100 px-4 py-2 transition-colors sm:py-4",
             "border border-neutral-200 hover:border-neutral-300",

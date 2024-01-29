@@ -1,12 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { RouteResponse } from "@skip-router/core";
+import { BridgeType, RouteResponse } from "@skip-router/core";
 import { ethers } from "ethers";
-import { Dispatch, Fragment, SetStateAction, useMemo } from "react";
+import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
+import { useBridgeByID } from "@/hooks/useBridges";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
+import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "./AdaptiveLink";
 import { SimpleTooltip } from "./SimpleTooltip";
@@ -42,6 +44,7 @@ interface TransferAction {
   sourceChain: string;
   destinationChain: string;
   id: string;
+  bridgeID: BridgeType;
 }
 
 interface SwapAction {
@@ -67,23 +70,18 @@ function RouteEnd({ amount, symbol, logo, chain }: RouteEndProps) {
     <div className="flex items-center gap-2">
       <div className="h-14 w-14 rounded-full border-2 border-neutral-200 bg-white p-1.5">
         <img
-          className="h-full w-full rounded-full"
+          className="h-full w-full"
           src={logo}
-          alt="Osmosis Logo"
+          alt={chain}
         />
       </div>
       <div className="font-semibold">
-        <p>
-          <SimpleTooltip label={`${amount} ${symbol}`}>
-            <span className="cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4">
-              {parseFloat(amount).toLocaleString("en-US", {
-                maximumFractionDigits: 8,
-              })}
-            </span>
-          </SimpleTooltip>{" "}
-          {symbol}
-        </p>
-        <p className="text-sm text-neutral-400">On {chain}</p>
+        <SimpleTooltip label={`${amount} ${symbol}`}>
+          <div className="cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4">
+            {parseFloat(amount).toLocaleString("en-US", { maximumFractionDigits: 8 })} {symbol}
+          </div>
+        </SimpleTooltip>
+        <div className="text-sm text-neutral-400">On {chain}</div>
       </div>
     </div>
   );
@@ -97,6 +95,7 @@ interface TransferStepProps {
 }
 
 function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
+  const { data: bridge } = useBridgeByID(action.bridgeID);
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
@@ -143,20 +142,16 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
     }
   }, [transfer?.state]);
 
-  const renderExplorerLink = useMemo(() => {
-    const packetTx =
-      operationIndex === 0 ? transfer?.txs.sendTx : isNextOpSwap ? transfer?.txs.sendTx : transfer?.txs.receiveTx;
-    if (!packetTx?.explorerLink) return null;
-    return (
-      <AdaptiveLink
-        className="text-xs font-semibold text-[#FF486E] underline"
-        href={packetTx.explorerLink}
-      >
-        <span>
-          {packetTx.explorerLink.split("/").at(-1)?.slice(0, 6)}…{packetTx.explorerLink.split("/").at(-1)?.slice(-6)}
-        </span>
-      </AdaptiveLink>
-    );
+  const explorerLink = useMemo(() => {
+    const packetTx = (() => {
+      if (operationIndex === 0) return transfer?.txs.sendTx;
+      if (isNextOpSwap) return transfer?.txs.sendTx;
+      return transfer?.txs.receiveTx;
+    })();
+    if (!packetTx?.explorerLink) {
+      return null;
+    }
+    return makeExplorerLink(packetTx.explorerLink);
   }, [isNextOpSwap, operationIndex, transfer?.txs.receiveTx, transfer?.txs.sendTx]);
 
   const { getAsset } = useAssets();
@@ -173,16 +168,23 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
       <div className="flex items-center justify-between gap-2">
         <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
         <div className="flex-1">
-          <p className="max-w-full break-all text-sm text-neutral-500">
-            Transfer to{" "}
+          <Gap.Parent className="max-w-full text-sm text-neutral-500">
+            <span>Transfer to</span>
             <img
-              className="-mt-1 inline-block h-4 w-4"
+              className="inline-block h-4 w-4"
               src={destinationChain.logoURI}
-              alt=""
-            />{" "}
+              alt={destinationChain.prettyName}
+            />
             <span className="font-semibold text-black">{destinationChain.prettyName}</span>
-          </p>
-          {renderExplorerLink}
+          </Gap.Parent>
+          {explorerLink && (
+            <AdaptiveLink
+              className="text-xs font-semibold text-[#FF486E] underline"
+              href={explorerLink.link}
+            >
+              {explorerLink.shorthand}
+            </AdaptiveLink>
+          )}
         </div>
       </div>
     );
@@ -191,31 +193,65 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
   return (
     <div className="flex items-center gap-2">
       <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
-      <div className="max-w-[18rem]">
-        <p className="text-sm text-neutral-500">
-          Transfer{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4"
-            src={asset.logoURI}
-            alt=""
-          />{" "}
-          <span className="font-semibold text-black">{asset.recommendedSymbol}</span> from{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4 rounded-full"
-            src={sourceChain.logoURI}
-            alt=""
-            onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
-          />{" "}
-          <span className="font-semibold text-black">{sourceChain.prettyName}</span> to{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4 rounded-full"
-            src={destinationChain.logoURI}
-            alt=""
-            onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
-          />{" "}
-          <span className="font-semibold text-black">{destinationChain.prettyName}</span>
-        </p>
-        {renderExplorerLink}
+      <div className="max-w-[18rem] space-y-1 text-sm text-neutral-500">
+        <Gap.Parent>
+          <span>Transfer</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={asset.logoURI}
+              alt={asset.name}
+            />
+            <span className="font-semibold text-black">{asset.recommendedSymbol}</span>
+          </Gap.Child>
+          <span>from</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={sourceChain.logoURI}
+              alt={sourceChain.prettyName}
+              onError={onImageError}
+            />
+            <span className="font-semibold text-black">{sourceChain.prettyName}</span>
+          </Gap.Child>
+        </Gap.Parent>
+        <Gap.Parent>
+          <span>to</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={destinationChain.logoURI}
+              alt={destinationChain.prettyName}
+              onError={onImageError}
+            />
+            <span className="font-semibold text-black">{destinationChain.prettyName}</span>
+          </Gap.Child>
+          {bridge && (
+            <>
+              <span>with</span>
+              <Gap.Child>
+                {bridge.name.toLowerCase() !== "ibc" && (
+                  <img
+                    className="inline-block h-4 w-4"
+                    src={bridge.logoURI}
+                    alt={bridge.name}
+                    onError={onImageError}
+                  />
+                )}
+
+                <span className="font-semibold text-black">{bridge.name}</span>
+              </Gap.Child>
+            </>
+          )}
+        </Gap.Parent>
+        {explorerLink && (
+          <AdaptiveLink
+            className="text-xs font-semibold text-[#FF486E] underline"
+            href={explorerLink.link}
+          >
+            {explorerLink.shorthand}
+          </AdaptiveLink>
+        )}
       </div>
     </div>
   );
@@ -231,9 +267,13 @@ interface SwapStepProps {
 function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
   const { getAsset } = useAssets();
 
-  const assetIn = getAsset(action.sourceAsset, action.chain);
+  const assetIn = useMemo(() => {
+    return getAsset(action.sourceAsset, action.chain);
+  }, [action.chain, action.sourceAsset, getAsset]);
 
-  const assetOut = getAsset(action.destinationAsset, action.chain);
+  const assetOut = useMemo(() => {
+    return getAsset(action.destinationAsset, action.chain);
+  }, [action.chain, action.destinationAsset, getAsset]);
 
   const venue = SWAP_VENUES[action.venue];
 
@@ -274,20 +314,11 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
     }
   }, [swap?.state]);
 
-  const renderExplorerLink = useMemo(() => {
+  const explorerLink = useMemo(() => {
     const receiveTx = swap?.txs.receiveTx;
-    if (!receiveTx) return null;
-    if (swap?.state !== "TRANSFER_SUCCESS") return null;
-    return (
-      <AdaptiveLink
-        className="text-xs font-semibold text-[#FF486E] underline"
-        href={receiveTx.explorerLink}
-      >
-        <span>
-          {receiveTx.explorerLink.split("/").at(-1)?.slice(0, 6)}…{receiveTx.explorerLink.split("/").at(-1)?.slice(-6)}
-        </span>
-      </AdaptiveLink>
-    );
+    if (!receiveTx) return;
+    if (swap?.state !== "TRANSFER_SUCCESS") return;
+    return makeExplorerLink(receiveTx.explorerLink);
   }, [swap?.state, swap?.txs.receiveTx]);
 
   if (!assetIn && assetOut) {
@@ -295,24 +326,36 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
       <div className="flex items-center gap-2">
         <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
         <div className="max-w-[18rem]">
-          <p className="text-sm text-neutral-500">
-            Swap to{" "}
-            <img
-              alt=""
-              className="-mt-1 inline-block h-4 w-4"
-              onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
-              src={assetOut.logoURI}
-            />{" "}
-            <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span> on{" "}
-            <img
-              alt=""
-              className="-mt-1 inline-block h-4 w-4"
-              onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
-              src={venue.imageURL}
-            />{" "}
-            <span className="font-semibold text-black">{venue.name}</span>
-          </p>
-          {renderExplorerLink}
+          <Gap.Parent className="text-sm text-neutral-500">
+            <span>Swap to</span>
+            <Gap.Child>
+              <img
+                alt={assetOut.name}
+                className="inline-block h-4 w-4"
+                onError={onImageError}
+                src={assetOut.logoURI}
+              />
+              <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
+            </Gap.Child>
+            <span>on</span>
+            <Gap.Child>
+              <img
+                alt={venue.name}
+                className="inline-block h-4 w-4"
+                onError={onImageError}
+                src={venue.imageURL}
+              />
+              <span className="font-semibold text-black">{venue.name}</span>
+            </Gap.Child>
+          </Gap.Parent>
+          {explorerLink && (
+            <AdaptiveLink
+              className="text-xs font-semibold text-[#FF486E] underline"
+              href={explorerLink.link}
+            >
+              {explorerLink.shorthand}
+            </AdaptiveLink>
+          )}
         </div>
       </div>
     );
@@ -323,22 +366,34 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
       <div className="flex items-center gap-2">
         <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
         <div>
-          <p className="text-sm text-neutral-500">
-            Swap{" "}
-            <img
-              className="-mt-1 inline-block h-4 w-4"
-              src={assetIn.logoURI}
-              alt=""
-            />{" "}
-            <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span> on{" "}
-            <img
-              className="-mt-1 inline-block h-4 w-4"
-              src={venue.imageURL}
-              alt=""
-            />{" "}
-            <span className="font-semibold text-black">{venue.name}</span>
-          </p>
-          {renderExplorerLink}
+          <Gap.Parent className="text-sm text-neutral-500">
+            <span>Swap</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={assetIn.logoURI}
+                alt={assetIn.name}
+              />
+              <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span>
+            </Gap.Child>
+            <span>on</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={venue.imageURL}
+                alt={venue.name}
+              />
+              <span className="font-semibold text-black">{venue.name}</span>
+            </Gap.Child>
+          </Gap.Parent>
+          {explorerLink && (
+            <AdaptiveLink
+              className="text-xs font-semibold text-[#FF486E] underline"
+              href={explorerLink.link}
+            >
+              {explorerLink.shorthand}
+            </AdaptiveLink>
+          )}
         </div>
       </div>
     );
@@ -352,28 +407,43 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
     <div className="flex items-center gap-2">
       <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
       <div className="max-w-[18rem]">
-        <p className="text-sm text-neutral-500">
-          Swap{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4"
-            src={assetIn.logoURI}
-            alt=""
-          />{" "}
-          <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span> for{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4"
-            src={assetOut.logoURI}
-            alt=""
-          />{" "}
-          <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span> on{" "}
-          <img
-            className="-mt-1 inline-block h-4 w-4"
-            src={venue.imageURL}
-            alt=""
-          />{" "}
-          <span className="font-semibold text-black">{venue.name}</span>
-        </p>
-        {renderExplorerLink}
+        <Gap.Parent className="text-sm text-neutral-500">
+          <span>Swap</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={assetIn.logoURI}
+              alt={assetIn.name}
+            />
+            <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span>
+          </Gap.Child>
+          <span>for</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={assetOut.logoURI}
+              alt={assetOut.name}
+            />
+            <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
+          </Gap.Child>
+          <span>on</span>
+          <Gap.Child>
+            <img
+              className="inline-block h-4 w-4"
+              src={venue.imageURL}
+              alt={venue.name}
+            />
+            <span className="font-semibold text-black">{venue.name}</span>
+          </Gap.Child>
+        </Gap.Parent>
+        {explorerLink && (
+          <AdaptiveLink
+            className="text-xs font-semibold text-[#FF486E] underline"
+            href={explorerLink.link}
+          >
+            {explorerLink.shorthand}
+          </AdaptiveLink>
+        )}
       </div>
     </div>
   );
@@ -459,6 +529,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
           sourceChain: operation.axelarTransfer.fromChainID,
           destinationChain: operation.axelarTransfer.toChainID,
           id: `transfer-${transferCount}-${i}`,
+          bridgeID: operation.axelarTransfer.bridgeID,
         });
 
         asset = operation.axelarTransfer.asset;
@@ -466,12 +537,22 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
         return;
       }
 
-      let sourceChain = "";
       if ("cctpTransfer" in operation) {
-        sourceChain = operation.cctpTransfer.fromChainID;
-      } else {
-        sourceChain = operation.transfer.chainID;
+        _actions.push({
+          type: "TRANSFER",
+          asset,
+          sourceChain: operation.cctpTransfer.fromChainID,
+          destinationChain: operation.cctpTransfer.toChainID,
+          id: `transfer-${transferCount}-${i}`,
+          bridgeID: operation.cctpTransfer.bridgeID,
+        });
+
+        asset = operation.cctpTransfer.burnToken;
+        transferCount++;
+        return;
       }
+
+      const sourceChain = operation.transfer.chainID;
 
       let destinationChain = "";
       if (i === route.operations.length - 1) {
@@ -487,9 +568,9 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
             destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
           }
         } else if ("axelarTransfer" in nextOperation) {
-          destinationChain = nextOperation.axelarTransfer.toChainID;
+          destinationChain = nextOperation.axelarTransfer.fromChainID;
         } else if ("cctpTransfer" in nextOperation) {
-          destinationChain = nextOperation.cctpTransfer.toChainID;
+          destinationChain = nextOperation.cctpTransfer.fromChainID;
         } else {
           destinationChain = nextOperation.transfer.chainID;
         }
@@ -501,13 +582,10 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
         sourceChain,
         destinationChain,
         id: `transfer-${transferCount}-${i}`,
+        bridgeID: operation.transfer.bridgeID,
       });
 
-      if ("cctpTransfer" in operation) {
-        asset = operation.cctpTransfer.burnToken;
-      } else {
-        asset = operation.transfer.destDenom;
-      }
+      asset = operation.transfer.destDenom;
       transferCount++;
     });
 
@@ -617,3 +695,33 @@ function Spinner() {
 }
 
 export default RouteDisplay;
+
+const Gap = {
+  Parent({ className, ...props }: ComponentProps<"div">) {
+    return (
+      <div
+        className={cn("flex flex-wrap items-center gap-x-2 gap-y-1", className)}
+        {...props}
+      />
+    );
+  },
+  Child({ className, ...props }: ComponentProps<"div">) {
+    return (
+      <div
+        className={cn("flex items-center gap-x-1 gap-y-1", className)}
+        {...props}
+      />
+    );
+  },
+};
+
+function makeExplorerLink(link: string) {
+  return {
+    link,
+    shorthand: `${link.split("/").at(-1)?.slice(0, 6)}…${link.split("/").at(-1)?.slice(-6)}`,
+  };
+}
+
+function onImageError(event: SyntheticEvent<HTMLImageElement>) {
+  event.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg";
+}

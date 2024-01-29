@@ -1,6 +1,7 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { clsx } from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
+
+import { cn } from "@/utils/ui";
 
 type Props = Tooltip.TooltipProps & {
   type?: "default" | "warning";
@@ -22,7 +23,7 @@ export const SimpleTooltip = (props: Props) => {
         <Tooltip.Content
           sideOffset={4}
           {..._content}
-          className={clsx(
+          className={cn(
             "rounded-md bg-white px-4 py-2 leading-none",
             "select-none shadow shadow-neutral-500/50",
             "text-sm",
@@ -33,7 +34,7 @@ export const SimpleTooltip = (props: Props) => {
           )}
         >
           {label}
-          <Tooltip.Arrow className={clsx("fill-white drop-shadow", type === "warning" && "fill-[#fbeef1]")} />
+          <Tooltip.Arrow className={cn("fill-white drop-shadow", type === "warning" && "fill-[#fbeef1]")} />
         </Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>

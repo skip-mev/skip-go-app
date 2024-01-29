@@ -1,8 +1,7 @@
 import { useManager } from "@cosmos-kit/react";
-import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
-import { clsx } from "clsx";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount as useWagmiAccount } from "wagmi";
@@ -12,21 +11,16 @@ import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
-import { useSkipClient } from "@/solve";
+import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
+import { cn } from "@/utils/ui";
 
 import RouteDisplay from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
-
-export interface RouteTransaction {
-  status: "INIT" | "PENDING" | "SUCCESS";
-  explorerLink: string | null | undefined;
-  txHash: string | null | undefined;
-}
 
 interface Props {
   route: RouteResponse;
@@ -42,31 +36,22 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-function TransactionDialogContent({
-  route,
-  onClose,
-  isAmountError,
-  transactionCount,
-  onAllTransactionComplete,
-}: Props) {
+function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const { data: chains = [] } = useChains();
 
   const skipClient = useSkipClient();
   const { address: evmAddress } = useWagmiAccount();
 
-  const [transacting, setTransacting] = useState(false);
+  const [isOngoing, setOngoing] = useState(false);
 
-  const [txComplete, setTxComplete] = useState(false);
-  const [isRouteExpanded, setIsRouteExpanded] = useState(false);
+  const [isTxComplete, setTxComplete] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
 
-  const [txStatuses, setTxStatuses] = useState<RouteTransaction[]>(() =>
-    Array.from({ length: transactionCount }, () => ({
-      status: "INIT",
-      explorerLink: null,
-      txHash: null,
-    })),
-  );
+  const txStatus = useBroadcastedTxsStatus({
+    txs: broadcastedTxs,
+    txsRequired: route.txsRequired,
+  });
 
   const { getWalletRepo } = useManager();
 
@@ -74,8 +59,8 @@ function TransactionDialogContent({
   const dstAccount = useAccount("destination");
 
   async function onSubmit() {
-    setTransacting(true);
-    setIsRouteExpanded(true);
+    setOngoing(true);
+    setIsExpanded(true);
     const historyId = randomId();
     try {
       const userAddresses: Record<string, string> = {};
@@ -139,15 +124,6 @@ function TransactionDialogContent({
         }
       }
 
-      setTxStatuses([
-        {
-          status: "PENDING",
-          explorerLink: null,
-          txHash: null,
-        },
-        ...txStatuses.slice(1),
-      ]);
-
       await skipClient.executeRoute({
         route,
         userAddresses,
@@ -180,37 +156,9 @@ function TransactionDialogContent({
             return txs;
           });
         },
-        onTransactionCompleted: async (chainID, txHash) => {
-          const makeExplorerUrl = await getExplorerUrl(chainID);
-          const explorerLink = makeExplorerUrl?.(txHash);
-
-          setTxStatuses((statuses) => {
-            const newStatuses = [...statuses];
-
-            const pendingIndex = newStatuses.findIndex((status) => status.status === "PENDING");
-
-            newStatuses[pendingIndex] = {
-              status: "SUCCESS",
-              explorerLink,
-              txHash,
-            };
-
-            if (pendingIndex < statuses.length - 1) {
-              newStatuses[pendingIndex + 1] = {
-                status: "PENDING",
-                explorerLink: null,
-                txHash: null,
-              };
-            }
-
-            return newStatuses;
-          });
-        },
       });
 
-      historyId && txHistory.success(historyId);
       setTxComplete(true);
-      onAllTransactionComplete?.();
     } catch (err: unknown) {
       if (process.env.NODE_ENV === "development") {
         console.error(err);
@@ -251,33 +199,18 @@ function TransactionDialogContent({
           </p>,
         );
       }
-      historyId && txHistory.fail(historyId);
-      setTxStatuses((statuses) => {
-        const newStatuses = [...statuses];
-        return newStatuses.map((status) => {
-          if (status.status === "PENDING") {
-            return {
-              status: "INIT",
-              explorerLink: null,
-              txHash: null,
-            };
-          }
-          return status;
-        });
-      });
     } finally {
-      setTransacting(false);
-      setBroadcastedTxs([]);
+      setOngoing(false);
     }
   }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
 
-  if (txComplete) {
+  if (isTxComplete && txStatus.data?.isSuccess) {
     return (
       <TransactionSuccessView
         route={route}
-        transactions={txStatuses}
+        transactions={broadcastedTxs}
         onClose={onClose}
       />
     );
@@ -299,21 +232,25 @@ function TransactionDialogContent({
       <div className="rounded-xl border border-neutral-300 p-4">
         <RouteDisplay
           route={route}
-          isRouteExpanded={isRouteExpanded}
-          setIsRouteExpanded={setIsRouteExpanded}
+          isRouteExpanded={isExpanded}
+          setIsRouteExpanded={setIsExpanded}
           broadcastedTxs={broadcastedTxs}
         />
       </div>
 
       <div className="flex-1 space-y-6">
-        {txStatuses.map(({ status }, i) => (
+        {broadcastedTxs.map(({ txHash }, i) => (
           <div
             key={`tx-${i}`}
             className="flex items-center gap-4"
           >
-            {status === "INIT" && <CheckCircleIcon className="h-7 w-7 text-neutral-300" />}
-            {status === "PENDING" && <SpinnerIcon className="inline-block h-7 w-7 animate-spin text-neutral-300" />}
-            {status === "SUCCESS" && <CheckCircleIcon className="h-7 w-7 text-emerald-400" />}
+            {txStatus.data?.states?.[i] === "STATE_COMPLETED_SUCCESS" ? (
+              <CheckCircleIcon className="h-7 w-7 text-emerald-400" />
+            ) : txStatus.data?.states?.[i] === "STATE_COMPLETED_ERROR" ? (
+              <XMarkIcon className="h-7 w-7 rounded-full bg-red-400 text-white" />
+            ) : (
+              <SpinnerIcon className="inline-block h-7 w-7 animate-spin text-neutral-300" />
+            )}
             <div className="flex-1">
               <p className="font-semibold">Transaction {i + 1}</p>
             </div>
@@ -326,9 +263,9 @@ function TransactionDialogContent({
                   rel="noopener noreferrer"
                 >
                   <span>
-                    {broadcastedTxs[i].txHash.slice(0, 6)}
+                    {txHash.slice(0, 6)}
                     ...
-                    {broadcastedTxs[i].txHash.slice(-6)}
+                    {txHash.slice(-6)}
                   </span>
                 </a>
               )}
@@ -356,6 +293,11 @@ function TransactionDialogContent({
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        {isAmountError && !isOngoing && !isTxComplete && (
+          <p className="text-balance text-center text-sm font-medium text-red-500">
+            {typeof isAmountError === "string" ? isAmountError : "Insufficient balance."}
+          </p>
+        )}
         <div className="flex w-full items-center rounded-md bg-black p-3 text-left text-xs font-medium uppercase text-white/50">
           <p className="flex-1">
             This route requires{" "}
@@ -366,9 +308,9 @@ function TransactionDialogContent({
             to complete
           </p>
         </div>
-        {transacting ? (
+        {isOngoing ? (
           <button
-            className={clsx(
+            className={cn(
               "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
               "outline-none transition-transform",
               "enabled:hover:rotate-1 enabled:hover:scale-105",
@@ -404,20 +346,17 @@ function TransactionDialogContent({
           </button>
         ) : (
           <button
-            className={clsx(
+            className={cn(
               "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white",
               "outline-none transition-transform",
               "enabled:hover:rotate-1 enabled:hover:scale-105",
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={transacting || !!isAmountError}
+            disabled={isOngoing || !!isAmountError}
           >
             Submit
           </button>
-        )}
-        {isAmountError && !transacting && !txComplete && (
-          <p className="text-center text-sm font-semibold text-red-500">Insufficient Balance</p>
         )}
       </div>
     </div>

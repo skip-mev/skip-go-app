@@ -1,5 +1,6 @@
-import { clsx } from "clsx";
 import { ComponentProps, forwardRef } from "react";
+
+import { cn } from "@/utils/ui";
 
 type Props = ComponentProps<"button"> & {
   address: string;
@@ -12,7 +13,7 @@ export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
     const { address, walletLogo, walletName, className, ...rest } = props;
     return (
       <button
-        className={clsx(
+        className={cn(
           "flex items-center gap-2 transition-colors focus:outline-none",
           "rounded-lg border border-neutral-200 px-2 py-1.5 hover:border-neutral-300 hover:bg-neutral-50",
           className,

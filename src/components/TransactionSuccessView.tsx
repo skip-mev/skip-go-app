@@ -5,12 +5,12 @@ import { FC } from "react";
 import { useAssets } from "@/context/assets";
 import { Chain, useChains } from "@/hooks/useChains";
 
-import { RouteTransaction } from "./TransactionDialog/TransactionDialogContent";
+import { BroadcastedTx } from "./TransactionDialog/TransactionDialogContent";
 
 const TransactionSuccessView: FC<{
   route: RouteResponse;
   onClose: () => void;
-  transactions: RouteTransaction[];
+  transactions: BroadcastedTx[];
 }> = ({ route, onClose, transactions }) => {
   const { getAsset } = useAssets();
   const { data: chains } = useChains();

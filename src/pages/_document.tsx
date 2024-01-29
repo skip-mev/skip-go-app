@@ -1,5 +1,6 @@
-import { clsx } from "clsx";
 import { Head, Html, Main, NextScript } from "next/document";
+
+import { cn } from "@/utils/ui";
 
 export default function Document() {
   return (
@@ -15,7 +16,7 @@ export default function Document() {
         />
       </Head>
       <body
-        className={clsx(
+        className={cn(
           "font-sans subpixel-antialiased",
           "relative overflow-x-hidden overflow-y-scroll",
           "before:fixed before:inset-x-0 before:bottom-0 before:h-[80vh] before:content-['']",

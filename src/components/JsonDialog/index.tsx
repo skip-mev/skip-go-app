@@ -1,9 +1,9 @@
 import { ArrowLeftIcon, CheckIcon, ClipboardDocumentIcon } from "@heroicons/react/20/solid";
 import * as Dialog from "@radix-ui/react-dialog";
-import { clsx } from "clsx";
 import { useMemo, useState } from "react";
 
 import { useJsonDisclosure } from "@/context/disclosures";
+import { cn } from "@/utils/ui";
 
 export const JsonDialog = () => {
   const [state, { close }] = useJsonDisclosure();
@@ -31,7 +31,7 @@ export const JsonDialog = () => {
     >
       <Dialog.Content className="absolute inset-0 overflow-hidden rounded-3xl bg-white">
         <button
-          className={clsx(
+          className={cn(
             "absolute right-4 top-5",
             "rounded-lg border px-2 py-1 text-sm transition-colors",
             "flex flex-grow items-center justify-center space-x-1",

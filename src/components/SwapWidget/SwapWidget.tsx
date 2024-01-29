@@ -1,12 +1,12 @@
 import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { clsx } from "clsx";
 import { ElementRef, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
 
 import { disclosure } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
+import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
@@ -36,20 +36,22 @@ export function SwapWidget() {
   const {
     amountIn,
     amountOut,
+    bridges,
     destinationAsset,
     destinationChain,
     direction,
     isAmountError,
     numberOfTransactions,
+    onAllTransactionComplete,
+    onBridgeChange,
+    onDestinationAmountChange,
     onDestinationAssetChange,
     onDestinationChainChange,
-    onDestinationAmountChange,
-    onSourceAssetChange,
-    onSourceChainChange,
+    onInvertDirection,
     onSourceAmountChange,
     onSourceAmountMax,
-    onInvertDirection,
-    onAllTransactionComplete,
+    onSourceAssetChange,
+    onSourceChainChange,
     priceImpactThresholdReached,
     route,
     routeError,
@@ -136,7 +138,6 @@ export function SwapWidget() {
               onAmountMax={onSourceAmountMax}
               onAssetChange={onSourceAssetChange}
               onChainChange={onSourceChainChange}
-              showBalance
               context="source"
               isLoading={direction === "swap-out" && routeLoading}
               isError={isAmountError}
@@ -145,7 +146,7 @@ export function SwapWidget() {
           <div className="relative">
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <button
-                className={clsx(
+                className={cn(
                   "pointer-events-auto flex h-8 w-8 items-center justify-center rounded-md bg-neutral-900 text-white",
                   "transition-transform enabled:hover:rotate-3 enabled:hover:scale-105",
                   "disabled:cursor-not-allowed disabled:bg-neutral-500 disabled:hover:scale-100",
@@ -204,17 +205,19 @@ export function SwapWidget() {
           </div>
           {route && (
             <SwapDetails
-              direction={direction}
               amountIn={amountIn}
               amountOut={amountOut}
-              sourceChain={sourceChain}
-              sourceAsset={sourceAsset}
-              gasRequired={sourceFeeAmount}
-              destinationChain={destinationChain}
+              bridges={bridges}
               destinationAsset={destinationAsset}
-              route={route}
+              destinationChain={destinationChain}
+              direction={direction}
+              gasRequired={sourceFeeAmount}
+              onBridgesChange={onBridgeChange}
               priceImpactPercent={swapPriceImpactPercent ?? 0}
               priceImpactThresholdReached={priceImpactThresholdReached}
+              route={route}
+              sourceAsset={sourceAsset}
+              sourceChain={sourceChain}
             />
           )}
           {routeLoading && <RouteLoadingBanner />}
@@ -235,7 +238,7 @@ export function SwapWidget() {
           )}
           {!isWalletConnected && (
             <button
-              className={clsx(
+              className={cn(
                 "w-full rounded-md bg-[#FF486E] py-4 font-semibold text-white outline-none transition-[opacity,transform]",
                 "disabled:cursor-not-allowed disabled:opacity-75",
                 "enabled:hover:rotate-1 enabled:hover:scale-105",

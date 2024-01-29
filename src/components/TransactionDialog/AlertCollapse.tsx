@@ -4,8 +4,9 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
 } from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
 import { ComponentProps, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+
+import { cn } from "@/utils/ui";
 
 interface ContextType {
   type: "error" | "warning" | "info" | "success";
@@ -36,7 +37,7 @@ export const Root = ({
   return (
     <Context.Provider value={{ type, isOpen, toggle }}>
       <div
-        className={clsx(
+        className={cn(
           "rounded-md",
           {
             "bg-red-50 text-red-400": type === "error",
@@ -57,13 +58,13 @@ export const Trigger = ({ className, children, onClick, ...props }: ComponentPro
   const Icon = useMemo(() => iconMap[type], [type]);
   return (
     <button
-      className={clsx("flex w-full items-center gap-2 p-3", "text-left text-xs font-medium uppercase", className)}
+      className={cn("flex w-full items-center gap-2 p-3", "text-left text-xs font-medium uppercase", className)}
       onClick={(event) => [toggle(), onClick?.(event)]}
       {...props}
     >
       <Icon className="h-5 w-5" />
       <span className="flex-1">{children}</span>
-      <ChevronRightIcon className={clsx("h-5 w-5", { "rotate-90": isOpen })} />
+      <ChevronRightIcon className={cn("h-5 w-5", { "rotate-90": isOpen })} />
     </button>
   );
 };
@@ -79,7 +80,7 @@ export const Content = ({ className, ...props }: ComponentProps<"div">) => {
   if (!isOpen) return null;
   return (
     <div
-      className={clsx("space-y-1 px-4 pb-4 text-sm", className)}
+      className={cn("space-y-1 px-4 pb-4 text-sm", className)}
       ref={ref}
       {...props}
     />

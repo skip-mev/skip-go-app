@@ -1,12 +1,12 @@
 import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { RouteResponse } from "@skip-router/core";
-import { clsx } from "clsx";
+import { BridgeType, RouteResponse } from "@skip-router/core";
 import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { formatPercent } from "@/utils/intl";
+import { cn } from "@/utils/ui";
 
 import { ConversionRate } from "../ConversionRate";
 import { SimpleTooltip } from "../SimpleTooltip";
@@ -15,22 +15,25 @@ import { SwapWidgetStore } from "./useSwapWidget";
 
 type Props = SwapWidgetStore & {
   amountOut: string;
-  route: RouteResponse;
+  onBridgesChange: (bridges: BridgeType[]) => void;
   priceImpactPercent: number;
   priceImpactThresholdReached: boolean;
+  route: RouteResponse;
 };
 
 export const SwapDetails = ({
   amountIn,
   amountOut,
-  sourceChain,
-  sourceAsset,
-  gasRequired,
-  destinationChain,
+  // bridges: selectedBridges,
   destinationAsset,
-  route,
+  destinationChain,
+  gasRequired,
+  // onBridgesChange,
   priceImpactPercent,
   priceImpactThresholdReached,
+  route,
+  sourceAsset,
+  sourceChain,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
@@ -57,7 +60,7 @@ export const SwapDetails = ({
 
   return (
     <Collapsible.Root
-      className={clsx(
+      className={cn(
         "group rounded-lg px-4 py-2 text-sm",
         "border border-neutral-200 transition-[border,shadow]",
         "hover:border-neutral-300 hover:shadow-sm",
@@ -99,33 +102,33 @@ export const SwapDetails = ({
         </ConversionRate>
         <div className="flex-grow" />
         <Collapsible.Trigger
-          className={clsx(
+          className={cn(
             "relative flex items-center gap-1 text-xs",
             "before:absolute before:-inset-2 before:content-['']",
             "text-neutral-400",
           )}
         >
           <span
-            className={clsx(
+            className={cn(
               "animate-slide-left-and-fade tabular-nums text-neutral-400 transition-opacity",
               open && "hidden",
             )}
           >
             Slippage: {slippage}%
           </span>
-          <ChevronDownIcon className={clsx("h-4 w-4 transition", open ? "rotate-180" : "rotate-0")} />
+          <ChevronDownIcon className={cn("h-4 w-4 transition", open ? "rotate-180" : "rotate-0")} />
         </Collapsible.Trigger>
       </div>
 
       <Collapsible.Content
-        className={clsx(
+        className={cn(
           "overflow-hidden",
           "data-[state=open]:animate-collapsible-open",
           "data-[state=closed]:animate-collapsible-closed",
         )}
       >
         <dl
-          className={clsx(
+          className={cn(
             "mb-2 mt-4 grid grid-cols-2 gap-2",
             "[&_dt]:text-start [&_dt]:text-neutral-400",
             "[&_dd]:text-end [&_dd]:tabular-nums",
@@ -141,7 +144,7 @@ export const SwapDetails = ({
           <dd>
             <SimpleTooltip label="Click to change maximum slippage">
               <button
-                className={clsx(
+                className={cn(
                   "mr-1 inline-flex items-center gap-1 p-1 text-xs transition-colors",
                   "text-red-500 hover:bg-neutral-100",
                   "rounded",
@@ -159,7 +162,7 @@ export const SwapDetails = ({
           <dd>
             <SimpleTooltip label="Click to change gas multiplier">
               <button
-                className={clsx(
+                className={cn(
                   "mr-1 inline-flex items-center gap-1 p-1 text-xs transition-colors",
                   "text-red-500 hover:bg-neutral-100",
                   "rounded",

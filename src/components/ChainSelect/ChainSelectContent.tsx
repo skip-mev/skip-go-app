@@ -1,10 +1,10 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
-import { clsx } from "clsx";
 import { matchSorter } from "match-sorter";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/hooks/useChains";
+import { cn } from "@/utils/ui";
 
 interface Props {
   chains: Chain[];
@@ -70,7 +70,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
         </div>
       ) : (
         <ScrollArea.Root
-          className={clsx(
+          className={cn(
             "relative isolate flex-grow overflow-hidden",
             "before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-2",
             "before:bg-gradient-to-b before:from-white before:to-transparent",
@@ -99,7 +99,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
             ))}
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar
-            className="z-20 flex touch-none select-none py-4 transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
+            className="duration-[160ms] z-20 flex touch-none select-none py-4 transition-colors ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
             orientation="vertical"
           >
             <ScrollArea.Thumb className="relative flex-1 rounded-[10px] bg-neutral-500/50 transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-2 before:w-2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-neutral-500" />

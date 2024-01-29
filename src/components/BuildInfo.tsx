@@ -1,8 +1,8 @@
-import { clsx } from "clsx";
 import { ReactNode, useEffect, useState } from "react";
 import { tinykeys } from "tinykeys";
 
 import { API_URL } from "@/constants/api";
+import { cn } from "@/utils/ui";
 
 const githubUrl = "https://github.com/skip-mev/ibc-dot-fun";
 
@@ -35,7 +35,7 @@ export const BuildInfo = () => {
   if (!show) return null;
 
   return (
-    <div className={clsx("fixed bottom-2 left-2", "w-[300px] space-y-2 rounded border bg-white p-2 shadow-md")}>
+    <div className={cn("fixed bottom-2 left-2", "w-[300px] space-y-2 rounded border bg-white p-2 shadow-md")}>
       <dl>
         {buildInfo.map(
           ([k, v], i) =>

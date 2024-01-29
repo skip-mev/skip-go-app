@@ -1,5 +1,5 @@
+import { BackspaceIcon } from "@heroicons/react/20/solid";
 import { BigNumber } from "bignumber.js";
-import { clsx } from "clsx";
 import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
@@ -10,6 +10,7 @@ import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain } from "@/hooks/useChains";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
+import { cn } from "@/utils/ui";
 
 import AssetSelect from "./AssetSelect";
 import ChainSelect from "./ChainSelect";
@@ -27,7 +28,6 @@ interface Props {
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];
-  showBalance?: boolean;
   context: "source" | "destination";
   isError?: string | boolean;
   isLoading?: boolean;
@@ -44,7 +44,6 @@ function AssetInput({
   chain,
   chains,
   onChainChange,
-  showBalance,
   context,
   isError,
   isLoading,
@@ -78,7 +77,7 @@ function AssetInput({
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "rounded-lg border border-neutral-200 p-4 transition-[border,shadow]",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
         "hover:border-neutral-300 hover:shadow-sm",
@@ -103,11 +102,19 @@ function AssetInput({
           />
         </div>
       </div>
-      <div className="relative isolate mb-2">
-        {isLoading && <SpinnerIcon className="absolute right-3 top-3 z-10 h-4 w-4 animate-spin text-neutral-300" />}
+      <div className="relative isolate">
+        {isLoading && <SpinnerIcon className="absolute right-2 top-2 z-10 h-4 w-4 animate-spin text-neutral-300" />}
+        {amount && !isLoading && (
+          <button className="absolute right-2 top-2 z-10">
+            <BackspaceIcon
+              className="h-4 w-4 text-neutral-300 transition-colors hover:text-neutral-400"
+              onClick={() => onAmountChange?.("")}
+            />
+          </button>
+        )}
         <input
           data-testid="amount"
-          className={clsx(
+          className={cn(
             "h-10 w-full text-3xl font-medium tabular-nums",
             "placeholder:text-neutral-300 focus:outline-none",
             isLoading && "animate-pulse text-neutral-500",
@@ -171,17 +178,17 @@ function AssetInput({
         <div className="flex h-8 items-center space-x-2 tabular-nums">
           <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
           {amountUSD !== undefined && diffPercentage !== 0 && context === "destination" ? (
-            <p className={clsx("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
+            <p className={cn("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>
           ) : null}
           <div className="flex-grow" />
-          {showBalance && account?.address && asset && (
+          {context === "source" && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
               <span className="mr-1">Balance:</span>
               <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
                 <div
-                  className={clsx(
+                  className={cn(
                     "mr-2 max-w-[16ch] truncate tabular-nums",
                     "cursor-help underline decoration-dotted underline-offset-4",
                   )}
@@ -192,7 +199,7 @@ function AssetInput({
                 </div>
               </SimpleTooltip>
               <button
-                className={clsx(
+                className={cn(
                   "rounded-md bg-[#FF486E] px-2 py-1 text-xs font-semibold uppercase text-white disabled:bg-red-200",
                   "transition-[transform,background] enabled:hover:rotate-2 enabled:hover:scale-110 disabled:cursor-not-allowed",
                 )}
@@ -206,7 +213,7 @@ function AssetInput({
         </div>
       </div>
       {typeof isError === "string" && (
-        <div className="animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
+        <div className="mt-2 animate-slide-up-and-fade text-balance text-center text-xs font-medium text-red-500">
           {isError}
         </div>
       )}

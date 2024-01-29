@@ -9,13 +9,13 @@ import {
   XCircleIcon,
 } from "@heroicons/react/20/solid";
 import * as Accordion from "@radix-ui/react-accordion";
-import { clsx } from "clsx";
 import { ComponentPropsWithoutRef, forwardRef, Fragment, useEffect, useMemo, useRef } from "react";
 
 import { disclosure } from "@/context/disclosures";
 import { txHistory, TxHistoryItem } from "@/context/tx-history";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useBroadcastedTxsStatus } from "@/solve";
+import { cn } from "@/utils/ui";
 
 import { AssetValue } from "../AssetValue";
 import { ChainSymbol } from "../ChainSymbol";
@@ -27,7 +27,7 @@ type RootProps = Omit<Accordion.AccordionSingleProps, "type">;
 export const Root = forwardRef<HTMLDivElement, RootProps>(function Root(props, ref) {
   return (
     <Accordion.Root
-      className={clsx("flex flex-col items-stretch space-y-2 py-2")}
+      className={cn("flex flex-col items-stretch space-y-2 py-2")}
       collapsible
       type="single"
       {...props}
@@ -83,7 +83,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
 
   return (
     <Accordion.Item
-      className={clsx(
+      className={cn(
         "p-1",
         "rounded-lg border border-neutral-200 transition-all",
         "data-[state=open]:shadow-md",
@@ -95,7 +95,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
       ref={ref}
     >
       <Accordion.Header
-        className={clsx(
+        className={cn(
           "relative flex flex-col items-stretch space-y-2",
           "rounded-md p-2 transition-colors hover:bg-neutral-100",
         )}
@@ -126,7 +126,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
             </div>
           </div>
           <div
-            className={clsx("flex items-center space-x-1 text-sm", {
+            className={cn("flex items-center space-x-1 text-sm", {
               "text-green-600": data.status === "success",
               "text-neutral-600": data.status === "pending",
               "text-red-600": data.status === "failed",
@@ -135,13 +135,13 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
             {!isLoading && <span className="capitalize">{data.status}</span>}
             <StatusIcon
               status={data.status}
-              className={clsx("h-4 w-4", !txsStatus?.isSettled && "animate-spin")}
+              className={cn("h-4 w-4", !txsStatus?.isSettled && "animate-spin")}
             />
           </div>
         </div>
 
         <Accordion.Trigger
-          className={clsx(
+          className={cn(
             "group flex items-center justify-center self-center text-xs text-black/60 outline-none",
             "HistoryListTrigger hover:underline",
             "before:absolute before:inset-0 before:content-['']",
@@ -157,14 +157,14 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
         >
           <span className="HistoryListTriggerText" />
           <ChevronDownIcon
-            className={clsx("h-4 w-4", "transition-transform group-data-[state=open]:rotate-180")}
+            className={cn("h-4 w-4", "transition-transform group-data-[state=open]:rotate-180")}
             aria-hidden
           />
         </Accordion.Trigger>
       </Accordion.Header>
 
       <Accordion.Content
-        className={clsx(
+        className={cn(
           "space-y-2 overflow-hidden",
           "data-[state=open]:animate-accordion-open",
           "data-[state=closed]:animate-accordion-closed",
@@ -216,7 +216,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
         </DescriptionList.Root>
         <div className="flex space-x-1">
           <button
-            className={clsx(
+            className={cn(
               "rounded-md border bg-neutral-100 px-2 py-1 text-xs transition-colors hover:bg-neutral-200",
               "flex flex-grow items-center justify-center space-x-1",
             )}
@@ -228,7 +228,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
             <span>View Raw Route</span>
           </button>
           <button
-            className={clsx(
+            className={cn(
               "rounded-md px-2 py-1 text-xs transition-colors",
               "flex items-center justify-center space-x-1",
               "bg-[#FF486E]/20 text-[#FF486E] hover:bg-[#FF486E]/30",

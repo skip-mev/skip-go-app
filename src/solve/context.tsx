@@ -38,29 +38,32 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       await wallet.initOfflineSigner(isLedger ? "amino" : "direct");
 
       if (!wallet.offlineSigner) {
-        throw new Error(`getCosmosSigner error: no offlineSigner for walletName '${walletName}'`);
+        throw new Error(`getCosmosSigner error: no offline signer for walletName '${walletName}'`);
       }
 
       return wallet.offlineSigner;
     },
     getEVMSigner: async (chainID) => {
-      const result = await getWalletClient({
+      const evmWalletClient = await getWalletClient({
         chainId: parseInt(chainID),
       });
 
-      if (!result) {
-        throw new Error("No offline signer available");
+      if (!evmWalletClient) {
+        throw new Error(`getEVMSigner error: no wallet client available for chain ${chainID}`);
       }
 
-      const chain = chains.find((c) => c.id === parseInt(chainID));
+      const chain = chains.find(({ id }) => id === parseInt(chainID));
       if (!chain) {
-        throw new Error("No chain found");
+        throw new Error(`getEVMSigner error: cannot find chain with id ${chainID}`);
       }
-      result.chain = chain;
 
-      return result;
+      // TODO: figure out why we re-assign evm chain on wallet client
+      evmWalletClient.chain = chain;
+
+      return evmWalletClient;
     },
     endpointOptions: {
+      // TODO: move to /api/nodes
       getRpcEndpointForChain: async (chainID) => {
         const testnets: Record<string, string> = {
           "osmo-test-5": "https://osmosis-testnet-rpc.polkachu.com",
@@ -74,6 +77,7 @@ export function SkipProvider({ children }: { children: ReactNode }) {
 
         return getNodeProxyEndpoint(chainID);
       },
+      // TODO: move to /api/nodes
       getRestEndpointForChain: async (chainID) => {
         if (chainID === "injective-1") {
           return "https://lcd.injective.network";

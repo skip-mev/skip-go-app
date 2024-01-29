@@ -5,12 +5,12 @@ if (typeof window !== "undefined") {
 import { ExperimentalFeature } from "@skip-router/core";
 import { createClient } from "@vercel/edge-config";
 
-const client = createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
+export const configClient = createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
 
 export async function getCorsDomains() {
   try {
     const key = "domains";
-    const value = await client.get<string[]>(key);
+    const value = await configClient.get<string[]>(key);
     if (Array.isArray(value)) {
       return value;
     }
@@ -35,7 +35,7 @@ export async function getExperimentalFeatures() {
       }
     })();
 
-    const value = await client.get<ExperimentalFeature[]>(key);
+    const value = await configClient.get<ExperimentalFeature[]>(key);
     if (Array.isArray(value)) {
       return value;
     }
