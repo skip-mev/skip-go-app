@@ -21,7 +21,7 @@ import { trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
-import { useRoute } from "@/solve";
+import { useRoute, useSkipClient } from "@/solve";
 import { getChainFeeAssets } from "@/utils/chain";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { getAmountWei, parseAmountWei } from "@/utils/number";
@@ -40,6 +40,8 @@ export function useSwapWidget() {
   /////////////////////////////////////////////////////////////////////////////
 
   // #region -- core states
+
+  const skipClient = useSkipClient();
 
   const { assetsByChainID, getFeeAsset } = useAssets();
   const { data: chains } = useChains();
@@ -111,7 +113,7 @@ export function useSwapWidget() {
     enabled: !isAnyDisclosureOpen,
   });
 
-  const gasAmount = useSettingsStore((state) => state.gasAmount);
+  const customGasAmount = useSettingsStore((state) => state.customGasAmount);
 
   // #endregion
 
@@ -451,8 +453,16 @@ export function useSwapWidget() {
       async ([srcChain, srcAsset, srcFeeAsset]) => {
         if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
 
+        const suggestedPrice = await skipClient.getRecommendedGasPrice(srcChain.chainID);
+
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
-          srcFeeAsset = await getFeeAsset(srcChain.chainID);
+          if (suggestedPrice) {
+            srcFeeAsset = assetsByChainID(srcChain.chainID).find(({ denom }) => {
+              return denom === suggestedPrice.denom;
+            });
+          } else {
+            srcFeeAsset = await getFeeAsset(srcChain.chainID);
+          }
         }
 
         if (!srcFeeAsset) {
@@ -460,27 +470,34 @@ export function useSwapWidget() {
           return;
         }
 
-        let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
-          return denom === srcFeeAsset?.denom;
-        });
+        const decimals = srcFeeAsset.decimals ?? 6;
 
-        feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(({ denom }) => {
-          return denom === srcFeeAsset?.denom;
-        });
+        let selectedGasPrice: BigNumber;
+        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : customGasAmount;
 
-        if (!feeDenomPrices) {
-          toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
-          return;
+        if (suggestedPrice) {
+          selectedGasPrice = BigNumber(suggestedPrice.amount.toString());
+        } else {
+          let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
+            return denom === srcFeeAsset?.denom;
+          });
+
+          feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(({ denom }) => {
+            return denom === srcFeeAsset?.denom;
+          });
+
+          if (!feeDenomPrices) {
+            toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
+            return;
+          }
+
+          selectedGasPrice = BigNumber(feeDenomPrices.gasPrice.average);
         }
 
-        const decimals = srcFeeAsset.decimals ?? 6;
-        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : gasAmount;
+        const gasRequired = selectedGasPrice.multipliedBy(actualGasAmount).shiftedBy(-decimals).toString();
 
         useSwapWidgetStore.setState({
-          gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
-            .multipliedBy(actualGasAmount)
-            .shiftedBy(-decimals)
-            .toString(),
+          gasRequired,
           sourceFeeAsset: srcFeeAsset,
         });
       },
@@ -489,7 +506,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [gasAmount, getFeeAsset]);
+  }, [assetsByChainID, customGasAmount, getFeeAsset, skipClient]);
 
   /**
    * sync either amount in or out depending on {@link direction}

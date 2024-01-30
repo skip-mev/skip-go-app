@@ -4,7 +4,7 @@ import { useSettingsStore } from "@/context/settings";
 import { formatNumberWithCommas, formatNumberWithoutCommas } from "@/utils/number";
 
 export const GasSetting = () => {
-  const currentValue = useSettingsStore((state) => state.gasAmount);
+  const currentValue = useSettingsStore((state) => state.customGasAmount);
 
   return (
     <div className="flex items-center space-x-2 p-2">
@@ -25,7 +25,7 @@ export const GasSetting = () => {
               latest = latest.replace(/[,]{2,}/g, ","); // Remove multiple commas
 
               const value = Math.max(0, +latest);
-              useSettingsStore.setState({ gasAmount: value.toString() });
+              useSettingsStore.setState({ customGasAmount: value.toString() });
             }}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
@@ -54,7 +54,7 @@ export const GasSetting = () => {
                 if (value.isNegative()) {
                   value = BigNumber(0);
                 }
-                useSettingsStore.setState({ gasAmount: value.toString() });
+                useSettingsStore.setState({ customGasAmount: value.toString() });
               }
             }}
           />
