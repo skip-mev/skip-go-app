@@ -231,15 +231,19 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onSourceChainChange = useCallback(
-    (chain: Chain) => {
+    async (chain: Chain) => {
       let feeAsset: Asset | undefined = undefined;
       if (chain.chainType === "cosmos") {
-        feeAsset = getFeeAsset(chain.chainID);
+        feeAsset = await getFeeAsset(chain.chainID);
       }
 
       let asset = feeAsset;
       if (!asset) {
-        [asset] = assetsByChainID(chain.chainID);
+        const assets = assetsByChainID(chain.chainID);
+        if (chain.chainType === "evm") {
+          asset = assets.find((asset) => asset.denom.endsWith("-native"));
+        }
+        asset ??= assets[0];
       }
 
       useSwapWidgetStore.setState({
@@ -276,11 +280,11 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onDestinationChainChange = useCallback(
-    (chain: Chain) => {
+    async (chain: Chain) => {
       const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
-      let asset = getFeeAsset(chain.chainID);
+      let asset = await getFeeAsset(chain.chainID);
       if (!asset) {
         [asset] = assets;
       }
@@ -336,22 +340,26 @@ export function useSwapWidget() {
   /**
    * Handle invert source and destination values
    */
-  const onInvertDirection = useCallback(() => {
-    useSwapWidgetStore.setState((prev) => {
-      if (!prev.destinationChain) return prev;
-      return {
-        sourceChain: prev.destinationChain,
-        sourceAsset: prev.destinationAsset,
-        destinationChain: prev.sourceChain,
-        destinationAsset: prev.sourceAsset,
-        amountIn: prev.amountOut,
-        amountOut: prev.amountIn,
-        direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
-        sourceFeeAsset:
-          prev.destinationChain.chainType === "cosmos" ? getFeeAsset(prev.destinationChain.chainID) : undefined,
-        gasRequired: undefined,
-      };
-    });
+  const onInvertDirection = useCallback(async () => {
+    const { destinationChain } = useSwapWidgetStore.getState();
+    if (!destinationChain) return;
+
+    let sourceFeeAsset: Asset | undefined = undefined;
+    if (destinationChain.chainType === "cosmos") {
+      sourceFeeAsset = await getFeeAsset(destinationChain.chainID);
+    }
+
+    useSwapWidgetStore.setState((prev) => ({
+      sourceChain: prev.destinationChain,
+      sourceAsset: prev.destinationAsset,
+      destinationChain: prev.sourceChain,
+      destinationAsset: prev.sourceAsset,
+      amountIn: prev.amountOut,
+      amountOut: prev.amountIn,
+      direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
+      sourceFeeAsset,
+      gasRequired: undefined,
+    }));
   }, [getFeeAsset]);
 
   /**
@@ -444,7 +452,7 @@ export function useSwapWidget() {
         if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
 
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
-          srcFeeAsset = getFeeAsset(srcChain.chainID);
+          srcFeeAsset = await getFeeAsset(srcChain.chainID);
         }
 
         if (!srcFeeAsset) {

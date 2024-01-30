@@ -1,16 +1,16 @@
-import { Asset } from "@skip-router/core";
+import { Asset, FeeAsset } from "@skip-router/core";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 
 import { useChains } from "@/hooks/useChains";
 import { sortFeeAssets } from "@/utils/chain";
 
-import { isAssetWithMetadata, useAssets as useSolveAssets } from "../solve";
+import { isAssetWithMetadata, useAssets as useSolveAssets, useSkipClient } from "../solve";
 
 interface AssetsContext {
   assets: Record<string, Asset[]>;
   assetsByChainID: (chainID?: string) => Asset[];
   getAsset(denom: string, chainID: string): Asset | undefined;
-  getFeeAsset(chainID: string): Asset | undefined;
+  getFeeAsset(chainID: string): Promise<Asset | undefined>;
   getNativeAssets(): Asset[];
   isReady: boolean;
 }
@@ -19,12 +19,14 @@ export const AssetsContext = createContext<AssetsContext>({
   assets: {},
   assetsByChainID: () => [],
   getAsset: () => undefined,
-  getFeeAsset: () => undefined,
+  getFeeAsset: async () => undefined,
   getNativeAssets: () => [],
   isReady: false,
 });
 
 export function AssetsProvider({ children }: { children: ReactNode }) {
+  const skipClient = useSkipClient();
+
   const { data: chains } = useChains();
   const { data: solveAssets } = useSolveAssets();
 
@@ -42,7 +44,8 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
 
   const assetsByChainID: AssetsContext["assetsByChainID"] = useCallback(
     (chainID?: string) => {
-      return chainID ? assets[chainID] || [] : [];
+      const chainAssets = chainID ? assets[chainID] || [] : [];
+      return /* console.log(chainAssets), */ chainAssets;
     },
     [assets],
   );
@@ -56,17 +59,24 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
   );
 
   const getFeeAsset = useCallback(
-    (chainID: string) => {
-      const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
+    async (chainID: string) => {
+      const cached = feeAssetCache[chainID];
+      if (cached) return cached;
 
-      if (!chain || chain.feeAssets.length === 0) return;
+      let feeAsset: FeeAsset | undefined;
+      feeAsset = await skipClient.getFeeInfoForChain(chainID);
 
-      const [firstFeeAsset] = chain.feeAssets.sort(sortFeeAssets);
-      if (!firstFeeAsset) return;
+      if (!feeAsset) {
+        const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
+        chain?.feeAssets && ([feeAsset] = chain.feeAssets.sort(sortFeeAssets));
+      }
 
-      return getAsset(firstFeeAsset.denom, chainID);
+      const asset = feeAsset && getAsset(feeAsset.denom, chainID);
+      if (!asset) return;
+
+      return (feeAssetCache[chainID] = asset), asset;
     },
-    [chains, getAsset],
+    [chains, getAsset, skipClient],
   );
 
   const getNativeAssets = useCallback(() => {
@@ -119,3 +129,5 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
 export function useAssets() {
   return useContext(AssetsContext);
 }
+
+const feeAssetCache: Record<string, Asset> = {};

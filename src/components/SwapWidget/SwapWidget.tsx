@@ -153,10 +153,10 @@ export function SwapWidget() {
                   "data-[swap=true]:pointer-events-none data-[swap=true]:animate-spin-swap",
                 )}
                 disabled={!destinationChain}
-                onClick={() => {
+                onClick={async () => {
                   if (!destinationChain || !invertButtonRef.current) return;
                   invertButtonRef.current.setAttribute("data-swap", "true");
-                  onInvertDirection();
+                  await onInvertDirection();
                 }}
                 data-testid="swap-button"
                 ref={invertButtonRef}
