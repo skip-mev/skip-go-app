@@ -68,13 +68,18 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
 
       if (!feeAsset) {
         const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
-        chain?.feeAssets && ([feeAsset] = chain.feeAssets.sort(sortFeeAssets));
+        if (!chain) return;
+        [feeAsset] = chain.feeAssets.sort(sortFeeAssets);
+      }
+      if (!feeAsset) {
+        return;
       }
 
-      const asset = feeAsset && getAsset(feeAsset.denom, chainID);
+      const asset = getAsset(feeAsset.denom, chainID);
       if (!asset) return;
 
-      return (feeAssetCache[chainID] = asset), asset;
+      feeAssetCache[chainID] = asset;
+      return asset;
     },
     [chains, getAsset, skipClient],
   );
