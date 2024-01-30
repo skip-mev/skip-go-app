@@ -1,17 +1,17 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { Asset } from "@skip-router/core";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
-import { AssetWithMetadata } from "@/context/assets";
 import { cn } from "@/utils/ui";
 
 import AssetSelectContent from "./AssetSelectContent";
 
 interface Props {
-  asset?: AssetWithMetadata;
-  assets?: AssetWithMetadata[];
+  asset?: Asset;
+  assets?: Asset[];
   balances?: Record<string, string>;
-  onChange?: (asset: AssetWithMetadata) => void;
+  onChange?: (asset: Asset) => void;
   showChainInfo?: boolean;
 }
 

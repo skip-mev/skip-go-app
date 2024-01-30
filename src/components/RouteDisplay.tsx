@@ -100,9 +100,10 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
   // format: operationType-<operationTypeCount>-<operationIndex>
-  const operationCount = Number(id.split("-")[1]);
+  const operationTypeCount = Number(id.split("-")[1]);
   const operationIndex = Number(id.split("-")[2]);
-  const transfer = statusData?.transferSequence[operationCount];
+  const isFirstOpSwap = actions[0]?.type === "SWAP";
+  const transferStatus = statusData?.transferSequence[operationTypeCount];
   const isNextOpSwap =
     actions
       // We can assume that the swap operation by the previous transfer
@@ -111,7 +112,25 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
 
   // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
   const renderTransferState = useMemo(() => {
-    switch (transfer?.state) {
+    if (isFirstOpSwap) {
+      if (transferStatus?.state === "TRANSFER_FAILURE") {
+        return (
+          <div className="rounded bg-white">
+            <XCircleIcon className="h-6 w-6 text-red-400" />
+          </div>
+        );
+      }
+      if (transferStatus?.state === "TRANSFER_SUCCESS") {
+        return (
+          <div className="rounded bg-white">
+            <CheckCircleIcon className="h-6 w-6 text-green-400" />
+          </div>
+        );
+      }
+
+      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+    }
+    switch (transferStatus?.state) {
       case "TRANSFER_SUCCESS":
         return (
           <div className="rounded bg-white">
@@ -140,19 +159,19 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
       default:
         return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
     }
-  }, [transfer?.state]);
+  }, [isFirstOpSwap, transferStatus?.state]);
 
   const explorerLink = useMemo(() => {
     const packetTx = (() => {
-      if (operationIndex === 0) return transfer?.txs.sendTx;
-      if (isNextOpSwap) return transfer?.txs.sendTx;
-      return transfer?.txs.receiveTx;
+      if (operationIndex === 0) return transferStatus?.txs.sendTx;
+      if (isNextOpSwap) return transferStatus?.txs.sendTx;
+      return transferStatus?.txs.receiveTx;
     })();
     if (!packetTx?.explorerLink) {
       return null;
     }
     return makeExplorerLink(packetTx.explorerLink);
-  }, [isNextOpSwap, operationIndex, transfer?.txs.receiveTx, transfer?.txs.sendTx]);
+  }, [isNextOpSwap, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
 
   const { getAsset } = useAssets();
 
@@ -279,17 +298,45 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
 
   // format: operationType-<operationTypeCount>-<operationIndex>
   const operationIndex = Number(id.split("-")[2]);
-  const operationCount = Number(
+  const operationTypeCount = Number(id.split("-")[1]);
+  const isSwapFirstStep = operationIndex === 0 && operationTypeCount === 0;
+
+  const sequenceIndex = Number(
     actions
       // We can assume that the swap operation by the previous transfer
       .find((x) => Number(x.id.split("-")[2]) === operationIndex - 1)
       ?.id.split("-")[1],
   );
-  const swap = statusData?.transferSequence[operationCount];
+  const swapStatus = statusData?.transferSequence[isSwapFirstStep ? 0 : sequenceIndex];
 
   // as for swap operations, we can assume that the swap is successful if the previous transfer state is TRANSFER_SUCCESS
   const renderSwapState = useMemo(() => {
-    switch (swap?.state) {
+    if (isSwapFirstStep) {
+      if (swapStatus?.state === "TRANSFER_PENDING") {
+        return (
+          <div className="rounded-full border-2 bg-white p-1">
+            <Spinner />
+          </div>
+        );
+      }
+      if (swapStatus?.state === "TRANSFER_SUCCESS") {
+        return (
+          <div className="rounded bg-white">
+            <CheckCircleIcon className="h-6 w-6 text-green-400" />
+          </div>
+        );
+      }
+      if (swapStatus?.state === "TRANSFER_FAILURE") {
+        return (
+          <div className="rounded bg-white">
+            <XCircleIcon className="h-6 w-6 text-red-400" />
+          </div>
+        );
+      }
+
+      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+    }
+    switch (swapStatus?.state) {
       case "TRANSFER_RECEIVED":
         return (
           <div className="rounded-full border-2 bg-white p-1">
@@ -312,14 +359,14 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
       default:
         return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
     }
-  }, [swap?.state]);
+  }, [isSwapFirstStep, swapStatus?.state]);
 
   const explorerLink = useMemo(() => {
-    const receiveTx = swap?.txs.receiveTx;
-    if (!receiveTx) return;
-    if (swap?.state !== "TRANSFER_SUCCESS") return;
-    return makeExplorerLink(receiveTx.explorerLink);
-  }, [swap?.state, swap?.txs.receiveTx]);
+    const tx = isSwapFirstStep ? swapStatus?.txs.sendTx : swapStatus?.txs.receiveTx;
+    if (!tx) return;
+    if (swapStatus?.state !== "TRANSFER_SUCCESS") return;
+    return makeExplorerLink(tx.explorerLink);
+  }, [isSwapFirstStep, swapStatus?.state, swapStatus?.txs.receiveTx, swapStatus?.txs.sendTx]);
 
   if (!assetIn && assetOut) {
     return (

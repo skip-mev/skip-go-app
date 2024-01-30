@@ -34,10 +34,11 @@ export const SwapDetails = ({
   route,
   sourceAsset,
   sourceChain,
+  sourceFeeAsset,
 }: Props) => {
   const [open, control] = useDisclosureKey("swapDetailsCollapsible");
 
-  const { gasAmount, slippage } = useSettingsStore();
+  const { slippage } = useSettingsStore();
 
   const axelarTransferOperation = useMemo(() => {
     for (const op of route.operations) {
@@ -156,9 +157,15 @@ export const SwapDetails = ({
             </SimpleTooltip>
             {slippage}%
           </dd>
-          <dt>Estimated Fee</dt>
-          <dd>{gasRequired ?? "-"}</dd>
-          <dt>Gas Amount</dt>
+          {sourceFeeAsset && (
+            <>
+              <dt>Estimated Fee</dt>
+              <dd>
+                {gasRequired ?? "-"} {sourceFeeAsset.recommendedSymbol}
+              </dd>
+            </>
+          )}
+          {/* <dt>Gas Amount</dt>
           <dd>
             <SimpleTooltip label="Click to change gas multiplier">
               <button
@@ -173,7 +180,7 @@ export const SwapDetails = ({
               </button>
             </SimpleTooltip>
             {parseFloat(gasAmount).toLocaleString()}
-          </dd>
+          </dd> */}
           <dt>Bridging Fee</dt>
           <dd>{bridgingFee ?? "-"}</dd>
         </dl>

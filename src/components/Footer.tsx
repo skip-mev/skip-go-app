@@ -24,7 +24,7 @@ export function Footer() {
           "bottom-0 right-4 sm:fixed",
           "group items-center gap-2 px-4 py-2 max-sm:w-full max-sm:justify-center sm:rounded-t-lg sm:shadow-xl",
           "bg-white text-[#FF486E] hover:bg-red-50 sm:hover:pb-3 sm:active:pb-2.5",
-          "ease-[cubic-bezier(0.08,0.82,0.17,1)] transition-[background,padding,transform] duration-500",
+          "transition-[background,padding,transform] duration-500",
           "sm:data-[open=false]:translate-y-0 sm:data-[open=true]:translate-y-full",
         )}
         onClick={() => open({ closeAll: true })}
@@ -33,6 +33,11 @@ export function Footer() {
         <ContactIcon className="h-4 w-4" />
         <span>Contact Us</span>
       </button>
+      <style jsx>{`
+        button {
+          transition-timing-function: cubic-bezier(0.08, 0.82, 0.17, 1);
+        }
+      `}</style>
     </footer>
   );
 }

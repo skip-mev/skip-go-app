@@ -1,10 +1,9 @@
-import { SkipRouter } from "@skip-router/core";
+import { Asset, SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
 import { ChainId } from "@/chains/types";
 import { multicall3ABI } from "@/constants/abis";
-import { AssetWithMetadata } from "@/context/assets";
 import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
 import { getCosmWasmClientForChainID, getStargateClientForChainID } from "@/utils/clients";
@@ -12,7 +11,7 @@ import { getCosmWasmClientForChainID, getStargateClientForChainID } from "@/util
 interface Args {
   address?: string;
   chain?: Chain;
-  assets?: AssetWithMetadata[];
+  assets?: Asset[];
   enabled?: boolean;
 }
 
@@ -40,7 +39,7 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
   });
 }
 
-export async function getBalancesByChain(address: string, chainID: ChainId, assets: AssetWithMetadata[]) {
+export async function getBalancesByChain(address: string, chainID: ChainId, assets: Asset[]) {
   const [stargate, cosmwasm] = await Promise.all([
     getStargateClientForChainID(chainID),
     getCosmWasmClientForChainID(chainID),

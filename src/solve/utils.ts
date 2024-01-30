@@ -1,7 +1,5 @@
 import { Asset } from "@skip-router/core";
 
-import { AssetWithMetadata } from "@/context/assets";
-
 export function isAssetWithMetadata(asset: Asset): asset is AssetWithMetadata {
   const { chainID, decimals, denom, name, recommendedSymbol, symbol } = asset;
 
@@ -21,3 +19,9 @@ export function isAssetWithMetadata(asset: Asset): asset is AssetWithMetadata {
 
   return true;
 }
+
+export type AssetWithMetadata = Asset & {
+  recommendedSymbol: NonNullable<Asset["recommendedSymbol"]>;
+  name: NonNullable<Asset["name"]>;
+  decimals: NonNullable<Asset["decimals"]>;
+};

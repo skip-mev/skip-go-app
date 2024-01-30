@@ -206,6 +206,31 @@ export const useBroadcastedTxsStatus = ({
                 state: transfer.ibcTransfer.state,
               };
             }
+            if ("cctpTransfer" in transfer) {
+              const cctpState: TransferState = (() => {
+                switch (transfer.cctpTransfer.state) {
+                  case "CCTP_TRANSFER_SENT":
+                    return "TRANSFER_PENDING";
+                  case "CCTP_TRANSFER_PENDING_CONFIRMATION":
+                    return "TRANSFER_PENDING";
+                  case "CCTP_TRANSFER_CONFIRMED":
+                    return "TRANSFER_PENDING";
+                  case "CCTP_TRANSFER_RECEIVED":
+                    return "TRANSFER_SUCCESS";
+                  default:
+                    return "TRANSFER_UNKNOWN";
+                }
+              })();
+              return {
+                srcChainID: transfer.cctpTransfer.dstChainID,
+                destChainID: transfer.cctpTransfer.dstChainID,
+                txs: {
+                  sendTx: transfer.cctpTransfer.txs.sendTx,
+                  receiveTx: transfer.cctpTransfer.txs.receiveTx,
+                },
+                state: cctpState,
+              };
+            }
             const axelarState: TransferState = (() => {
               switch (transfer.axelarTransfer.state) {
                 case "AXELAR_TRANSFER_PENDING_RECEIPT":

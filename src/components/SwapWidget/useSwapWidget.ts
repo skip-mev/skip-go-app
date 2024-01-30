@@ -1,5 +1,5 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
-import { BridgeType } from "@skip-router/core";
+import { Asset, BridgeType } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
 import { formatUnits } from "ethers";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -14,14 +14,14 @@ import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
-import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { trackWallet } from "@/context/track-wallet";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
-import { useRoute } from "@/solve";
+import { useRoute, useSkipClient } from "@/solve";
 import { getChainFeeAssets } from "@/utils/chain";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { getAmountWei, parseAmountWei } from "@/utils/number";
@@ -40,6 +40,8 @@ export function useSwapWidget() {
   /////////////////////////////////////////////////////////////////////////////
 
   // #region -- core states
+
+  const skipClient = useSkipClient();
 
   const { assetsByChainID, getFeeAsset } = useAssets();
   const { data: chains } = useChains();
@@ -111,7 +113,7 @@ export function useSwapWidget() {
     enabled: !isAnyDisclosureOpen,
   });
 
-  const gasAmount = useSettingsStore((state) => state.gasAmount);
+  const customGasAmount = useSettingsStore((state) => state.customGasAmount);
 
   // #endregion
 
@@ -231,15 +233,19 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onSourceChainChange = useCallback(
-    (chain: Chain) => {
-      let feeAsset: AssetWithMetadata | undefined = undefined;
+    async (chain: Chain) => {
+      let feeAsset: Asset | undefined = undefined;
       if (chain.chainType === "cosmos") {
-        feeAsset = getFeeAsset(chain.chainID);
+        feeAsset = await getFeeAsset(chain.chainID);
       }
 
       let asset = feeAsset;
       if (!asset) {
-        [asset] = assetsByChainID(chain.chainID);
+        const assets = assetsByChainID(chain.chainID);
+        if (chain.chainType === "evm") {
+          asset = assets.find((asset) => asset.denom.endsWith("-native"));
+        }
+        asset ??= assets[0];
       }
 
       useSwapWidgetStore.setState({
@@ -255,7 +261,7 @@ export function useSwapWidget() {
   /**
    * Handle source asset change
    */
-  const onSourceAssetChange = useCallback((asset: AssetWithMetadata) => {
+  const onSourceAssetChange = useCallback((asset: Asset) => {
     useSwapWidgetStore.setState({
       sourceAsset: asset,
       gasRequired: undefined,
@@ -276,11 +282,11 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onDestinationChainChange = useCallback(
-    (chain: Chain) => {
+    async (chain: Chain) => {
       const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
-      let asset = getFeeAsset(chain.chainID);
+      let asset = await getFeeAsset(chain.chainID);
       if (!asset) {
         [asset] = assets;
       }
@@ -307,7 +313,7 @@ export function useSwapWidget() {
    * - if destination chain is defined, only update destination asset
    */
   const onDestinationAssetChange = useCallback(
-    (asset: AssetWithMetadata) => {
+    (asset: Asset) => {
       // If destination asset is defined, but no destination chain, select chain based off asset.
       let { destinationChain: currentDstChain } = useSwapWidgetStore.getState();
 
@@ -336,22 +342,26 @@ export function useSwapWidget() {
   /**
    * Handle invert source and destination values
    */
-  const onInvertDirection = useCallback(() => {
-    useSwapWidgetStore.setState((prev) => {
-      if (!prev.destinationChain) return prev;
-      return {
-        sourceChain: prev.destinationChain,
-        sourceAsset: prev.destinationAsset,
-        destinationChain: prev.sourceChain,
-        destinationAsset: prev.sourceAsset,
-        amountIn: prev.amountOut,
-        amountOut: prev.amountIn,
-        direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
-        sourceFeeAsset:
-          prev.destinationChain.chainType === "cosmos" ? getFeeAsset(prev.destinationChain.chainID) : undefined,
-        gasRequired: undefined,
-      };
-    });
+  const onInvertDirection = useCallback(async () => {
+    const { destinationChain } = useSwapWidgetStore.getState();
+    if (!destinationChain) return;
+
+    let sourceFeeAsset: Asset | undefined = undefined;
+    if (destinationChain.chainType === "cosmos") {
+      sourceFeeAsset = await getFeeAsset(destinationChain.chainID);
+    }
+
+    useSwapWidgetStore.setState((prev) => ({
+      sourceChain: prev.destinationChain,
+      sourceAsset: prev.destinationAsset,
+      destinationChain: prev.sourceChain,
+      destinationAsset: prev.sourceAsset,
+      amountIn: prev.amountOut,
+      amountOut: prev.amountIn,
+      direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
+      sourceFeeAsset,
+      gasRequired: undefined,
+    }));
   }, [getFeeAsset]);
 
   /**
@@ -443,8 +453,16 @@ export function useSwapWidget() {
       async ([srcChain, srcAsset, srcFeeAsset]) => {
         if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
 
+        const suggestedPrice = await skipClient.getRecommendedGasPrice(srcChain.chainID);
+
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
-          srcFeeAsset = getFeeAsset(srcChain.chainID);
+          if (suggestedPrice) {
+            srcFeeAsset = assetsByChainID(srcChain.chainID).find(({ denom }) => {
+              return denom === suggestedPrice.denom;
+            });
+          } else {
+            srcFeeAsset = await getFeeAsset(srcChain.chainID);
+          }
         }
 
         if (!srcFeeAsset) {
@@ -452,27 +470,34 @@ export function useSwapWidget() {
           return;
         }
 
-        let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
-          return denom === srcFeeAsset?.denom;
-        });
+        const decimals = srcFeeAsset.decimals ?? 6;
 
-        feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(({ denom }) => {
-          return denom === srcFeeAsset?.denom;
-        });
+        let selectedGasPrice: BigNumber;
+        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : customGasAmount;
 
-        if (!feeDenomPrices) {
-          toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
-          return;
+        if (suggestedPrice) {
+          selectedGasPrice = BigNumber(suggestedPrice.amount.toString());
+        } else {
+          let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
+            return denom === srcFeeAsset?.denom;
+          });
+
+          feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(({ denom }) => {
+            return denom === srcFeeAsset?.denom;
+          });
+
+          if (!feeDenomPrices) {
+            toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
+            return;
+          }
+
+          selectedGasPrice = BigNumber(feeDenomPrices.gasPrice.average);
         }
 
-        const decimals = srcFeeAsset.decimals ?? 6;
-        const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : gasAmount;
+        const gasRequired = selectedGasPrice.multipliedBy(actualGasAmount).shiftedBy(-decimals).toString();
 
         useSwapWidgetStore.setState({
-          gasRequired: BigNumber(feeDenomPrices.gasPrice.average)
-            .multipliedBy(actualGasAmount)
-            .shiftedBy(-decimals)
-            .toString(),
+          gasRequired,
           sourceFeeAsset: srcFeeAsset,
         });
       },
@@ -481,7 +506,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [gasAmount, getFeeAsset]);
+  }, [assetsByChainID, customGasAmount, getFeeAsset, skipClient]);
 
   /**
    * sync either amount in or out depending on {@link direction}
@@ -763,10 +788,10 @@ export interface SwapWidgetStore {
   amountIn: string;
   amountOut: string;
   sourceChain?: Chain;
-  sourceAsset?: AssetWithMetadata;
-  sourceFeeAsset?: AssetWithMetadata;
+  sourceAsset?: Asset;
+  sourceFeeAsset?: Asset;
   destinationChain?: Chain;
-  destinationAsset?: AssetWithMetadata;
+  destinationAsset?: Asset;
   direction: "swap-in" | "swap-out";
   gasRequired?: string;
   bridges: BridgeType[];
@@ -794,7 +819,7 @@ const useSwapWidgetStore = create(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function findEquivalentAsset(asset: AssetWithMetadata, assets: AssetWithMetadata[]) {
+function findEquivalentAsset(asset: Asset, assets: Asset[]) {
   return assets.find((a) => {
     const isSameOriginChain = a.originChainID === asset.originChainID;
     const isSameOriginDenom = a.originDenom === asset.originDenom;

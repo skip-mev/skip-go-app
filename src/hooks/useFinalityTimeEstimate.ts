@@ -20,6 +20,12 @@ export function useFinalityTimeEstimate(route: RouteResponse) {
           return getFinalityTime(destinationChain.chainID);
         }
       }
+      if ("cctpTransfer" in operation) {
+        const sourceChain = chains.find(({ chainID }) => chainID === operation.cctpTransfer.fromChainID);
+        if (sourceChain?.chainType === "evm") {
+          return getFinalityTime(sourceChain.chainID);
+        }
+      }
     }
 
     return "";

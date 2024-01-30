@@ -1,19 +1,18 @@
 if (typeof window !== "undefined") {
   throw new Error("edge-config.ts should only be imported on the server");
 }
-
 import { ExperimentalFeature } from "@skip-router/core";
 import { createClient } from "@vercel/edge-config";
+import { z } from "zod";
 
 export const configClient = createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
 
 export async function getCorsDomains() {
   try {
-    const key = "domains";
-    const value = await configClient.get<string[]>(key);
-    if (Array.isArray(value)) {
-      return value;
-    }
+    const key = "allowlist-domains";
+    const data = await configClient.get(key);
+    const value = await stringArraySchema.parseAsync(data);
+    return value;
   } catch (error) {
     console.error(error);
   }
@@ -35,11 +34,12 @@ export async function getExperimentalFeatures() {
       }
     })();
 
-    const value = await configClient.get<ExperimentalFeature[]>(key);
-    if (Array.isArray(value)) {
-      return value;
-    }
+    const data = await configClient.get(key);
+    const value = (await stringArraySchema.parseAsync(data)) as ExperimentalFeature[];
+    return value;
   } catch (error) {
     console.error(error);
   }
 }
+
+const stringArraySchema = z.array(z.string()).default([]);
