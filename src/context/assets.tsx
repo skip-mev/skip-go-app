@@ -2,6 +2,7 @@ import { Asset } from "@skip-router/core";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 
 import { useChains } from "@/hooks/useChains";
+import { sortFeeAssets } from "@/utils/chain";
 
 import { isAssetWithMetadata, useAssets as useSolveAssets } from "../solve";
 
@@ -62,12 +63,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
 
       if (!chain || chain.feeAssets.length === 0) return;
 
-      // deprio denoms start with 'ibc/' and 'factory/'
-      const [firstFeeAsset] = chain.feeAssets.sort((a, b) => {
-        if (a.denom.match(/^(ibc|factory)\//)) return 1;
-        if (b.denom.match(/^(ibc|factory)\//)) return -1;
-        return 0;
-      });
+      const [firstFeeAsset] = chain.feeAssets.sort(sortFeeAssets);
       if (!firstFeeAsset) return;
 
       return getAsset(firstFeeAsset.denom, chainID);
