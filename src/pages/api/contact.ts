@@ -17,7 +17,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req: NextRequest) {
   if (req.method.toLowerCase() === "head") {
-    const status = !!(await configClient.get("show_contact_form").catch(() => false));
+    const status = !!(await configClient.get("show-contact-form").catch(() => false));
     return new Response(null, { status: status ? 200 : 404 }); // OK or Not Found
   }
 
