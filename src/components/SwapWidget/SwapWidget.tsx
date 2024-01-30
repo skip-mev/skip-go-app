@@ -61,6 +61,7 @@ export function SwapWidget() {
     sourceAsset,
     sourceChain,
     sourceFeeAmount,
+    sourceFeeAsset,
     swapPriceImpactPercent,
   } = useSwapWidget();
 
@@ -217,6 +218,7 @@ export function SwapWidget() {
               priceImpactThresholdReached={priceImpactThresholdReached}
               route={route}
               sourceAsset={sourceAsset}
+              sourceFeeAsset={sourceFeeAsset}
               sourceChain={sourceChain}
             />
           )}
