@@ -473,8 +473,8 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
             />
             <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
           </Gap.Child>
-          <span>on</span>
           <Gap.Child>
+            <span>on</span>
             <img
               className="inline-block h-4 w-4"
               src={venue.imageURL}
