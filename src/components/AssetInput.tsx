@@ -1,9 +1,10 @@
 import { BackspaceIcon } from "@heroicons/react/20/solid";
+import { Asset } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
 import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
 
-import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
@@ -23,8 +24,8 @@ interface Props {
   diffPercentage?: number;
   onAmountChange?: (amount: string) => void;
   onAmountMax?: MouseEventHandler<HTMLButtonElement>;
-  asset?: AssetWithMetadata;
-  onAssetChange?: (asset: AssetWithMetadata) => void;
+  asset?: Asset;
+  onAssetChange?: (asset: Asset) => void;
   chain?: Chain;
   onChainChange?: (chain: Chain) => void;
   chains: Chain[];

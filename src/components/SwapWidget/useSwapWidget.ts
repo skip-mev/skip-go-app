@@ -1,5 +1,5 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
-import { BridgeType } from "@skip-router/core";
+import { Asset, BridgeType } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
 import { formatUnits } from "ethers";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -14,7 +14,7 @@ import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
-import { AssetWithMetadata, useAssets } from "@/context/assets";
+import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { trackWallet } from "@/context/track-wallet";
@@ -232,7 +232,7 @@ export function useSwapWidget() {
    */
   const onSourceChainChange = useCallback(
     (chain: Chain) => {
-      let feeAsset: AssetWithMetadata | undefined = undefined;
+      let feeAsset: Asset | undefined = undefined;
       if (chain.chainType === "cosmos") {
         feeAsset = getFeeAsset(chain.chainID);
       }
@@ -255,7 +255,7 @@ export function useSwapWidget() {
   /**
    * Handle source asset change
    */
-  const onSourceAssetChange = useCallback((asset: AssetWithMetadata) => {
+  const onSourceAssetChange = useCallback((asset: Asset) => {
     useSwapWidgetStore.setState({
       sourceAsset: asset,
       gasRequired: undefined,
@@ -307,7 +307,7 @@ export function useSwapWidget() {
    * - if destination chain is defined, only update destination asset
    */
   const onDestinationAssetChange = useCallback(
-    (asset: AssetWithMetadata) => {
+    (asset: Asset) => {
       // If destination asset is defined, but no destination chain, select chain based off asset.
       let { destinationChain: currentDstChain } = useSwapWidgetStore.getState();
 
@@ -763,10 +763,10 @@ export interface SwapWidgetStore {
   amountIn: string;
   amountOut: string;
   sourceChain?: Chain;
-  sourceAsset?: AssetWithMetadata;
-  sourceFeeAsset?: AssetWithMetadata;
+  sourceAsset?: Asset;
+  sourceFeeAsset?: Asset;
   destinationChain?: Chain;
-  destinationAsset?: AssetWithMetadata;
+  destinationAsset?: Asset;
   direction: "swap-in" | "swap-out";
   gasRequired?: string;
   bridges: BridgeType[];
@@ -794,7 +794,7 @@ const useSwapWidgetStore = create(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function findEquivalentAsset(asset: AssetWithMetadata, assets: AssetWithMetadata[]) {
+function findEquivalentAsset(asset: Asset, assets: Asset[]) {
   return assets.find((a) => {
     const isSameOriginChain = a.originChainID === asset.originChainID;
     const isSameOriginDenom = a.originDenom === asset.originDenom;

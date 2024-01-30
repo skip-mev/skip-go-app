@@ -6,14 +6,12 @@ import { sortFeeAssets } from "@/utils/chain";
 
 import { isAssetWithMetadata, useAssets as useSolveAssets } from "../solve";
 
-export type AssetWithMetadata = Required<Asset>;
-
 interface AssetsContext {
-  assets: Record<string, AssetWithMetadata[]>;
-  assetsByChainID: (chainID?: string) => AssetWithMetadata[];
-  getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
-  getFeeAsset(chainID: string): AssetWithMetadata | undefined;
-  getNativeAssets(): AssetWithMetadata[];
+  assets: Record<string, Asset[]>;
+  assetsByChainID: (chainID?: string) => Asset[];
+  getAsset(denom: string, chainID: string): Asset | undefined;
+  getFeeAsset(chainID: string): Asset | undefined;
+  getNativeAssets(): Asset[];
   isReady: boolean;
 }
 
@@ -31,7 +29,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
   const { data: solveAssets } = useSolveAssets();
 
   const assets = useMemo(() => {
-    const data: Record<string, AssetWithMetadata[]> = {};
+    const data: Record<string, Asset[]> = {};
 
     if (!solveAssets || !chains) return data;
 
@@ -72,7 +70,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
   );
 
   const getNativeAssets = useCallback(() => {
-    const nativeAssets: AssetWithMetadata[] = [];
+    const nativeAssets: Asset[] = [];
 
     for (const chainAssetList of Object.values(assets)) {
       for (const asset of chainAssetList) {

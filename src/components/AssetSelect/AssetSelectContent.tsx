@@ -1,17 +1,17 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { Asset } from "@skip-router/core";
 import { formatUnits, toBigInt } from "ethers";
 import { matchSorter } from "match-sorter";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AssetWithMetadata } from "@/context/assets";
 import { formatMaxFraction } from "@/utils/intl";
 import { cn } from "@/utils/ui";
 
 interface Props {
-  assets?: AssetWithMetadata[];
+  assets?: Asset[];
   balances: Record<string, string>;
-  onChange?: (asset: AssetWithMetadata) => void;
+  onChange?: (asset: Asset) => void;
   onClose: () => void;
   showChainInfo?: boolean;
 }
