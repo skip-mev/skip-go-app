@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { ethers } from "ethers";
+import { formatUnits } from "ethers";
 import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
@@ -515,7 +515,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
 
   const amountIn = useMemo(() => {
     try {
-      return ethers.formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
+      return formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
@@ -523,11 +523,11 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
 
   const amountOut = useMemo(() => {
     try {
-      return ethers.formatUnits(route.estimatedAmountOut ?? 0, destinationAsset?.decimals ?? 6);
+      return formatUnits(route.amountOut ?? 0, destinationAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
-  }, [route.estimatedAmountOut, destinationAsset?.decimals]);
+  }, [route.amountOut, destinationAsset?.decimals]);
 
   const actions = useMemo(() => {
     const _actions: Action[] = [];
