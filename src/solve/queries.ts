@@ -116,6 +116,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
             }
@@ -126,6 +127,7 @@ export function useRoute({
               destAssetDenom: destinationAsset,
               destAssetChainID: destinationAssetChainID,
               swapVenue,
+              allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
             },
