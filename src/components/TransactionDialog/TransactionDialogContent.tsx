@@ -1,16 +1,15 @@
-import { useManager } from "@cosmos-kit/react";
 import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { useAccount as useWagmiAccount } from "wagmi";
 
+import { getHotfixedGasPrice } from "@/constants/gas";
 import { useSettingsStore } from "@/context/settings";
 import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
-import { useChains } from "@/hooks/useChains";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
+import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
@@ -37,10 +36,7 @@ export interface BroadcastedTx {
 }
 
 function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
-  const { data: chains = [] } = useChains();
-
   const skipClient = useSkipClient();
-  const { address: evmAddress } = useWagmiAccount();
 
   const [isOngoing, setOngoing] = useState(false);
 
@@ -53,82 +49,23 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
     txsRequired: route.txsRequired,
   });
 
-  const { getWalletRepo } = useManager();
-
   const srcAccount = useAccount("source");
   const dstAccount = useAccount("destination");
 
+  const { data: userAddresses } = useWalletAddresses(route.chainIDs);
+
   async function onSubmit() {
+    if (!userAddresses) return;
     setOngoing(true);
     setIsExpanded(true);
     const historyId = randomId();
     try {
-      const userAddresses: Record<string, string> = {};
-
-      const srcChain = chains.find((c) => {
-        return c.chainID === route.sourceAssetChainID;
-      });
-      const dstChain = chains.find((c) => {
-        return c.chainID === route.destAssetChainID;
-      });
-
-      for (const chainID of route.chainIDs) {
-        const chain = chains.find((c) => c.chainID === chainID);
-        if (!chain) {
-          throw new Error(`executeRoute error: cannot find chain '${chainID}'`);
-        }
-
-        if (chain.chainType === "cosmos") {
-          const { wallets } = getWalletRepo(chain.chainName);
-
-          const walletName = (() => {
-            // if `chainID` is the source or destination chain
-            if (srcChain?.chainID === chainID) {
-              return srcAccount?.wallet?.walletName;
-            }
-            if (dstChain?.chainID === chainID) {
-              return dstAccount?.wallet?.walletName;
-            }
-
-            // if `chainID` isn't the source or destination chain
-            if (srcChain?.chainType === "cosmos") {
-              return srcAccount?.wallet?.walletName;
-            }
-            if (dstChain?.chainType === "cosmos") {
-              return dstAccount?.wallet?.walletName;
-            }
-          })();
-
-          if (!walletName) {
-            throw new Error(`executeRoute error: cannot find wallet for '${chain.chainName}'`);
-          }
-
-          const wallet = wallets.find((w) => w.walletName === walletName);
-          if (!wallet) {
-            throw new Error(`executeRoute error: cannot find wallet for '${chain.chainName}'`);
-          }
-          if (wallet.isWalletDisconnected || !wallet.isWalletConnected) {
-            await wallet.connect();
-          }
-          if (!wallet.address) {
-            throw new Error(`executeRoute error: cannot resolve wallet address for '${chain.chainName}'`);
-          }
-          userAddresses[chainID] = wallet.address;
-        }
-
-        if (chain.chainType === "evm") {
-          if (!evmAddress) {
-            throw new Error(`executeRoute error: evm wallet not connected`);
-          }
-          userAddresses[chainID] = evmAddress;
-        }
-      }
-
       await skipClient.executeRoute({
         route,
         userAddresses,
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
+        getGasPrice: getHotfixedGasPrice,
         onTransactionBroadcast: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);

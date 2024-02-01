@@ -13,7 +13,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
-import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
+import { EVMOS_GAS_AMOUNT, getHotfixedGasPrice, isChainIdEvmos } from "@/constants/gas";
 import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -141,9 +141,10 @@ export function useSwapWidget() {
       const parsedFeeBalance = BigNumber(balances[srcFeeAsset.denom] ?? "0").shiftedBy(-(srcFeeAsset.decimals ?? 6));
       const parsedGasRequired = BigNumber(gasRequired || "0");
       if (
-        srcFeeAsset.denom === srcAsset.denom
+        parsedGasRequired.gt(0) &&
+        (srcFeeAsset.denom === srcAsset.denom
           ? parsedAmount.isGreaterThan(parsedBalance.minus(parsedGasRequired))
-          : parsedFeeBalance.minus(parsedGasRequired).isLessThanOrEqualTo(0)
+          : parsedFeeBalance.minus(parsedGasRequired).isLessThanOrEqualTo(0))
       ) {
         return `Insufficient balance. You need ≈${gasRequired} ${srcFeeAsset.recommendedSymbol} to accomodate gas fees.`;
       }
@@ -453,12 +454,13 @@ export function useSwapWidget() {
       async ([srcChain, srcAsset, srcFeeAsset]) => {
         if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
 
-        const suggestedPrice = await skipClient.getRecommendedGasPrice(srcChain.chainID);
+        let suggestedPrice = await getHotfixedGasPrice(srcChain.chainID);
+        suggestedPrice ??= await skipClient.getRecommendedGasPrice(srcChain.chainID);
 
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
           if (suggestedPrice) {
             srcFeeAsset = assetsByChainID(srcChain.chainID).find(({ denom }) => {
-              return denom === suggestedPrice.denom;
+              return denom === suggestedPrice!.denom;
             });
           } else {
             srcFeeAsset = await getFeeAsset(srcChain.chainID);

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { ethers } from "ethers";
+import { formatUnits } from "ethers";
 import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
@@ -175,7 +175,14 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, action.sourceChain);
+  const asset = (() => {
+    const currentAsset = getAsset(action.asset, action.sourceChain);
+    if (currentAsset) return currentAsset;
+    const prevAction = actions[operationIndex - 1];
+    if (!prevAction || prevAction.type !== "TRANSFER") return;
+    const prevAsset = getAsset(prevAction.asset, prevAction.sourceChain);
+    return prevAsset;
+  })();
 
   if (!sourceChain || !destinationChain) {
     // this should be unreachable
@@ -184,17 +191,50 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
 
   if (!asset) {
     return (
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
         <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
-        <div className="flex-1">
-          <Gap.Parent className="max-w-full text-sm text-neutral-500">
-            <span>Transfer to</span>
-            <img
-              className="inline-block h-4 w-4"
-              src={destinationChain.logoURI}
-              alt={destinationChain.prettyName}
-            />
-            <span className="font-semibold text-black">{destinationChain.prettyName}</span>
+        <div className="max-w-[18rem] space-y-1 text-sm text-neutral-500">
+          <Gap.Parent>
+            <span>Transfer</span>
+            <span>from</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={sourceChain.logoURI}
+                alt={sourceChain.prettyName}
+                onError={onImageError}
+              />
+              <span className="font-semibold text-black">{sourceChain.prettyName}</span>
+            </Gap.Child>
+          </Gap.Parent>
+          <Gap.Parent>
+            <span>to</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={destinationChain.logoURI}
+                alt={destinationChain.prettyName}
+                onError={onImageError}
+              />
+              <span className="font-semibold text-black">{destinationChain.prettyName}</span>
+            </Gap.Child>
+            {bridge && (
+              <>
+                <span>with</span>
+                <Gap.Child>
+                  {bridge.name.toLowerCase() !== "ibc" && (
+                    <img
+                      className="inline-block h-4 w-4"
+                      src={bridge.logoURI}
+                      alt={bridge.name}
+                      onError={onImageError}
+                    />
+                  )}
+
+                  <span className="font-semibold text-black">{bridge.name}</span>
+                </Gap.Child>
+              </>
+            )}
           </Gap.Parent>
           {explorerLink && (
             <AdaptiveLink
@@ -515,7 +555,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
 
   const amountIn = useMemo(() => {
     try {
-      return ethers.formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
+      return formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
@@ -523,11 +563,11 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
 
   const amountOut = useMemo(() => {
     try {
-      return ethers.formatUnits(route.estimatedAmountOut ?? 0, destinationAsset?.decimals ?? 6);
+      return formatUnits(route.amountOut ?? 0, destinationAsset?.decimals ?? 6);
     } catch {
       return "0.0";
     }
-  }, [route.estimatedAmountOut, destinationAsset?.decimals]);
+  }, [route.amountOut, destinationAsset?.decimals]);
 
   const actions = useMemo(() => {
     const _actions: Action[] = [];

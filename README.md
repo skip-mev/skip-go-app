@@ -23,11 +23,14 @@ cp .env.example .env
 Make sure to set the following environment variables in `.env` file:
 
 ```bash
-NEXT_PUBLIC_API_URL="https://api.skip.money" # required
-NEXT_PUBLIC_CLIENT_ID=
-POLKACHU_USER=      # required
-POLKACHU_PASSWORD=  # required
+NEXT_PUBLIC_API_URL="https://api.skip.money"
+NEXT_PUBLIC_CLIENT_ID=    # optional
+POLKACHU_USER=            # required
+POLKACHU_PASSWORD=        # required
+NEXT_PUBLIC_EDGE_CONFIG=  # required
 ```
+
+To retrieve `NEXT_PUBLIC_EDGE_CONFIG`, visit the [edge config token setup page](https://link.skip.money/ibc-fun-edge-config-token).
 
 Read more on all available environment variables in [`.env.example`](.env.example) file.
 
