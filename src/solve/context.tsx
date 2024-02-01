@@ -41,6 +41,10 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getCosmosSigner error: no offline signer for walletName '${walletName}'`);
       }
 
+      wallet.client.setDefaultSignOptions?.({
+        preferNoSetFee: true,
+      });
+
       return wallet.offlineSigner;
     },
     getEVMSigner: async (chainID) => {
