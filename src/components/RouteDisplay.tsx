@@ -191,17 +191,50 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
 
   if (!asset) {
     return (
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
         <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
-        <div className="flex-1">
-          <Gap.Parent className="max-w-full text-sm text-neutral-500">
-            <span>Transfer to</span>
-            <img
-              className="inline-block h-4 w-4"
-              src={destinationChain.logoURI}
-              alt={destinationChain.prettyName}
-            />
-            <span className="font-semibold text-black">{destinationChain.prettyName}</span>
+        <div className="max-w-[18rem] space-y-1 text-sm text-neutral-500">
+          <Gap.Parent>
+            <span>Transfer</span>
+            <span>from</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={sourceChain.logoURI}
+                alt={sourceChain.prettyName}
+                onError={onImageError}
+              />
+              <span className="font-semibold text-black">{sourceChain.prettyName}</span>
+            </Gap.Child>
+          </Gap.Parent>
+          <Gap.Parent>
+            <span>to</span>
+            <Gap.Child>
+              <img
+                className="inline-block h-4 w-4"
+                src={destinationChain.logoURI}
+                alt={destinationChain.prettyName}
+                onError={onImageError}
+              />
+              <span className="font-semibold text-black">{destinationChain.prettyName}</span>
+            </Gap.Child>
+            {bridge && (
+              <>
+                <span>with</span>
+                <Gap.Child>
+                  {bridge.name.toLowerCase() !== "ibc" && (
+                    <img
+                      className="inline-block h-4 w-4"
+                      src={bridge.logoURI}
+                      alt={bridge.name}
+                      onError={onImageError}
+                    />
+                  )}
+
+                  <span className="font-semibold text-black">{bridge.name}</span>
+                </Gap.Child>
+              </>
+            )}
           </Gap.Parent>
           {explorerLink && (
             <AdaptiveLink
