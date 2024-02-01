@@ -175,7 +175,14 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
 
   const { getAsset } = useAssets();
 
-  const asset = getAsset(action.asset, action.sourceChain);
+  const asset = (() => {
+    const currentAsset = getAsset(action.asset, action.sourceChain);
+    if (currentAsset) return currentAsset;
+    const prevAction = actions[operationIndex - 1];
+    if (!prevAction || prevAction.type !== "TRANSFER") return;
+    const prevAsset = getAsset(prevAction.asset, prevAction.sourceChain);
+    return prevAsset;
+  })();
 
   if (!sourceChain || !destinationChain) {
     // this should be unreachable
