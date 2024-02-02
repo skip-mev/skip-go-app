@@ -109,6 +109,7 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
       // We can assume that the swap operation by the previous transfer
       .find((x) => Number(x.id.split("-")[2]) === operationIndex + 1)
       ?.id.split("-")[0] === "swap";
+  const isPrevOpTransfer = actions[operationIndex - 1]?.type === "TRANSFER";
 
   // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
   const renderTransferState = useMemo(() => {
@@ -165,13 +166,14 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
     const packetTx = (() => {
       if (operationIndex === 0) return transferStatus?.txs.sendTx;
       if (isNextOpSwap) return transferStatus?.txs.sendTx;
+      if (isPrevOpTransfer) return transferStatus?.txs.sendTx;
       return transferStatus?.txs.receiveTx;
     })();
     if (!packetTx?.explorerLink) {
       return null;
     }
     return makeExplorerLink(packetTx.explorerLink);
-  }, [isNextOpSwap, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
+  }, [isNextOpSwap, isPrevOpTransfer, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
 
   const { getAsset } = useAssets();
 
