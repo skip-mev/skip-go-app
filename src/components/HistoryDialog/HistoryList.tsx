@@ -61,7 +61,11 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const estimatedFinalityTime = useFinalityTimeEstimate(data.route);
-  const { data: txsStatus, isLoading } = useBroadcastedTxsStatus({
+  const {
+    data: txsStatus,
+    isLoading,
+    errorUpdateCount,
+  } = useBroadcastedTxsStatus({
     txsRequired: data.route.txsRequired,
     txs: data.txStatus.map((item) => ({
       chainID: item.chainId,
@@ -71,6 +75,9 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
   });
 
   useEffect(() => {
+    if (errorUpdateCount > 4) {
+      txHistory.remove(id);
+    }
     if (txsStatus?.isSettled) {
       if (txsStatus.isSuccess) {
         txHistory.success(id);
@@ -79,7 +86,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
         txHistory.fail(id);
       }
     }
-  }, [id, txsStatus]);
+  }, [errorUpdateCount, id, txsStatus]);
 
   return (
     <Accordion.Item
