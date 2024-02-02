@@ -97,9 +97,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
 
       setTxComplete(true);
     } catch (err: unknown) {
-      if (process.env.NODE_ENV === "development") {
-        console.error(err);
-      }
+      console.error(err);
       if (err instanceof Error) {
         if (!isUserRejectedRequestError(err)) {
           Sentry.withScope((scope) => {
