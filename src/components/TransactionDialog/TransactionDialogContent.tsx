@@ -66,7 +66,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         getGasPrice: getHotfixedGasPrice,
-        onTransactionBroadcast: async (txStatus) => {
+        onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
 
