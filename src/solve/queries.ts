@@ -304,7 +304,7 @@ export const useBroadcastedTxsStatus = ({
       setPrevData(resData);
       return resData;
     },
-    enabled: !isSettled && !!txs && txs.length > 0 && enabled !== undefined ? enabled : true,
+    enabled: !isSettled && (!!txs && txs.length > 0 && enabled !== undefined ? enabled : true),
     refetchInterval: 1000 * 2,
     // to make the data persist when query key changed
     initialData: prevData,
