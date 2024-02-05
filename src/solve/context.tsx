@@ -6,6 +6,7 @@ import { useNetwork as useWagmiNetwork } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
 import { API_URL } from "@/constants/api";
+import { OVERRIDE_REST_ENDPOINTS, OVERRIDE_RPC_ENDPOINTS } from "@/constants/endpoints";
 import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
 import { isWalletClientUsingLedger } from "@/utils/wallet";
@@ -67,31 +68,11 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       return evmWalletClient;
     },
     endpointOptions: {
-      // TODO: move to /api/nodes
       getRpcEndpointForChain: async (chainID) => {
-        const testnets: Record<string, string> = {
-          "osmo-test-5": "https://osmosis-testnet-rpc.polkachu.com",
-          "pion-1": "https://neutron-testnet-rpc.polkachu.com",
-          "axelar-testnet-lisbon-3": "https://axelar-testnet-rpc.polkachu.com",
-        };
-
-        if (testnets[chainID]) {
-          return testnets[chainID];
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return OVERRIDE_RPC_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
       },
-      // TODO: move to /api/nodes
       getRestEndpointForChain: async (chainID) => {
-        if (chainID === "injective-1") {
-          return "https://lcd.injective.network";
-        }
-
-        if (chainID === "evmos_9001-2") {
-          return "https://evmos-api.polkachu.com";
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return OVERRIDE_REST_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
       },
     },
   });
