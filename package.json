@@ -81,6 +81,7 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "resend": "^3.1.0",
+    "stridejs": "^0.8.0-alpha.5",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
