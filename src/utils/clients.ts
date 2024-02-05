@@ -1,5 +1,6 @@
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { StargateClient } from "@cosmjs/stargate";
+import { AccountParser, StargateClient } from "@cosmjs/stargate";
+import { strideAccountParser } from "stridejs";
 
 import { ChainId, chainIdToName } from "@/chains/types";
 
@@ -20,7 +21,14 @@ export async function getStargateClientForChainID(chainID: ChainId) {
 
   const preferredEndpoint = getNodeProxyEndpoint(chainID);
 
-  const client = await StargateClient.connect(preferredEndpoint, {});
+  let accountParser: AccountParser | undefined;
+  if (chainID.includes("stride")) {
+    accountParser = strideAccountParser;
+  }
+
+  const client = await StargateClient.connect(preferredEndpoint, {
+    accountParser,
+  });
 
   STARGATE_CLIENTS[chainID] = client;
 
