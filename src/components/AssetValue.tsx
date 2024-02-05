@@ -1,28 +1,27 @@
-import { BigNumberish, formatUnits } from "ethers";
 import { useMemo } from "react";
+import { formatUnits } from "viem";
 
-import { ChainId } from "@/chains/types";
 import { useAssets } from "@/context/assets";
 import { raise } from "@/utils/assert";
-import { formatMaxFraction } from "@/utils/intl";
 
 interface Props {
-  chainId: ChainId;
+  chainId: string;
   denom: string;
-  value: BigNumberish;
+  value: string;
 }
 
-export const AssetValue = ({ chainId, denom, value }: Props) => {
+export function AssetValue({ chainId, denom, value }: Props) {
   const { getAsset } = useAssets();
 
-  const { decimals, recommendedSymbol } = useMemo(() => {
-    return getAsset(denom, chainId) || raise(`No asset found for ${denom}`);
+  const { decimals = 6, recommendedSymbol } = useMemo(() => {
+    return getAsset(denom, chainId) || raise(`AssetValue error: no asset found for '${denom}' on '${chainId}'`);
   }, [chainId, denom, getAsset]);
 
   const formattedValue = useMemo(() => {
-    let v = formatUnits(value, decimals);
-    v = formatMaxFraction(parseFloat(v), 2);
-    return v;
+    const v = formatUnits(BigInt(value), decimals);
+    return parseFloat(v).toLocaleString("en-US", {
+      maximumFractionDigits: 2,
+    });
   }, [decimals, value]);
 
   return (
@@ -30,4 +29,4 @@ export const AssetValue = ({ chainId, denom, value }: Props) => {
       {formattedValue} {recommendedSymbol}
     </span>
   );
-};
+}
