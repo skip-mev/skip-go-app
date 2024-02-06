@@ -126,12 +126,31 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
           });
         }
 
-        toast.error(
-          <p>
-            <strong>Swap Failed!</strong>
-            <br />
-            {err.name}: {err.message}
-          </p>,
+        toast(
+          ({ createdAt, id }) => (
+            <div className="flex flex-col">
+              <h4 className="mb-2 font-bold">Swap Failed!</h4>
+              <pre className="mb-4 select-all overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
+                {err instanceof Error ? `${err.name}: ${err.message}` : String(err)}
+                <br />
+                <br />
+                {new Date(createdAt).toISOString()}
+              </pre>
+              <button
+                className="self-end text-sm font-medium text-red-500 hover:underline"
+                onClick={() => toast.dismiss(id)}
+              >
+                Clear Notification &times;
+              </button>
+            </div>
+          ),
+          {
+            ariaProps: {
+              "aria-live": "assertive",
+              role: "alert",
+            },
+            duration: Infinity,
+          },
         );
       }
     } finally {
