@@ -9,7 +9,7 @@ import { API_URL } from "@/constants/api";
 import { OVERRIDE_REST_ENDPOINTS, OVERRIDE_RPC_ENDPOINTS } from "@/constants/endpoints";
 import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
-import { isWalletClientUsingLedger } from "@/utils/wallet";
+import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
 export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
@@ -32,15 +32,16 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         if (destination?.chainType === "cosmos") return destination.walletName;
       })();
 
-      let wallet = getWalletRepo(chainName).wallets.find((w) => {
+      const wallet = getWalletRepo(chainName).wallets.find((w) => {
         return w.walletName === walletName;
-      });
-      wallet ??= getWalletRepo(chainName).wallets.find((w) => {
-        return w.isWalletConnected && !w.isWalletDisconnected;
       });
 
       if (!wallet) {
-        throw new Error(`getCosmosSigner error: unable to find cosmos wallets connected to '${chainID}'`);
+        throw new Error(`getCosmosSigner error: unable to find wallets connected to '${chainID}'`);
+      }
+
+      if (!wallet.isWalletConnected || wallet.isWalletDisconnected) {
+        await gracefullyConnect(wallet);
       }
 
       const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
