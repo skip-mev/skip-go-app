@@ -2,7 +2,6 @@ import { Asset, SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
 
-import { ChainId } from "@/chains/types";
 import { multicall3ABI } from "@/constants/abis";
 import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
@@ -39,7 +38,7 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
   });
 }
 
-export async function getBalancesByChain(address: string, chainID: ChainId, assets: Asset[]) {
+export async function getBalancesByChain(address: string, chainID: string, assets: Asset[]) {
   const [stargate, cosmwasm] = await Promise.all([
     getStargateClientForChainID(chainID),
     getCosmWasmClientForChainID(chainID),
@@ -76,7 +75,7 @@ export async function getEvmChainBalances(
   skipClient: SkipRouter,
   publicClient: PublicClient,
   address: string,
-  chainID: ChainId,
+  chainID: string,
 ) {
   const assets = await skipClient.assets({
     chainID,
