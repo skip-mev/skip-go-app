@@ -92,9 +92,9 @@ export function useSwapWidget() {
   } = useRoute({
     direction: direction,
     amount: direction === "swap-in" ? amountInWei : amountOutWei,
-    sourceAsset: srcAsset && (srcAsset.isEVM ? srcAsset.tokenContract : srcAsset.denom),
+    sourceAsset: srcAsset?.denom,
     sourceAssetChainID: srcAsset?.chainID,
-    destinationAsset: dstAsset && (dstAsset.isEVM ? dstAsset.tokenContract : dstAsset.denom),
+    destinationAsset: dstAsset?.denom,
     destinationAssetChainID: dstAsset?.chainID,
     enabled: shouldRouteLoad,
   });
