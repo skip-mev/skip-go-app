@@ -13,9 +13,9 @@ const eslintConfig = {
   ],
   plugins: ["simple-import-sort"],
   rules: {
-    "@next/next/no-img-element": "off",
-    "simple-import-sort/exports": "warn",
-    "simple-import-sort/imports": "warn",
+    "@next/next/no-img-element": ["off"],
+    "simple-import-sort/exports": ["warn"],
+    "simple-import-sort/imports": ["warn"],
   },
   ignorePatterns: ["node_modules/", ".next/", "out/", "src/chains/*"],
   overrides: [
@@ -35,9 +35,11 @@ const eslintConfig = {
             extendDefaults: true,
           },
         ],
+        "@typescript-eslint/no-explicit-any": ["warn"],
       },
     },
   ],
   root: true,
 };
+
 module.exports = eslintConfig;

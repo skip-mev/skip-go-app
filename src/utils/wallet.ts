@@ -1,6 +1,5 @@
 import { ChainWalletBase } from "@cosmos-kit/core";
 
-import { ChainId } from "@/chains/types";
 import { MergedWalletClient } from "@/lib/cosmos-kit";
 
 export async function gracefullyConnect(
@@ -38,7 +37,7 @@ export async function gracefullyConnect(
   await wallet.connect();
 }
 
-export async function isWalletClientUsingLedger<T extends MergedWalletClient>(walletClient: T, chainID: ChainId) {
+export async function isWalletClientUsingLedger<T extends MergedWalletClient>(walletClient: T, chainID: string) {
   if (!("client" in walletClient)) {
     return false;
   }

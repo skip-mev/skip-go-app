@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { formatUnits } from "ethers";
 import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
+import { formatUnits } from "viem";
 
 import { useAssets } from "@/context/assets";
 import { useBridgeByID } from "@/hooks/useBridges";
@@ -109,6 +108,7 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
       // We can assume that the swap operation by the previous transfer
       .find((x) => Number(x.id.split("-")[2]) === operationIndex + 1)
       ?.id.split("-")[0] === "swap";
+  const isPrevOpTransfer = actions[operationIndex - 1]?.type === "TRANSFER";
 
   // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
   const renderTransferState = useMemo(() => {
@@ -165,13 +165,14 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
     const packetTx = (() => {
       if (operationIndex === 0) return transferStatus?.txs.sendTx;
       if (isNextOpSwap) return transferStatus?.txs.sendTx;
+      if (isPrevOpTransfer) return transferStatus?.txs.sendTx;
       return transferStatus?.txs.receiveTx;
     })();
     if (!packetTx?.explorerLink) {
       return null;
     }
     return makeExplorerLink(packetTx.explorerLink);
-  }, [isNextOpSwap, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
+  }, [isNextOpSwap, isPrevOpTransfer, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
 
   const { getAsset } = useAssets();
 
@@ -555,17 +556,17 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
 
   const amountIn = useMemo(() => {
     try {
-      return formatUnits(route.amountIn, sourceAsset?.decimals ?? 6);
+      return formatUnits(BigInt(route.amountIn), sourceAsset?.decimals ?? 6);
     } catch {
-      return "0.0";
+      return "0";
     }
   }, [route.amountIn, sourceAsset?.decimals]);
 
   const amountOut = useMemo(() => {
     try {
-      return formatUnits(route.amountOut ?? 0, destinationAsset?.decimals ?? 6);
+      return formatUnits(BigInt(route.amountOut), destinationAsset?.decimals ?? 6);
     } catch {
-      return "0.0";
+      return "0";
     }
   }, [route.amountOut, destinationAsset?.decimals]);
 

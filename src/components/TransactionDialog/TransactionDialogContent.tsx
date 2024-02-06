@@ -66,7 +66,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
         getGasPrice: getHotfixedGasPrice,
-        onTransactionBroadcast: async (txStatus) => {
+        onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
 
@@ -97,45 +97,60 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
 
       setTxComplete(true);
     } catch (err: unknown) {
-      if (process.env.NODE_ENV === "development") {
-        console.error(err);
+      console.error(err);
+      if (isUserRejectedRequestError(err)) {
+        return;
       }
-      if (err instanceof Error) {
-        if (!isUserRejectedRequestError(err)) {
-          Sentry.withScope((scope) => {
-            scope.setUser({
-              id: srcAccount?.address,
-            });
-            scope.setTransactionName("Swap.onSubmit");
-            scope.setTags({
-              sourceChain: route.sourceAssetChainID,
-              destinationChain: route.destAssetChainID,
-              sourceAssetDenom: route.sourceAssetDenom,
-              destinationAssetDenom: route.destAssetDenom,
-              doesSwap: route.doesSwap,
-            });
-            scope.setExtras({
-              sourceAddress: srcAccount?.address,
-              destinationAddress: dstAccount?.address,
-              sourceChain: route.sourceAssetChainID,
-              destinationChain: route.destAssetChainID,
-              sourceAssetDenom: route.sourceAssetDenom,
-              destinationAssetDenom: route.destAssetDenom,
-              amountIn: route.amountIn,
-              amountOut: route.amountOut,
-            });
-            Sentry.captureException(err);
-          });
-        }
-
-        toast.error(
-          <p>
-            <strong>Swap Failed!</strong>
-            <br />
-            {err.name}: {err.message}
-          </p>,
-        );
-      }
+      Sentry.withScope((scope) => {
+        scope.setUser({
+          id: srcAccount?.address,
+        });
+        scope.setTransactionName("Swap.onSubmit");
+        scope.setTags({
+          sourceChain: route.sourceAssetChainID,
+          destinationChain: route.destAssetChainID,
+          sourceAssetDenom: route.sourceAssetDenom,
+          destinationAssetDenom: route.destAssetDenom,
+          doesSwap: route.doesSwap,
+        });
+        scope.setExtras({
+          sourceAddress: srcAccount?.address,
+          destinationAddress: dstAccount?.address,
+          sourceChain: route.sourceAssetChainID,
+          destinationChain: route.destAssetChainID,
+          sourceAssetDenom: route.sourceAssetDenom,
+          destinationAssetDenom: route.destAssetDenom,
+          amountIn: route.amountIn,
+          amountOut: route.amountOut,
+        });
+        Sentry.captureException(err);
+      });
+      toast(
+        ({ createdAt, id }) => (
+          <div className="flex flex-col">
+            <h4 className="mb-2 font-bold">Swap Failed!</h4>
+            <pre className="mb-4 select-all overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
+              {err instanceof Error ? `${err.name}: ${err.message}` : String(err)}
+              <br />
+              <br />
+              {new Date(createdAt).toISOString()}
+            </pre>
+            <button
+              className="self-end text-sm font-medium text-red-500 hover:underline"
+              onClick={() => toast.dismiss(id)}
+            >
+              Clear Notification &times;
+            </button>
+          </div>
+        ),
+        {
+          ariaProps: {
+            "aria-live": "assertive",
+            role: "alert",
+          },
+          duration: Infinity,
+        },
+      );
     } finally {
       setOngoing(false);
     }

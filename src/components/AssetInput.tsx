@@ -1,8 +1,8 @@
 import { BackspaceIcon } from "@heroicons/react/20/solid";
 import { Asset } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
-import { formatUnits } from "ethers";
 import { MouseEventHandler, useMemo } from "react";
+import { formatUnits } from "viem";
 
 import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
@@ -69,7 +69,7 @@ function AssetInput({
 
   const selectedAssetBalance = useMemo(() => {
     if (!asset || !balances) return "0";
-    return formatUnits(balances[asset.denom] ?? "0", asset.decimals ?? 6);
+    return formatUnits(BigInt(balances[asset.denom] ?? "0"), asset.decimals ?? 6);
   }, [asset, balances]);
 
   const maxButtonDisabled = useMemo(() => {
@@ -121,7 +121,7 @@ function AssetInput({
             isLoading && "animate-pulse text-neutral-500",
           )}
           type="text"
-          placeholder="0.0"
+          placeholder="0"
           value={formatNumberWithCommas(amount)}
           inputMode="numeric"
           onChange={(e) => {

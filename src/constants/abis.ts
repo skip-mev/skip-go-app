@@ -1,4 +1,6 @@
-export const multicall3ABI = [
+import { Abi } from "viem";
+
+export const multicall3ABI: Abi = [
   {
     inputs: [
       {

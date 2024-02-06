@@ -1,9 +1,9 @@
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { Asset, BridgeType } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
-import { formatUnits } from "ethers";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { formatUnits } from "viem";
 import {
   useAccount as useWagmiAccount,
   useNetwork as useWagmiNetwork,
@@ -397,7 +397,7 @@ export function useSwapWidget() {
        * - source chain is not cosmos
        */
       if (event.shiftKey || isDifferentAsset || isNotCosmos) {
-        const newAmountIn = formatUnits(balance, decimals);
+        const newAmountIn = formatUnits(BigInt(balance), decimals);
         useSwapWidgetStore.setState({
           amountIn: newAmountIn,
           direction: "swap-in",
@@ -419,7 +419,7 @@ export function useSwapWidget() {
       }
 
       // otherwise, max balance
-      const newAmountIn = formatUnits(balance, decimals);
+      const newAmountIn = formatUnits(BigInt(balance), decimals);
       useSwapWidgetStore.setState({
         amountIn: newAmountIn,
         direction: "swap-in",

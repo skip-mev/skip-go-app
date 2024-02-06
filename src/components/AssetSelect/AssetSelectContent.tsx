@@ -1,11 +1,10 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Asset } from "@skip-router/core";
-import { formatUnits, toBigInt } from "ethers";
 import { matchSorter } from "match-sorter";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { formatUnits } from "viem";
 
-import { formatMaxFraction } from "@/utils/intl";
 import { cn } from "@/utils/ui";
 
 interface Props {
@@ -39,8 +38,8 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
         return true;
       })
       .sort((a, b) => {
-        const balanceA = balances[a.denom] ? toBigInt(balances[a.denom]) : 0n;
-        const balanceB = balances[b.denom] ? toBigInt(balances[b.denom]) : 0n;
+        const balanceA = BigInt(balances[a.denom] || "0");
+        const balanceB = BigInt(balances[b.denom] || "0");
         if (balanceA > balanceB) return -1;
         if (balanceA < balanceB) return 1;
         return 0;
@@ -102,7 +101,10 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
               <div>
                 {balances[asset.denom] && (
                   <p className="text-sm font-medium text-neutral-400">
-                    {formatMaxFraction(parseFloat(formatUnits(balances[asset.denom], asset.decimals)))}
+                    {parseFloat(formatUnits(BigInt(balances[asset.denom]), asset.decimals ?? 6)).toLocaleString(
+                      "en-US",
+                      { maximumFractionDigits: 6 },
+                    )}
                   </p>
                 )}
               </div>

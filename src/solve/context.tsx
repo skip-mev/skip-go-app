@@ -6,9 +6,10 @@ import { useNetwork as useWagmiNetwork } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
 import { API_URL } from "@/constants/api";
+import { OVERRIDE_REST_ENDPOINTS, OVERRIDE_RPC_ENDPOINTS } from "@/constants/endpoints";
 import { trackWallet } from "@/context/track-wallet";
 import { getNodeProxyEndpoint } from "@/utils/api";
-import { isWalletClientUsingLedger } from "@/utils/wallet";
+import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
 export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
@@ -25,13 +26,22 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
 
-      const walletName = trackWallet.get().source?.walletName;
+      const walletName = (() => {
+        const { source, destination } = trackWallet.get();
+        if (source?.chainType === "cosmos") return source.walletName;
+        if (destination?.chainType === "cosmos") return destination.walletName;
+      })();
+
       const wallet = getWalletRepo(chainName).wallets.find((w) => {
         return w.walletName === walletName;
       });
 
       if (!wallet) {
-        throw new Error(`getCosmosSigner error: unknown walletName '${walletName}'`);
+        throw new Error(`getCosmosSigner error: unable to find wallets connected to '${chainID}'`);
+      }
+
+      if (!wallet.isWalletConnected || wallet.isWalletDisconnected) {
+        await gracefullyConnect(wallet);
       }
 
       const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
@@ -40,6 +50,10 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       if (!wallet.offlineSigner) {
         throw new Error(`getCosmosSigner error: no offline signer for walletName '${walletName}'`);
       }
+
+      wallet.client.setDefaultSignOptions?.({
+        preferNoSetFee: true,
+      });
 
       return wallet.offlineSigner;
     },
@@ -63,31 +77,11 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       return evmWalletClient;
     },
     endpointOptions: {
-      // TODO: move to /api/nodes
       getRpcEndpointForChain: async (chainID) => {
-        const testnets: Record<string, string> = {
-          "osmo-test-5": "https://osmosis-testnet-rpc.polkachu.com",
-          "pion-1": "https://neutron-testnet-rpc.polkachu.com",
-          "axelar-testnet-lisbon-3": "https://axelar-testnet-rpc.polkachu.com",
-        };
-
-        if (testnets[chainID]) {
-          return testnets[chainID];
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return OVERRIDE_RPC_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
       },
-      // TODO: move to /api/nodes
       getRestEndpointForChain: async (chainID) => {
-        if (chainID === "injective-1") {
-          return "https://lcd.injective.network";
-        }
-
-        if (chainID === "evmos_9001-2") {
-          return "https://evmos-api.polkachu.com";
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return OVERRIDE_REST_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
       },
     },
   });

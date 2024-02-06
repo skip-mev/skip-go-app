@@ -1,17 +1,14 @@
 import { BigNumber } from "bignumber.js";
-import { formatUnits } from "ethers";
+import { formatUnits } from "viem";
 
 export function formatNumberWithCommas(str: string | number) {
-  const text = String(str);
-  // Format integer part with commas every three digits
-  const parts = text.split(".");
+  const parts = str.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
   return parts.join(".");
 }
 
 export function formatNumberWithoutCommas(str: string | number) {
-  return String(str).replace(/,/g, "");
+  return str.toString().replace(/,/g, "");
 }
 
 export function getAmountWei(amount?: string, decimals = 6) {
@@ -26,7 +23,7 @@ export function getAmountWei(amount?: string, decimals = 6) {
 export function parseAmountWei(amount?: string, decimals = 6) {
   if (!amount) return "0";
   try {
-    return formatUnits(amount.replace(/,/g, ""), decimals ?? 6);
+    return formatUnits(BigInt(amount.replace(/,/g, "")), decimals ?? 6);
   } catch (err) {
     return "0";
   }

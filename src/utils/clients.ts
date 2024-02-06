@@ -1,26 +1,21 @@
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { StargateClient } from "@cosmjs/stargate";
 
-import { ChainId, chainIdToName } from "@/chains/types";
-
 import { getNodeProxyEndpoint } from "./api";
+import { getCustomAccountParser } from "./stargate";
 
 const STARGATE_CLIENTS: Record<string, StargateClient> = {};
 
-export async function getStargateClientForChainID(chainID: ChainId) {
+export async function getStargateClientForChainID(chainID: string) {
   if (STARGATE_CLIENTS[chainID]) {
     return STARGATE_CLIENTS[chainID];
   }
 
-  const chainName = chainIdToName[chainID];
-
-  if (!chainName) {
-    throw new Error(`stargateClient error: chain with ID ${chainID} not found`);
-  }
-
   const preferredEndpoint = getNodeProxyEndpoint(chainID);
 
-  const client = await StargateClient.connect(preferredEndpoint, {});
+  const client = await StargateClient.connect(preferredEndpoint, {
+    accountParser: getCustomAccountParser(chainID),
+  });
 
   STARGATE_CLIENTS[chainID] = client;
 
@@ -29,15 +24,9 @@ export async function getStargateClientForChainID(chainID: ChainId) {
 
 const COSMWASM_CLIENTS: Record<string, CosmWasmClient> = {};
 
-export async function getCosmWasmClientForChainID(chainID: ChainId) {
+export async function getCosmWasmClientForChainID(chainID: string) {
   if (COSMWASM_CLIENTS[chainID]) {
     return COSMWASM_CLIENTS[chainID];
-  }
-
-  const chainName = chainIdToName[chainID];
-
-  if (!chainName) {
-    throw new Error(`cosmWasmClient error: chain with ID ${chainID} not found`);
   }
 
   const preferredEndpoint = getNodeProxyEndpoint(chainID);

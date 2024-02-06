@@ -1,7 +1,7 @@
 import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
-import { CHAIN_IDS_L5_NODES, CHAIN_IDS_POLKACHU_BACKUP_NODES } from "@/constants/rpc";
+import { ALLOWLIST_LAVENDER_FIVE_CHAIN_IDS, ALLOWLIST_POLKACHU_BACKUP_CHAIN_IDS } from "@/constants/endpoints";
 import { getCorsDomains } from "@/lib/edge-config";
 import { getPolkachuAuthHeader } from "@/utils/api";
 import { raise } from "@/utils/assert";
@@ -51,8 +51,8 @@ export default async function handler(req: NextRequest) {
   const args = searchParams.getAll("$args");
   searchParams.delete("$args");
 
-  const shouldUseL5 = CHAIN_IDS_L5_NODES.includes(chainID);
-  const shouldUsePolkachuBackup = CHAIN_IDS_POLKACHU_BACKUP_NODES.includes(chainID);
+  const shouldUseL5 = ALLOWLIST_LAVENDER_FIVE_CHAIN_IDS.includes(chainID);
+  const shouldUsePolkachuBackup = ALLOWLIST_POLKACHU_BACKUP_CHAIN_IDS.includes(chainID);
 
   const headers = new Headers();
 

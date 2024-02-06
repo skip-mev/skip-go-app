@@ -1,11 +1,10 @@
 import { CubeIcon } from "@heroicons/react/20/solid";
 import { useMemo } from "react";
 
-import { ChainId } from "@/chains/types";
 import { useChainByID } from "@/hooks/useChains";
 
 interface Props {
-  chainId: ChainId;
+  chainId: string;
 }
 
 export const ChainSymbol = ({ chainId }: Props) => {
