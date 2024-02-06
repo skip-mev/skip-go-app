@@ -1,9 +1,10 @@
 import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
+import { chainRecord } from "@/chains/chains";
 import { ALLOWLIST_LAVENDER_FIVE_CHAIN_IDS, ALLOWLIST_POLKACHU_BACKUP_CHAIN_IDS } from "@/constants/endpoints";
 import { getCorsDomains } from "@/lib/edge-config";
-import { getPolkachuAuthHeader } from "@/utils/api";
+import { getPolkachuAuthHeader, hasPolkachuAuth } from "@/utils/api";
 import { raise } from "@/utils/assert";
 
 export const config: PageConfig = {
@@ -55,16 +56,22 @@ export default async function handler(req: NextRequest) {
   const shouldUsePolkachuBackup = ALLOWLIST_POLKACHU_BACKUP_CHAIN_IDS.includes(chainID);
 
   const headers = new Headers();
+  const isPrivate = hasPolkachuAuth();
 
-  let rpcURL = `https://${chainID}-skip-rpc.polkachu.com`;
+  let rpcURL: string | undefined;
   if (shouldUseL5) {
     rpcURL = `https://skip-secretnetwork-rpc.lavenderfive.com`;
-  }
-  if (shouldUsePolkachuBackup) {
-    rpcURL = `https://${chainID}-skip-rpc-1.polkachu.com`;
-  }
-  if (!shouldUseL5) {
+  } else if (isPrivate) {
+    rpcURL = shouldUsePolkachuBackup
+      ? `https://${chainID}-skip-rpc-1.polkachu.com`
+      : `https://${chainID}-skip-rpc.polkachu.com`;
     headers.set("authorization", getPolkachuAuthHeader());
+  } else {
+    rpcURL = chainRecord[chainID]?.apis?.rpc?.[0]?.address;
+  }
+
+  if (!rpcURL) {
+    return new Response(null, { status: 404 }); // Not Found
   }
 
   const search = searchParams.toString();

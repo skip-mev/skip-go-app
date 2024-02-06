@@ -90,7 +90,7 @@ function checkEnv() {
   const log = require("next/dist/build/output/log");
 
   if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
-    log.warn("env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work");
+    log.warn("env POLKACHU_USER or POLKACHU_PASSWORD is not set, will use public nodes");
   }
 
   checkEnv.once = true;

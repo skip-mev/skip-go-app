@@ -11,3 +11,7 @@ export function getPolkachuAuthHeader() {
   const userpass = `${process.env.POLKACHU_USER}:${process.env.POLKACHU_PASSWORD}`;
   return `Basic ${Buffer.from(userpass).toString("base64")}`;
 }
+
+export function hasPolkachuAuth() {
+  return Boolean(process.env.POLKACHU_USER && process.env.POLKACHU_PASSWORD);
+}
