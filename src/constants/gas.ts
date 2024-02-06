@@ -14,6 +14,6 @@ export async function getHotfixedGasPrice(chainID: string) {
   }
 
   if (chainID === "dymension_1100-1") {
-    return GasPrice.fromString("0.4udym");
+    return GasPrice.fromString("20000000000adym");
   }
 }
