@@ -9,6 +9,7 @@ export const ALLOWLIST_POLKACHU_BACKUP_CHAIN_IDS = [
 ];
 
 export const OVERRIDE_REST_ENDPOINTS: Record<string, string> = {
+  "dymension_1100-1": "https://dymension-api.polkachu.com",
   "evmos_9001-2": "https://evmos-api.polkachu.com",
   "injective-1": "https://lcd.injective.network",
 };
