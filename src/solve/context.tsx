@@ -26,13 +26,21 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
 
-      const walletName = trackWallet.get().source?.walletName;
-      const wallet = getWalletRepo(chainName).wallets.find((w) => {
+      const walletName = (() => {
+        const { source, destination } = trackWallet.get();
+        if (source?.chainType === "cosmos") return source.walletName;
+        if (destination?.chainType === "cosmos") return destination.walletName;
+      })();
+
+      let wallet = getWalletRepo(chainName).wallets.find((w) => {
         return w.walletName === walletName;
+      });
+      wallet ??= getWalletRepo(chainName).wallets.find((w) => {
+        return w.isWalletConnected && !w.isWalletDisconnected;
       });
 
       if (!wallet) {
-        throw new Error(`getCosmosSigner error: unknown walletName '${walletName}'`);
+        throw new Error(`getCosmosSigner error: unable to find cosmos wallets connected to '${chainID}'`);
       }
 
       const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
