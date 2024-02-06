@@ -5,20 +5,26 @@ import { ExperimentalFeature } from "@skip-router/core";
 import { createClient } from "@vercel/edge-config";
 import { z } from "zod";
 
-export const configClient = createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG!);
+export function client() {
+  if (!process.env.NEXT_PUBLIC_EDGE_CONFIG) {
+    throw new Error("NEXT_PUBLIC_EDGE_CONFIG is not set");
+  }
+  return createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG);
+}
 
-export async function getCorsDomains() {
+export async function getCorsDomains(): Promise<string[]> {
   try {
     const key = "allowlist-domains";
-    const data = await configClient.get(key);
+    const data = await client().get(key);
     const value = await stringArraySchema.parseAsync(data);
     return value;
   } catch (error) {
     console.error(error);
+    return [];
   }
 }
 
-export async function getExperimentalFeatures() {
+export async function getExperimentalFeatures(): Promise<ExperimentalFeature[]> {
   try {
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
     const key = (() => {
@@ -34,11 +40,12 @@ export async function getExperimentalFeatures() {
       }
     })();
 
-    const data = await configClient.get(key);
+    const data = await client().get(key);
     const value = (await stringArraySchema.parseAsync(data)) as ExperimentalFeature[];
     return value;
   } catch (error) {
     console.error(error);
+    return ["cctp"];
   }
 }
 

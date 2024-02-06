@@ -18,7 +18,7 @@ export const config: PageConfig = {
 export default async function handler(req: NextRequest) {
   try {
     if (req.method === "OPTIONS" && process.env.NODE_ENV === "production") {
-      const allowedDomains = (await getCorsDomains()) ?? [];
+      const allowedDomains = await getCorsDomains();
       if (allowedDomains.length > 0) {
         const origin = req.headers.get("origin") || "";
         if (!allowedDomains.includes(origin)) {
