@@ -4,7 +4,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo }
 import { useChains } from "@/hooks/useChains";
 import { sortFeeAssets } from "@/utils/chain";
 
-import { useAssets as useSolveAssets, useSkipClient } from "../solve";
+import { useAssets as useSolveAssets } from "../solve";
 
 interface AssetsContext {
   assets: Record<string, Asset[]>;
@@ -25,8 +25,6 @@ export const AssetsContext = createContext<AssetsContext>({
 });
 
 export function AssetsProvider({ children }: { children: ReactNode }) {
-  const skipClient = useSkipClient();
-
   const { data: chains } = useChains();
   const { data: assets = {} } = useSolveAssets();
 
@@ -52,7 +50,6 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
       if (cached) return cached;
 
       let feeAsset: FeeAsset | undefined;
-      feeAsset = await skipClient.getFeeInfoForChain(chainID);
 
       if (!feeAsset) {
         const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
@@ -69,7 +66,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
       feeAssetCache[chainID] = asset;
       return asset;
     },
-    [chains, getAsset, skipClient],
+    [chains, getAsset],
   );
 
   const getNativeAssets = useCallback(() => {
