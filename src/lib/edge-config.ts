@@ -12,18 +12,6 @@ export function client() {
   return createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG);
 }
 
-export async function getCorsDomains(): Promise<string[]> {
-  try {
-    const key = "allowlist-domains";
-    const data = await client().get(key);
-    const value = await stringArraySchema.parseAsync(data);
-    return value;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
-
 export async function getExperimentalFeatures(): Promise<ExperimentalFeature[]> {
   try {
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;

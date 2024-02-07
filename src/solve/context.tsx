@@ -2,19 +2,15 @@ import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
 import { getWalletClient } from "@wagmi/core";
 import { createContext, ReactNode } from "react";
-import { useNetwork as useWagmiNetwork } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
-import { API_URL } from "@/constants/api";
-import { OVERRIDE_REST_ENDPOINTS, OVERRIDE_RPC_ENDPOINTS } from "@/constants/endpoints";
+import { API_URL, APP_URL } from "@/constants/api";
 import { trackWallet } from "@/context/track-wallet";
-import { getNodeProxyEndpoint } from "@/utils/api";
 import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
 export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
 export function SkipProvider({ children }: { children: ReactNode }) {
-  const { chains } = useWagmiNetwork();
   const { getWalletRepo } = useManager();
 
   const skipClient = new SkipRouter({
@@ -66,22 +62,14 @@ export function SkipProvider({ children }: { children: ReactNode }) {
         throw new Error(`getEVMSigner error: no wallet client available for chain ${chainID}`);
       }
 
-      const chain = chains.find(({ id }) => id === parseInt(chainID));
-      if (!chain) {
-        throw new Error(`getEVMSigner error: cannot find chain with id ${chainID}`);
-      }
-
-      // TODO: figure out why we re-assign evm chain on wallet client
-      evmWalletClient.chain = chain;
-
       return evmWalletClient;
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
-        return OVERRIDE_RPC_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
+        return `${APP_URL}/api/rpc/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
-        return OVERRIDE_REST_ENDPOINTS[chainID] || getNodeProxyEndpoint(chainID);
+        return `${APP_URL}/api/rest/${chainID}`;
       },
     },
   });
