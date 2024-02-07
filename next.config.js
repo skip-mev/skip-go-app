@@ -23,6 +23,14 @@ let nextConfig = {
       source: "/.well-known/walletconnect.txt",
       destination: "/api/walletconnect/verify",
     },
+    {
+      source: "/api/rest/(.*)",
+      destination: "/api/rest/handler",
+    },
+    {
+      source: "/api/rpc/(.*)",
+      destination: "/api/rpc/handler",
+    },
   ],
   transpilePackages:
     process.env.NODE_ENV === "test"
