@@ -27,7 +27,7 @@ const defaultValues: TxHistoryState = {};
 export const useTxHistory = create(
   persist(() => defaultValues, {
     name: "TxHistoryState",
-    version: 2,
+    version: 3,
   }),
 );
 
