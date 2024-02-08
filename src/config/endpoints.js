@@ -1,23 +1,51 @@
 // @ts-check
 
 /**
+ * @typedef {{ endpoint: string | undefined; isPrivate: boolean } | undefined} EndpointConfig
+ */
+
+/**
+ * @typedef {(chainID: string) => MaybePromise<EndpointConfig>} FallbackEndpointFn
+ */
+
+/**
  * @param {string} chainID
  * @param {"api" | "rpc"} type
+ * @returns {EndpointConfig}
  */
 exports.getWhitelabelEndpoint = (chainID, type) => {
+  /** @type {string | undefined} */
+  let endpoint;
+
+  if (type === "api") {
+    endpoint = exports.CUSTOM_API_CHAIN_IDS[chainID];
+  } else {
+    endpoint = exports.CUSTOM_RPC_CHAIN_IDS[chainID];
+  }
+
+  if (endpoint) {
+    return {
+      endpoint,
+      isPrivate: false,
+    };
+  }
+
   /** @type {true | number | undefined} */
   const config = exports.WHITELABEL_CHAIN_IDS[chainID];
 
-  if (!config) return;
-
-  const parts = [chainID, "skip", type];
-  if (typeof config === "number") {
-    parts.push(config.toString());
+  if (!config) {
+    return undefined;
   }
 
-  const endpoint = `https://${parts.join("-")}.polkachu.com`;
+  const parts = [chainID, "skip", type]; // e.g. 'cosmoshub-4-skip-rpc'
+  if (typeof config === "number") {
+    parts.push(config.toString()); // e.g. 'osmosis-1-skip-rpc-1'
+  }
 
-  return endpoint;
+  return {
+    endpoint: `https://${parts.join("-")}.polkachu.com`,
+    isPrivate: true,
+  };
 };
 
 /**
