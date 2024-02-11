@@ -25,7 +25,11 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
   },
   "terra-astroport": {
     name: "Terra Astroport",
-    imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
+    imageURL: "https://avatars.githubusercontent.com/u/87135340",
+  },
+  "injective-astroport": {
+    name: "Injective Astroport",
+    imageURL: "https://avatars.githubusercontent.com/u/87135340",
   },
   "osmosis-poolmanager": {
     name: "Osmosis",
@@ -34,6 +38,18 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
   "neutron-lido-satellite": {
     name: "Neutron Lido Satellite",
     imageURL: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
+  },
+  "migaloo-white-whale": {
+    name: "Migaloo White Whale",
+    imageURL: "https://whitewhale.money/logo.svg",
+  },
+  "chihuahua-white-whale": {
+    name: "Chihuahua White Whale",
+    imageURL: "https://whitewhale.money/logo.svg",
+  },
+  "terra-white-whale": {
+    name: "Terra White Whale",
+    imageURL: "https://whitewhale.money/logo.svg",
   },
 };
 
