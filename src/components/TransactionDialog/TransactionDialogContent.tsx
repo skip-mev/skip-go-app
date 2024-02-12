@@ -4,13 +4,13 @@ import { RouteResponse } from "@skip-router/core";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
-import { getHotfixedGasPrice } from "@/constants/gas";
 import { useSettingsStore } from "@/context/settings";
 import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
+import { getChainGasPrice } from "@/utils/chain";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
@@ -73,7 +73,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         userAddresses,
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getGasPrice: getHotfixedGasPrice,
+        getGasPrice: getChainGasPrice,
         onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
@@ -137,7 +137,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         ({ createdAt, id }) => (
           <div className="flex flex-col">
             <h4 className="mb-2 font-bold">Swap Failed!</h4>
-            <pre className="mb-4 select-all overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
+            <pre className="mb-4 overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
               {err instanceof Error ? `${err.name}: ${err.message}` : String(err)}
               <br />
               <br />

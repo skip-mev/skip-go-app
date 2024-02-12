@@ -1,3 +1,4 @@
+import { GasPrice } from "@cosmjs/stargate";
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { Asset, BridgeType } from "@skip-router/core";
 import { BigNumber } from "bignumber.js";
@@ -13,7 +14,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
-import { EVMOS_GAS_AMOUNT, getHotfixedGasPrice, isChainIdEvmos } from "@/constants/gas";
+import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
@@ -22,7 +23,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute, useSkipClient } from "@/solve";
-import { getChainFeeAssets } from "@/utils/chain";
+import { getChainFeeAssets, getChainGasPrice } from "@/utils/chain";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { getAmountWei, parseAmountWei } from "@/utils/number";
 import { gracefullyConnect } from "@/utils/wallet";
@@ -253,6 +254,7 @@ export function useSwapWidget() {
         sourceChain: chain,
         sourceAsset: asset,
         sourceFeeAsset: feeAsset,
+        sourceGasPrice: undefined,
         gasRequired: undefined,
       });
     },
@@ -265,6 +267,7 @@ export function useSwapWidget() {
   const onSourceAssetChange = useCallback((asset: Asset) => {
     useSwapWidgetStore.setState({
       sourceAsset: asset,
+      sourceGasPrice: undefined,
       gasRequired: undefined,
     });
   }, []);
@@ -361,6 +364,7 @@ export function useSwapWidget() {
       amountOut: prev.amountIn,
       direction: prev.direction === "swap-in" ? "swap-out" : "swap-in",
       sourceFeeAsset,
+      sourceGasPrice: undefined,
       gasRequired: undefined,
     }));
   }, [getFeeAsset]);
@@ -454,13 +458,12 @@ export function useSwapWidget() {
       async ([srcChain, srcAsset, srcFeeAsset]) => {
         if (!(srcChain?.chainType === "cosmos" && srcAsset)) return;
 
-        let suggestedPrice = await getHotfixedGasPrice(srcChain.chainID);
-        suggestedPrice ??= await skipClient.getRecommendedGasPrice(srcChain.chainID);
+        let srcGasPrice = await getChainGasPrice(srcChain.chainID);
 
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
-          if (suggestedPrice) {
+          if (srcGasPrice) {
             srcFeeAsset = assetsByChainID(srcChain.chainID).find(({ denom }) => {
-              return denom === suggestedPrice!.denom;
+              return denom === srcGasPrice!.denom;
             });
           } else {
             srcFeeAsset = await getFeeAsset(srcChain.chainID);
@@ -477,8 +480,8 @@ export function useSwapWidget() {
         let selectedGasPrice: BigNumber;
         const actualGasAmount = isChainIdEvmos(srcChain.chainID) ? EVMOS_GAS_AMOUNT : customGasAmount;
 
-        if (suggestedPrice) {
-          selectedGasPrice = BigNumber(suggestedPrice.amount.toString());
+        if (srcGasPrice) {
+          selectedGasPrice = BigNumber(srcGasPrice.amount.toString());
         } else {
           let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
             return denom === srcFeeAsset?.denom;
@@ -493,6 +496,7 @@ export function useSwapWidget() {
             return;
           }
 
+          srcGasPrice = GasPrice.fromString(`${feeDenomPrices.gasPrice.average}${feeDenomPrices.denom}`);
           selectedGasPrice = BigNumber(feeDenomPrices.gasPrice.average);
         }
 
@@ -501,6 +505,7 @@ export function useSwapWidget() {
         useSwapWidgetStore.setState({
           gasRequired,
           sourceFeeAsset: srcFeeAsset,
+          sourceGasPrice: srcGasPrice,
         });
       },
       {
@@ -792,6 +797,7 @@ export interface SwapWidgetStore {
   sourceChain?: Chain;
   sourceAsset?: Asset;
   sourceFeeAsset?: Asset;
+  sourceGasPrice?: GasPrice;
   destinationChain?: Chain;
   destinationAsset?: Asset;
   direction: "swap-in" | "swap-out";

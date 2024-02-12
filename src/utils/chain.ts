@@ -1,12 +1,22 @@
+import { GasPrice } from "@cosmjs/stargate";
 import { Chain, FeeAsset } from "@skip-router/core";
 
+import { CUSTOM_GAS_PRICE_CHAIN_IDS } from "@/config/gas";
 import { CHAIN_NAME_TO_CHAINLIST_ID, CHAINLIST_LOGO_CHAIN_IDS } from "@/constants/chainlist";
 
 export async function getChainFeeAssets(chainID: string): Promise<FeeAsset[]> {
-  const response = await fetch(`/api/gas/${chainID}`);
+  const response = await fetch(`/api/fee-assets/${chainID}`);
   if (!response.ok) return [];
   const feeAssets = await response.json();
   return feeAssets;
+}
+
+export async function getChainGasPrice(chainID: string): Promise<GasPrice | undefined> {
+  const customGasPrice = CUSTOM_GAS_PRICE_CHAIN_IDS[chainID];
+  if (customGasPrice) return customGasPrice;
+  const response = await fetch(`/api/gas/${chainID}`);
+  if (!response.ok) return;
+  return GasPrice.fromString(await response.text());
 }
 
 export function getChainLogo(chain: Chain) {
