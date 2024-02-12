@@ -30,9 +30,10 @@ const Context = createContext<ContextType>({
 export const Root = ({
   className,
   type = "info",
+  initialOpen = false,
   ...props
-}: ComponentProps<"div"> & { type?: ContextType["type"] }) => {
-  const [isOpen, setIsOpen] = useState(() => false);
+}: ComponentProps<"div"> & { type?: ContextType["type"]; initialOpen?: boolean }) => {
+  const [isOpen, setIsOpen] = useState(() => initialOpen);
   const toggle = () => setIsOpen((state) => !state);
   return (
     <Context.Provider value={{ type, isOpen, toggle }}>
@@ -58,7 +59,12 @@ export const Trigger = ({ className, children, onClick, ...props }: ComponentPro
   const Icon = useMemo(() => iconMap[type], [type]);
   return (
     <button
-      className={cn("flex w-full items-center gap-2 p-3", "text-left text-xs font-medium uppercase", className)}
+      className={cn(
+        "flex w-full items-center gap-2 p-3",
+        "text-left text-xs font-medium uppercase",
+        isOpen && "pb-0",
+        className,
+      )}
       onClick={(event) => [toggle(), onClick?.(event)]}
       {...props}
     >
@@ -80,7 +86,7 @@ export const Content = ({ className, ...props }: ComponentProps<"div">) => {
   if (!isOpen) return null;
   return (
     <div
-      className={cn("space-y-1 px-4 pb-4 text-sm", className)}
+      className={cn("space-y-1 p-4 text-sm", className)}
       ref={ref}
       {...props}
     />
