@@ -261,7 +261,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             <AlertCollapse.Content>
               <p>
                 <b>WARNING: </b>
-                ibc.fun does not support signing with ledger when transferring over CCTP to the Ethereum ecosystem.
+                ibc.fun does not support signing with Ledger when transferring over CCTP to the Ethereum ecosystem.
                 We&apos;re actively working on fixing this. We apologize for the inconvenience
               </p>
             </AlertCollapse.Content>
