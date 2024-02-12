@@ -35,6 +35,12 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
+const isCCTPFromNobleInOperation = (route: RouteResponse) => {
+  return route.operations.some(
+    (operation) => "cctpTransfer" in operation && operation.cctpTransfer.fromChainID === "noble-1",
+  );
+};
+
 function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const skipClient = useSkipClient();
 
@@ -51,6 +57,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
 
   const srcAccount = useAccount("source");
   const dstAccount = useAccount("destination");
+
+  const showLedgerWarning = isCCTPFromNobleInOperation(route) && srcAccount?.wallet?.mode === "ledger";
 
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
@@ -245,6 +253,20 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        {showLedgerWarning && (
+          <AlertCollapse.Root
+            type="warning"
+            initialOpen={true}
+          >
+            <AlertCollapse.Content>
+              <p>
+                <b>WARNING: </b>
+                ibc.fun does not support signing with ledger when transferring over CCTP to the Ethereum ecosystem.
+                We&apos;re actively working on fixing this. We apologize for the inconvenience
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
+        )}
         {isAmountError && !isOngoing && !isTxComplete && (
           <p className="text-balance text-center text-sm font-medium text-red-500">
             {typeof isAmountError === "string" ? isAmountError : "Insufficient balance."}
@@ -305,7 +327,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={isOngoing || !!isAmountError}
+            disabled={isOngoing || !!isAmountError || showLedgerWarning}
           >
             Submit
           </button>
