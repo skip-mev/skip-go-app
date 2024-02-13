@@ -1,23 +1,53 @@
 // @ts-check
 
 /**
+ * @typedef {{ endpoint: string | undefined; isPrivate: boolean } | undefined} EndpointConfig
+ */
+
+/**
+ * @typedef {(chainID: string) => MaybePromise<EndpointConfig>} FallbackEndpointFn
+ */
+
+/**
  * @param {string} chainID
  * @param {"api" | "rpc"} type
+ * @returns {EndpointConfig}
  */
 exports.getWhitelabelEndpoint = (chainID, type) => {
+  /** @type {string | undefined} */
+  let endpoint;
+
+  if (type === "api") {
+    endpoint = exports.CUSTOM_API_CHAIN_IDS[chainID];
+  } else {
+    endpoint = exports.CUSTOM_RPC_CHAIN_IDS[chainID];
+  }
+
+  if (endpoint) {
+    return {
+      endpoint,
+      isPrivate: false,
+    };
+  }
+
   /** @type {true | number | undefined} */
   const config = exports.WHITELABEL_CHAIN_IDS[chainID];
 
-  if (!config) return;
-
-  const parts = [chainID, "skip", type];
-  if (typeof config === "number") {
-    parts.push(config.toString());
+  if (!config) {
+    return undefined;
   }
 
-  const endpoint = `https://${parts.join("-")}.polkachu.com`;
+  const nodeID = exports.WHITELABEL_CUSTOM_NODE_IDS[chainID] || chainID;
 
-  return endpoint;
+  const parts = [nodeID, "skip", type]; // e.g. 'cosmoshub-4-skip-rpc'
+  if (typeof config === "number") {
+    parts.push(config.toString()); // e.g. 'osmosis-1-skip-rpc-1'
+  }
+
+  return {
+    endpoint: `https://${parts.join("-")}.polkachu.com`,
+    isPrivate: true,
+  };
 };
 
 /**
@@ -104,4 +134,12 @@ exports.WHITELABEL_CHAIN_IDS = {
   "umee-1": true,
   "ununifi-beta-v1": true,
   "dimension_37-1": true,
+};
+
+/**
+ * @type {Record<string, string>}
+ */
+exports.WHITELABEL_CUSTOM_NODE_IDS = {
+  "crypto-org-chain-mainnet-1": "crypto-org-mainnet",
+  "shentu-2.2": "shentu-22",
 };
