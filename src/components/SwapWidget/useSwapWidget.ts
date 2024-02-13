@@ -23,7 +23,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute, useSkipClient } from "@/solve";
-import { getChainFeeAssets, getChainGasPrice } from "@/utils/chain";
+import { getChainFeeAssets, getChainGasPrice } from "@/utils/chain.client";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { getAmountWei, parseAmountWei } from "@/utils/number";
 import { gracefullyConnect } from "@/utils/wallet";

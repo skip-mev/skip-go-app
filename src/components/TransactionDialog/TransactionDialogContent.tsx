@@ -10,7 +10,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
-import { getChainGasPrice } from "@/utils/chain";
+import { getChainGasPrice } from "@/utils/chain.client";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
