@@ -10,6 +10,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
+import { isCCTPLedgerBrokenInOperation } from "@/utils/cctp";
 import { getChainGasPrice } from "@/utils/chain.client";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
@@ -35,12 +36,6 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
-const isCCTPFromNobleInOperation = (route: RouteResponse) => {
-  return route.operations.some(
-    (operation) => "cctpTransfer" in operation && operation.cctpTransfer.fromChainID === "noble-1",
-  );
-};
-
 function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const skipClient = useSkipClient();
 
@@ -58,7 +53,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const srcAccount = useAccount("source");
   const dstAccount = useAccount("destination");
 
-  const showLedgerWarning = isCCTPFromNobleInOperation(route) && srcAccount?.wallet?.mode === "ledger";
+  const showLedgerWarning = isCCTPLedgerBrokenInOperation(route) && srcAccount?.wallet?.mode === "ledger";
 
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
