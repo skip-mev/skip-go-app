@@ -5,7 +5,13 @@ import { type FallbackEndpointFn, getWhitelabelEndpoint } from "@/config/endpoin
 export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEndpointFn) {
   return async function handler(req: NextRequest) {
     try {
-      const [chainID, ...args] = req.url.split(`/api/${type}/`).pop()!.split("/");
+      const splitter = (() => {
+        if (type === "api") return "/api/rest/";
+        if (type === "rpc") return "/api/rpc/";
+        throw new Error(`createProxyHandler error: unknown handler type '${type}'`);
+      })();
+
+      const [chainID, ...args] = req.url.split(splitter).pop()!.split("/");
 
       let data = getWhitelabelEndpoint(chainID, type);
       fallbackFn && (data ??= await fallbackFn(chainID));
