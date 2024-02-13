@@ -1,8 +1,8 @@
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { StargateClient } from "@cosmjs/stargate";
+import { accountParser } from "@skip-router/core/parser";
 
-import { getNodeProxyEndpoint } from "./api";
-import { getCustomAccountParser } from "./stargate";
+import { APP_URL } from "@/constants/api";
 
 const STARGATE_CLIENTS: Record<string, StargateClient> = {};
 
@@ -11,15 +11,12 @@ export async function getStargateClientForChainID(chainID: string) {
     return STARGATE_CLIENTS[chainID];
   }
 
-  const preferredEndpoint = getNodeProxyEndpoint(chainID);
-
-  const client = await StargateClient.connect(preferredEndpoint, {
-    accountParser: getCustomAccountParser(chainID),
+  const endpoint = `${APP_URL}/api/rpc/${chainID}`;
+  const client = await StargateClient.connect(endpoint, {
+    accountParser,
   });
 
-  STARGATE_CLIENTS[chainID] = client;
-
-  return client;
+  return (STARGATE_CLIENTS[chainID] = client), client;
 }
 
 const COSMWASM_CLIENTS: Record<string, CosmWasmClient> = {};
@@ -29,11 +26,8 @@ export async function getCosmWasmClientForChainID(chainID: string) {
     return COSMWASM_CLIENTS[chainID];
   }
 
-  const preferredEndpoint = getNodeProxyEndpoint(chainID);
+  const endpoint = `${APP_URL}/api/rpc/${chainID}`;
+  const client = await CosmWasmClient.connect(endpoint);
 
-  const client = await CosmWasmClient.connect(preferredEndpoint);
-
-  COSMWASM_CLIENTS[chainID] = client;
-
-  return client;
+  return (COSMWASM_CLIENTS[chainID] = client), client;
 }

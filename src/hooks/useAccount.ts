@@ -34,6 +34,7 @@ export function useAccount(context: TrackWalletCtx) {
               walletInfo: {
                 logo: cosmosWallet.walletInfo.logo,
               },
+              mode: cosmosWallet.walletInfo.mode,
             }
           : undefined,
         chainType: chain.chainType,

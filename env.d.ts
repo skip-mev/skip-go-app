@@ -13,3 +13,5 @@ declare namespace NodeJS {
     readonly WALLETCONNECT_VERIFY_KEY?: string;
   }
 }
+
+declare type MaybePromise<T> = T | Promise<T>;

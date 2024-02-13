@@ -2,7 +2,7 @@ import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 import { Resend } from "resend";
 
-import { configClient } from "@/lib/edge-config";
+import { client } from "@/lib/edge-config";
 import { contactFormSchema } from "@/schemas/api";
 
 export const config: PageConfig = {
@@ -17,7 +17,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req: NextRequest) {
   if (req.method.toLowerCase() === "head") {
-    const status = !!(await configClient.get("show-contact-form").catch(() => false));
+    const status = !!(await client()
+      .get("show-contact-form")
+      .catch(() => false));
     return new Response(null, { status: status ? 200 : 404 }); // OK or Not Found
   }
 

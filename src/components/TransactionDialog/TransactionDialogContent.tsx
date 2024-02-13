@@ -4,13 +4,13 @@ import { RouteResponse } from "@skip-router/core";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
-import { getHotfixedGasPrice } from "@/constants/gas";
 import { useSettingsStore } from "@/context/settings";
 import { txHistory } from "@/context/tx-history";
 import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
+import { getChainGasPrice } from "@/utils/chain.client";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { randomId } from "@/utils/random";
@@ -35,6 +35,12 @@ export interface BroadcastedTx {
   explorerLink: string;
 }
 
+const isCCTPFromNobleInOperation = (route: RouteResponse) => {
+  return route.operations.some(
+    (operation) => "cctpTransfer" in operation && operation.cctpTransfer.fromChainID === "noble-1",
+  );
+};
+
 function TransactionDialogContent({ route, onClose, isAmountError, transactionCount }: Props) {
   const skipClient = useSkipClient();
 
@@ -52,6 +58,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const srcAccount = useAccount("source");
   const dstAccount = useAccount("destination");
 
+  const showLedgerWarning = isCCTPFromNobleInOperation(route) && srcAccount?.wallet?.mode === "ledger";
+
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
   async function onSubmit() {
@@ -65,7 +73,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         userAddresses,
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getGasPrice: getHotfixedGasPrice,
+        getGasPrice: getChainGasPrice,
         onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
@@ -129,7 +137,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         ({ createdAt, id }) => (
           <div className="flex flex-col">
             <h4 className="mb-2 font-bold">Swap Failed!</h4>
-            <pre className="mb-4 select-all overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
+            <pre className="mb-4 overflow-auto whitespace-pre-wrap break-all rounded border p-2 font-mono text-xs">
               {err instanceof Error ? `${err.name}: ${err.message}` : String(err)}
               <br />
               <br />
@@ -245,6 +253,20 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        {showLedgerWarning && (
+          <AlertCollapse.Root
+            type="warning"
+            initialOpen={true}
+          >
+            <AlertCollapse.Content>
+              <p>
+                <b>WARNING: </b>
+                ibc.fun does not support signing with Ledger when transferring over CCTP to the Ethereum ecosystem.
+                We&apos;re actively working on fixing this. We apologize for the inconvenience
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
+        )}
         {isAmountError && !isOngoing && !isTxComplete && (
           <p className="text-balance text-center text-sm font-medium text-red-500">
             {typeof isAmountError === "string" ? isAmountError : "Insufficient balance."}
@@ -305,7 +327,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
               "disabled:cursor-not-allowed disabled:opacity-75",
             )}
             onClick={onSubmit}
-            disabled={isOngoing || !!isAmountError}
+            disabled={isOngoing || !!isAmountError || showLedgerWarning}
           >
             Submit
           </button>

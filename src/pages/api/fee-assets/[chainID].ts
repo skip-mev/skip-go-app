@@ -3,18 +3,17 @@ import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
 import { chainRecord } from "@/chains/chains";
-import { chainNameToId } from "@/chains/types";
 
 export const config: PageConfig = {
   runtime: "edge",
 };
 
 export default async function handler(req: NextRequest) {
-  const chainName = chainNameToId[req.nextUrl.searchParams.get("chainName") || ""];
-  if (!chainName) {
+  const chainID = req.nextUrl.searchParams.get("chainID");
+  if (!chainID) {
     return new Response(null, { status: 404 }); // Not Found
   }
-  const { fees } = chainRecord[chainName];
+  const { fees } = chainRecord[chainID];
 
   const feeAssets: FeeAsset[] =
     fees?.fee_tokens.map((ft) => ({
