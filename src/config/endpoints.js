@@ -37,7 +37,9 @@ exports.getWhitelabelEndpoint = (chainID, type) => {
     return undefined;
   }
 
-  const parts = [chainID, "skip", type]; // e.g. 'cosmoshub-4-skip-rpc'
+  const nodeID = exports.WHITELABEL_CUSTOM_NODE_IDS[chainID] || chainID;
+
+  const parts = [nodeID, "skip", type]; // e.g. 'cosmoshub-4-skip-rpc'
   if (typeof config === "number") {
     parts.push(config.toString()); // e.g. 'osmosis-1-skip-rpc-1'
   }
@@ -132,4 +134,12 @@ exports.WHITELABEL_CHAIN_IDS = {
   "umee-1": true,
   "ununifi-beta-v1": true,
   "dimension_37-1": true,
+};
+
+/**
+ * @type {Record<string, string>}
+ */
+exports.WHITELABEL_CUSTOM_NODE_IDS = {
+  "crypto-org-chain-mainnet-1": "crypto-org-mainnet",
+  "shentu-2.2": "shentu-22",
 };
