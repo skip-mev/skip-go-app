@@ -1,10 +1,13 @@
+import { WalletClient } from "@cosmos-kit/core";
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
+import { isWalletClientUsingLedger } from "@/utils/wallet";
 
 export function useAccount(context: TrackWalletCtx) {
   const trackedWallet = useTrackWallet(context);
@@ -20,6 +23,20 @@ export function useAccount(context: TrackWalletCtx) {
 
   const wagmiAccount = useWagmiAccount();
 
+  const getIsLedger = async (client: WalletClient, chainId: string) => {
+    const isLedger = await isWalletClientUsingLedger(client, chainId);
+    return isLedger;
+  };
+
+  const cosmosWalletIsLedgerQuery = useQuery({
+    queryKey: ["cosmosWallet", cosmosWallet, chain, cosmosWallet?.client, chain?.chainID],
+    queryFn: () => {
+      if (!cosmosWallet || !chain) return;
+      return getIsLedger(cosmosWallet.client, chain.chainID);
+    },
+    enabled: chain && chain.chainType === "cosmos" && !!cosmosWallet,
+  });
+
   const account = useMemo(() => {
     trackedWallet;
     if (!chain) return;
@@ -34,7 +51,7 @@ export function useAccount(context: TrackWalletCtx) {
               walletInfo: {
                 logo: cosmosWallet.walletInfo.logo,
               },
-              mode: cosmosWallet.walletInfo.mode,
+              isLedger: !!cosmosWalletIsLedgerQuery.data,
             }
           : undefined,
         chainType: chain.chainType,
@@ -79,7 +96,7 @@ export function useAccount(context: TrackWalletCtx) {
         },
       };
     }
-  }, [chain, context, cosmosWallet, trackedWallet, wagmiAccount]);
+  }, [chain, context, cosmosWallet, trackedWallet, wagmiAccount, cosmosWalletIsLedgerQuery.data]);
 
   return account;
 }
