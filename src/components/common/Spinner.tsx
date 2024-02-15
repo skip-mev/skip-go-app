@@ -1,9 +1,14 @@
-export const Spinner = () => (
+import { ComponentProps } from "react";
+
+import { cn } from "@/utils/ui";
+
+export const Spinner = ({ className, ...props }: ComponentProps<"svg">) => (
   <svg
-    className="h-4 w-4 animate-spin text-[#FF486E]"
+    className={cn("animate-spin", className)}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
+    {...props}
   >
     <circle
       className="opacity-25"
