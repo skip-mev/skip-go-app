@@ -17,7 +17,7 @@ import { isCCTPLedgerBrokenInOperation, isEthermintLedgerInOperation } from "@/u
 import { randomId } from "@/utils/random";
 import { cn } from "@/utils/ui";
 
-import RouteDisplay from "../RouteDisplay";
+import { RouteDisplay } from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
