@@ -1,6 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 
-import { Spinner } from "../common/Spinner";
+import { Spinner } from "../Icons/Spinner";
 
 export const Step = {
   SuccessState: () => (
