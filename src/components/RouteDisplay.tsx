@@ -1,15 +1,15 @@
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
+import { Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 import { formatUnits } from "viem";
 
 import { useAssets } from "@/context/assets";
 import { useBridgeByID } from "@/hooks/useBridges";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
-import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "./AdaptiveLink";
+import { Gap } from "./common/Gap";
+import { Step } from "./RouteDisplay/Step";
 import { SimpleTooltip } from "./SimpleTooltip";
 import { BroadcastedTx } from "./TransactionDialog/TransactionDialogContent";
 
@@ -134,47 +134,23 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
   const renderTransferState = useMemo(() => {
     if (isFirstOpSwap) {
       if (transferStatus?.state === "TRANSFER_FAILURE") {
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       }
       if (transferStatus?.state === "TRANSFER_SUCCESS") {
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       }
 
-      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+      return <Step.DefaultState />;
     }
     switch (transferStatus?.state) {
       case "TRANSFER_SUCCESS":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_RECEIVED":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_FAILURE":
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       case "TRANSFER_PENDING":
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
 
       default:
         return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
@@ -374,51 +350,26 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
   const renderSwapState = useMemo(() => {
     if (isSwapFirstStep) {
       if (swapStatus?.state === "TRANSFER_PENDING") {
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
       }
       if (swapStatus?.state === "TRANSFER_SUCCESS") {
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       }
       if (swapStatus?.state === "TRANSFER_FAILURE") {
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       }
 
       return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
     }
     switch (swapStatus?.state) {
       case "TRANSFER_RECEIVED":
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
       case "TRANSFER_SUCCESS":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_FAILURE":
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
-
+        return <Step.FailureState />;
       default:
-        return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+        return <Step.DefaultState />;
     }
   }, [isSwapFirstStep, swapStatus?.state]);
 
@@ -777,51 +728,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
   );
 }
 
-function Spinner() {
-  return (
-    <svg
-      className="h-4 w-4 animate-spin text-[#FF486E]"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx={12}
-        cy={12}
-        r={10}
-        stroke="currentColor"
-        strokeWidth={4}
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
-}
-
 export default RouteDisplay;
-
-const Gap = {
-  Parent({ className, ...props }: ComponentProps<"div">) {
-    return (
-      <div
-        className={cn("flex flex-wrap items-center gap-x-2 gap-y-1", className)}
-        {...props}
-      />
-    );
-  },
-  Child({ className, ...props }: ComponentProps<"div">) {
-    return (
-      <div
-        className={cn("flex items-center gap-x-1 gap-y-1", className)}
-        {...props}
-      />
-    );
-  },
-};
 
 function makeExplorerLink(link: string) {
   return {
