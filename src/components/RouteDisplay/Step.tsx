@@ -15,7 +15,7 @@ export const Step = {
   ),
   LoadingState: () => (
     <div className="rounded-full border-2 bg-white p-1">
-      <Spinner />
+      <Spinner className="h-4 w-4 text-[#FF486E]" />
     </div>
   ),
   DefaultState: () => <div className="h-2 w-2 rounded-full bg-neutral-200" />,
