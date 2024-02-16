@@ -208,7 +208,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
               className="rounded-full border-2 border-neutral-200 bg-white p-1 text-neutral-400 transition-transform hover:scale-110"
               onClick={() => setIsRouteExpanded(true)}
             >
-              <ExpandArrow />
+              <ExpandArrow className="h-4 w-4" />
             </button>
           </div>
         )}
