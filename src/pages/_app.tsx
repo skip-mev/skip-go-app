@@ -12,7 +12,6 @@ import { WagmiConfig } from "wagmi";
 import { getAssetLists, getChains } from "@/chains";
 import { DefaultSeo } from "@/components/DefaultSeo";
 import { metadata } from "@/constants/seo";
-import { DefaultLayout } from "@/layouts/default";
 import { wallets } from "@/lib/cosmos-kit";
 import { persister, queryClient } from "@/lib/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
@@ -51,9 +50,7 @@ export default function App({ Component, pageProps }: AppProps) {
           wallets={wallets}
         >
           <WagmiConfig config={wagmiConfig}>
-            <DefaultLayout>
-              <Component {...pageProps} />
-            </DefaultLayout>
+            <Component {...pageProps} />
           </WagmiConfig>
         </ChainProvider>
       </PersistQueryClientProvider>
