@@ -64,7 +64,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
               operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut,
             chain: operation.swap.swapIn.swapVenue.chainID,
             venue: operation.swap.swapIn.swapVenue.name,
-            id: `swap-${swapCount}-${i}`,
+            id: `SWAP-${swapCount}-${i}`,
           });
 
           asset = operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut;
@@ -78,7 +78,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
               operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut,
             chain: operation.swap.swapOut.swapVenue.chainID,
             venue: operation.swap.swapOut.swapVenue.name,
-            id: `swap-${swapCount}-${i}`,
+            id: `SWAP-${swapCount}-${i}`,
           });
 
           asset = operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut;
@@ -93,7 +93,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
           asset,
           sourceChain: operation.axelarTransfer.fromChainID,
           destinationChain: operation.axelarTransfer.toChainID,
-          id: `transfer-${transferCount}-${i}`,
+          id: `TRANSFER-${transferCount}-${i}`,
           bridgeID: operation.axelarTransfer.bridgeID,
         });
 
@@ -108,7 +108,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
           asset,
           sourceChain: operation.cctpTransfer.fromChainID,
           destinationChain: operation.cctpTransfer.toChainID,
-          id: `transfer-${transferCount}-${i}`,
+          id: `TRANSFER-${transferCount}-${i}`,
           bridgeID: operation.cctpTransfer.bridgeID,
         });
 
@@ -146,7 +146,7 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
         asset,
         sourceChain,
         destinationChain,
-        id: `transfer-${transferCount}-${i}`,
+        id: `TRANSFER-${transferCount}-${i}`,
         bridgeID: operation.transfer.bridgeID,
       });
 
@@ -188,7 +188,6 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
                 <SwapStep
                   action={action}
                   actions={actions}
-                  id={action.id}
                   statusData={statusData}
                 />
               )}
@@ -196,7 +195,6 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
                 <TransferStep
                   action={action}
                   actions={actions}
-                  id={action.id}
                   statusData={statusData}
                 />
               )}
