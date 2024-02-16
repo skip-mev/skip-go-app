@@ -4,11 +4,11 @@ import { SWAP_VENUES } from "@/constants/swap-venues";
 import { useAssets } from "@/context/assets";
 import { useBroadcastedTxsStatus } from "@/solve";
 import { onImageError } from "@/utils/image";
-import { makeExplorerLink } from "@/utils/link";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { Gap } from "../common/Gap";
 import { Action } from ".";
+import { makeOperationState } from "./operation-state";
 import { Step } from "./Step";
 
 export interface SwapAction {
@@ -23,11 +23,10 @@ export interface SwapAction {
 export interface SwapStepProps {
   action: SwapAction;
   actions: Action[];
-  id: string;
   statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
 }
 
-export const SwapStep = ({ action, actions, id, statusData }: SwapStepProps) => {
+export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
   const { getAsset } = useAssets();
 
   const assetIn = useMemo(() => {
@@ -40,35 +39,30 @@ export const SwapStep = ({ action, actions, id, statusData }: SwapStepProps) => 
 
   const venue = SWAP_VENUES[action.venue];
 
-  // format: operationType-<operationTypeCount>-<operationIndex>
-  const operationIndex = Number(id.split("-")[2]);
-  const operationTypeCount = Number(id.split("-")[1]);
-  const isSwapFirstStep = operationIndex === 0 && operationTypeCount === 0;
+  const { explorerLink, state, operationIndex, operationTypeIndex } = makeOperationState({
+    actions,
+    action,
+    statusData,
+  });
 
-  const sequenceIndex = Number(
-    actions
-      // We can assume that the swap operation by the previous transfer
-      .find((x) => Number(x.id.split("-")[2]) === operationIndex - 1)
-      ?.id.split("-")[1],
-  );
-  const swapStatus = statusData?.transferSequence[isSwapFirstStep ? 0 : sequenceIndex];
+  const isSwapFirstStep = operationIndex === 0 && operationTypeIndex === 0;
 
   // as for swap operations, we can assume that the swap is successful if the previous transfer state is TRANSFER_SUCCESS
   const renderSwapState = useMemo(() => {
     if (isSwapFirstStep) {
-      if (swapStatus?.state === "TRANSFER_PENDING") {
+      if (state === "TRANSFER_PENDING") {
         return <Step.LoadingState />;
       }
-      if (swapStatus?.state === "TRANSFER_SUCCESS") {
+      if (state === "TRANSFER_SUCCESS") {
         return <Step.SuccessState />;
       }
-      if (swapStatus?.state === "TRANSFER_FAILURE") {
+      if (state === "TRANSFER_FAILURE") {
         return <Step.FailureState />;
       }
 
-      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+      return <Step.DefaultState />;
     }
-    switch (swapStatus?.state) {
+    switch (state) {
       case "TRANSFER_RECEIVED":
         return <Step.LoadingState />;
       case "TRANSFER_SUCCESS":
@@ -78,14 +72,7 @@ export const SwapStep = ({ action, actions, id, statusData }: SwapStepProps) => 
       default:
         return <Step.DefaultState />;
     }
-  }, [isSwapFirstStep, swapStatus?.state]);
-
-  const explorerLink = useMemo(() => {
-    const tx = isSwapFirstStep ? swapStatus?.txs.sendTx : swapStatus?.txs.receiveTx;
-    if (!tx) return;
-    if (swapStatus?.state !== "TRANSFER_SUCCESS") return;
-    return makeExplorerLink(tx.explorerLink);
-  }, [isSwapFirstStep, swapStatus?.state, swapStatus?.txs.receiveTx, swapStatus?.txs.sendTx]);
+  }, [isSwapFirstStep, state]);
 
   if (!assetIn && assetOut) {
     return (

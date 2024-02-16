@@ -6,11 +6,11 @@ import { useBridgeByID } from "@/hooks/useBridges";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
 import { onImageError } from "@/utils/image";
-import { makeExplorerLink } from "@/utils/link";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { Gap } from "../common/Gap";
 import { Action } from ".";
+import { makeOperationState } from "./operation-state";
 import { Step } from "./Step";
 
 export interface TransferAction {
@@ -25,40 +25,32 @@ export interface TransferAction {
 interface TransferStepProps {
   actions: Action[];
   action: TransferAction;
-  id: string;
   statusData?: ReturnType<typeof useBroadcastedTxsStatus>["data"];
 }
 
-export const TransferStep = ({ action, actions, id, statusData }: TransferStepProps) => {
+export const TransferStep = ({ action, actions, statusData }: TransferStepProps) => {
+  const { getAsset } = useAssets();
   const { data: bridge } = useBridgeByID(action.bridgeID);
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
-  // format: operationType-<operationTypeCount>-<operationIndex>
-  const operationTypeCount = Number(id.split("-")[1]);
-  const operationIndex = Number(id.split("-")[2]);
-  const isFirstOpSwap = actions[0]?.type === "SWAP";
-  const transferStatus = statusData?.transferSequence[operationTypeCount];
-  const isNextOpSwap =
-    actions
-      // We can assume that the swap operation by the previous transfer
-      .find((x) => Number(x.id.split("-")[2]) === operationIndex + 1)
-      ?.id.split("-")[0] === "swap";
-  const isPrevOpTransfer = actions[operationIndex - 1]?.type === "TRANSFER";
+  const { explorerLink, state, operationIndex } = makeOperationState({ actions, action, statusData });
 
-  // We can assume that the transfer is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
+  const isFirstOpSwap = actions[0]?.type === "SWAP";
+
   const renderTransferState = useMemo(() => {
+    // We don't show loading state if first operation is swap operation, loading will be in swap operation
     if (isFirstOpSwap) {
-      if (transferStatus?.state === "TRANSFER_FAILURE") {
+      if (state === "TRANSFER_FAILURE") {
         return <Step.FailureState />;
       }
-      if (transferStatus?.state === "TRANSFER_SUCCESS") {
+      if (state === "TRANSFER_SUCCESS") {
         return <Step.SuccessState />;
       }
-
       return <Step.DefaultState />;
     }
-    switch (transferStatus?.state) {
+    // We can assume that the transfer operation is successful when the state is TRANSFER_SUCCESS or TRANSFER_RECEIVED
+    switch (state) {
       case "TRANSFER_SUCCESS":
         return <Step.SuccessState />;
       case "TRANSFER_RECEIVED":
@@ -71,22 +63,7 @@ export const TransferStep = ({ action, actions, id, statusData }: TransferStepPr
       default:
         return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
     }
-  }, [isFirstOpSwap, transferStatus?.state]);
-
-  const explorerLink = useMemo(() => {
-    const packetTx = (() => {
-      if (operationIndex === 0) return transferStatus?.txs.sendTx;
-      if (isNextOpSwap) return transferStatus?.txs.sendTx;
-      if (isPrevOpTransfer) return transferStatus?.txs.sendTx;
-      return transferStatus?.txs.receiveTx;
-    })();
-    if (!packetTx?.explorerLink) {
-      return null;
-    }
-    return makeExplorerLink(packetTx.explorerLink);
-  }, [isNextOpSwap, isPrevOpTransfer, operationIndex, transferStatus?.txs.receiveTx, transferStatus?.txs.sendTx]);
-
-  const { getAsset } = useAssets();
+  }, [isFirstOpSwap, state]);
 
   const asset = (() => {
     const currentAsset = getAsset(action.asset, action.sourceChain);
