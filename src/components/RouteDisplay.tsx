@@ -1,15 +1,16 @@
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { ComponentProps, Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
+import { Dispatch, Fragment, SetStateAction, SyntheticEvent, useMemo } from "react";
 import { formatUnits } from "viem";
 
 import { useAssets } from "@/context/assets";
 import { useBridgeByID } from "@/hooks/useBridges";
 import { useChainByID } from "@/hooks/useChains";
 import { useBroadcastedTxsStatus } from "@/solve";
-import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "./AdaptiveLink";
+import { Gap } from "./common/Gap";
+import { ExpandArrow } from "./Icons/ExpandArrow";
+import { Step } from "./RouteDisplay/Step";
 import { SimpleTooltip } from "./SimpleTooltip";
 import { BroadcastedTx } from "./TransactionDialog/TransactionDialogContent";
 
@@ -134,50 +135,26 @@ function TransferStep({ action, actions, id, statusData }: TransferStepProps) {
   const renderTransferState = useMemo(() => {
     if (isFirstOpSwap) {
       if (transferStatus?.state === "TRANSFER_FAILURE") {
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       }
       if (transferStatus?.state === "TRANSFER_SUCCESS") {
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       }
 
-      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+      return <Step.DefaultState />;
     }
     switch (transferStatus?.state) {
       case "TRANSFER_SUCCESS":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_RECEIVED":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_FAILURE":
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       case "TRANSFER_PENDING":
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
 
       default:
-        return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+        return <Step.DefaultState />;
     }
   }, [isFirstOpSwap, transferStatus?.state]);
 
@@ -374,51 +351,26 @@ function SwapStep({ action, actions, id, statusData }: SwapStepProps) {
   const renderSwapState = useMemo(() => {
     if (isSwapFirstStep) {
       if (swapStatus?.state === "TRANSFER_PENDING") {
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
       }
       if (swapStatus?.state === "TRANSFER_SUCCESS") {
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       }
       if (swapStatus?.state === "TRANSFER_FAILURE") {
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
+        return <Step.FailureState />;
       }
 
-      return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+      return <Step.DefaultState />;
     }
     switch (swapStatus?.state) {
       case "TRANSFER_RECEIVED":
-        return (
-          <div className="rounded-full border-2 bg-white p-1">
-            <Spinner />
-          </div>
-        );
+        return <Step.LoadingState />;
       case "TRANSFER_SUCCESS":
-        return (
-          <div className="rounded bg-white">
-            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-          </div>
-        );
+        return <Step.SuccessState />;
       case "TRANSFER_FAILURE":
-        return (
-          <div className="rounded bg-white">
-            <XCircleIcon className="h-6 w-6 text-red-400" />
-          </div>
-        );
-
+        return <Step.FailureState />;
       default:
-        return <div className="h-2 w-2 rounded-full bg-neutral-200" />;
+        return <Step.DefaultState />;
     }
   }, [isSwapFirstStep, swapStatus?.state]);
 
@@ -751,18 +703,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
               className="rounded-full border-2 border-neutral-200 bg-white p-1 text-neutral-400 transition-transform hover:scale-110"
               onClick={() => setIsRouteExpanded(true)}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <ExpandArrow className="h-4 w-4" />
             </button>
           </div>
         )}
@@ -777,51 +718,7 @@ function RouteDisplay({ route, isRouteExpanded, setIsRouteExpanded, broadcastedT
   );
 }
 
-function Spinner() {
-  return (
-    <svg
-      className="h-4 w-4 animate-spin text-[#FF486E]"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx={12}
-        cy={12}
-        r={10}
-        stroke="currentColor"
-        strokeWidth={4}
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
-}
-
 export default RouteDisplay;
-
-const Gap = {
-  Parent({ className, ...props }: ComponentProps<"div">) {
-    return (
-      <div
-        className={cn("flex flex-wrap items-center gap-x-2 gap-y-1", className)}
-        {...props}
-      />
-    );
-  },
-  Child({ className, ...props }: ComponentProps<"div">) {
-    return (
-      <div
-        className={cn("flex items-center gap-x-1 gap-y-1", className)}
-        {...props}
-      />
-    );
-  },
-};
 
 function makeExplorerLink(link: string) {
   return {
