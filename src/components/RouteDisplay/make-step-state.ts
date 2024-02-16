@@ -3,7 +3,7 @@ import { makeExplorerLink } from "@/utils/link";
 
 import { Action } from ".";
 
-export const makeOperationState = ({
+export const makeStepState = ({
   actions,
   action,
   statusData,

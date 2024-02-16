@@ -10,7 +10,7 @@ import { onImageError } from "@/utils/image";
 import { AdaptiveLink } from "../AdaptiveLink";
 import { Gap } from "../common/Gap";
 import { Action } from ".";
-import { makeOperationState } from "./operation-state";
+import { makeStepState } from "./make-step-state";
 import { Step } from "./Step";
 
 export interface TransferAction {
@@ -34,7 +34,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
   const { data: sourceChain } = useChainByID(action.sourceChain);
   const { data: destinationChain } = useChainByID(action.destinationChain);
 
-  const { explorerLink, state, operationIndex } = makeOperationState({ actions, action, statusData });
+  const { explorerLink, state, operationIndex } = makeStepState({ actions, action, statusData });
 
   const isFirstOpSwap = actions[0]?.type === "SWAP";
 

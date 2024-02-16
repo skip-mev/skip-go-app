@@ -8,7 +8,7 @@ import { onImageError } from "@/utils/image";
 import { AdaptiveLink } from "../AdaptiveLink";
 import { Gap } from "../common/Gap";
 import { Action } from ".";
-import { makeOperationState } from "./operation-state";
+import { makeStepState } from "./make-step-state";
 import { Step } from "./Step";
 
 export interface SwapAction {
@@ -39,7 +39,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
 
   const venue = SWAP_VENUES[action.venue];
 
-  const { explorerLink, state, operationIndex, operationTypeIndex } = makeOperationState({
+  const { explorerLink, state, operationIndex, operationTypeIndex } = makeStepState({
     actions,
     action,
     statusData,
