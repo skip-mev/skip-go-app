@@ -6,128 +6,111 @@ import { TransferAction } from "./TransferStep";
 export type Action = TransferAction | SwapAction;
 
 export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
-  const result = route.operations.map((operation, i) => {
-    const isFirstOperation = i === 0;
-    const isLastOperation = i === route.operations.length - 1;
-    const prevOperation = route.operations[i - 1];
-    const nextOperation = route.operations[i + 1];
+  const _actions: Action[] = [];
 
-    const swapIndex =
-      route.operations.slice(0, i + 1).reduce((acc, op) => {
-        if ("swap" in op) {
-          acc++;
-        }
-        return acc;
-      }, 0) - 1;
-    const transferIndex =
-      route.operations.slice(0, i + 1).reduce((acc, op) => {
-        if ("axelarTransfer" in op || "cctpTransfer" in op || "transfer" in op) {
-          acc++;
-        }
-        return acc;
-      }, 0) - 1;
+  let swapCount = 0;
+  let transferCount = 0;
+  let asset = route.sourceAssetDenom;
 
-    // Will be used in TRANSFER operation
-    const transferAsset = (() => {
-      if (isFirstOperation) {
-        return route.sourceAssetDenom;
-      }
-      if ("swap" in prevOperation && "swapIn" in prevOperation.swap) {
-        return prevOperation.swap.swapIn.swapOperations[prevOperation.swap.swapIn.swapOperations.length - 1].denomOut;
-      }
-      if ("swap" in prevOperation && "swapOut" in prevOperation.swap) {
-        return prevOperation.swap.swapOut.swapOperations[prevOperation.swap.swapOut.swapOperations.length - 1].denomOut;
-      }
-      if ("axelarTransfer" in prevOperation) {
-        return prevOperation.axelarTransfer.asset;
-      }
-      if ("cctpTransfer" in prevOperation) {
-        return prevOperation.cctpTransfer.burnToken;
-      }
-      if ("transfer" in prevOperation) {
-        return prevOperation.transfer.destDenom;
-      }
-    })();
+  route.operations.forEach((operation, i) => {
+    if ("swap" in operation) {
+      if ("swapIn" in operation.swap) {
+        _actions.push({
+          type: "SWAP",
+          sourceAsset: operation.swap.swapIn.swapOperations[0].denomIn,
+          destinationAsset:
+            operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut,
+          chain: operation.swap.swapIn.swapVenue.chainID,
+          venue: operation.swap.swapIn.swapVenue.name,
+          id: `SWAP-${swapCount}-${i}`,
+        });
 
-    // Will be used in TRANSFER operation
-    const transferDestinationChain = (() => {
-      if (isLastOperation) {
-        return route.destAssetChainID;
+        asset = operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut;
       }
-      if ("swap" in nextOperation && "swapIn" in nextOperation.swap) {
-        return nextOperation.swap.swapIn.swapVenue.chainID;
-      }
-      if ("swap" in nextOperation && "swapOut" in nextOperation.swap) {
-        return nextOperation.swap.swapOut.swapVenue.chainID;
-      }
-      if ("axelarTransfer" in nextOperation) {
-        return nextOperation.axelarTransfer.fromChainID;
-      }
-      if ("cctpTransfer" in nextOperation) {
-        return nextOperation.cctpTransfer.fromChainID;
-      }
-      if ("transfer" in nextOperation) {
-        return nextOperation.transfer.chainID;
-      }
-    })();
 
-    if ("swap" in operation && "swapIn" in operation.swap) {
-      const res: SwapAction = {
-        type: "SWAP",
-        sourceAsset: operation.swap.swapIn.swapOperations[0].denomIn,
-        destinationAsset:
-          operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut,
-        chain: operation.swap.swapIn.swapVenue.chainID,
-        venue: operation.swap.swapIn.swapVenue.name,
-        id: `SWAP-${swapIndex}-${i}`,
-      };
-      return res;
+      if ("swapOut" in operation.swap) {
+        _actions.push({
+          type: "SWAP",
+          sourceAsset: operation.swap.swapOut.swapOperations[0].denomIn,
+          destinationAsset:
+            operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut,
+          chain: operation.swap.swapOut.swapVenue.chainID,
+          venue: operation.swap.swapOut.swapVenue.name,
+          id: `SWAP-${swapCount}-${i}`,
+        });
+
+        asset = operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut;
+      }
+      swapCount++;
+      return;
     }
-    if ("swap" in operation && "swapOut" in operation.swap) {
-      const res: SwapAction = {
-        type: "SWAP",
-        sourceAsset: operation.swap.swapOut.swapOperations[0].denomIn,
-        destinationAsset:
-          operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut,
-        chain: operation.swap.swapOut.swapVenue.chainID,
-        venue: operation.swap.swapOut.swapVenue.name,
-        id: `SWAP-${swapIndex}-${i}`,
-      };
-      return res;
-    }
+
     if ("axelarTransfer" in operation) {
-      const res: TransferAction = {
+      _actions.push({
         type: "TRANSFER",
-        bridgeID: operation.axelarTransfer.bridgeID,
+        asset,
         sourceChain: operation.axelarTransfer.fromChainID,
         destinationChain: operation.axelarTransfer.toChainID,
-        asset: transferAsset || operation.axelarTransfer.asset,
-        id: `TRANSFER-${transferIndex}-${i}`,
-      };
-      return res;
+        id: `TRANSFER-${transferCount}-${i}`,
+        bridgeID: operation.axelarTransfer.bridgeID,
+      });
+
+      asset = operation.axelarTransfer.asset;
+      transferCount++;
+      return;
     }
+
     if ("cctpTransfer" in operation) {
-      const res: TransferAction = {
+      _actions.push({
         type: "TRANSFER",
-        bridgeID: operation.cctpTransfer.bridgeID,
+        asset,
         sourceChain: operation.cctpTransfer.fromChainID,
         destinationChain: operation.cctpTransfer.toChainID,
-        asset: transferAsset || operation.cctpTransfer.burnToken,
-        id: `TRANSFER-${transferIndex}-${i}`,
-      };
-      return res;
+        id: `TRANSFER-${transferCount}-${i}`,
+        bridgeID: operation.cctpTransfer.bridgeID,
+      });
+
+      asset = operation.cctpTransfer.burnToken;
+      transferCount++;
+      return;
     }
-    if ("transfer" in operation && !!transferDestinationChain) {
-      const res: TransferAction = {
-        type: "TRANSFER",
-        sourceChain: operation.transfer.chainID,
-        destinationChain: transferDestinationChain,
-        asset: transferAsset || operation.transfer.destDenom,
-        id: `TRANSFER-${transferIndex}-${i}`,
-        bridgeID: operation.transfer.bridgeID,
-      };
-      return res;
+
+    const sourceChain = operation.transfer.chainID;
+
+    let destinationChain = "";
+    if (i === route.operations.length - 1) {
+      destinationChain = route.destAssetChainID;
+    } else {
+      const nextOperation = route.operations[i + 1];
+      if ("swap" in nextOperation) {
+        if ("swapIn" in nextOperation.swap) {
+          destinationChain = nextOperation.swap.swapIn.swapVenue.chainID;
+        }
+
+        if ("swapOut" in nextOperation.swap) {
+          destinationChain = nextOperation.swap.swapOut.swapVenue.chainID;
+        }
+      } else if ("axelarTransfer" in nextOperation) {
+        destinationChain = nextOperation.axelarTransfer.fromChainID;
+      } else if ("cctpTransfer" in nextOperation) {
+        destinationChain = nextOperation.cctpTransfer.fromChainID;
+      } else {
+        destinationChain = nextOperation.transfer.chainID;
+      }
     }
+
+    _actions.push({
+      type: "TRANSFER",
+      asset,
+      sourceChain,
+      destinationChain,
+      id: `TRANSFER-${transferCount}-${i}`,
+      bridgeID: operation.transfer.bridgeID,
+    });
+
+    asset = operation.transfer.destDenom;
+    transferCount++;
   });
-  return result.filter((op) => op !== undefined) as Action[];
+
+  return _actions;
 };
