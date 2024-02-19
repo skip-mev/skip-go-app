@@ -47,14 +47,18 @@ export async function getBalancesByChain(address: string, chainID: string, asset
   const balances = await stargate.getAllBalances(address);
 
   const cw20Assets = assets.filter((asset) => asset.isCW20);
-
-  const cw20Balances = await Promise.all(
-    cw20Assets.map((asset) => {
-      return cosmwasm.queryContractSmart(asset.tokenContract!, {
-        balance: { address },
-      });
+  const _cw20Balances = await Promise.all(
+    cw20Assets.map(async (asset) => {
+      try {
+        return await cosmwasm.queryContractSmart(asset.tokenContract!, {
+          balance: { address },
+        });
+      } catch (e) {
+        return e;
+      }
     }),
   );
+  const cw20Balances = _cw20Balances.filter((result) => !(result instanceof Error));
 
   const allBalances = balances.reduce<Record<string, string>>(
     (acc, balance) => ({ ...acc, [balance.denom]: balance.amount }),
