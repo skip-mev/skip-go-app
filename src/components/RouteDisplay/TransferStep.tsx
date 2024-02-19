@@ -9,7 +9,7 @@ import { onImageError } from "@/utils/image";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { Gap } from "../common/Gap";
-import { Action } from ".";
+import { Action } from "./make-actions";
 import { makeStepState } from "./make-step-state";
 import { Step } from "./Step";
 

@@ -10,10 +10,8 @@ import { ExpandArrow } from "../Icons/ExpandArrow";
 import { BroadcastedTx } from "../TransactionDialog/TransactionDialogContent";
 import { makeActions } from "./make-actions";
 import { RouteEnd } from "./RouteEnd";
-import { SwapAction, SwapStep } from "./SwapStep";
-import { TransferAction, TransferStep } from "./TransferStep";
-
-export type Action = TransferAction | SwapAction;
+import { SwapStep } from "./SwapStep";
+import { TransferStep } from "./TransferStep";
 
 interface RouteDisplayProps {
   route: RouteResponse;
