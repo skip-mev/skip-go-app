@@ -100,7 +100,7 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-lg font-semibold">{asset.recommendedSymbol} </p>
+                  <p className="text-lg font-semibold">{asset.recommendedSymbol || asset.symbol}</p>
                   {asset.isCW20 && (
                     <p className="rounded bg-yellow-600 px-1.5 text-xs font-semibold text-white">CW20</p>
                   )}
