@@ -1,7 +1,7 @@
 import { useBroadcastedTxsStatus } from "@/solve";
 import { makeExplorerLink } from "@/utils/link";
 
-import { Action } from ".";
+import { Action } from "./make-actions";
 
 export const makeStepState = ({
   actions,
