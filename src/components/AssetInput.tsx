@@ -60,7 +60,7 @@ function AssetInput({
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
 
-  const { data: balances } = useBalancesByChain({
+  const { data: balances, isLoading: isBalancesLoading } = useBalancesByChain({
     address: account?.address,
     chain,
     assets,
@@ -100,6 +100,7 @@ function AssetInput({
             balances={balances}
             onChange={onAssetChange}
             showChainInfo={!!chain}
+            isBalancesLoading={isBalancesLoading}
           />
         </div>
       </div>
@@ -186,19 +187,23 @@ function AssetInput({
           <div className="flex-grow" />
           {context === "source" && account?.address && asset && (
             <div className="flex animate-slide-left-and-fade items-center text-sm text-neutral-400">
-              <span className="mr-1">Balance:</span>
-              <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
-                <div
-                  className={cn(
-                    "mr-2 max-w-[16ch] truncate tabular-nums",
-                    "cursor-help underline decoration-dotted underline-offset-4",
-                  )}
-                >
-                  {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
-                    maximumFractionDigits: 4,
-                  })}
-                </div>
-              </SimpleTooltip>
+              <span className="mr-1">Balance:</span>{" "}
+              {isBalancesLoading ? (
+                <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <SimpleTooltip label={`${parseFloat(selectedAssetBalance).toString()} ${asset.recommendedSymbol}`}>
+                  <div
+                    className={cn(
+                      "mr-2 max-w-[16ch] truncate tabular-nums",
+                      "cursor-help underline decoration-dotted underline-offset-4",
+                    )}
+                  >
+                    {parseFloat(selectedAssetBalance).toLocaleString("en-US", {
+                      maximumFractionDigits: 4,
+                    })}
+                  </div>
+                </SimpleTooltip>
+              )}
               <button
                 className={cn(
                   "rounded-md bg-[#FF486E] px-2 py-1 text-xs font-semibold uppercase text-white disabled:bg-red-200",

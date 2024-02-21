@@ -13,9 +13,10 @@ interface Props {
   balances?: Record<string, string>;
   onChange?: (asset: Asset) => void;
   showChainInfo?: boolean;
+  isBalancesLoading?: boolean;
 }
 
-function AssetSelect({ asset, assets, balances, onChange, showChainInfo }: Props) {
+function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalancesLoading }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog
@@ -56,6 +57,7 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo }: Props
           onChange={onChange}
           onClose={() => setIsOpen(false)}
           showChainInfo={showChainInfo}
+          isBalancesLoading={isBalancesLoading}
         />
       </DialogContent>
     </Dialog>

@@ -7,15 +7,18 @@ import { formatUnits } from "viem";
 
 import { cn } from "@/utils/ui";
 
+import { SpinnerIcon } from "../SpinnerIcon";
+
 interface Props {
   assets?: Asset[];
   balances: Record<string, string>;
   onChange?: (asset: Asset) => void;
   onClose: () => void;
   showChainInfo?: boolean;
+  isBalancesLoading?: boolean;
 }
 
-function AssetSelectContent({ assets = [], balances, onChange, onClose, showChainInfo }: Props) {
+function AssetSelectContent({ assets = [], balances, onChange, onClose, showChainInfo, isBalancesLoading }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => inputRef.current?.focus(), []);
@@ -63,6 +66,7 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <p className="text-xl font-bold">Select Token</p>
+        {isBalancesLoading && <SpinnerIcon className="h-4 w-4 animate-spin text-neutral-400" />}
       </div>
       <input
         className="z-20 w-full rounded-md border px-4 py-2"
@@ -95,7 +99,13 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
                 onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               />
               <div className="flex-1">
-                <p className="text-lg font-semibold">{asset.recommendedSymbol}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-lg font-semibold">{asset.recommendedSymbol || asset.symbol}</p>
+                  {asset.isCW20 && (
+                    <p className="rounded bg-yellow-600 px-1.5 text-xs font-semibold text-white">CW20</p>
+                  )}
+                </div>
+
                 {showChainInfo && <p className="text-sm text-neutral-400">{asset.chainID}</p>}
               </div>
               <div>

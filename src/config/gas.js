@@ -6,4 +6,6 @@ const { GasPrice } = require("@cosmjs/stargate");
 exports.CUSTOM_GAS_PRICE_CHAIN_IDS = {
   "dymension_1100-1": GasPrice.fromString("20000000000adym"),
   "noble-1": GasPrice.fromString("0.0uusdc"),
+  "carbon-1": GasPrice.fromString("100swth"),
+  "akashnet-2": GasPrice.fromString("0.025uakt"), // https://www.mintscan.io/akash/parameters
 };
