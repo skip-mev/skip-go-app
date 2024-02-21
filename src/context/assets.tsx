@@ -55,8 +55,7 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
         const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
         if (!chain) return;
         else if (chainID === "carbon-1") {
-          feeAsset = chain.feeAssets.find((v) => v.denom == "swth")
-       
+          feeAsset = chain.feeAssets.find((v) => v.denom == "swth");
         } else {
           [feeAsset] = chain.feeAssets.sort(sortFeeAssets);
         }
