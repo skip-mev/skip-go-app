@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 
 import { Footer } from "@/components/Footer";
 import Header from "@/components/Header";
+import { Help } from "@/components/Help";
 import SkipBanner from "@/components/SkipBanner";
 import { VersionCheck } from "@/components/VersionCheck";
 import { AssetsProvider } from "@/context/assets";
@@ -19,6 +20,7 @@ export function DefaultLayout({ children }: { children: ReactNode }) {
           <Footer />
         </main>
         <VersionCheck />
+        <Help />
         <Toaster
           position="top-right"
           toastOptions={{ duration: 1000 * 10 }}
