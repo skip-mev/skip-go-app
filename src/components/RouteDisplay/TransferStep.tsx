@@ -74,6 +74,15 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
     return prevAsset;
   })();
 
+  const dataTestValue = JSON.stringify({
+    sourceChain: action.sourceChain,
+    destinationChain: action.destinationChain,
+    sourceAsset: action.asset,
+    destinationAsset: action.asset,
+    bridgeOrVenue: action.bridgeID,
+    type: action.type,
+  });
+
   if (!sourceChain || !destinationChain) {
     // this should be unreachable
     return null;
@@ -81,7 +90,11 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
 
   if (!asset) {
     return (
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        data-testid={`operation-step-${operationIndex}`}
+        data-test-value={dataTestValue}
+      >
         <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
         <div className="max-w-[18rem] space-y-1 text-sm text-neutral-500">
           <Gap.Parent>
@@ -130,6 +143,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
             <AdaptiveLink
               className="text-xs font-semibold text-[#FF486E] underline"
               href={explorerLink.link}
+              data-testid={`explorer-link`}
             >
               {explorerLink.shorthand}
             </AdaptiveLink>
@@ -140,7 +154,11 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-2"
+      data-testid={`operation-step-${operationIndex}`}
+      data-test-value={dataTestValue}
+    >
       <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center">{renderTransferState}</div>
       <div className="max-w-[18rem] space-y-1 text-sm text-neutral-500">
         <Gap.Parent>
@@ -197,6 +215,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
           <AdaptiveLink
             className="text-xs font-semibold text-[#FF486E] underline"
             href={explorerLink.link}
+            data-testid={`explorer-link`}
           >
             {explorerLink.shorthand}
           </AdaptiveLink>

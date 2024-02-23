@@ -54,7 +54,11 @@ export const RouteDisplay = ({ route, isRouteExpanded, setIsRouteExpanded, broad
       <div className="absolute inset-y-0 flex w-14 items-center justify-center py-7">
         <div className="h-full w-0.5 bg-neutral-200"></div>
       </div>
-      <div className="relative flex h-full flex-col justify-between gap-4">
+      <div
+        className="relative flex h-full flex-col justify-between gap-4"
+        data-testid="operations"
+        data-test-value={actions.length}
+      >
         <div className="flex items-center justify-between pr-4">
           <RouteEnd
             amount={amountIn}

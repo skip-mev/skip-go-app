@@ -74,9 +74,22 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
     }
   }, [isSwapFirstStep, state]);
 
+  const dataTestValue = JSON.stringify({
+    sourceChain: action.chain,
+    destinationChain: action.chain,
+    sourceAsset: action.sourceAsset,
+    destinationAsset: action.destinationAsset,
+    bridgeOrVenue: action.venue,
+    type: action.type,
+  });
+
   if (!assetIn && assetOut) {
     return (
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        data-testid={`operation-step-${operationIndex}`}
+        data-test-value={dataTestValue}
+      >
         <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
         <div className="max-w-[18rem]">
           <Gap.Parent className="text-sm text-neutral-500">
@@ -105,6 +118,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
             <AdaptiveLink
               className="text-xs font-semibold text-[#FF486E] underline"
               href={explorerLink.link}
+              data-testid={`explorer-link`}
             >
               {explorerLink.shorthand}
             </AdaptiveLink>
@@ -157,7 +171,11 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-2"
+      data-testid={`operation-step-${operationIndex}`}
+      data-test-value={dataTestValue}
+    >
       <div className="flex h-14 w-14 items-center justify-center">{renderSwapState}</div>
       <div className="max-w-[18rem]">
         <Gap.Parent className="text-sm text-neutral-500">
@@ -193,6 +211,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
           <AdaptiveLink
             className="text-xs font-semibold text-[#FF486E] underline"
             href={explorerLink.link}
+            data-testid={`explorer-link`}
           >
             {explorerLink.shorthand}
           </AdaptiveLink>

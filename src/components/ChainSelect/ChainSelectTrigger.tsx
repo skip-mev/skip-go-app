@@ -18,6 +18,7 @@ const ChainSelectTrigger = forwardRef<HTMLButtonElement, Props>(
           "border border-neutral-200 hover:border-neutral-300",
         )}
         ref={ref}
+        data-testid={"select-chain"}
         {...props}
       >
         <span className="flex-1">{chain ? chain.prettyName : "Select Chain"}</span>

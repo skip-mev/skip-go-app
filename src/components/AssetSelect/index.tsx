@@ -32,6 +32,7 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalan
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           disabled={!assets || assets.length === 0}
+          data-testid="select-asset"
         >
           {asset && (
             <img

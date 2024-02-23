@@ -84,6 +84,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
                 className="flex w-full items-center gap-4 rounded-xl p-4 text-left transition-colors hover:bg-[#ECD9D9] focus:-outline-offset-2"
                 key={chain.chainID}
                 onClick={() => onChange(chain)}
+                data-testid="chain-item"
               >
                 <img
                   alt={chain.prettyName}

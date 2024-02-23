@@ -196,7 +196,10 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         />
       </div>
 
-      <div className="flex-1 space-y-6">
+      <div
+        className="flex-1 space-y-6"
+        data-testid="tx-hash-list"
+      >
         {broadcastedTxs.map(({ txHash }, i) => (
           <div
             key={`tx-${i}`}
@@ -219,6 +222,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
                   href={broadcastedTxs[i].explorerLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-testid={`tx-hash-${i + 1}`}
+                  data-test-value={txHash}
                 >
                   <span>
                     {txHash.slice(0, 6)}
@@ -289,7 +294,11 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         <div className="flex w-full items-center rounded-md bg-black p-3 text-left text-xs font-medium uppercase text-white/50">
           <p className="flex-1">
             This route requires{" "}
-            <span className="text-white">
+            <span
+              className="text-white"
+              data-testid="transactions-count"
+              data-test-value={transactionCount}
+            >
               {transactionCount} Transaction
               {transactionCount > 1 ? "s" : ""}
             </span>{" "}
