@@ -4,7 +4,7 @@ import { getWalletClient } from "@wagmi/core";
 import { createContext, ReactNode } from "react";
 
 import { chainIdToName } from "@/chains/types";
-import { API_URL, APP_URL } from "@/constants/api";
+import { API_URL, appUrl } from "@/constants/api";
 import { trackWallet } from "@/context/track-wallet";
 import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
@@ -66,10 +66,10 @@ export function SkipProvider({ children }: { children: ReactNode }) {
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
-        return `${APP_URL}/api/rpc/${chainID}`;
+        return `${appUrl}/api/rpc/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
-        return `${APP_URL}/api/rest/${chainID}`;
+        return `${appUrl}/api/rest/${chainID}`;
       },
     },
   });
