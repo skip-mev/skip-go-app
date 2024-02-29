@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 import { disclosure, useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
-import { formatPercent } from "@/utils/intl";
+import { formatPercent, formatUSD } from "@/utils/intl";
 import { cn } from "@/utils/ui";
 
 import { ConversionRate } from "../ConversionRate";
@@ -48,11 +48,12 @@ export const SwapDetails = ({
 
   const bridgingFee = useMemo(() => {
     if (!axelarTransferOperation) return;
-    const { feeAmount, asset } = axelarTransferOperation.axelarTransfer;
-    const computed = (+feeAmount / Math.pow(10, 18)).toLocaleString("en-US", {
+    const { feeAmount, feeAsset, usdFeeAmount } = axelarTransferOperation.axelarTransfer;
+    const computed = (+feeAmount / Math.pow(10, feeAsset.decimals || 18)).toLocaleString("en-US", {
       maximumFractionDigits: 6,
     });
-    return `${computed} ${asset}`;
+
+    return { inAsset: `${computed} ${feeAsset.symbol}`, inUSD: `${formatUSD(usdFeeAmount)}` };
   }, [axelarTransferOperation]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
@@ -159,7 +160,7 @@ export const SwapDetails = ({
           </dd>
           {sourceFeeAsset && (
             <>
-              <dt>Estimated Fee</dt>
+              <dt>Estimated Transaction Fee</dt>
               <dd>
                 {gasRequired ?? "-"} {sourceFeeAsset.recommendedSymbol}
               </dd>
@@ -182,7 +183,10 @@ export const SwapDetails = ({
             {parseFloat(gasAmount).toLocaleString()}
           </dd> */}
           <dt>Bridging Fee</dt>
-          <dd>{bridgingFee ?? "-"}</dd>
+          <dd>
+            {bridgingFee?.inAsset ?? "-"}{" "}
+            <span className="text-sm tabular-nums text-neutral-400">{bridgingFee?.inUSD ?? "-"}</span>
+          </dd>
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
