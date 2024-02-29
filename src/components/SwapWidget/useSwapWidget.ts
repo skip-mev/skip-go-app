@@ -842,5 +842,5 @@ function getRouteErrorMessage({ message }: { message: string }) {
   if (message.includes("evm native destination tokens are currently not supported")) {
     return "EVM native destination tokens are currently not supported";
   }
-  return "Route not found";
+  return message;
 }
