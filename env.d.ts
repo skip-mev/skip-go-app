@@ -11,6 +11,7 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?: string;
     readonly RESEND_API_KEY?: string;
     readonly WALLETCONNECT_VERIFY_KEY?: string;
+    readonly WORD_PHRASE_KEY?: string;
   }
 }
 

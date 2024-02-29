@@ -11,8 +11,8 @@ export async function initialSetup(playwrightInstance: BrowserType) {
 
   await playwright.assignWindows();
   await playwright.assignActiveTabName("keplr");
-
-  await importWallet("test test test test test test test test test test test junk", "Tester@1234");
+  const phrase = process.env.WORD_PHRASE_KEY || "test test test test test test test test test test test junk";
+  await importWallet(phrase, "Tester@1234");
 
   // keplrWindow
 }
