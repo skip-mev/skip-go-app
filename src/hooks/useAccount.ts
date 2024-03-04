@@ -7,7 +7,7 @@ import { useAccount as useWagmiAccount } from "wagmi";
 import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
-import { isWalletClientUsingLedger } from "@/utils/wallet";
+import { isReadyToCheckLedger, isWalletClientUsingLedger } from "@/utils/wallet";
 
 export function useAccount(context: TrackWalletCtx) {
   const trackedWallet = useTrackWallet(context);
@@ -28,13 +28,28 @@ export function useAccount(context: TrackWalletCtx) {
     return isLedger;
   };
 
+  const readyToCheckLedger = useMemo(() => {
+    if (!cosmosWallet?.client) return false;
+    return isReadyToCheckLedger(cosmosWallet?.client);
+  }, [cosmosWallet?.client]);
+
   const cosmosWalletIsLedgerQuery = useQuery({
-    queryKey: ["cosmosWallet", cosmosWallet, chain, cosmosWallet?.client, chain?.chainID],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      "cosmosWallet",
+      { context, cosmosWallet: cosmosWallet?.walletName, address: cosmosWallet?.address, chainID: chain?.chainID },
+    ],
     queryFn: () => {
-      if (!cosmosWallet || !chain) return;
+      if (!cosmosWallet?.client || !chain) return;
       return getIsLedger(cosmosWallet.client, chain.chainID);
     },
-    enabled: chain && chain.chainType === "cosmos" && !!cosmosWallet,
+    enabled:
+      chain &&
+      chain.chainType === "cosmos" &&
+      !!cosmosWallet &&
+      context === "source" &&
+      readyToCheckLedger &&
+      !!cosmosWallet?.address,
   });
 
   const account = useMemo(() => {
