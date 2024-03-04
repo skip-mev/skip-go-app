@@ -87,8 +87,8 @@
     "tailwindcss-animate": "^1.0.7",
     "tinykeys": "^2.1.0",
     "undici": "^6.6.1",
-    "viem": "1.x",
-    "wagmi": "1.x",
+    "viem": "^2.7.16",
+    "wagmi": "^2.5.7",
     "zod": "^3.22.4",
     "zustand": "^4.5.0"
   },

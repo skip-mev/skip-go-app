@@ -1,7 +1,5 @@
 import { useWallet, useWalletClient as useCosmosWalletClient } from "@cosmos-kit/react";
 import { ComponentProps, useEffect, useMemo } from "react";
-import toast from "react-hot-toast";
-import { useConnect } from "wagmi";
 import { create } from "zustand";
 
 import { MergedWalletClient } from "@/lib/cosmos-kit";
@@ -80,35 +78,9 @@ const EvmWalletListItem = ({
 }: ComponentProps<"div"> & {
   walletName: string;
 }) => {
-  const { connectors } = useConnect({
-    onError: (err) => {
-      toast.error(
-        <p>
-          <strong>Failed to connect!</strong>
-          <br />
-          {err.name}: {err.message}
-        </p>,
-      );
-    },
-  });
-
-  const connector = useMemo(() => {
-    return connectors.find((c) => c.id === walletName);
-  }, [connectors, walletName]);
-
-  const show = useMemo(() => {
-    return connector?.ready ?? false;
-  }, [connector?.ready]);
-
   useEffect(() => {
-    const unregister = () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      useStore.setState(({ [walletName]: _, ...latest }) => latest, true);
-    };
-    if (show) useStore.setState({ [walletName]: true });
-    else unregister();
-    return unregister;
-  }, [show, walletName]);
+    useStore.setState({ [walletName]: true });
+  }, [walletName]);
 
-  return <div {...props}>{show ? children : null}</div>;
+  return <div {...props}>{children}</div>;
 };

@@ -8,8 +8,7 @@ import { formatUnits } from "viem";
 import {
   useAccount as useWagmiAccount,
   useDisconnect as useWagmiDisconnect,
-  useNetwork as useWagmiNetwork,
-  useSwitchNetwork as useWagmiSwitchNetwork,
+  useSwitchChain as useWagmiSwitchNetwork,
 } from "wagmi";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
@@ -51,11 +50,12 @@ export function useSwapWidget() {
   const srcAccount = useAccount("source");
 
   const { getWalletRepo } = useCosmosManager();
-  const { connector } = useWagmiAccount();
-  const { chain: evmChain } = useWagmiNetwork();
-  const { switchNetworkAsync } = useWagmiSwitchNetwork({
-    onError: (error) => {
-      toast.error(`Network switch error: ${error.message}`);
+  const { connector, chain: evmChain } = useWagmiAccount();
+  const { switchChainAsync: switchNetworkAsync } = useWagmiSwitchNetwork({
+    mutation: {
+      onError: (error) => {
+        toast.error(`Network switch error: ${error.message}`);
+      },
     },
   });
   const { disconnect } = useWagmiDisconnect();
@@ -631,7 +631,7 @@ export function useSwapWidget() {
           if (evmChain && connector) {
             try {
               if (switchNetworkAsync && evmChain.id !== +srcChain.chainID) {
-                await switchNetworkAsync(+srcChain.chainID);
+                await switchNetworkAsync({ chainId: +srcChain.chainID });
               }
               trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
             } catch (error) {
@@ -693,7 +693,7 @@ export function useSwapWidget() {
           if (evmChain && connector) {
             try {
               if (switchNetworkAsync && evmChain.id !== +dstChain.chainID && srcChain && srcChain.chainType !== "evm") {
-                await switchNetworkAsync(+dstChain.chainID);
+                await switchNetworkAsync({ chainId: +dstChain.chainID });
               }
               trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
             } catch (error) {
