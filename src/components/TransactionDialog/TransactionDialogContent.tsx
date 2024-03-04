@@ -57,6 +57,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const showEthermintLikeLedgerWarning = isEthermintLedgerInOperation(route) && srcAccount?.wallet?.isLedger;
 
   const showLedgerWarning = showCCTPLedgerWarning || showEthermintLikeLedgerWarning;
+  const isEvmtoEvm = srcAccount?.chainType === "evm" && dstAccount?.chainType === "evm";
 
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
@@ -282,6 +283,20 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
                 ibc.fun does not support signing with Ledger on Ethermint-like chains (e.g. Injective, Dymension, EVMOS,
                 etc...). We&apos;re actively working on fixing this with the Ledger team. We apologize for the
                 inconvenience.
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
+        )}
+        {isEvmtoEvm && (
+          <AlertCollapse.Root
+            type="warning"
+            initialOpen={true}
+          >
+            <AlertCollapse.Content>
+              <p>
+                <b>WARNING: </b>
+                ibc.fun only supports swapping/transferring to, from, and within the Cosmos ecosystem at this time. If
+                you&apos;re not transferring to or from a Cosmos chain, we recommend jumper.exchange
               </p>
             </AlertCollapse.Content>
           </AlertCollapse.Root>
