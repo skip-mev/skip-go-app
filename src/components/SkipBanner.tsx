@@ -7,7 +7,7 @@ import { AdaptiveLink, AdaptiveLinkProps } from "./AdaptiveLink";
 function SkipBanner({ className, ...props }: Omit<AdaptiveLinkProps, "href">) {
   return (
     <AdaptiveLink
-      href="https://skip.money/docs/frontends"
+      href="https://api-docs.skip.money"
       className={cn("overflow-hidden bg-[#FF486E] py-2 text-sm font-semibold text-white", className)}
       {...props}
     >
