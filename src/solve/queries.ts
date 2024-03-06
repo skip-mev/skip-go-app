@@ -133,8 +133,6 @@ export function useRoute({
             },
       );
 
-      console.log(route);
-
       if (!route.operations) {
         throw new Error("No route found");
       }
