@@ -10,6 +10,7 @@ import {
   kava,
   linea,
   mainnet,
+  manta,
   moonbeam,
   optimism,
   polygon,
@@ -44,4 +45,5 @@ export const EVM_CHAINS: Chain[] = [
   optimism,
   fantom,
   kava,
+  manta,
 ];
