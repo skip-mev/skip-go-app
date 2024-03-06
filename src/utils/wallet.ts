@@ -65,3 +65,26 @@ export async function isWalletClientUsingLedger<T extends MergedWalletClient>(wa
 
   return false;
 }
+
+export function isReadyToCheckLedger<T extends MergedWalletClient>(walletClient: T) {
+  if (!("client" in walletClient)) {
+    return false;
+  }
+
+  // Keplr | Leap | Okxwallet | Vectis | XDEFI
+  if ("getKey" in walletClient.client) {
+    return true;
+  }
+
+  // Station
+  if ("keplr" in walletClient.client) {
+    return true;
+  }
+
+  // Cosmostation
+  if ("cosmos" in walletClient.client) {
+    return true;
+  }
+
+  return false;
+}

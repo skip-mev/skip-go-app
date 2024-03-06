@@ -5,7 +5,7 @@ let browser: Browser;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let _mainWindow: Page;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let _keplrPopupWindow: Page;
+let _keplrPopupWindow: Page | undefined;
 let _keplrWindow: Page;
 // let metamaskNotificationWindow;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -21,6 +21,16 @@ const extensionsData: Record<
 
 export function keplrWindow() {
   return _keplrWindow;
+}
+
+export function keplrPopupWindow() {
+  return _keplrPopupWindow;
+}
+
+export function close() {
+  if (browser) {
+    browser.close();
+  }
 }
 
 export async function init(playwrightInstance?: BrowserType) {
@@ -44,6 +54,18 @@ export async function init(playwrightInstance?: BrowserType) {
   return browser.isConnected();
 }
 
+export async function watchKeplrPopupApproveWindow() {
+  while (browser) {
+    assignWindows();
+    if (_keplrPopupWindow) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await _keplrPopupWindow?.getByRole("button", { name: "Approve" }).click();
+      _keplrPopupWindow = undefined;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
+
 export async function assignActiveTabName(tabName: string) {
   _activeTabName = tabName;
 }
@@ -53,7 +75,8 @@ export async function assignWindows() {
 
   const keplrExtensionData = extensionsData.keplr;
 
-  const pages = await browser.contexts()[0].pages();
+  const pages = await browser.contexts()[0]?.pages();
+  if (!pages) return;
 
   for (const page of pages) {
     if (page.url().includes("specs/runner")) {

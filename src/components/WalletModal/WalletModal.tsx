@@ -2,6 +2,7 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import toast from "react-hot-toast";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
@@ -151,7 +152,17 @@ function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
   const { chainID, context } = useWalletModal();
   const { disconnectAsync } = useDisconnect();
-  const { connectors, connectAsync } = useConnect();
+  const { connectors, connectAsync } = useConnect({
+    onError: (err) => {
+      toast.error(
+        <p>
+          <strong>Failed to connect!</strong>
+          <br />
+          {err.name}: {err.message}
+        </p>,
+      );
+    },
+  });
   const { getWalletRepo } = useManager();
 
   const { setIsOpen } = useWalletModal();
@@ -209,8 +220,12 @@ function WalletModalWithContext() {
         },
         connect: async () => {
           if (connector.id === currentConnector?.id) return;
-          await connectAsync({ connector, chainId: Number(chainID) });
-          context && trackWallet.track(context, chainID, connector.id, chainType);
+          try {
+            await connectAsync({ connector, chainId: Number(chainID) });
+            context && trackWallet.track(context, chainID, connector.id, chainType);
+          } catch (error) {
+            console.error(error);
+          }
         },
         disconnect: async () => {
           await disconnectAsync();

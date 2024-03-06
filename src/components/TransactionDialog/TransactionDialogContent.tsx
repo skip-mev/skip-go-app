@@ -17,7 +17,7 @@ import { isCCTPLedgerBrokenInOperation, isEthermintLedgerInOperation } from "@/u
 import { randomId } from "@/utils/random";
 import { cn } from "@/utils/ui";
 
-import RouteDisplay from "../RouteDisplay";
+import { RouteDisplay } from "../RouteDisplay";
 import { SpinnerIcon } from "../SpinnerIcon";
 import TransactionSuccessView from "../TransactionSuccessView";
 import * as AlertCollapse from "./AlertCollapse";
@@ -57,6 +57,7 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const showEthermintLikeLedgerWarning = isEthermintLedgerInOperation(route) && srcAccount?.wallet?.isLedger;
 
   const showLedgerWarning = showCCTPLedgerWarning || showEthermintLikeLedgerWarning;
+  const isEvmtoEvm = srcAccount?.chainType === "evm" && dstAccount?.chainType === "evm";
 
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
@@ -196,7 +197,10 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         />
       </div>
 
-      <div className="flex-1 space-y-6">
+      <div
+        className="flex-1 space-y-6"
+        data-testid="tx-hash-list"
+      >
         {broadcastedTxs.map(({ txHash }, i) => (
           <div
             key={`tx-${i}`}
@@ -219,6 +223,8 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
                   href={broadcastedTxs[i].explorerLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-testid={`tx-hash-${i + 1}`}
+                  data-test-value={txHash}
                 >
                   <span>
                     {txHash.slice(0, 6)}
@@ -281,6 +287,20 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
             </AlertCollapse.Content>
           </AlertCollapse.Root>
         )}
+        {isEvmtoEvm && (
+          <AlertCollapse.Root
+            type="warning"
+            initialOpen={true}
+          >
+            <AlertCollapse.Content>
+              <p>
+                <b>WARNING: </b>
+                ibc.fun only supports swapping/transferring to, from, and within the Cosmos ecosystem at this time. If
+                you&apos;re not transferring to or from a Cosmos chain, we recommend jumper.exchange
+              </p>
+            </AlertCollapse.Content>
+          </AlertCollapse.Root>
+        )}
         {isAmountError && !isOngoing && !isTxComplete && (
           <p className="text-balance text-center text-sm font-medium text-red-500">
             {typeof isAmountError === "string" ? isAmountError : "Insufficient balance."}
@@ -289,7 +309,11 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         <div className="flex w-full items-center rounded-md bg-black p-3 text-left text-xs font-medium uppercase text-white/50">
           <p className="flex-1">
             This route requires{" "}
-            <span className="text-white">
+            <span
+              className="text-white"
+              data-testid="transactions-count"
+              data-test-value={transactionCount}
+            >
               {transactionCount} Transaction
               {transactionCount > 1 ? "s" : ""}
             </span>{" "}
