@@ -75,6 +75,36 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
       return;
     }
 
+    if ("hyperlaneTransfer" in operation) {
+      _actions.push({
+        type: "TRANSFER",
+        asset,
+        sourceChain: operation.hyperlaneTransfer.fromChainID,
+        destinationChain: operation.hyperlaneTransfer.toChainID,
+        id: `transfer-${transferCount}-${i}`,
+        bridgeID: operation.hyperlaneTransfer.bridgeID,
+      });
+
+      asset = operation.hyperlaneTransfer.denomIn;
+      transferCount++;
+      return;
+    }
+
+    if ("bankSend" in operation) {
+      _actions.push({
+        type: "TRANSFER",
+        asset,
+        sourceChain: operation.bankSend.chainID,
+        destinationChain: operation.bankSend.chainID,
+        id: `transfer-${transferCount}-${i}`,
+        bridgeID: "IBC",
+      });
+
+      asset = operation.bankSend.denom;
+      transferCount++;
+      return;
+    }
+
     const sourceChain = operation.transfer.chainID;
 
     let destinationChain = "";
@@ -94,6 +124,10 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
         destinationChain = nextOperation.axelarTransfer.fromChainID;
       } else if ("cctpTransfer" in nextOperation) {
         destinationChain = nextOperation.cctpTransfer.fromChainID;
+      } else if ("hyperlaneTransfer" in nextOperation) {
+        destinationChain = nextOperation.hyperlaneTransfer.fromChainID;
+      } else if ("bankSend" in nextOperation) {
+        destinationChain = nextOperation.bankSend.chainID;
       } else {
         destinationChain = nextOperation.transfer.chainID;
       }

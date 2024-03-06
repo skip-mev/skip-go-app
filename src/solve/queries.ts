@@ -233,6 +233,31 @@ export const useBroadcastedTxsStatus = ({
                 state: cctpState,
               };
             }
+            if ("hyperlaneTransfer" in transfer) {
+              const hyperlaneState: TransferState = (() => {
+                switch (transfer.hyperlaneTransfer.state) {
+                  case "HYPERLANE_TRANSFER_SENT":
+                    return "TRANSFER_PENDING";
+                  case "HYPERLANE_TRANSFER_FAILED":
+                    return "TRANSFER_FAILURE";
+                  case "HYPERLANE_TRANSFER_RECEIVED":
+                    return "TRANSFER_SUCCESS";
+                  case "HYPERLANE_TRANSFER_UNKNOWN":
+                    return "TRANSFER_UNKNOWN";
+                  default:
+                    return "TRANSFER_UNKNOWN";
+                }
+              })();
+              return {
+                srcChainID: transfer.hyperlaneTransfer.fromChainID,
+                destChainID: transfer.hyperlaneTransfer.toChainID,
+                txs: {
+                  sendTx: transfer.hyperlaneTransfer.txs.sendTx,
+                  receiveTx: transfer.hyperlaneTransfer.txs.receiveTx,
+                },
+                state: hyperlaneState,
+              };
+            }
             const axelarState: TransferState = (() => {
               switch (transfer.axelarTransfer.state) {
                 case "AXELAR_TRANSFER_PENDING_RECEIPT":
