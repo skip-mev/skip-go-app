@@ -1,3 +1,4 @@
+import { SwapVenue } from "@skip-router/core";
 import { useMemo } from "react";
 
 import { SWAP_VENUES } from "@/constants/swap-venues";
@@ -16,7 +17,7 @@ export interface SwapAction {
   sourceAsset: string;
   destinationAsset: string;
   chain: string;
-  venue: string;
+  venue: SwapVenue;
   id: string;
 }
 
@@ -37,7 +38,8 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
     return getAsset(action.destinationAsset, action.chain);
   }, [action.chain, action.destinationAsset, getAsset]);
 
-  const venue = SWAP_VENUES[action.venue];
+  // swap venue from api don't have pretty name, so we still use the name from the constant
+  const venue = SWAP_VENUES[action.venue.name];
 
   const { explorerLink, state, operationIndex, operationTypeIndex } = makeStepState({
     actions,
@@ -106,12 +108,12 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
             <span>on</span>
             <Gap.Child>
               <img
-                alt={venue.name}
+                alt={action.venue.name}
                 className="inline-block h-4 w-4"
                 onError={onImageError}
-                src={venue.imageURL}
+                src={action.venue.logoUri}
               />
-              <span className="font-semibold text-black">{venue.name}</span>
+              <span className="font-semibold text-black">{venue.prettyName}</span>
             </Gap.Child>
           </Gap.Parent>
           {explorerLink && (
@@ -147,10 +149,10 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
             <Gap.Child>
               <img
                 className="inline-block h-4 w-4"
-                src={venue.imageURL}
-                alt={venue.name}
+                src={action.venue.logoUri}
+                alt={action.venue.name}
               />
-              <span className="font-semibold text-black">{venue.name}</span>
+              <span className="font-semibold text-black">{venue.prettyName}</span>
             </Gap.Child>
           </Gap.Parent>
           {explorerLink && (
@@ -201,10 +203,10 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
             <span>on</span>
             <img
               className="inline-block h-4 w-4"
-              src={venue.imageURL}
-              alt={venue.name}
+              src={action.venue.logoUri}
+              alt={action.venue.name}
             />
-            <span className="font-semibold text-black">{venue.name}</span>
+            <span className="font-semibold text-black">{venue.prettyName}</span>
           </Gap.Child>
         </Gap.Parent>
         {explorerLink && (
