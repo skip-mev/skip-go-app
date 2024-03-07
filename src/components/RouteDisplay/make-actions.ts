@@ -21,7 +21,7 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
           destinationAsset:
             operation.swap.swapIn.swapOperations[operation.swap.swapIn.swapOperations.length - 1].denomOut,
           chain: operation.swap.swapIn.swapVenue.chainID,
-          venue: operation.swap.swapIn.swapVenue.name,
+          venue: operation.swap.swapIn.swapVenue,
           id: `SWAP-${swapCount}-${i}`,
         });
 
@@ -35,7 +35,7 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
           destinationAsset:
             operation.swap.swapOut.swapOperations[operation.swap.swapOut.swapOperations.length - 1].denomOut,
           chain: operation.swap.swapOut.swapVenue.chainID,
-          venue: operation.swap.swapOut.swapVenue.name,
+          venue: operation.swap.swapOut.swapVenue,
           id: `SWAP-${swapCount}-${i}`,
         });
 
