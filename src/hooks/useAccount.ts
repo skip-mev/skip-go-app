@@ -66,7 +66,7 @@ export function useAccount(context: TrackWalletCtx) {
               walletInfo: {
                 logo: cosmosWallet.walletInfo.logo,
               },
-              isLedger: !!cosmosWalletIsLedgerQuery.data,
+              isLedger: cosmosWalletIsLedgerQuery.data,
             }
           : undefined,
         chainType: chain.chainType,
