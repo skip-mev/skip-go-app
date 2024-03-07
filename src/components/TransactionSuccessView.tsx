@@ -41,7 +41,7 @@ const TransactionSuccessView: FC<{
           />
         </svg>
       </div>
-      <div>
+      <div data-testid="transaction-success">
         <p className="mb-4 text-3xl font-bold">{route.doesSwap ? "Swap" : "Transfer"} Successful</p>
       </div>
       <p className="pb-8 text-center font-medium text-neutral-400">

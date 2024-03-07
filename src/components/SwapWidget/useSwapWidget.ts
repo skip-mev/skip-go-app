@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { formatUnits } from "viem";
 import {
   useAccount as useWagmiAccount,
+  useDisconnect as useWagmiDisconnect,
   useNetwork as useWagmiNetwork,
   useSwitchNetwork as useWagmiSwitchNetwork,
 } from "wagmi";
@@ -52,7 +53,12 @@ export function useSwapWidget() {
   const { getWalletRepo } = useCosmosManager();
   const { connector } = useWagmiAccount();
   const { chain: evmChain } = useWagmiNetwork();
-  const { switchNetworkAsync } = useWagmiSwitchNetwork();
+  const { switchNetworkAsync } = useWagmiSwitchNetwork({
+    onError: (error) => {
+      toast.error(`Network switch error: ${error.message}`);
+    },
+  });
+  const { disconnect } = useWagmiDisconnect();
 
   const [userTouchedDstAsset, setUserTouchedDstAsset] = useState(false);
 
@@ -630,9 +636,12 @@ export function useSwapWidget() {
               trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
             } catch (error) {
               console.error(error);
+              trackWallet.untrack("source");
+              disconnect();
             }
           } else {
             trackWallet.untrack("source");
+            disconnect();
           }
         }
       },
@@ -683,15 +692,18 @@ export function useSwapWidget() {
         if (dstChain && dstChain.chainType === "evm") {
           if (evmChain && connector) {
             try {
-              if (switchNetworkAsync && evmChain.id !== +dstChain.chainID) {
+              if (switchNetworkAsync && evmChain.id !== +dstChain.chainID && srcChain && srcChain.chainType !== "evm") {
                 await switchNetworkAsync(+dstChain.chainID);
               }
               trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
             } catch (error) {
               console.error(error);
+              trackWallet.untrack("destination");
+              disconnect();
             }
           } else {
             trackWallet.untrack("destination");
+            disconnect();
           }
         }
       },
@@ -700,7 +712,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [connector, evmChain, getWalletRepo, switchNetworkAsync]);
+  }, [connector, evmChain, getWalletRepo, srcChain, switchNetworkAsync]);
 
   /**
    * sync destination chain wallet connections on track wallet level
@@ -842,5 +854,5 @@ function getRouteErrorMessage({ message }: { message: string }) {
   if (message.includes("evm native destination tokens are currently not supported")) {
     return "EVM native destination tokens are currently not supported";
   }
-  return "Route not found";
+  return message;
 }

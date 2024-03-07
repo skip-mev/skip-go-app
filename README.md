@@ -42,10 +42,15 @@ Read more on all available environment variables in [`.env.example`](.env.exampl
 - build production bundle: `npm run build`
 - run production server: `npm run start` (must run `build` first)
 
+## Testing
+
+`npm run test` will run the unit tests.
+`npm run test:e2e` will run the automated end-to-end tests. Make sure you have `WORD_PHRASE_KEY=""`(12 word phrase key) in your `.env` file. This will be used to importing the wallet and perform the tests.
+
 ## Contributing
 
 Feel free to open an issue or submit a pull request for any bugs and/or improvements.
 
 ## Contact
 
-Reach out to our [support email](mailto:support@skip.money), or join our [Discord](https://skip.money/discord) server.
+Reach out by joining our [Discord](https://skip.money/discord) server.

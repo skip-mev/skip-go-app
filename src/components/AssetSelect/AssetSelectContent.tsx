@@ -89,6 +89,7 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
           {filteredAssets.map((asset) => (
             <button
               key={`${asset.chainID}-${asset.denom}`}
+              data-testid="asset-item"
               className="flex w-full items-center gap-4 rounded-xl p-4 text-left transition-colors hover:bg-[#ECD9D9] focus:-outline-offset-2"
               onClick={() => (onClose(), onChange?.(asset))}
             >
