@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Asset } from "@skip-router/core";
+import Image from "next/image";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
@@ -35,10 +36,12 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalan
           data-testid="select-asset"
         >
           {asset && (
-            <img
-              alt={asset.recommendedSymbol}
-              className="h-6 w-6 rounded-full"
-              src={asset.logoURI}
+            <Image
+              alt={asset.recommendedSymbol || "asset symbol"}
+              height={24}
+              width={24}
+              className="h-6 w-6 rounded-full object-contain"
+              src={asset.logoURI || "/logo-fallback.png"}
               onError={(event) => (event.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
             />
           )}

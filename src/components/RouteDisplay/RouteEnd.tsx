@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { SimpleTooltip } from "../SimpleTooltip";
 
 export interface RouteEndProps {
@@ -10,9 +12,11 @@ export interface RouteEndProps {
 export const RouteEnd = ({ amount, symbol, logo, chain }: RouteEndProps) => {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-14 w-14 rounded-full border-2 border-neutral-200 bg-white p-1.5">
-        <img
-          className="h-full w-full"
+      <div className="relative h-14 w-14 rounded-full border-2 border-neutral-200 bg-white p-1.5">
+        <Image
+          height={54}
+          width={54}
+          className="object-contain"
           src={logo}
           alt={chain}
         />

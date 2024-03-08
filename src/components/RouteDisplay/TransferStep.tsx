@@ -1,4 +1,5 @@
 import { BridgeType } from "@skip-router/core";
+import Image from "next/image";
 import { useMemo } from "react";
 
 import { useAssets } from "@/context/assets";
@@ -101,9 +102,11 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
             <span>Transfer</span>
             <span>from</span>
             <Gap.Child>
-              <img
-                className="inline-block h-4 w-4"
-                src={sourceChain.logoURI}
+              <Image
+                className="inline-block h-4 w-4 object-contain"
+                height={16}
+                width={16}
+                src={sourceChain.logoURI || "/logo-fallback.png"}
                 alt={sourceChain.prettyName}
                 onError={onImageError}
               />
@@ -113,9 +116,11 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
           <Gap.Parent>
             <span>to</span>
             <Gap.Child>
-              <img
-                className="inline-block h-4 w-4"
-                src={destinationChain.logoURI}
+              <Image
+                className="inline-block h-4 w-4 object-contain"
+                height={16}
+                width={16}
+                src={destinationChain.logoURI || "/logo-fallback.png"}
                 alt={destinationChain.prettyName}
                 onError={onImageError}
               />
@@ -126,8 +131,10 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
                 <span>with</span>
                 <Gap.Child>
                   {bridge.name.toLowerCase() !== "ibc" && (
-                    <img
-                      className="inline-block h-4 w-4"
+                    <Image
+                      className="inline-block h-4 w-4 object-contain"
+                      height={16}
+                      width={16}
                       src={bridge.logoURI}
                       alt={bridge.name}
                       onError={onImageError}
@@ -164,18 +171,22 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
         <Gap.Parent>
           <span>Transfer</span>
           <Gap.Child>
-            <img
-              className="inline-block h-4 w-4"
-              src={asset.logoURI}
-              alt={asset.name}
+            <Image
+              className="inline-block h-4 w-4 object-contain"
+              height={16}
+              width={16}
+              src={asset.logoURI || "/logo-fallback.png"}
+              alt={asset.name || "asset"}
             />
             <span className="font-semibold text-black">{asset.recommendedSymbol}</span>
           </Gap.Child>
           <span>from</span>
           <Gap.Child>
-            <img
-              className="inline-block h-4 w-4"
-              src={sourceChain.logoURI}
+            <Image
+              className="inline-block h-4 w-4 object-contain"
+              height={16}
+              width={16}
+              src={sourceChain.logoURI || "/logo-fallback.png"}
               alt={sourceChain.prettyName}
               onError={onImageError}
             />
@@ -185,9 +196,11 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
         <Gap.Parent>
           <span>to</span>
           <Gap.Child>
-            <img
-              className="inline-block h-4 w-4"
-              src={destinationChain.logoURI}
+            <Image
+              className="inline-block h-4 w-4 object-contain"
+              height={16}
+              width={16}
+              src={destinationChain.logoURI || "/logo-fallback.png"}
               alt={destinationChain.prettyName}
               onError={onImageError}
             />
@@ -198,8 +211,10 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
               <span>with</span>
               <Gap.Child>
                 {bridge.name.toLowerCase() !== "ibc" && (
-                  <img
-                    className="inline-block h-4 w-4"
+                  <Image
+                    className="inline-block h-4 w-4 object-contain"
+                    height={16}
+                    width={16}
                     src={bridge.logoURI}
                     alt={bridge.name}
                     onError={onImageError}
