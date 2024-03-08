@@ -56,6 +56,15 @@ let nextConfig = {
           "uuid",
         ]
       : [],
+  images: {
+    dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
   webpack: (config, { dev, isServer }) => {
     if (dev && isServer) checkEnv();
     return config;
