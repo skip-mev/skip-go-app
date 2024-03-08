@@ -53,12 +53,10 @@ export const SwapDetails = ({
 
   const bridgingFee = useMemo(() => {
     if (hyperlaneTransferOperation) {
-      console.log(hyperlaneTransferOperation.hyperlaneTransfer);
       const { feeAmount, feeAsset, usdFeeAmount } = hyperlaneTransferOperation.hyperlaneTransfer;
       const computed = (+feeAmount / Math.pow(10, feeAsset.decimals || 6)).toLocaleString("en-US", {
         maximumFractionDigits: 6,
       });
-      console.log(feeAmount, computed);
       return { inAsset: `${computed} ${feeAsset.symbol}`, inUSD: usdFeeAmount && `${formatUSD(usdFeeAmount)}` };
     }
     if (axelarTransferOperation) {
