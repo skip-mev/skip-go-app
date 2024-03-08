@@ -104,7 +104,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
                 alt={assetOut.name || "assetOut"}
                 className="inline-block h-4 w-4 object-contain"
                 onError={onImageError}
-                src={assetOut.logoURI || "/empty-chain.png"}
+                src={assetOut.logoURI || "/logo-fallback.png"}
               />
               <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
             </Gap.Child>
@@ -147,7 +147,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
                 height={16}
                 width={16}
                 className="inline-block h-4 w-4 object-contain"
-                src={assetIn.logoURI || "/empty-chain.png"}
+                src={assetIn.logoURI || "/logo-fallback.png"}
                 alt={assetIn.name || "assetIn"}
               />
               <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span>
@@ -195,7 +195,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
               width={16}
               className="inline-block h-4 w-4 object-contain"
               onError={onImageError}
-              src={assetIn.logoURI || "/empty-chain.png"}
+              src={assetIn.logoURI || "/logo-fallback.png"}
               alt={assetIn.name || "assetIn"}
             />
 
@@ -207,7 +207,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
               height={16}
               width={16}
               className="inline-block h-4 w-4 object-contain"
-              src={assetOut.logoURI || "/empty-chain.png"}
+              src={assetOut.logoURI || "/logo-fallback.png"}
               alt={assetOut.name || "assetOut"}
             />
             <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>

@@ -32,7 +32,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
             ...chain,
             chainName: chainIdToName[chain.chainID] || chain.chainName,
             prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
-            logoURI: chain.logoURI || "/empty-chain.png",
+            logoURI: chain.logoURI || "/logo-fallback.png",
           };
         })
         .sort((chainA, chainB) => {

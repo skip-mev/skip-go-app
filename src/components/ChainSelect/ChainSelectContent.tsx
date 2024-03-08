@@ -92,7 +92,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
                   className="h-[48px] w-[48px] rounded-full object-contain"
                   width={48}
                   height={48}
-                  src={chain.logoURI || "/empty-chain.png"}
+                  src={chain.logoURI || "/logo-fallback.png"}
                 />
 
                 <div>

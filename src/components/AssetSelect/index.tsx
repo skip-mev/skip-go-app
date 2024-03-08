@@ -41,7 +41,7 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalan
               height={24}
               width={24}
               className="h-6 w-6 rounded-full object-contain"
-              src={asset.logoURI || "/empty-chain.png"}
+              src={asset.logoURI || "/logo-fallback.png"}
               onError={(event) => (event.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
             />
           )}

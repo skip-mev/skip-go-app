@@ -106,7 +106,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
                 className="inline-block h-4 w-4 object-contain"
                 height={16}
                 width={16}
-                src={sourceChain.logoURI || "/empty-chain.png"}
+                src={sourceChain.logoURI || "/logo-fallback.png"}
                 alt={sourceChain.prettyName}
                 onError={onImageError}
               />
@@ -120,7 +120,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
                 className="inline-block h-4 w-4 object-contain"
                 height={16}
                 width={16}
-                src={destinationChain.logoURI || "/empty-chain.png"}
+                src={destinationChain.logoURI || "/logo-fallback.png"}
                 alt={destinationChain.prettyName}
                 onError={onImageError}
               />
@@ -175,7 +175,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
-              src={asset.logoURI || "/empty-chain.png"}
+              src={asset.logoURI || "/logo-fallback.png"}
               alt={asset.name || "asset"}
             />
             <span className="font-semibold text-black">{asset.recommendedSymbol}</span>
@@ -186,7 +186,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
-              src={sourceChain.logoURI || "/empty-chain.png"}
+              src={sourceChain.logoURI || "/logo-fallback.png"}
               alt={sourceChain.prettyName}
               onError={onImageError}
             />
@@ -200,7 +200,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
-              src={destinationChain.logoURI || "/empty-chain.png"}
+              src={destinationChain.logoURI || "/logo-fallback.png"}
               alt={destinationChain.prettyName}
               onError={onImageError}
             />

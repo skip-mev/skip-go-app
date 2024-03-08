@@ -99,7 +99,7 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
                 width={48}
                 alt={asset.recommendedSymbol || "symbol"}
                 className="h-12 w-12 rounded-full object-contain"
-                src={asset.logoURI || "/empty-chain.png"}
+                src={asset.logoURI || "/logo-fallback.png"}
                 onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               />
               <div className="flex-1">
