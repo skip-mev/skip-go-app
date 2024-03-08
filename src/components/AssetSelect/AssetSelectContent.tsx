@@ -2,6 +2,7 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Asset } from "@skip-router/core";
 import { matchSorter } from "match-sorter";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatUnits } from "viem";
 
@@ -93,10 +94,12 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
               className="flex w-full items-center gap-4 rounded-xl p-4 text-left transition-colors hover:bg-[#ECD9D9] focus:-outline-offset-2"
               onClick={() => (onClose(), onChange?.(asset))}
             >
-              <img
-                alt={asset.recommendedSymbol}
-                className="h-12 w-12 rounded-full"
-                src={asset.logoURI}
+              <Image
+                height={48}
+                width={48}
+                alt={asset.recommendedSymbol || "symbol"}
+                className="h-12 w-12 rounded-full object-contain"
+                src={asset.logoURI || "/empty-chain.png"}
                 onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
               />
               <div className="flex-1">

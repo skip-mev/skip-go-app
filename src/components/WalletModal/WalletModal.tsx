@@ -2,6 +2,7 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import Image from "next/image";
 import toast from "react-hot-toast";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
@@ -104,9 +105,11 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
                 onClick={() => onWalletConnect(wallet)}
               >
                 {wallet.walletInfo.logo && (
-                  <img
+                  <Image
+                    height={36}
+                    width={36}
                     alt={wallet.walletPrettyName}
-                    className="h-9 w-9"
+                    className="h-9 w-9 object-contain"
                     src={
                       typeof wallet.walletInfo.logo === "string" ? wallet.walletInfo.logo : wallet.walletInfo.logo.major
                     }

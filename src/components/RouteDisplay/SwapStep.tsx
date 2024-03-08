@@ -1,4 +1,5 @@
 import { SwapVenue } from "@skip-router/core";
+import Image from "next/image";
 import { useMemo } from "react";
 
 import { SWAP_VENUES } from "@/constants/swap-venues";
@@ -97,19 +98,23 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
           <Gap.Parent className="text-sm text-neutral-500">
             <span>Swap to</span>
             <Gap.Child>
-              <img
-                alt={assetOut.name}
-                className="inline-block h-4 w-4"
+              <Image
+                height={16}
+                width={16}
+                alt={assetOut.name || "assetOut"}
+                className="inline-block h-4 w-4 object-contain"
                 onError={onImageError}
-                src={assetOut.logoURI}
+                src={assetOut.logoURI || "/empty-chain.png"}
               />
               <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
             </Gap.Child>
             <span>on</span>
             <Gap.Child>
-              <img
+              <Image
+                height={16}
+                width={16}
                 alt={action.venue.name}
-                className="inline-block h-4 w-4"
+                className="inline-block h-4 w-4 object-contain"
                 onError={onImageError}
                 src={action.venue.logoUri}
               />
@@ -138,16 +143,18 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
           <Gap.Parent className="text-sm text-neutral-500">
             <span>Swap</span>
             <Gap.Child>
-              <img
-                className="inline-block h-4 w-4"
-                src={assetIn.logoURI}
-                alt={assetIn.name}
+              <Image
+                height={16}
+                width={16}
+                className="inline-block h-4 w-4 object-contain"
+                src={assetIn.logoURI || "/empty-chain.png"}
+                alt={assetIn.name || "assetIn"}
               />
               <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span>
             </Gap.Child>
             <span>on</span>
             <Gap.Child>
-              <img
+              <Image
                 className="inline-block h-4 w-4"
                 src={action.venue.logoUri}
                 alt={action.venue.name}
@@ -183,28 +190,37 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
         <Gap.Parent className="text-sm text-neutral-500">
           <span>Swap</span>
           <Gap.Child>
-            <img
-              className="inline-block h-4 w-4"
-              src={assetIn.logoURI}
-              alt={assetIn.name}
+            <Image
+              height={16}
+              width={16}
+              className="inline-block h-4 w-4 object-contain"
+              onError={onImageError}
+              src={assetIn.logoURI || "/empty-chain.png"}
+              alt={assetIn.name || "assetIn"}
             />
+
             <span className="font-semibold text-black">{assetIn.recommendedSymbol}</span>
           </Gap.Child>
           <span>for</span>
           <Gap.Child>
-            <img
-              className="inline-block h-4 w-4"
-              src={assetOut.logoURI}
-              alt={assetOut.name}
+            <Image
+              height={16}
+              width={16}
+              className="inline-block h-4 w-4 object-contain"
+              src={assetOut.logoURI || "/empty-chain.png"}
+              alt={assetOut.name || "assetOut"}
             />
             <span className="font-semibold text-black">{assetOut.recommendedSymbol}</span>
           </Gap.Child>
           <Gap.Child>
             <span>on</span>
-            <img
-              className="inline-block h-4 w-4"
-              src={action.venue.logoUri}
+            <Image
+              height={16}
+              width={16}
               alt={action.venue.name}
+              className="inline-block h-4 w-4 object-contain"
+              onError={onImageError}
+              src={action.venue.logoUri}
             />
             <span className="font-semibold text-black">{venue.prettyName}</span>
           </Gap.Child>
