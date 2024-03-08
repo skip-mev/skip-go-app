@@ -3,7 +3,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 const defaultValues = {
   confirmSwapDialog: false,
-  contactDialog: false,
   historyDialog: false,
   priceImpactDialog: false,
   settingsDialog: false,
