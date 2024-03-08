@@ -45,16 +45,31 @@ export const SwapDetails = ({
       if ("axelarTransfer" in op) return op;
     }
   }, [route]);
+  const hyperlaneTransferOperation = useMemo(() => {
+    for (const op of route.operations) {
+      if ("hyperlaneTransfer" in op) return op;
+    }
+  }, [route]);
 
   const bridgingFee = useMemo(() => {
-    if (!axelarTransferOperation) return;
-    const { feeAmount, feeAsset, usdFeeAmount } = axelarTransferOperation.axelarTransfer;
-    const computed = (+feeAmount / Math.pow(10, feeAsset.decimals || 18)).toLocaleString("en-US", {
-      maximumFractionDigits: 6,
-    });
+    if (hyperlaneTransferOperation) {
+      console.log(hyperlaneTransferOperation.hyperlaneTransfer);
+      const { feeAmount, feeAsset, usdFeeAmount } = hyperlaneTransferOperation.hyperlaneTransfer;
+      const computed = (+feeAmount / Math.pow(10, feeAsset.decimals || 6)).toLocaleString("en-US", {
+        maximumFractionDigits: 6,
+      });
+      console.log(feeAmount, computed);
+      return { inAsset: `${computed} ${feeAsset.symbol}`, inUSD: usdFeeAmount && `${formatUSD(usdFeeAmount)}` };
+    }
+    if (axelarTransferOperation) {
+      const { feeAmount, feeAsset, usdFeeAmount } = axelarTransferOperation.axelarTransfer;
+      const computed = (+feeAmount / Math.pow(10, feeAsset.decimals || 18)).toLocaleString("en-US", {
+        maximumFractionDigits: 6,
+      });
 
-    return { inAsset: `${computed} ${feeAsset.symbol}`, inUSD: `${formatUSD(usdFeeAmount)}` };
-  }, [axelarTransferOperation]);
+      return { inAsset: `${computed} ${feeAsset.symbol}`, inUSD: `${formatUSD(usdFeeAmount)}` };
+    }
+  }, [axelarTransferOperation, hyperlaneTransferOperation]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
