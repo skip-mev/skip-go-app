@@ -88,7 +88,7 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
               >
                 <img
                   alt={chain.prettyName}
-                  className="h-12 w-12 rounded-full"
+                  className="h-12 w-12 rounded-full object-contain"
                   src={chain.logoURI}
                   onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
                 />
