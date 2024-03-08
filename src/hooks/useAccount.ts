@@ -40,7 +40,7 @@ export function useAccount(context: TrackWalletCtx) {
       { context, cosmosWallet: cosmosWallet?.walletName, address: cosmosWallet?.address, chainID: chain?.chainID },
     ],
     queryFn: () => {
-      if (!cosmosWallet?.client || !chain) return;
+      if (!cosmosWallet?.client || !chain) return null;
       return getIsLedger(cosmosWallet.client, chain.chainID);
     },
     enabled:
