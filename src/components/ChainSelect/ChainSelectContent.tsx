@@ -1,6 +1,7 @@
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { matchSorter } from "match-sorter";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Chain } from "@/hooks/useChains";
@@ -86,12 +87,14 @@ function ChainSelectContent({ chains, onChange, onClose }: Props) {
                 onClick={() => onChange(chain)}
                 data-testid="chain-item"
               >
-                <img
+                <Image
                   alt={chain.prettyName}
-                  className="h-12 w-12 rounded-full object-contain"
-                  src={chain.logoURI}
-                  onError={(e) => (e.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
+                  className="h-[48px] w-[48px] rounded-full object-contain"
+                  width={48}
+                  height={48}
+                  src={chain.logoURI || "/empty-chain.png"}
                 />
+
                 <div>
                   <p className="text-lg font-semibold">{chain.prettyName}</p>
                   <p className="text-sm text-neutral-500">{chain.chainID}</p>
