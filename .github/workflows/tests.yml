@@ -22,14 +22,23 @@ jobs:
         run: npm run lint
 
       - name: Test
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: npm test
 
   "e2e-tests":
-    timeout-minutes: 60
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.38.0-jammy
     steps:
+      - name: Waiting for 200 from the Vercel Preview
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        id: waitFor200
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          check_interval: 15
+          max_timeout: 1200
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -43,6 +52,12 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
+        env:
+          WORD_PHRASE_KEY: ${{ secrets.WORD_PHRASE_KEY }}
+          POLKACHU_USER: ${{ secrets.WORD_PHRASE_KEY }}
+          POLKACHU_PASSWORD: ${{ secrets.POLKACHU_PASSWORD }}
+          NEXT_PUBLIC_EDGE_CONFIG: ${{ secrets.NEXT_PUBLIC_EDGE_CONFIG }}
+          PLAYWRIGHT_TEST_BASE_URL: ${{ steps.waitFor200.outputs.url }}
         run: xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npm run test:e2e
       - uses: actions/upload-artifact@v3
         if: always()

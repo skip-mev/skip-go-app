@@ -103,16 +103,16 @@ const makeActionsTest = async (_route: RouteArgs) => {
 
 test("make-actions: Cosmoshub ATOM -> Akash AKT", async () => {
   await makeActionsTest(cosmosHubAtomToAkashAKT);
-});
+}, 30000);
 
 test("make-actions: Cosmoshub ATOM to Akash ATOM", async () => {
   await makeActionsTest(cosmoshubATOMToAkashATOM);
-});
+}, 30000);
 
 test("make-actions: Noble USDC to Ethereum USDC", async () => {
   await makeActionsTest(nobleUSDCToEthereumUSDC);
-});
+}, 30000);
 
 test("make-actions: Cosmoshub ATOM to Arbitrum ARB", async () => {
   await makeActionsTest(cosmoshubATOMToArbitrumARB);
-});
+}, 30000);
