@@ -11,7 +11,6 @@ import { cn } from "@/utils/ui";
 import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
-import { ContactDialog } from "../ContactDialog";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
 import { JsonDialog } from "../JsonDialog";
@@ -297,7 +296,6 @@ export function SwapWidget() {
             </div>
           )}
         </div>
-        <ContactDialog />
         <HistoryDialog />
         <SettingsDialog />
         <JsonDialog />
