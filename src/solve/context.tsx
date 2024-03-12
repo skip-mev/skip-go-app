@@ -2,10 +2,12 @@ import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
 import { getWalletClient } from "@wagmi/core";
 import { createContext, ReactNode } from "react";
+import { WalletClient } from "viem";
 
 import { chainIdToName } from "@/chains/types";
 import { API_URL, appUrl } from "@/constants/api";
 import { trackWallet } from "@/context/track-wallet";
+import { config } from "@/lib/wagmi";
 import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
 export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
@@ -54,9 +56,9 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       return wallet.offlineSigner;
     },
     getEVMSigner: async (chainID) => {
-      const evmWalletClient = await getWalletClient({
+      const evmWalletClient = (await getWalletClient(config, {
         chainId: parseInt(chainID),
-      });
+      })) as WalletClient;
 
       if (!evmWalletClient) {
         throw new Error(`getEVMSigner error: no wallet client available for chain ${chainID}`);

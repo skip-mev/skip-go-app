@@ -1,14 +1,56 @@
-import { configureChains, createConfig } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
-import { publicProvider } from "wagmi/providers/public";
+import { http } from "viem";
+import { createConfig } from "wagmi";
+import {
+  arbitrum,
+  avalanche,
+  base,
+  bsc,
+  celo,
+  fantom,
+  filecoin,
+  kava,
+  linea,
+  mainnet,
+  manta,
+  moonbeam,
+  optimism,
+  polygon,
+  polygonMumbai,
+} from "wagmi/chains";
 
-import { EVM_CHAINS } from "@/constants/wagmi";
-
-const { publicClient, chains } = configureChains(EVM_CHAINS, [publicProvider()]);
-
-export const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors: [new MetaMaskConnector({ chains }), new InjectedConnector({ chains })],
-  publicClient,
+export const config = createConfig({
+  chains: [
+    arbitrum,
+    avalanche,
+    base,
+    bsc,
+    celo,
+    fantom,
+    filecoin,
+    kava,
+    linea,
+    mainnet,
+    manta,
+    moonbeam,
+    optimism,
+    polygon,
+    polygonMumbai,
+  ],
+  transports: {
+    [arbitrum.id]: http(),
+    [avalanche.id]: http(),
+    [base.id]: http(),
+    [bsc.id]: http(),
+    [celo.id]: http(),
+    [fantom.id]: http(),
+    [filecoin.id]: http(),
+    [kava.id]: http(),
+    [linea.id]: http(),
+    [mainnet.id]: http(),
+    [manta.id]: http(),
+    [moonbeam.id]: http(),
+    [optimism.id]: http(),
+    [polygon.id]: http(),
+    [polygonMumbai.id]: http(),
+  },
 });

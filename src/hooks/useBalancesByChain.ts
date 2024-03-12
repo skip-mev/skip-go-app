@@ -1,8 +1,9 @@
 import { Asset, SkipRouter } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
-import { erc20ABI, PublicClient, usePublicClient } from "wagmi";
+import { createPublicClient, erc20Abi, http, PublicClient } from "viem";
 
 import { multicall3ABI } from "@/constants/abis";
+import { EVM_CHAINS } from "@/constants/wagmi";
 import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
 import { getCosmWasmClientForChainID, getStargateClientForChainID } from "@/utils/clients";
@@ -15,9 +16,9 @@ interface Args {
 }
 
 export function useBalancesByChain({ address, chain, assets, enabled = true }: Args) {
-  const publicClient = usePublicClient({
-    chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
-  });
+  // const publicClient = usePublicClient({
+  //   chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
+  // });
 
   const skipClient = useSkipClient();
 
@@ -29,6 +30,10 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
       }
 
       if (chain.chainType === "evm") {
+        const publicClient = createPublicClient({
+          chain: EVM_CHAINS.find((i) => i.id === Number(chain.chainID)),
+          transport: http(),
+        });
         return getEvmChainBalances(skipClient, publicClient, address, chain.chainID);
       }
 
@@ -93,7 +98,7 @@ export async function getEvmChainBalances(
     contracts: chainAssets.map((asset) => {
       if (!asset.tokenContract) {
         return {
-          address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+          address: "0xcA11bde05977b3631167028862bE2a173976CA11" as `0x${string}`,
           abi: multicall3ABI,
           functionName: "getEthBalance",
           args: [address as `0x${string}`],
@@ -102,13 +107,12 @@ export async function getEvmChainBalances(
 
       return {
         address: asset.tokenContract as `0x${string}`,
-        abi: erc20ABI,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [address as `0x${string}`],
       };
     }),
   });
-
   return chainAssets.reduce<Record<string, string>>(
     (acc, asset, i) => ({
       ...acc,

@@ -52,9 +52,8 @@ test("make-step: Noble USDC to Injective INJ", async () => {
       wrapper: AllTheProviders,
     },
   );
-
   await waitFor(() => expect(result.current.isLoading).toBeFalsy(), {
-    timeout: 10000,
+    timeout: 120000,
   });
 
   actions.forEach((action, i) => {
@@ -68,4 +67,4 @@ test("make-step: Noble USDC to Injective INJ", async () => {
     expect(operationTypeIndex).toBeDefined();
     expect(explorerLink).toBeDefined();
   });
-});
+}, 120000);

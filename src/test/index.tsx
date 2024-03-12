@@ -3,13 +3,13 @@ import { ChainProvider } from "@cosmos-kit/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Queries, queries, render, RenderOptions } from "@testing-library/react";
 import React, { ComponentProps, FC, Fragment, PropsWithChildren } from "react";
-import { WagmiConfig } from "wagmi";
+import { WagmiProvider } from "wagmi";
 
 import { getAssetLists, getChains } from "@/chains";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { AssetsProvider } from "@/context/assets";
 import { queryClient } from "@/lib/react-query";
-import { wagmiConfig } from "@/lib/wagmi";
+import { config } from "@/lib/wagmi";
 import { SkipProvider } from "@/solve";
 
 type ChainProviderProps = ComponentProps<typeof ChainProvider>;
@@ -29,13 +29,13 @@ export const AllTheProviders: FC<PropsWithChildren> = ({ children }) => {
           logLevel="NONE"
           walletModal={() => <div></div>}
         >
-          <WagmiConfig config={wagmiConfig}>
+          <WagmiProvider config={config}>
             <SkipProvider>
               <WalletModalProvider>
                 <AssetsProvider>{children}</AssetsProvider>
               </WalletModalProvider>
             </SkipProvider>
-          </WagmiConfig>
+          </WagmiProvider>
         </ChainProvider>
       </QueryClientProvider>
     </Fragment>

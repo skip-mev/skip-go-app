@@ -8,7 +8,6 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { chainIdToName } from "@/chains/types";
 import { DialogContent } from "@/components/Dialog";
-import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 import { cn } from "@/utils/ui";
@@ -156,14 +155,16 @@ function WalletModalWithContext() {
   const { chainID, context } = useWalletModal();
   const { disconnectAsync } = useDisconnect();
   const { connectors, connectAsync } = useConnect({
-    onError: (err) => {
-      toast.error(
-        <p>
-          <strong>Failed to connect!</strong>
-          <br />
-          {err.name}: {err.message}
-        </p>,
-      );
+    mutation: {
+      onError: (err) => {
+        toast.error(
+          <p>
+            <strong>Failed to connect!</strong>
+            <br />
+            {err.name}: {err.message}
+          </p>,
+        );
+      },
     },
   });
   const { getWalletRepo } = useManager();
@@ -212,14 +213,11 @@ function WalletModalWithContext() {
         continue;
       }
 
-      const logoUrl =
-        INJECTED_EVM_WALLET_LOGOS[connector.name] || EVM_WALLET_LOGOS[connector.id] || EVM_WALLET_LOGOS.injected;
-
       const minimalWallet: MinimalWallet = {
         walletName: connector.id,
         walletPrettyName: connector.name,
         walletInfo: {
-          logo: logoUrl,
+          logo: connector.icon,
         },
         connect: async () => {
           if (connector.id === currentConnector?.id) return;
