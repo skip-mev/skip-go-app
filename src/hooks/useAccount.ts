@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { EVM_WALLET_LOGOS, INJECTED_EVM_WALLET_LOGOS } from "@/constants/wagmi";
 import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
 import { isReadyToCheckLedger, isWalletClientUsingLedger } from "@/utils/wallet";
@@ -40,7 +39,7 @@ export function useAccount(context: TrackWalletCtx) {
       { context, cosmosWallet: cosmosWallet?.walletName, address: cosmosWallet?.address, chainID: chain?.chainID },
     ],
     queryFn: () => {
-      if (!cosmosWallet?.client || !chain) return;
+      if (!cosmosWallet?.client || !chain) return null;
       return getIsLedger(cosmosWallet.client, chain.chainID);
     },
     enabled:
@@ -91,10 +90,7 @@ export function useAccount(context: TrackWalletCtx) {
               walletName: wagmiAccount.connector.id,
               walletPrettyName: wagmiAccount.connector.name,
               walletInfo: {
-                logo:
-                  wagmiAccount.connector.id === "injected"
-                    ? INJECTED_EVM_WALLET_LOGOS[wagmiAccount.connector.name]
-                    : EVM_WALLET_LOGOS[wagmiAccount.connector.id],
+                logo: wagmiAccount.connector.icon,
               },
             }
           : undefined,
