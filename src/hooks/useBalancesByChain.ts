@@ -1,8 +1,11 @@
 import { Asset, SkipRouter } from "@skip-router/core";
+import * as token from "@solana/spl-token";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { createPublicClient, erc20Abi, http, PublicClient } from "viem";
 
 import { multicall3ABI } from "@/constants/abis";
+import { appUrl } from "@/constants/api";
 import { EVM_CHAINS } from "@/constants/wagmi";
 import { Chain } from "@/hooks/useChains";
 import { useSkipClient } from "@/solve";
@@ -36,8 +39,12 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
         });
         return getEvmChainBalances(skipClient, publicClient, address, chain.chainID);
       }
-
-      return getBalancesByChain(address, chain.chainID, assets ?? []);
+      if (chain.chainType === "cosmos") {
+        return getBalancesByChain(address, chain.chainID, assets ?? []);
+      }
+      if (chain.chainType === "svm") {
+        return getSvmChainBalances(address, chain.chainID, assets ?? []);
+      }
     },
     enabled: !!chain && !!address && enabled,
   });
@@ -121,3 +128,49 @@ export async function getEvmChainBalances(
     {},
   );
 }
+
+export const getSvmChainBalances = async (address: string, chainID: string, assets: Asset[]) => {
+  const rpc = `${appUrl}/api/rpc/${chainID}`;
+  const connection = new Connection(rpc);
+  // get SOL balance
+  const solBalance = await connection.getBalance(new PublicKey(address));
+  // solana-devnet
+  const allBalances: Record<string, string> = {};
+  if (chainID === "solana-devnet") {
+    allBalances["solana-devnet-native"] = solBalance.toString();
+  }
+
+  const _splTokenBalances = await Promise.all(
+    assets
+      .filter((i) => i.denom !== "solana-devnet-native")
+      .map(async (asset) => {
+        try {
+          const tokenAddress = await token.getAssociatedTokenAddress(
+            new PublicKey(asset.denom),
+            new PublicKey(address),
+          );
+          const tokenBalance = await token.getAccount(connection, tokenAddress);
+          return {
+            denom: asset.denom,
+            amount: tokenBalance.amount.toString(),
+          };
+        } catch (e) {
+          return e;
+        }
+      }),
+  );
+  console.log("sss", _splTokenBalances);
+  const splTokenBalances = _splTokenBalances.filter((result) => !(result instanceof Error)) as {
+    denom: string;
+    amount: string;
+  }[];
+
+  console.log("spl", splTokenBalances);
+
+  splTokenBalances.forEach((balance) => {
+    if (balance instanceof Error) return;
+    allBalances[balance.denom] = balance.amount;
+  });
+
+  return allBalances;
+};

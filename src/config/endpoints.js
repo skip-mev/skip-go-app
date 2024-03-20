@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @typedef {{ endpoint: string | undefined; isPrivate: boolean } | undefined} EndpointConfig
+ * @typedef {{ endpoint: string | undefined; isPrivate: boolean; isApiKey?: boolean } | undefined} EndpointConfig
  */
 
 /**
@@ -16,6 +16,21 @@
 exports.getWhitelabelEndpoint = (chainID, type) => {
   /** @type {string | undefined} */
   let endpoint;
+
+  if (chainID === "solana-devnet") {
+    return {
+      endpoint: "https://devnet.helius-rpc.com",
+      isPrivate: false,
+      isApiKey: true,
+    };
+  }
+  if (chainID === "solana-mainnet") {
+    return {
+      endpoint: "https://mainnet.helius-rpc.com",
+      isPrivate: false,
+      isApiKey: true,
+    };
+  }
 
   if (type === "api") {
     endpoint = exports.CUSTOM_API_CHAIN_IDS[chainID];

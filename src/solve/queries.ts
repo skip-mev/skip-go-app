@@ -27,6 +27,7 @@ export function useAssets(options: AssetsRequest = {}) {
       return skipClient.assets({
         includeEvmAssets: true,
         includeCW20Assets: true,
+        includeSvmAssets: true,
         ...options,
       });
     },
