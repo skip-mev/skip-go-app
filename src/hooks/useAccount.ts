@@ -1,5 +1,6 @@
 import { WalletClient } from "@cosmos-kit/core";
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
@@ -21,6 +22,8 @@ export function useAccount(context: TrackWalletCtx) {
   }, [chain?.chainName, chain?.chainType, getWalletRepo, trackedWallet?.walletName]);
 
   const wagmiAccount = useWagmiAccount();
+
+  const { wallets } = useWallet();
 
   const getIsLedger = async (client: WalletClient, chainId: string) => {
     const isLedger = await isWalletClientUsingLedger(client, chainId);
@@ -107,7 +110,43 @@ export function useAccount(context: TrackWalletCtx) {
         },
       };
     }
-  }, [chain, context, cosmosWallet, trackedWallet, wagmiAccount, cosmosWalletIsLedgerQuery.data]);
-
+    if (chain.chainType === "svm") {
+      const solanaWallet = wallets.find((w) => w.adapter.name === trackedWallet?.walletName);
+      return {
+        address: solanaWallet?.adapter.publicKey?.toBase58(),
+        isWalletConnected: solanaWallet?.adapter.connected && !solanaWallet.adapter.connecting,
+        wallet: solanaWallet
+          ? {
+              walletName: solanaWallet.adapter.name,
+              walletPrettyName: solanaWallet.adapter.name,
+              walletInfo: {
+                logo: solanaWallet.adapter.icon,
+              },
+            }
+          : undefined,
+        chainType: chain.chainType,
+        connect: () => {
+          return solanaWallet?.adapter.connect().then(() => {
+            trackWallet.track(context, chain.chainID, solanaWallet.adapter.name, chain.chainType);
+          });
+        },
+        disconnect: () => {
+          return solanaWallet?.adapter.disconnect().then(() => {
+            trackWallet.untrack(context);
+          });
+        },
+      };
+    }
+  }, [
+    trackedWallet,
+    chain,
+    cosmosWallet,
+    cosmosWalletIsLedgerQuery.data,
+    context,
+    wagmiAccount.address,
+    wagmiAccount.isConnected,
+    wagmiAccount.connector,
+    wallets,
+  ]);
   return account;
 }
