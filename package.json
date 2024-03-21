@@ -13,9 +13,9 @@
     "start": "next start",
     "test": "node --experimental-vm-modules --no-warnings ./node_modules/.bin/jest",
     "test:e2e": "playwright test transactions.spec.ts --project=chromium",
-    "test:e2e-1": "playwright test 1nobleUSDCToInjectiveINJ.spec.spec.ts --project=chromium",
-    "test:e2e-2": "playwright test 2injectiveINJToCosmoshubATOM.spec.spec.ts --project=chromium",
-    "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.spec.ts --project=chromium",
+    "test:e2e-1": "playwright test 1nobleUSDCToInjectiveINJ.spec.ts --project=chromium",
+    "test:e2e-2": "playwright test 2injectiveINJToCosmoshubATOM.spec.ts --project=chromium",
+    "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.ts --project=chromium",
     "visdeps": "bash ./src/scripts/visdeps.sh"
   },
   "overrides": {
