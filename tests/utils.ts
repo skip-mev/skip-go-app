@@ -54,8 +54,7 @@ export async function expectPageLoaded(page: Page) {
     height: 1080,
     width: 1920,
   });
-  // @ts-expect-error - playwright types are not up to date
-  await page.goto(process.env.PLAYWRIGHT_TEST_BASE_URL);
+  await page.goto(process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000");
   await test.expect(page.getByRole("button", { name: "Cosmos Hub" })).toBeVisible({
     timeout: 5000,
   });
