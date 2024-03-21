@@ -105,6 +105,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
               >
                 {wallet.walletInfo.logo && (
                   <Image
+                    unoptimized
                     height={36}
                     width={36}
                     alt={wallet.walletPrettyName}

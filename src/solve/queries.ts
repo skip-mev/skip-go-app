@@ -119,6 +119,7 @@ export function useRoute({
               allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
+              rapidRelay: true,
             }
           : {
               amountOut: amount,
@@ -130,6 +131,7 @@ export function useRoute({
               allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
+              rapidRelay: true,
             },
       );
 
@@ -139,7 +141,8 @@ export function useRoute({
 
       return route;
     },
-    refetchInterval: refetchCount < 10 ? 1000 * 5 : false,
+    refetchInterval: refetchCount < 10 ? 1000 * 10 : false,
+    retry: 1,
     enabled:
       enabled &&
       !!sourceAsset &&
