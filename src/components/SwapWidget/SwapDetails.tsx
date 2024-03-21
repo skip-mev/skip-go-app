@@ -69,6 +69,33 @@ export const SwapDetails = ({
     }
   }, [axelarTransferOperation, hyperlaneTransferOperation]);
 
+  const isRapidRelay = route.estimatedFees?.some((fee) => fee.feeType === "RAPID_RELAY");
+
+  const rapidRelayFee = useMemo(() => {
+    if (!isRapidRelay) return;
+    const fee = route.estimatedFees.filter((fee) => fee.feeType === "RAPID_RELAY");
+    const sameAsset = fee.every((fee, i, arr) => fee.originAsset.symbol === arr[0].originAsset.symbol);
+    if (!sameAsset) return;
+    const computedAmount = fee.reduce((acc, fee) => acc + Number(fee.amount), 0);
+    const computedUsd = fee.reduce((acc, fee) => acc + Number(fee.usdAmount), 0);
+    const inAsset = (computedAmount / Math.pow(10, fee[0].originAsset.decimals || 6)).toLocaleString("en-US", {
+      maximumFractionDigits: 6,
+    });
+
+    return {
+      amount: Number(inAsset),
+      inAsset: `${inAsset} ${fee[0].originAsset.symbol}`,
+      inUSD: `${formatUSD(computedUsd)}`,
+    };
+  }, [isRapidRelay, route.estimatedFees]);
+
+  const totalAmountOut = useMemo(() => {
+    if (isRapidRelay) {
+      return String(parseFloat(amountOut) + (rapidRelayFee?.amount || 0));
+    }
+    return amountOut;
+  }, [amountOut, isRapidRelay, rapidRelayFee?.amount]);
+
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
   }
@@ -89,7 +116,7 @@ export const SwapDetails = ({
           srcAsset={sourceAsset}
           destAsset={destinationAsset}
           amountIn={amountIn}
-          amountOut={amountOut}
+          amountOut={totalAmountOut}
         >
           {({ left, right, conversion, toggle }) => (
             <div>
@@ -195,11 +222,24 @@ export const SwapDetails = ({
             </SimpleTooltip>
             {parseFloat(gasAmount).toLocaleString()}
           </dd> */}
-          <dt>Bridging Fee</dt>
-          <dd>
-            {bridgingFee?.inAsset ?? "-"}{" "}
-            <span className="text-sm tabular-nums text-neutral-400">{bridgingFee?.inUSD ?? "-"}</span>
-          </dd>
+          {bridgingFee && (
+            <>
+              <dt>Bridging Fee</dt>
+              <dd>
+                {bridgingFee?.inAsset ?? "-"}{" "}
+                <span className="text-sm tabular-nums text-neutral-400">{bridgingFee?.inUSD ?? "-"}</span>
+              </dd>
+            </>
+          )}
+          {rapidRelayFee && (
+            <>
+              <dt>Relayer Fee</dt>
+              <dd>
+                {rapidRelayFee?.inAsset ?? "-"}{" "}
+                <span className="text-sm tabular-nums text-neutral-400">{rapidRelayFee?.inUSD ?? "-"}</span>
+              </dd>
+            </>
+          )}
         </dl>
       </Collapsible.Content>
     </Collapsible.Root>
