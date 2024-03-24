@@ -121,7 +121,7 @@ export function useSwapWidget() {
     assets: srcAssets,
     enabled: !isAnyDisclosureOpen,
   });
-  console.log("srcAssets", srcAssets);
+  console.log("balances", isAnyDisclosureOpen, balances);
 
   const customGasAmount = useSettingsStore((state) => state.customGasAmount);
 
@@ -143,6 +143,7 @@ export function useSwapWidget() {
     if (!amountIn || !balances || !srcAsset) {
       return false;
     }
+    console.log("isAmountError", amountIn, srcAsset, balances);
 
     const parsedAmount = BigNumber(amountIn || "0");
     const parsedBalance = BigNumber(balances[srcAsset.denom] ?? "0").shiftedBy(-(srcAsset.decimals ?? 6));

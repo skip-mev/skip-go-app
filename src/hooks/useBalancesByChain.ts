@@ -139,6 +139,10 @@ export const getSvmChainBalances = async (address: string, chainID: string, asse
   if (chainID === "solana-devnet") {
     allBalances["solana-devnet-native"] = solBalance.toString();
   }
+  // solana-mainnet
+  if (chainID === "solana") {
+    allBalances["solana-native"] = solBalance.toString();
+  }
 
   const _splTokenBalances = await Promise.all(
     assets
@@ -159,13 +163,10 @@ export const getSvmChainBalances = async (address: string, chainID: string, asse
         }
       }),
   );
-  console.log("sss", _splTokenBalances);
   const splTokenBalances = _splTokenBalances.filter((result) => !(result instanceof Error)) as {
     denom: string;
     amount: string;
   }[];
-
-  console.log("spl", splTokenBalances);
 
   splTokenBalances.forEach((balance) => {
     if (balance instanceof Error) return;

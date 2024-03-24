@@ -24,7 +24,7 @@ exports.getWhitelabelEndpoint = (chainID, type) => {
       isApiKey: true,
     };
   }
-  if (chainID === "solana-mainnet") {
+  if (chainID === "solana") {
     return {
       endpoint: "https://mainnet.helius-rpc.com",
       isPrivate: false,
