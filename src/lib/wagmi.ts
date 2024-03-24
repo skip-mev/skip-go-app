@@ -3,7 +3,9 @@ import { createConfig } from "wagmi";
 import {
   arbitrum,
   avalanche,
+  avalancheFuji,
   base,
+  baseSepolia,
   bsc,
   celo,
   fantom,
@@ -16,6 +18,7 @@ import {
   optimism,
   polygon,
   polygonMumbai,
+  sepolia,
 } from "wagmi/chains";
 
 export const config = createConfig({
@@ -35,6 +38,9 @@ export const config = createConfig({
     optimism,
     polygon,
     polygonMumbai,
+    sepolia,
+    avalancheFuji,
+    baseSepolia,
   ],
   transports: {
     [arbitrum.id]: http(),
@@ -52,5 +58,8 @@ export const config = createConfig({
     [optimism.id]: http(),
     [polygon.id]: http(),
     [polygonMumbai.id]: http(),
+    [sepolia.id]: http(),
+    [avalancheFuji.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
