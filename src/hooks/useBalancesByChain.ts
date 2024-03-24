@@ -22,7 +22,6 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
   // const publicClient = usePublicClient({
   //   chainId: chain?.chainType === "evm" ? parseInt(chain.chainID) : undefined,
   // });
-
   const skipClient = useSkipClient();
 
   return useQuery({
@@ -31,7 +30,6 @@ export function useBalancesByChain({ address, chain, assets, enabled = true }: A
       if (!chain || !address) {
         return {};
       }
-
       if (chain.chainType === "evm") {
         const publicClient = createPublicClient({
           chain: EVM_CHAINS.find((i) => i.id === Number(chain.chainID)),

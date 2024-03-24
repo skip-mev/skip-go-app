@@ -112,8 +112,7 @@ export function useSwapWidget() {
     return assetsByChainID(srcChain?.chainID);
 
     // reason: only update when `srcChain?.chainID` changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [srcChain?.chainID]);
+  }, [srcChain?.chainID, assetsByChainID]);
 
   const { data: balances } = useBalancesByChain({
     address: srcAccount?.address,
@@ -121,7 +120,6 @@ export function useSwapWidget() {
     assets: srcAssets,
     enabled: !isAnyDisclosureOpen,
   });
-  console.log("balances", isAnyDisclosureOpen, balances);
 
   const customGasAmount = useSettingsStore((state) => state.customGasAmount);
 
@@ -143,7 +141,6 @@ export function useSwapWidget() {
     if (!amountIn || !balances || !srcAsset) {
       return false;
     }
-    console.log("isAmountError", amountIn, srcAsset, balances);
 
     const parsedAmount = BigNumber(amountIn || "0");
     const parsedBalance = BigNumber(balances[srcAsset.denom] ?? "0").shiftedBy(-(srcAsset.decimals ?? 6));
