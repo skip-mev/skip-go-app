@@ -4,7 +4,7 @@ import Link from "next/link";
 function Footer() {
   return (
     <div className="relative flex flex-row items-center justify-center space-x-0 px-4 py-8 sm:py-12">
-      <p className="text-sm text-black sm:text-base">Crafted by Skip</p>
+      <p className="text-sm text-black sm:text-base">Crafted by</p>
       <Link
         href="https://skip.money/"
         target="_blank"
