@@ -73,7 +73,6 @@ export function SwapWidget() {
   const destAccount = useAccount("destination");
 
   const isWalletConnected = srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
-  const isEvmtoEvm = srcAccount?.chainType === "evm" && destAccount?.chainType === "evm";
 
   function promptDestAsset() {
     document.querySelector("[data-testid='destination'] button")?.click();
@@ -235,16 +234,6 @@ export function SwapWidget() {
                 This transaction will let you transfer and stake tokens on dydx, it will not allow you to trade. Follow
                 the <AdaptiveLink href="https://dydx.exchange">dydx frontend</AdaptiveLink> directions to set up a
                 trading account
-              </p>
-            </div>
-          )}
-          {isEvmtoEvm && (
-            <div className="flex w-full items-center rounded-md bg-yellow-50 p-3 text-left text-sm font-medium text-yellow-600">
-              <p className="flex-1 [&_a]:underline">
-                <b>WARNING: </b>
-                ibc.fun only supports swapping/transferring to, from, and within the Cosmos ecosystem at this time. If
-                you&apos;re not transferring to or from a Cosmos chain, we recommend{" "}
-                <AdaptiveLink href="https://jumper.exchange">jumper.exchange</AdaptiveLink>
               </p>
             </div>
           )}
