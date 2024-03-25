@@ -2,6 +2,7 @@ import { http } from "viem";
 import { createConfig } from "wagmi";
 import {
   arbitrum,
+  arbitrumSepolia,
   avalanche,
   avalancheFuji,
   base,
@@ -16,6 +17,7 @@ import {
   manta,
   moonbeam,
   optimism,
+  optimismSepolia,
   polygon,
   polygonMumbai,
   sepolia,
@@ -41,6 +43,8 @@ export const config = createConfig({
     sepolia,
     avalancheFuji,
     baseSepolia,
+    optimismSepolia,
+    arbitrumSepolia,
   ],
   transports: {
     [arbitrum.id]: http(),
@@ -61,5 +65,7 @@ export const config = createConfig({
     [sepolia.id]: http(),
     [avalancheFuji.id]: http(),
     [baseSepolia.id]: http(),
+    [optimismSepolia.id]: http(),
+    [arbitrumSepolia.id]: http(),
   },
 });
