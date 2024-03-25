@@ -2,7 +2,7 @@ import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { getWalletClient } from "@wagmi/core";
-import { createContext, ReactNode, useMemo } from "react";
+import { createContext, ReactNode } from "react";
 import { WalletClient } from "viem";
 
 import { chainIdToName } from "@/chains/types";
