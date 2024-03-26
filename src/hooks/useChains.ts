@@ -25,7 +25,6 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
       const chains = await skipClient.chains({
         includeEVM: true,
         includeSVM: true,
-        includeTestnets: true,
       });
 
       return chains
