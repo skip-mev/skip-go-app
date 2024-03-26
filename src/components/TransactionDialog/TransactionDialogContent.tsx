@@ -10,7 +10,6 @@ import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
-import { getChainGasPrice } from "@/utils/chain.client";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { isCCTPLedgerBrokenInOperation, isEthermintLedgerInOperation } from "@/utils/ledger-warning";
@@ -71,7 +70,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         userAddresses,
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getGasPrice: getChainGasPrice,
         onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
