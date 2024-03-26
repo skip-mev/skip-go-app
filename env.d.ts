@@ -12,6 +12,7 @@ declare namespace NodeJS {
     readonly RESEND_API_KEY?: string;
     readonly WALLETCONNECT_VERIFY_KEY?: string;
     readonly WORD_PHRASE_KEY?: string;
+    readonly NEXT_PUBLIC_IS_TESTNET?: boolean;
   }
 }
 
