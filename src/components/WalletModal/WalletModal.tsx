@@ -2,6 +2,7 @@ import { useManager } from "@cosmos-kit/react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
@@ -26,6 +27,7 @@ export interface MinimalWallet {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   isWalletConnected: boolean;
+  isAvailable?: boolean;
 }
 
 interface Props {
@@ -71,7 +73,9 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
               href={
                 chainType === "cosmos"
                   ? "https://cosmos.network/wallets"
-                  : "https://ethereum.org/en/wallets/find-wallet"
+                  : chainType === "solana"
+                    ? "https://solana.com/ecosystem/explore?categories=wallet"
+                    : "https://ethereum.org/en/wallets/find-wallet"
               }
               className="inline-flex items-center gap-1 text-red-500 hover:underline"
             >
@@ -89,54 +93,66 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         )}
       >
         <ScrollArea.Viewport className="h-full w-full py-4">
-          {wallets.map((wallet) => (
-            <WalletListItem
-              key={wallet.walletName}
-              chainType={chainType}
-              walletName={wallet.walletName}
-              className={cn(
-                "group relative mb-2 data-[unsupported=true]:opacity-30",
-                "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
-              )}
-            >
-              <button
-                className="flex w-full items-center gap-2 rounded-lg p-2 transition-colors focus:-outline-offset-2 group-hover:bg-[#FF486E]/20"
-                onClick={() => onWalletConnect(wallet)}
-              >
-                {wallet.walletInfo.logo && (
-                  <Image
-                    height={36}
-                    width={36}
-                    alt={wallet.walletPrettyName}
-                    className="h-9 w-9 object-contain"
-                    src={
-                      typeof wallet.walletInfo.logo === "string" ? wallet.walletInfo.logo : wallet.walletInfo.logo.major
-                    }
-                    aria-hidden="true"
-                  />
+          {wallets.map((wallet) => {
+            // currently only svm chainType that have isAvailable
+            return (
+              <WalletListItem
+                key={wallet.walletName}
+                chainType={chainType}
+                walletName={wallet.walletName}
+                className={cn(
+                  "group relative mb-2 data-[unsupported=true]:opacity-30",
+                  "data-[unsupported=true]:before:absolute data-[unsupported=true]:before:inset-0 data-[unsupported=true]:before:cursor-not-allowed",
                 )}
-                <p className="flex-1 text-left font-semibold">
-                  {wallet.walletPrettyName === "Leap Cosmos MetaMask"
-                    ? "Metamask (Leap Snap)"
-                    : wallet.walletPrettyName}
-                </p>
-              </button>
-              {wallet.isWalletConnected && (
+              >
                 <button
-                  aria-label={`Disconnect ${wallet.walletPrettyName}`}
-                  className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg bg-[#FF486E]/20 px-2.5 py-1 text-xs font-semibold text-[#FF486E] transition-colors focus:outline-none group-hover:bg-[#FF486E]/30"
-                  onClick={async (event) => {
-                    event.stopPropagation();
-                    await wallet.disconnect();
-                    context && trackWallet.untrack(context);
-                    onClose();
-                  }}
+                  className="flex w-full items-center gap-2 rounded-lg p-2 transition-colors focus:-outline-offset-2 group-hover:bg-[#FF486E]/20"
+                  onClick={() => onWalletConnect(wallet)}
+                  disabled={chainType === "svm" && wallet.isAvailable !== true}
                 >
-                  Disconnect
+                  {wallet.walletInfo.logo && (
+                    <Image
+                      unoptimized
+                      height={36}
+                      width={36}
+                      alt={wallet.walletPrettyName}
+                      className="h-9 w-9 object-contain"
+                      src={
+                        typeof wallet.walletInfo.logo === "string"
+                          ? wallet.walletInfo.logo
+                          : wallet.walletInfo.logo.major
+                      }
+                      aria-hidden="true"
+                    />
+                  )}
+                  <p className="flex-1 text-left font-semibold">
+                    {wallet.walletPrettyName === "Leap Cosmos MetaMask"
+                      ? "Metamask (Leap Snap)"
+                      : wallet.walletPrettyName}
+                  </p>
                 </button>
-              )}
-            </WalletListItem>
-          ))}
+                {wallet.isWalletConnected && (
+                  <button
+                    aria-label={`Disconnect ${wallet.walletPrettyName}`}
+                    className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg bg-[#FF486E]/20 px-2.5 py-1 text-xs font-semibold text-[#FF486E] transition-colors focus:outline-none group-hover:bg-[#FF486E]/30"
+                    onClick={async (event) => {
+                      event.stopPropagation();
+                      await wallet.disconnect();
+                      context && trackWallet.untrack(context);
+                      onClose();
+                    }}
+                  >
+                    Disconnect
+                  </button>
+                )}
+                {chainType === "svm" && wallet.isAvailable !== true && (
+                  <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg bg-[#c2c2c2]/20 px-2.5 py-1 text-xs font-semibold text-[#909090] transition-colors focus:outline-none group-hover:bg-[#c2c2c2]/30">
+                    Not Installed
+                  </div>
+                )}
+              </WalletListItem>
+            );
+          })}
         </ScrollArea.Viewport>
         <ScrollArea.Scrollbar
           className="z-20 flex touch-none select-none py-4 transition-colors ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
@@ -154,6 +170,7 @@ function WalletModalWithContext() {
   const { connector: currentConnector } = useAccount();
   const { chainID, context } = useWalletModal();
   const { disconnectAsync } = useDisconnect();
+  // evm
   const { connectors, connectAsync } = useConnect({
     mutation: {
       onError: (err) => {
@@ -167,7 +184,10 @@ function WalletModalWithContext() {
       },
     },
   });
+  // cosmos
   const { getWalletRepo } = useManager();
+  // solana
+  const { wallets: solanaWallets } = useWallet();
 
   const { setIsOpen } = useWalletModal();
 
@@ -235,6 +255,33 @@ function WalletModalWithContext() {
         isWalletConnected: connector.id === currentConnector?.id,
       };
 
+      wallets.push(minimalWallet);
+    }
+  }
+
+  if (chainType === "svm") {
+    for (const wallet of solanaWallets) {
+      const minimalWallet: MinimalWallet = {
+        walletName: wallet.adapter.name,
+        walletPrettyName: wallet.adapter.name,
+        walletInfo: {
+          logo: wallet.adapter.icon,
+        },
+        connect: async () => {
+          try {
+            await wallet.adapter.connect();
+            context && trackWallet.track(context, chainID, wallet.adapter.name, chainType);
+          } catch (error) {
+            console.error(error);
+          }
+        },
+        disconnect: async () => {
+          await wallet.adapter.disconnect();
+          context && trackWallet.untrack(context);
+        },
+        isWalletConnected: wallet.adapter.connected,
+        isAvailable: wallet.readyState === "Installed",
+      };
       wallets.push(minimalWallet);
     }
   }

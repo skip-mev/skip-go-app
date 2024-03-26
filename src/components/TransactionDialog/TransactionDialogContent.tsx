@@ -161,7 +161,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
-
   if (isTxComplete && txStatus.data?.isSuccess) {
     return (
       <TransactionSuccessView

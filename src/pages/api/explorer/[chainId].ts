@@ -17,6 +17,15 @@ export default async function handler(req: NextRequest) {
     const parsedIntId = parseInt(chainId);
     const isEvmChain = typeof parsedIntId === "number" && !isNaN(parsedIntId);
 
+    const isSvmChain = chainId === "solana-devnet" || chainId === "solana";
+
+    if (isSvmChain) {
+      baseUrl =
+        chainId === "solana-devnet"
+          ? "https://solscan.io/tx/${txHash}?cluster=devnet"
+          : "https://solscan.io/tx/${txHash}";
+    }
+
     if (isEvmChain) {
       const { EVM_CHAINS } = await import("@/constants/wagmi");
       const chain = EVM_CHAINS.find((chain) => chain.id === parseInt(chainId));
