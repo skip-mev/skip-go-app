@@ -172,6 +172,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
           <span>Transfer</span>
           <Gap.Child>
             <Image
+              unoptimized
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
@@ -183,6 +184,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
           <span>from</span>
           <Gap.Child>
             <Image
+              unoptimized
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
@@ -197,6 +199,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
           <span>to</span>
           <Gap.Child>
             <Image
+              unoptimized
               className="inline-block h-4 w-4 object-contain"
               height={16}
               width={16}
@@ -212,6 +215,7 @@ export const TransferStep = ({ action, actions, statusData }: TransferStepProps)
               <Gap.Child>
                 {bridge.name.toLowerCase() !== "ibc" && (
                   <Image
+                    unoptimized
                     className="inline-block h-4 w-4 object-contain"
                     height={16}
                     width={16}

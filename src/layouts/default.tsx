@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Help } from "@/components/Help";
 import SkipBanner from "@/components/SkipBanner";
@@ -16,6 +17,7 @@ export function DefaultLayout({ children }: { children: ReactNode }) {
           <SkipBanner className="inset-x-0 top-0 z-50 w-screen sm:fixed" />
           <Header />
           {children}
+          <Footer />
         </main>
         <VersionCheck />
         <Help />

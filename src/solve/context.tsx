@@ -1,5 +1,6 @@
 import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { getWalletClient } from "@wagmi/core";
 import { createContext, ReactNode } from "react";
 import { WalletClient } from "viem";
@@ -14,6 +15,7 @@ export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>
 
 export function SkipProvider({ children }: { children: ReactNode }) {
   const { getWalletRepo } = useManager();
+  const { wallets } = useWallet();
 
   const skipClient = new SkipRouter({
     clientID: process.env.NEXT_PUBLIC_CLIENT_ID,
@@ -65,6 +67,20 @@ export function SkipProvider({ children }: { children: ReactNode }) {
       }
 
       return evmWalletClient;
+    },
+    getSVMSigner: async () => {
+      const walletName = (() => {
+        const { source, destination } = trackWallet.get();
+        if (source?.chainType === "svm") return source.walletName;
+        if (destination?.chainType === "svm") return destination.walletName;
+      })();
+      const solanaWallet = wallets.find((w) => w.adapter.name === walletName);
+
+      if (!solanaWallet?.adapter) {
+        throw new Error(`getSVMSigner error: no wallet client available`);
+      }
+
+      return solanaWallet.adapter;
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {

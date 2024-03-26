@@ -1,4 +1,5 @@
 import { useManager } from "@cosmos-kit/react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAccount as useWagmiAccount } from "wagmi";
@@ -11,6 +12,7 @@ export function useWalletAddresses(chainIDs: string[]) {
 
   const { address: evmAddress } = useWagmiAccount();
   const { getWalletRepo } = useManager();
+  const { wallets } = useWallet();
 
   const srcAccount = useAccount("source");
   const dstAccount = useAccount("destination");
@@ -78,6 +80,18 @@ export function useWalletAddresses(chainIDs: string[]) {
             throw new Error(`useWalletAddresses error: evm wallet not connected`);
           }
           record[currentChainID] = evmAddress;
+        }
+
+        if (chain.chainType === "svm") {
+          const solanaWallet = wallets.find(
+            (w) =>
+              w.adapter.name === srcAccount?.wallet?.walletName || w.adapter.name === dstAccount?.wallet?.walletName,
+          );
+
+          if (!solanaWallet?.adapter.publicKey) {
+            throw new Error(`useWalletAddresses error: svm wallet not connected`);
+          }
+          record[currentChainID] = solanaWallet.adapter.publicKey.toBase58();
         }
       }
 

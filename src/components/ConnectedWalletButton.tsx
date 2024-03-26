@@ -24,6 +24,7 @@ export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
       >
         {walletLogo && (
           <Image
+            unoptimized
             height={16}
             width={16}
             alt={walletName}

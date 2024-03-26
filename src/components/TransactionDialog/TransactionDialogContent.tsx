@@ -10,7 +10,6 @@ import { useAccount } from "@/hooks/useAccount";
 import { useFinalityTimeEstimate } from "@/hooks/useFinalityTimeEstimate";
 import { useWalletAddresses } from "@/hooks/useWalletAddresses";
 import { useBroadcastedTxsStatus, useSkipClient } from "@/solve";
-import { getChainGasPrice } from "@/utils/chain.client";
 import { isUserRejectedRequestError } from "@/utils/error";
 import { getExplorerUrl } from "@/utils/explorer";
 import { isCCTPLedgerBrokenInOperation, isEthermintLedgerInOperation } from "@/utils/ledger-warning";
@@ -57,7 +56,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   const showEthermintLikeLedgerWarning = isEthermintLedgerInOperation(route) && srcAccount?.wallet?.isLedger === true;
 
   const showLedgerWarning = showCCTPLedgerWarning || showEthermintLikeLedgerWarning;
-  const isEvmtoEvm = srcAccount?.chainType === "evm" && dstAccount?.chainType === "evm";
 
   const { data: userAddresses } = useWalletAddresses(route.chainIDs);
 
@@ -72,7 +70,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
         userAddresses,
         validateGasBalance: route.txsRequired === 1,
         slippageTolerancePercent: useSettingsStore.getState().slippage,
-        getGasPrice: getChainGasPrice,
         onTransactionTracked: async (txStatus) => {
           const makeExplorerUrl = await getExplorerUrl(txStatus.chainID);
           const explorerLink = makeExplorerUrl?.(txStatus.txHash);
@@ -164,7 +161,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
   }
 
   const estimatedFinalityTime = useFinalityTimeEstimate(route);
-
   if (isTxComplete && txStatus.data?.isSuccess) {
     return (
       <TransactionSuccessView
@@ -283,20 +279,6 @@ function TransactionDialogContent({ route, onClose, isAmountError, transactionCo
                 ibc.fun does not support signing with Ledger on Ethermint-like chains (e.g. Injective, Dymension, EVMOS,
                 etc...). We&apos;re actively working on fixing this with the Ledger team. We apologize for the
                 inconvenience.
-              </p>
-            </AlertCollapse.Content>
-          </AlertCollapse.Root>
-        )}
-        {isEvmtoEvm && (
-          <AlertCollapse.Root
-            type="warning"
-            initialOpen={true}
-          >
-            <AlertCollapse.Content>
-              <p>
-                <b>WARNING: </b>
-                ibc.fun only supports swapping/transferring to, from, and within the Cosmos ecosystem at this time. If
-                you&apos;re not transferring to or from a Cosmos chain, we recommend satelite.money
               </p>
             </AlertCollapse.Content>
           </AlertCollapse.Root>

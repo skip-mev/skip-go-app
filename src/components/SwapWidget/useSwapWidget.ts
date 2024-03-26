@@ -1,6 +1,7 @@
 import { GasPrice } from "@cosmjs/stargate";
 import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { Asset, BridgeType } from "@skip-router/core";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { BigNumber } from "bignumber.js";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -59,6 +60,7 @@ export function useSwapWidget() {
     },
   });
   const { disconnect } = useWagmiDisconnect();
+  const { wallets } = useWallet();
 
   const [userTouchedDstAsset, setUserTouchedDstAsset] = useState(false);
 
@@ -110,8 +112,7 @@ export function useSwapWidget() {
     return assetsByChainID(srcChain?.chainID);
 
     // reason: only update when `srcChain?.chainID` changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [srcChain?.chainID]);
+  }, [srcChain?.chainID, assetsByChainID]);
 
   const { data: balances } = useBalancesByChain({
     address: srcAccount?.address,
@@ -644,13 +645,22 @@ export function useSwapWidget() {
             disconnect();
           }
         }
+        if (srcChain && srcChain.chainType === "svm") {
+          const solanaWallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+
+          if (solanaWallet?.adapter.connected) {
+            trackWallet.track("source", srcChain.chainID, solanaWallet.adapter.name, srcChain.chainType);
+          } else {
+            trackWallet.untrack("source");
+          }
+        }
       },
       {
         equalityFn: shallow,
         fireImmediately: true,
       },
     );
-  }, [connector, evmChain, getWalletRepo, switchNetworkAsync]);
+  }, [connector, disconnect, evmChain, getWalletRepo, switchNetworkAsync, wallets]);
 
   /**
    * sync destination chain wallet connections
@@ -704,6 +714,15 @@ export function useSwapWidget() {
           } else {
             trackWallet.untrack("destination");
             disconnect();
+          }
+        }
+        if (dstChain && dstChain.chainType === "svm") {
+          const solanaWallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+
+          if (solanaWallet?.adapter.connected) {
+            trackWallet.track("destination", dstChain.chainID, solanaWallet.adapter.name, dstChain.chainType);
+          } else {
+            trackWallet.untrack("destination");
           }
         }
       },

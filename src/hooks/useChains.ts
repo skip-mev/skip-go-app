@@ -16,7 +16,6 @@ export type UseChainsQueryArgs<T = Chain[]> = {
 
 export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
   const { select = (t) => t as T } = args;
-
   const skipClient = useSkipClient();
 
   return useQuery({
@@ -24,6 +23,8 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
     queryFn: async () => {
       const chains = await skipClient.chains({
         includeEVM: true,
+        includeSVM: true,
+        includeTestnets: process.env.NEXT_PUBLIC_IS_TESTNET ? true : false,
       });
 
       return chains
@@ -35,6 +36,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
             logoURI: chain.logoURI || "/logo-fallback.png",
           };
         })
+        .filter((chain) => (process.env.NEXT_PUBLIC_IS_TESTNET ? chain.isTestnet : true))
         .sort((chainA, chainB) => {
           return chainA.prettyName.localeCompare(chainB.prettyName);
         });
