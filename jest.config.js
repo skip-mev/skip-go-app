@@ -13,6 +13,7 @@ const customJestConfig = {
   moduleNameMapper: {
     isows: "<rootDir>/node_modules/isows/_cjs/index.js", // https://github.com/wagmi-dev/viem/issues/1329
     tinykeys: "<rootDir>/node_modules/tinykeys/dist/tinykeys.js",
+    uuid: require.resolve("uuid"),
   },
   setupFiles: ["<rootDir>/jest.polyfills.js"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
