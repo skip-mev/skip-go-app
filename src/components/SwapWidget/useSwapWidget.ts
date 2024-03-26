@@ -646,10 +646,18 @@ export function useSwapWidget() {
           }
         }
         if (srcChain && srcChain.chainType === "svm") {
-          const solanaWallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+          let wallet: (typeof wallets)[number] | undefined;
+          if (srcTrack?.chainType === "svm") {
+            wallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+          } else if (dstTrack?.chainType === "svm") {
+            wallet = wallets.find((w) => w.adapter.name === dstTrack?.walletName);
+          } else {
+            wallet = wallets.find((w) => w.adapter.connected);
+          }
 
-          if (solanaWallet?.adapter.connected) {
-            trackWallet.track("source", srcChain.chainID, solanaWallet.adapter.name, srcChain.chainType);
+          if (wallet) {
+            wallet.adapter.connect();
+            trackWallet.track("source", srcChain.chainID, wallet.adapter.name, srcChain.chainType);
           } else {
             trackWallet.untrack("source");
           }
@@ -717,10 +725,18 @@ export function useSwapWidget() {
           }
         }
         if (dstChain && dstChain.chainType === "svm") {
-          const solanaWallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+          let wallet: (typeof wallets)[number] | undefined;
+          if (dstTrack?.chainType === "svm") {
+            wallet = wallets.find((w) => w.adapter.name === dstTrack?.walletName);
+          } else if (srcTrack?.chainType === "svm") {
+            wallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
+          } else {
+            wallet = wallets.find((w) => w.adapter.connected);
+          }
 
-          if (solanaWallet?.adapter.connected) {
-            trackWallet.track("destination", dstChain.chainID, solanaWallet.adapter.name, dstChain.chainType);
+          if (wallet) {
+            wallet.adapter.connect();
+            trackWallet.track("destination", dstChain.chainID, wallet.adapter.name, dstChain.chainType);
           } else {
             trackWallet.untrack("destination");
           }
@@ -731,7 +747,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [connector, evmChain, getWalletRepo, srcChain, switchNetworkAsync]);
+  }, [connector, disconnect, evmChain, getWalletRepo, srcChain, switchNetworkAsync, wallets]);
 
   /**
    * sync destination chain wallet connections on track wallet level

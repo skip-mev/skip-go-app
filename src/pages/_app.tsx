@@ -31,6 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <WalletProvider
         wallets={solanaWallets}
         localStorageKey="solana-wallet"
+        autoConnect
       >
         <ChainProvider
           assetLists={assets}
