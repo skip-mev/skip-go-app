@@ -7,6 +7,8 @@ import {
   avalancheFuji,
   base,
   baseSepolia,
+  blast,
+  blastSepolia,
   bsc,
   celo,
   fantom,
@@ -23,6 +25,7 @@ import {
   sepolia,
 } from "wagmi/chains";
 
+// Update EVM_CHAINS in src/constants/wagmi.ts as well
 export const config = createConfig({
   chains: [
     arbitrum,
@@ -45,6 +48,8 @@ export const config = createConfig({
     baseSepolia,
     optimismSepolia,
     arbitrumSepolia,
+    blast,
+    blastSepolia,
   ],
   transports: {
     [arbitrum.id]: http(),
@@ -67,5 +72,7 @@ export const config = createConfig({
     [baseSepolia.id]: http(),
     [optimismSepolia.id]: http(),
     [arbitrumSepolia.id]: http(),
+    [blast.id]: http(),
+    [blastSepolia.id]: http(),
   },
 });
