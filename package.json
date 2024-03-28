@@ -124,6 +124,8 @@
     "globby": "^14.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "json-schema-to-typescript": "^13.1.2",
+    "json-schema-to-zod": "^1.2.0",
     "msw": "1.x",
     "npm-run-all2": "^6.1.2",
     "p-map": "^7.0.1",
