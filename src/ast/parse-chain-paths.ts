@@ -10,9 +10,16 @@ import { parseChainJson } from "./parse-chain-json";
 interface Args {
   registryPath: string;
   chainPaths: string[];
+  initiaRegistryPath: string;
+  initiaChainPaths: string[];
 }
 
-export async function parseChainPaths({ registryPath, chainPaths }: Args): Promise<Variables> {
+export async function parseChainPaths({
+  registryPath,
+  chainPaths,
+  initiaChainPaths,
+  initiaRegistryPath,
+}: Args): Promise<Variables> {
   const chains: Chain[] = [];
   const assetlists: AssetList[] = [];
 
@@ -27,10 +34,10 @@ export async function parseChainPaths({ registryPath, chainPaths }: Args): Promi
   const explorersRecord: Record<string, Explorer[]> = {};
   const chainInfosRecord: Record<string, ChainInfo> = {};
 
-  async function loadChainPath(chainPath: string) {
+  async function loadChainPath(_registryPath: string, chainPath: string) {
     const [assetlist, chain] = await Promise.all([
-      parseAssetListJson({ registryPath, chainPath }),
-      parseChainJson({ registryPath, chainPath }),
+      parseAssetListJson({ registryPath: _registryPath, chainPath }),
+      parseChainJson({ registryPath: _registryPath, chainPath }),
     ]);
 
     chains.push(chain);
@@ -54,7 +61,8 @@ export async function parseChainPaths({ registryPath, chainPaths }: Args): Promi
       });
   }
 
-  await pMap(chainPaths, loadChainPath, { concurrency });
+  await pMap(chainPaths, (i) => loadChainPath(registryPath, i), { concurrency });
+  await pMap(initiaChainPaths, (i) => loadChainPath(initiaRegistryPath, i), { concurrency });
 
   return {
     chains,
