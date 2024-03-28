@@ -118,7 +118,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
                 onError={onImageError}
                 src={action.venue.logoUri}
               />
-              <span className="font-semibold text-black">{venue.prettyName}</span>
+              <span className="font-semibold text-black">{venue?.prettyName}</span>
             </Gap.Child>
           </Gap.Parent>
           {explorerLink && (
@@ -159,7 +159,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
                 src={action.venue.logoUri}
                 alt={action.venue.name}
               />
-              <span className="font-semibold text-black">{venue.prettyName}</span>
+              <span className="font-semibold text-black">{venue?.prettyName}</span>
             </Gap.Child>
           </Gap.Parent>
           {explorerLink && (
@@ -222,7 +222,7 @@ export const SwapStep = ({ action, actions, statusData }: SwapStepProps) => {
               onError={onImageError}
               src={action.venue.logoUri}
             />
-            <span className="font-semibold text-black">{venue.prettyName}</span>
+            <span className="font-semibold text-black">{venue?.prettyName}</span>
           </Gap.Child>
         </Gap.Parent>
         {explorerLink && (
