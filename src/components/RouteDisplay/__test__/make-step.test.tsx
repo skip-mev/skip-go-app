@@ -3,12 +3,12 @@ import { AllTheProviders, renderHook, waitFor } from "@/test";
 
 import { makeActions } from "../make-actions";
 import { makeStepState } from "../make-step-state";
-import { nobleUSDCtoInjectiveINJ } from "./route-to-test";
+import { cosmoshubATOMToAkashATOM } from "./route-to-test";
 import { createRoute } from "./utils";
 
 test("make-step: Noble USDC to Injective INJ", async () => {
   const { direction, amount, sourceAsset, sourceAssetChainID, destinationAsset, destinationAssetChainID, swapVenue } =
-    nobleUSDCtoInjectiveINJ;
+    cosmoshubATOMToAkashATOM;
 
   const route = await createRoute(
     direction === "swap-in"
@@ -42,8 +42,8 @@ test("make-step: Noble USDC to Injective INJ", async () => {
         txsRequired: route.txsRequired,
         txs: [
           {
-            chainID: "noble-1",
-            txHash: "40C220E06B22435842A1DDA80ED2D38917228D8A77419A9F4B885C9E48D6B228",
+            chainID: "cosmoshub-4",
+            txHash: "F1852511F30AE8F1EC95C494963FD0B00CA5CB1BB684F6FFB4B1DE34AF33C6B7",
           },
         ],
         enabled: true,
