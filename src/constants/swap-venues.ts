@@ -30,4 +30,7 @@ export const SWAP_VENUES: Record<string, SwapVenueConfig> = {
   "terra-white-whale": {
     prettyName: "Terra White Whale",
   },
+  "testnet-initia-dex": {
+    prettyName: "Testnet Initia DEX",
+  },
 };
