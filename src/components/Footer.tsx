@@ -15,7 +15,9 @@ function Footer() {
             fill
             className="h-8 sm:h-16"
             alt={"skip logo"}
-            objectFit="contain"
+            style={{
+              objectFit: "contain",
+            }}
           />
         </div>
       </Link>
