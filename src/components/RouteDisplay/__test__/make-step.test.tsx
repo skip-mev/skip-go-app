@@ -6,7 +6,7 @@ import { makeStepState } from "../make-step-state";
 import { cosmoshubATOMToAkashATOM } from "./route-to-test";
 import { createRoute } from "./utils";
 
-test("make-step: Noble USDC to Injective INJ", async () => {
+test("make-step: cosmoshub ATOM to Akash ATOM", async () => {
   const { direction, amount, sourceAsset, sourceAssetChainID, destinationAsset, destinationAssetChainID, swapVenue } =
     cosmoshubATOMToAkashATOM;
 
