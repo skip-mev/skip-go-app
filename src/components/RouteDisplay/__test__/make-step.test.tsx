@@ -6,7 +6,7 @@ import { makeStepState } from "../make-step-state";
 import { cosmoshubATOMToAkashATOM } from "./route-to-test";
 import { createRoute } from "./utils";
 
-test("make-step: Noble USDC to Injective INJ", async () => {
+test("make-step: cosmoshub ATOM to Akash ATOM", async () => {
   const { direction, amount, sourceAsset, sourceAssetChainID, destinationAsset, destinationAssetChainID, swapVenue } =
     cosmoshubATOMToAkashATOM;
 
@@ -43,7 +43,7 @@ test("make-step: Noble USDC to Injective INJ", async () => {
         txs: [
           {
             chainID: "cosmoshub-4",
-            txHash: "F1852511F30AE8F1EC95C494963FD0B00CA5CB1BB684F6FFB4B1DE34AF33C6B7",
+            txHash: "F793B9F1ABCA715FF4706004AA4E220E6F0E5BE79CA97D5FD799BF6FD27BE036",
           },
         ],
         enabled: true,
