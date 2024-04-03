@@ -53,6 +53,7 @@
     "@fontsource/jost": "^5.0.16",
     "@graz-sh/types": "^0.0.14",
     "@heroicons/react": "^2.1.1",
+    "@initia/initia-registry-types": "^0.0.12",
     "@injectivelabs/sdk-ts": "^1.14.5",
     "@injectivelabs/utils": "^1.14.5",
     "@keplr-wallet/types": "^0.12.66",
