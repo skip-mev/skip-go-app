@@ -1,5 +1,5 @@
 import { Asset, FeeAsset } from "@skip-router/core";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
+import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
 
 import { useChains } from "@/hooks/useChains";
 import { sortFeeAssets } from "@/utils/chain";
@@ -89,20 +89,20 @@ export function AssetsProvider({ children }: { children: ReactNode }) {
 
   const isReady = useMemo(() => Object.keys(assets).length > 0, [assets]);
 
-  useEffect(() => {
-    if (!isReady || !chains || !assets) return;
-    const load = (src: string) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => img.remove();
-    };
-    chains.forEach(({ chainID, logoURI }) => {
-      logoURI && load(logoURI);
-      (assets[chainID] || []).forEach(({ logoURI }) => {
-        logoURI && load(logoURI);
-      });
-    });
-  }, [assets, chains, isReady]);
+  // useEffect(() => {
+  //   if (!isReady || !chains || !assets) return;
+  //   const load = (src: string) => {
+  //     const img = new Image();
+  //     img.src = src;
+  //     img.onload = () => img.remove();
+  //   };
+  //   chains.forEach(({ chainID, logoURI }) => {
+  //     logoURI && load(logoURI);
+  //     (assets[chainID] || []).forEach(({ logoURI }) => {
+  //       logoURI && load(logoURI);
+  //     });
+  //   });
+  // }, [assets, chains, isReady]);
 
   return (
     <AssetsContext.Provider

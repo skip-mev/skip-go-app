@@ -34,6 +34,18 @@ export function useAssets(options: AssetsRequest = {}) {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
+    select: (assets) => {
+      return Object.fromEntries(
+        Object.entries(assets).map(([chainID, chainAssets]) => {
+          return [
+            chainID,
+            chainAssets.filter((asset) => {
+              return !(asset.denom === "solana-devnet-native" || asset.denom === "solana-native");
+            }),
+          ];
+        }),
+      );
+    },
   });
 }
 
