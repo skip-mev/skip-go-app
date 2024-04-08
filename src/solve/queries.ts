@@ -132,7 +132,7 @@ export function useRoute({
               allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
-              rapidRelay: true,
+              smartRelay: true,
             }
           : {
               amountOut: amount,
@@ -144,7 +144,7 @@ export function useRoute({
               allowMultiTx: true,
               allowUnsafe: true,
               experimentalFeatures,
-              rapidRelay: true,
+              smartRelay: true,
             },
       );
 

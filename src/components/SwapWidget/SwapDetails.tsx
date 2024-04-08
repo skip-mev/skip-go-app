@@ -69,11 +69,11 @@ export const SwapDetails = ({
     }
   }, [axelarTransferOperation, hyperlaneTransferOperation]);
 
-  const isRapidRelay = route.estimatedFees?.some((fee) => fee.feeType === "RAPID_RELAY");
+  const isSmartRelay = route.estimatedFees?.some((fee) => fee.feeType === "SMART_RELAY");
 
-  const rapidRelayFee = useMemo(() => {
-    if (!isRapidRelay) return;
-    const fee = route.estimatedFees.filter((fee) => fee.feeType === "RAPID_RELAY");
+  const smartRelayFee = useMemo(() => {
+    if (!isSmartRelay) return;
+    const fee = route.estimatedFees.filter((fee) => fee.feeType === "SMART_RELAY");
     const sameAsset = fee.every((fee, i, arr) => fee.originAsset.symbol === arr[0].originAsset.symbol);
     if (!sameAsset) return;
     const computedAmount = fee.reduce((acc, fee) => acc + Number(fee.amount), 0);
@@ -87,14 +87,14 @@ export const SwapDetails = ({
       inAsset: `${inAsset} ${fee[0].originAsset.symbol}`,
       inUSD: `${formatUSD(computedUsd)}`,
     };
-  }, [isRapidRelay, route.estimatedFees]);
+  }, [isSmartRelay, route.estimatedFees]);
 
   const totalAmountOut = useMemo(() => {
-    if (isRapidRelay) {
-      return String(parseFloat(amountOut) + (rapidRelayFee?.amount || 0));
+    if (isSmartRelay) {
+      return String(parseFloat(amountOut) + (smartRelayFee?.amount || 0));
     }
     return amountOut;
-  }, [amountOut, isRapidRelay, rapidRelayFee?.amount]);
+  }, [amountOut, isSmartRelay, smartRelayFee?.amount]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
@@ -231,12 +231,12 @@ export const SwapDetails = ({
               </dd>
             </>
           )}
-          {rapidRelayFee && (
+          {smartRelayFee && (
             <>
               <dt>Relayer Fee</dt>
               <dd>
-                {rapidRelayFee?.inAsset ?? "-"}{" "}
-                <span className="text-sm tabular-nums text-neutral-400">{rapidRelayFee?.inUSD ?? "-"}</span>
+                {smartRelayFee?.inAsset ?? "-"}{" "}
+                <span className="text-sm tabular-nums text-neutral-400">{smartRelayFee?.inUSD ?? "-"}</span>
               </dd>
             </>
           )}
