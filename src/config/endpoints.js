@@ -142,6 +142,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "shentu-22": true,
   "sifchain-1": true,
   "sommelier-3": true,
+  "ssc-1": true,
   "stargaze-1": true,
   "stride-1": true,
   "teritori-1": true,
