@@ -149,6 +149,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "umee-1": true,
   "ununifi-beta-v1": true,
   "dimension_37-1": true,
+  "ssc-1": true,
 };
 
 /**
