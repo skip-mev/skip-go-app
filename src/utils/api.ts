@@ -15,8 +15,6 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       let data = getWhitelabelEndpoint(chainID, type);
 
-      console.log(chainID, data);
-
       fallbackFn && (data ??= await fallbackFn(chainID));
 
       if (!data) {
