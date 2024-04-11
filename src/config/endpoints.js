@@ -142,6 +142,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "shentu-22": true,
   "sifchain-1": true,
   "sommelier-3": true,
+  "ssc-1": true,
   "stargaze-1": true,
   "stride-1": true,
   "teritori-1": true,
@@ -149,7 +150,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "umee-1": true,
   "ununifi-beta-v1": true,
   "dimension_37-1": true,
-  "ssc-1": true,
+  "coreum-mainnet-1": true,
 };
 
 /**

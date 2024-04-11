@@ -1,9 +1,9 @@
 import { ChevronDownIcon, PencilSquareIcon } from "@heroicons/react/16/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { BridgeType, RouteResponse } from "@skip-router/core";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-import { disclosure, useDisclosureKey } from "@/context/disclosures";
+import { disclosure } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { formatPercent, formatUSD } from "@/utils/intl";
 import { cn } from "@/utils/ui";
@@ -36,7 +36,7 @@ export const SwapDetails = ({
   sourceChain,
   sourceFeeAsset,
 }: Props) => {
-  const [open, control] = useDisclosureKey("swapDetailsCollapsible");
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const { slippage } = useSettingsStore();
 
@@ -69,11 +69,11 @@ export const SwapDetails = ({
     }
   }, [axelarTransferOperation, hyperlaneTransferOperation]);
 
-  const isRapidRelay = route.estimatedFees?.some((fee) => fee.feeType === "RAPID_RELAY");
+  const isSmartRelay = route.estimatedFees?.some((fee) => fee.feeType === "SMART_RELAY");
 
-  const rapidRelayFee = useMemo(() => {
-    if (!isRapidRelay) return;
-    const fee = route.estimatedFees.filter((fee) => fee.feeType === "RAPID_RELAY");
+  const smartRelayFee = useMemo(() => {
+    if (!isSmartRelay) return;
+    const fee = route.estimatedFees.filter((fee) => fee.feeType === "SMART_RELAY");
     const sameAsset = fee.every((fee, i, arr) => fee.originAsset.symbol === arr[0].originAsset.symbol);
     if (!sameAsset) return;
     const computedAmount = fee.reduce((acc, fee) => acc + Number(fee.amount), 0);
@@ -87,14 +87,14 @@ export const SwapDetails = ({
       inAsset: `${inAsset} ${fee[0].originAsset.symbol}`,
       inUSD: `${formatUSD(computedUsd)}`,
     };
-  }, [isRapidRelay, route.estimatedFees]);
+  }, [isSmartRelay, route.estimatedFees]);
 
   const totalAmountOut = useMemo(() => {
-    if (isRapidRelay) {
-      return String(parseFloat(amountOut) + (rapidRelayFee?.amount || 0));
+    if (isSmartRelay) {
+      return String(parseFloat(amountOut) + (smartRelayFee?.amount || 0));
     }
     return amountOut;
-  }, [amountOut, isRapidRelay, rapidRelayFee?.amount]);
+  }, [amountOut, isSmartRelay, smartRelayFee?.amount]);
 
   if (!(sourceChain && sourceAsset && destinationChain && destinationAsset)) {
     return null;
@@ -108,8 +108,8 @@ export const SwapDetails = ({
         "hover:border-neutral-300 hover:shadow-sm",
         "focus-within:border-neutral-300 focus-within:shadow-sm",
       )}
-      open={open || priceImpactThresholdReached}
-      onOpenChange={control.set}
+      open={detailsOpen || priceImpactThresholdReached}
+      onOpenChange={(open) => setDetailsOpen(open)}
     >
       <div className="relative flex items-center gap-1 text-center text-xs">
         <ConversionRate
@@ -153,12 +153,12 @@ export const SwapDetails = ({
           <span
             className={cn(
               "animate-slide-left-and-fade tabular-nums text-neutral-400 transition-opacity",
-              open && "hidden",
+              detailsOpen && "hidden",
             )}
           >
             Slippage: {slippage}%
           </span>
-          <ChevronDownIcon className={cn("h-4 w-4 transition", open ? "rotate-180" : "rotate-0")} />
+          <ChevronDownIcon className={cn("h-4 w-4 transition", detailsOpen ? "rotate-180" : "rotate-0")} />
         </Collapsible.Trigger>
       </div>
 
@@ -231,12 +231,12 @@ export const SwapDetails = ({
               </dd>
             </>
           )}
-          {rapidRelayFee && (
+          {smartRelayFee && (
             <>
               <dt>Relayer Fee</dt>
               <dd>
-                {rapidRelayFee?.inAsset ?? "-"}{" "}
-                <span className="text-sm tabular-nums text-neutral-400">{rapidRelayFee?.inUSD ?? "-"}</span>
+                {smartRelayFee?.inAsset ?? "-"}{" "}
+                <span className="text-sm tabular-nums text-neutral-400">{smartRelayFee?.inUSD ?? "-"}</span>
               </dd>
             </>
           )}

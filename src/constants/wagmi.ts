@@ -5,6 +5,8 @@ import {
   avalancheFuji,
   base,
   baseSepolia,
+  blast,
+  blastSepolia,
   bsc,
   celo,
   Chain,
@@ -43,4 +45,6 @@ export const EVM_CHAINS: Chain[] = [
   baseSepolia,
   optimismSepolia,
   arbitrumSepolia,
+  blast,
+  blastSepolia,
 ];

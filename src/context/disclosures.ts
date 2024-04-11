@@ -6,7 +6,6 @@ const defaultValues = {
   historyDialog: false,
   priceImpactDialog: false,
   settingsDialog: false,
-  swapDetailsCollapsible: false,
 
   // TODO: port dialogs to new system
   // assetSelect: false,
