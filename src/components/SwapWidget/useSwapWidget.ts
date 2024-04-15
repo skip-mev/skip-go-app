@@ -206,10 +206,6 @@ export function useSwapWidget() {
       return ["Bad Price Warning", route.warning.message];
     }
 
-    if (route.warning.type === "LOW_INFO_WARNING") {
-      return ["Low Information Warning", route.warning.message];
-    }
-
     return [undefined, undefined];
   }, [route]);
 
