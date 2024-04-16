@@ -158,7 +158,7 @@ export function useRoute({
           // @ts-expect-error - error
           String(error?.message).toLowerCase().includes("no routes found") ||
           // @ts-expect-error - error
-          String(error?.message).toLowerCase().includes("smart relay")
+          String(error?.message).toLowerCase().includes("relay")
         ) {
           setIsError(true);
         }
