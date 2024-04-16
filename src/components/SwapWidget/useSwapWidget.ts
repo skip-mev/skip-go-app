@@ -202,6 +202,10 @@ export function useSwapWidget() {
       return [undefined, undefined];
     }
 
+    if (Number(route.usdAmountIn) === 0 || Number(route.usdAmountOut) === 0) {
+      return [undefined, undefined];
+    }
+
     if (route.warning.type === "BAD_PRICE_WARNING") {
       return ["Bad Price Warning", route.warning.message];
     }
