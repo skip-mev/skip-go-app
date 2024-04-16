@@ -183,8 +183,12 @@ export function useSwapWidget() {
     if (!route) {
       return undefined;
     }
-
-    if (!route.usdAmountIn || !route.usdAmountOut) {
+    if (
+      !route.usdAmountIn ||
+      !route.usdAmountOut ||
+      Number(route.usdAmountIn) === 0 ||
+      Number(route.usdAmountOut) === 0
+    ) {
       return undefined;
     }
 
@@ -831,6 +835,7 @@ export function useSwapWidget() {
     sourceFeeAmount: gasRequired,
     sourceFeeAsset: srcFeeAsset,
     swapPriceImpactPercent,
+    usdDiffPercent,
   };
 }
 
