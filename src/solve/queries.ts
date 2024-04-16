@@ -149,7 +149,7 @@ export function useRoute({
         );
 
         if (!route.operations) {
-          throw new Error("No route found");
+          throw new Error("no routes found");
         }
 
         return route;
