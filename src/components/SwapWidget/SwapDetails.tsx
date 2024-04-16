@@ -176,7 +176,7 @@ export const SwapDetails = ({
             "[&_dd]:text-end [&_dd]:tabular-nums",
           )}
         >
-          {priceImpactPercent && route.usdAmountIn && route.usdAmountOut ? (
+          {priceImpactPercent ? (
             <>
               <dt className={priceImpactThresholdReached ? "text-red-500" : ""}>Price Impact</dt>
               <dd className={priceImpactThresholdReached ? "text-red-500" : ""}>{formatPercent(priceImpactPercent)}</dd>
