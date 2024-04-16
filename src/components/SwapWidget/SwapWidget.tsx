@@ -62,12 +62,8 @@ export function SwapWidget() {
     sourceFeeAmount,
     sourceFeeAsset,
     swapPriceImpactPercent,
+    usdDiffPercent,
   } = useSwapWidget();
-
-  let usdDiffPercent = 0.0;
-  if (route?.usdAmountIn && route?.usdAmountOut) {
-    usdDiffPercent = (parseFloat(route.usdAmountOut) - parseFloat(route.usdAmountIn)) / parseFloat(route.usdAmountIn);
-  }
 
   const srcAccount = useAccount("source");
   const destAccount = useAccount("destination");

@@ -3,7 +3,7 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.skip.mone
 export const APP_URL = process.env.APP_URL;
 
 export const appUrl =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview" || process.env.NEXT_PUBLIC_VERCEL_ENV === "staging"
     ? typeof window !== "undefined"
       ? `https://${window.location.hostname}`
       : process.env.NEXT_PUBLIC_VERCEL_URL

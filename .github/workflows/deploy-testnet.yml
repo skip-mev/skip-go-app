@@ -21,7 +21,7 @@ jobs:
 
       - id: pull-staging
         name: Pull latest 'staging'
-        run: git pull origin staging
+        run: git pull --ff-only origin staging
 
       - id: diff-check
         name: Check if 'testnet' is behind 'staging'

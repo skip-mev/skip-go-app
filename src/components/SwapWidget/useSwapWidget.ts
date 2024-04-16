@@ -25,7 +25,6 @@ import { useBalancesByChain } from "@/hooks/useBalancesByChain";
 import { Chain, useChains } from "@/hooks/useChains";
 import { useRoute, useSkipClient } from "@/solve";
 import { getChainFeeAssets, getChainGasPrice } from "@/utils/chain.client";
-import { formatPercent, formatUSD } from "@/utils/intl";
 import { getAmountWei, parseAmountWei } from "@/utils/number";
 import { gracefullyConnect } from "@/utils/wallet";
 
@@ -183,8 +182,12 @@ export function useSwapWidget() {
     if (!route) {
       return undefined;
     }
-
-    if (!route.usdAmountIn || !route.usdAmountOut) {
+    if (
+      !route.usdAmountIn ||
+      !route.usdAmountOut ||
+      Number(route.usdAmountIn) === 0 ||
+      Number(route.usdAmountOut) === 0
+    ) {
       return undefined;
     }
 
@@ -195,36 +198,20 @@ export function useSwapWidget() {
   }, [route]);
 
   const [routeWarningTitle, routeWarningMessage] = useMemo(() => {
-    if (!route) {
+    if (!route?.warning) {
       return [undefined, undefined];
     }
 
-    if (!route.swapPriceImpactPercent && (!route.usdAmountIn || !route.usdAmountOut)) {
-      return ["Low Information Trade", "We were unable to calculate the price impact of this route."];
+    if (Number(route.usdAmountIn) === 0 || Number(route.usdAmountOut) === 0) {
+      return [undefined, undefined];
     }
 
-    if (usdDiffPercent && Math.abs(usdDiffPercent) > PRICE_IMPACT_THRESHOLD) {
-      const amountInUSD = formatUSD(parseFloat(route.usdAmountIn ?? "0"));
-
-      const amountOutUSD = formatUSD(parseFloat(route.usdAmountOut ?? "0"));
-
-      const formattedUsdDiffPercent = formatPercent(Math.abs(usdDiffPercent));
-      return [
-        "Bad Trade Warning",
-        `Your estimated output value (${amountOutUSD}) is ${formattedUsdDiffPercent} lower than your estimated input value (${amountInUSD}).`,
-      ];
-    }
-
-    if (swapPriceImpactPercent && swapPriceImpactPercent > PRICE_IMPACT_THRESHOLD) {
-      const formattedPriceImpact = formatPercent(swapPriceImpactPercent);
-      return [
-        "Bad Trade Warning",
-        `Your swap is expected to execute at a ${formattedPriceImpact} worse price than the current estimated on-chain price. It's likely there's not much liquidity available for this swap.`,
-      ];
+    if (route.warning.type === "BAD_PRICE_WARNING") {
+      return ["Bad Price Warning", route.warning.message];
     }
 
     return [undefined, undefined];
-  }, [route, swapPriceImpactPercent, usdDiffPercent]);
+  }, [route]);
 
   // #endregion
 
@@ -252,7 +239,12 @@ export function useSwapWidget() {
       if (!asset) {
         const assets = assetsByChainID(chain.chainID);
         if (chain.chainType === "evm") {
-          asset = assets.find((asset) => asset.denom.endsWith("-native"));
+          asset = assets.find(
+            (asset) =>
+              asset.denom.endsWith("-native") ||
+              asset.name?.toLowerCase() === chain.chainName.toLowerCase() ||
+              asset.symbol?.toLowerCase().includes("usdc"),
+          );
         }
         asset ??= assets[0];
       }
@@ -297,9 +289,23 @@ export function useSwapWidget() {
       const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
-      let asset = await getFeeAsset(chain.chainID);
+      let feeAsset: Asset | undefined = undefined;
+      if (chain.chainType === "cosmos") {
+        feeAsset = await getFeeAsset(chain.chainID);
+      }
+
+      let asset = feeAsset;
       if (!asset) {
-        [asset] = assets;
+        const assets = assetsByChainID(chain.chainID);
+        if (chain.chainType === "evm") {
+          asset = assets.find(
+            (asset) =>
+              asset.denom.endsWith("-native") ||
+              asset.name?.toLowerCase() === chain.chainName.toLowerCase() ||
+              asset.symbol?.toLowerCase().includes("usdc"),
+          );
+        }
+        asset ??= assets[0];
       }
       if (currentDstAsset && userTouchedDstAsset) {
         const equivalentAsset = findEquivalentAsset(currentDstAsset, assets);
@@ -831,6 +837,7 @@ export function useSwapWidget() {
     sourceFeeAmount: gasRequired,
     sourceFeeAsset: srcFeeAsset,
     swapPriceImpactPercent,
+    usdDiffPercent,
   };
 }
 
