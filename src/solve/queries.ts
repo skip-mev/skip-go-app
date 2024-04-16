@@ -165,7 +165,7 @@ export function useRoute({
         throw error;
       }
     },
-    refetchInterval: isError ? false : refetchCount < 10 ? 1000 * 1 : false,
+    refetchInterval: isError ? false : refetchCount < 10 ? 1000 * 10 : false,
     retry: false,
     enabled:
       enabled &&
