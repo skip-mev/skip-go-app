@@ -252,7 +252,12 @@ export function useSwapWidget() {
       if (!asset) {
         const assets = assetsByChainID(chain.chainID);
         if (chain.chainType === "evm") {
-          asset = assets.find((asset) => asset.denom.endsWith("-native"));
+          asset = assets.find(
+            (asset) =>
+              asset.denom.endsWith("-native") ||
+              asset.name?.toLowerCase() === chain.chainName.toLowerCase() ||
+              asset.symbol?.toLowerCase().includes("usdc"),
+          );
         }
         asset ??= assets[0];
       }
@@ -297,9 +302,23 @@ export function useSwapWidget() {
       const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
-      let asset = await getFeeAsset(chain.chainID);
+      let feeAsset: Asset | undefined = undefined;
+      if (chain.chainType === "cosmos") {
+        feeAsset = await getFeeAsset(chain.chainID);
+      }
+
+      let asset = feeAsset;
       if (!asset) {
-        [asset] = assets;
+        const assets = assetsByChainID(chain.chainID);
+        if (chain.chainType === "evm") {
+          asset = assets.find(
+            (asset) =>
+              asset.denom.endsWith("-native") ||
+              asset.name?.toLowerCase() === chain.chainName.toLowerCase() ||
+              asset.symbol?.toLowerCase().includes("usdc"),
+          );
+        }
+        asset ??= assets[0];
       }
       if (currentDstAsset && userTouchedDstAsset) {
         const equivalentAsset = findEquivalentAsset(currentDstAsset, assets);
