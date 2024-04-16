@@ -73,7 +73,7 @@ export function useRoute({
   const skipClient = useSkipClient();
 
   const [refetchCount, setRefetchCount] = useState(0);
-
+  const [isError, setIsError] = useState(false);
   const { data: experimentalFeatures } = useExperimentalFeatures();
 
   const queryKey = useMemo(
@@ -119,42 +119,53 @@ export function useRoute({
       if (!sourceAsset || !sourceAssetChainID || !destinationAsset || !destinationAssetChainID) {
         return;
       }
+      try {
+        const route = await skipClient.route(
+          direction === "swap-in"
+            ? {
+                amountIn: amount,
+                sourceAssetDenom: sourceAsset,
+                sourceAssetChainID: sourceAssetChainID,
+                destAssetDenom: destinationAsset,
+                destAssetChainID: destinationAssetChainID,
+                swapVenue,
+                allowMultiTx: true,
+                allowUnsafe: true,
+                experimentalFeatures,
+                smartRelay: true,
+              }
+            : {
+                amountOut: amount,
+                sourceAssetDenom: sourceAsset,
+                sourceAssetChainID: sourceAssetChainID,
+                destAssetDenom: destinationAsset,
+                destAssetChainID: destinationAssetChainID,
+                swapVenue,
+                allowMultiTx: true,
+                allowUnsafe: true,
+                experimentalFeatures,
+                smartRelay: true,
+              },
+        );
 
-      const route = await skipClient.route(
-        direction === "swap-in"
-          ? {
-              amountIn: amount,
-              sourceAssetDenom: sourceAsset,
-              sourceAssetChainID: sourceAssetChainID,
-              destAssetDenom: destinationAsset,
-              destAssetChainID: destinationAssetChainID,
-              swapVenue,
-              allowMultiTx: true,
-              allowUnsafe: true,
-              experimentalFeatures,
-              smartRelay: true,
-            }
-          : {
-              amountOut: amount,
-              sourceAssetDenom: sourceAsset,
-              sourceAssetChainID: sourceAssetChainID,
-              destAssetDenom: destinationAsset,
-              destAssetChainID: destinationAssetChainID,
-              swapVenue,
-              allowMultiTx: true,
-              allowUnsafe: true,
-              experimentalFeatures,
-              smartRelay: true,
-            },
-      );
+        if (!route.operations) {
+          throw new Error("no routes found");
+        }
 
-      if (!route.operations) {
-        throw new Error("No route found");
+        return route;
+      } catch (error) {
+        if (
+          // @ts-expect-error - error
+          String(error?.message).toLowerCase().includes("no routes found") ||
+          // @ts-expect-error - error
+          String(error?.message).toLowerCase().includes("relay")
+        ) {
+          setIsError(true);
+        }
+        throw error;
       }
-
-      return route;
     },
-    refetchInterval: refetchCount < 10 ? 1000 * 10 : false,
+    refetchInterval: isError ? false : refetchCount < 10 ? 1000 * 1 : false,
     retry: false,
     enabled:
       enabled &&
@@ -172,6 +183,7 @@ export function useRoute({
   }, [query.isRefetching]);
 
   useEffect(() => {
+    setIsError(false);
     setRefetchCount(0);
   }, [queryKey]);
 
