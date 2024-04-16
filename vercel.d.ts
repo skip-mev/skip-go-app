@@ -43,7 +43,7 @@ declare namespace NodeJS {
     readonly VERCEL_GIT_PREVIOUS_SHA?: string;
     readonly VERCEL_GIT_PULL_REQUEST_ID?: string;
 
-    readonly NEXT_PUBLIC_VERCEL_ENV?: "production" | "preview" | "development";
+    readonly NEXT_PUBLIC_VERCEL_ENV?: "production" | "preview" | "development" | "staging";
     readonly NEXT_PUBLIC_VERCEL_URL?: string;
     readonly NEXT_PUBLIC_VERCEL_BRANCH_URL?: string;
     readonly NEXT_PUBLIC_VERCEL_AUTOMATION_BYPASS_SECRET?: string;
