@@ -31,6 +31,10 @@ let nextConfig = {
       source: "/api/rpc/(.*)",
       destination: "/api/rpc/handler",
     },
+    {
+      source: "/api/skip/(.*)",
+      destination: "/api/skip/handler",
+    },
   ],
   transpilePackages:
     process.env.NODE_ENV === "test"
