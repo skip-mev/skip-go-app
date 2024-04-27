@@ -6,7 +6,7 @@ import { createContext, ReactNode } from "react";
 import { WalletClient } from "viem";
 
 import { chainIdToName } from "@/chains/types";
-import { API_URL, appUrl } from "@/constants/api";
+import { appUrl } from "@/constants/api";
 import { trackWallet } from "@/context/track-wallet";
 import { config } from "@/lib/wagmi";
 import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
@@ -19,7 +19,7 @@ export function SkipProvider({ children }: { children: ReactNode }) {
 
   const skipClient = new SkipRouter({
     clientID: process.env.NEXT_PUBLIC_CLIENT_ID,
-    apiURL: API_URL,
+    apiURL: `${appUrl}/api/skip`,
     getCosmosSigner: async (chainID) => {
       const chainName = chainIdToName[chainID];
       if (!chainName) {
