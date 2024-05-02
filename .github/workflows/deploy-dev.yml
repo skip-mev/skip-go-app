@@ -13,15 +13,15 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - id: configure
-        name: configure
-        run: git config pull.ff true
-
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
         with:
           ref: dev
+
+      - id: configure
+        name: configure
+        run: git config pull.ff true
 
       - id: pull-main
         name: Pull latest 'main'
