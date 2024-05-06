@@ -178,8 +178,10 @@ function AssetInput({
           }}
         />
         <div className="flex h-8 items-center space-x-2 tabular-nums">
-          <p className="text-sm tabular-nums text-neutral-400">{amountUSD ? formatUSD(amountUSD) : null}</p>
-          {amountUSD !== undefined && diffPercentage !== 0 && context === "destination" ? (
+          <p className="text-sm tabular-nums text-neutral-400">
+            {amountUSD && Number(amountUSD) > 0 ? formatUSD(amountUSD) : null}
+          </p>
+          {amountUSD !== undefined && Number(amountUSD) > 0 && diffPercentage !== 0 && context === "destination" ? (
             <p className={cn("text-sm tabular-nums", diffPercentage >= 0 ? "text-green-500" : "text-red-500")}>
               ({formatPercent(diffPercentage)})
             </p>

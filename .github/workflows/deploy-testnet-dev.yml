@@ -17,7 +17,11 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: testnet
+          ref: testnet-dev
+
+      - id: configure
+        name: configure
+        run: git config pull.ff true
 
       - id: pull-staging
         name: Pull latest 'staging'
