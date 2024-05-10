@@ -225,7 +225,11 @@ export const PreviewRoute = ({
     }
 
     const isSignRequired =
-      enabledSetAddressIndex && chainIDsWithAction[enabledSetAddressIndex]?.transferAction?.signRequired;
+      enabledSetAddressIndex &&
+      chainIDsWithAction[enabledSetAddressIndex]?.transferAction?.signRequired &&
+      enabledSetAddressIndex !== 0 &&
+      chainIDsWithAction[enabledSetAddressIndex].transferAction?.id !==
+        chainIDsWithAction[enabledSetAddressIndex - 1].transferAction?.id;
 
     return (
       <button
@@ -279,7 +283,7 @@ export const PreviewRoute = ({
           setIsExpanded(true);
         }}
       >
-        {enabledSetAddressIndex === Object.values(chainAddressesStore).length - 1 && !isSignRequired
+        {enabledSetAddressIndex === Object.values(chainAddressesStore).length - 1 || !isSignRequired
           ? "Set Destination Address"
           : isSignRequired
             ? "Connect Wallet"
