@@ -14,8 +14,8 @@ export function useWalletAddresses(chainIDs: string[]) {
   const { getWalletRepo } = useManager();
   const { wallets } = useWallet();
 
-  const srcAccount = useAccount("source");
-  const dstAccount = useAccount("destination");
+  const cosmos = useAccount("cosmos");
+  const svm = useAccount("svm");
 
   const queryKey = useMemo(() => ["USE_WALLET_ADDRESSES", chainIDs] as const, [chainIDs]);
 
@@ -26,9 +26,6 @@ export function useWalletAddresses(chainIDs: string[]) {
 
       const srcChain = chains.find(({ chainID }) => {
         return chainID === chainIDs.at(0);
-      });
-      const dstChain = chains.find(({ chainID }) => {
-        return chainID === chainIDs.at(-1);
       });
 
       for (const currentChainID of chainIDs) {
@@ -43,18 +40,12 @@ export function useWalletAddresses(chainIDs: string[]) {
           const currentWalletName = (() => {
             // if `chainID` is the source or destination chain
             if (srcChain?.chainID === currentChainID) {
-              return srcAccount?.wallet?.walletName;
-            }
-            if (dstChain?.chainID === currentChainID) {
-              return dstAccount?.wallet?.walletName;
+              return cosmos?.wallet?.walletName;
             }
 
             // if `chainID` isn't the source or destination chain
             if (srcChain?.chainType === "cosmos") {
-              return srcAccount?.wallet?.walletName;
-            }
-            if (dstChain?.chainType === "cosmos") {
-              return dstAccount?.wallet?.walletName;
+              return cosmos?.wallet?.walletName;
             }
           })();
 
@@ -83,10 +74,7 @@ export function useWalletAddresses(chainIDs: string[]) {
         }
 
         if (chain.chainType === "svm") {
-          const solanaWallet = wallets.find(
-            (w) =>
-              w.adapter.name === srcAccount?.wallet?.walletName || w.adapter.name === dstAccount?.wallet?.walletName,
-          );
+          const solanaWallet = wallets.find((w) => w.adapter.name === svm?.wallet?.walletName);
 
           if (!solanaWallet?.adapter.publicKey) {
             throw new Error(`useWalletAddresses error: svm wallet not connected`);

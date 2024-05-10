@@ -17,6 +17,7 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { useAssets } from "@/context/assets";
+import { chainAddresses } from "@/context/chainAddresses";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { trackWallet } from "@/context/track-wallet";
@@ -47,8 +48,6 @@ export function useSwapWidget() {
   const { assetsByChainID, getFeeAsset } = useAssets();
   const { data: chains } = useChains();
 
-  const srcAccount = useAccount("source");
-
   const { getWalletRepo } = useCosmosManager();
   const { connector, chain: evmChain } = useWagmiAccount();
   const { switchChainAsync: switchNetworkAsync } = useWagmiSwitchNetwork({
@@ -75,6 +74,8 @@ export function useSwapWidget() {
     sourceChain: srcChain,
     sourceFeeAsset: srcFeeAsset,
   } = useSwapWidgetStore();
+
+  const srcAccount = useAccount(srcChain?.chainID);
 
   const amountInWei = useMemo(() => {
     return getAmountWei(amountIn, srcAsset?.decimals);
@@ -605,18 +606,15 @@ export function useSwapWidget() {
     return useSwapWidgetStore.subscribe(
       (state) => state.sourceChain,
       async (srcChain) => {
-        const { source: srcTrack, destination: dstTrack } = trackWallet.get();
+        const { cosmos, svm } = trackWallet.get();
 
         if (srcChain && srcChain.chainType === "cosmos") {
           const { wallets } = getWalletRepo(srcChain.chainName);
           let wallet: (typeof wallets)[number] | undefined;
-          if (srcTrack?.chainType === "cosmos") {
+
+          if (cosmos?.chainType === "cosmos") {
             wallet = wallets.find((w) => {
-              return w.walletName === srcTrack.walletName;
-            });
-          } else if (dstTrack?.chainType === "cosmos") {
-            wallet = wallets.find((w) => {
-              return w.walletName === dstTrack.walletName;
+              return w.walletName === cosmos.walletName;
             });
           } else {
             wallet = wallets.find((w) => {
@@ -626,12 +624,12 @@ export function useSwapWidget() {
           if (wallet) {
             try {
               await gracefullyConnect(wallet);
-              trackWallet.track("source", srcChain.chainID, wallet.walletName, srcChain.chainType);
+              trackWallet.track("cosmos", wallet.walletName, srcChain.chainType);
             } catch (error) {
               console.error(error);
             }
           } else {
-            trackWallet.untrack("source");
+            trackWallet.untrack("cosmos");
           }
         }
         if (srcChain && srcChain.chainType === "evm") {
@@ -640,32 +638,30 @@ export function useSwapWidget() {
               if (switchNetworkAsync && evmChain.id !== +srcChain.chainID) {
                 await switchNetworkAsync({ chainId: +srcChain.chainID });
               }
-              trackWallet.track("source", srcChain.chainID, connector.id, srcChain.chainType);
+              trackWallet.track("evm", connector.id, srcChain.chainType);
             } catch (error) {
               console.error(error);
-              trackWallet.untrack("source");
+              trackWallet.untrack("evm");
               disconnect();
             }
           } else {
-            trackWallet.untrack("source");
+            trackWallet.untrack("evm");
             disconnect();
           }
         }
         if (srcChain && srcChain.chainType === "svm") {
           let wallet: (typeof wallets)[number] | undefined;
-          if (srcTrack?.chainType === "svm") {
-            wallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
-          } else if (dstTrack?.chainType === "svm") {
-            wallet = wallets.find((w) => w.adapter.name === dstTrack?.walletName);
+          if (svm?.chainType === "svm") {
+            wallet = wallets.find((w) => w.adapter.name === svm?.walletName);
           } else {
             wallet = wallets.find((w) => w.adapter.connected);
           }
 
           if (wallet) {
             wallet.adapter.connect();
-            trackWallet.track("source", srcChain.chainID, wallet.adapter.name, srcChain.chainType);
+            trackWallet.track("svm", wallet.adapter.name, srcChain.chainType);
           } else {
-            trackWallet.untrack("source");
+            trackWallet.untrack("svm");
           }
         }
       },
@@ -676,133 +672,13 @@ export function useSwapWidget() {
     );
   }, [connector, disconnect, evmChain, getWalletRepo, switchNetworkAsync, wallets]);
 
-  /**
-   * sync destination chain wallet connections
-   * @see {dstChain}
-   */
-  useEffect(() => {
-    return useSwapWidgetStore.subscribe(
-      (state) => state.destinationChain,
-      async (dstChain) => {
-        const { source: srcTrack, destination: dstTrack } = trackWallet.get();
-
-        if (dstChain && dstChain.chainType === "cosmos") {
-          const { wallets } = getWalletRepo(dstChain.chainName);
-          let wallet: (typeof wallets)[number] | undefined;
-          if (dstTrack?.chainType === "cosmos") {
-            wallet = wallets.find((w) => {
-              return w.walletName === dstTrack.walletName;
-            });
-          } else if (srcTrack?.chainType === "cosmos") {
-            wallet = wallets.find((w) => {
-              return w.walletName === srcTrack.walletName;
-            });
-          } else {
-            wallet = wallets.find((w) => {
-              return w.isWalletConnected && !w.isWalletDisconnected;
-            });
-          }
-          if (wallet) {
-            try {
-              await gracefullyConnect(wallet);
-              trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
-            } catch (error) {
-              console.error(error);
-            }
-          } else {
-            trackWallet.untrack("destination");
-          }
-        }
-        if (dstChain && dstChain.chainType === "evm") {
-          if (evmChain && connector) {
-            try {
-              if (switchNetworkAsync && evmChain.id !== +dstChain.chainID && srcChain && srcChain.chainType !== "evm") {
-                await switchNetworkAsync({ chainId: +dstChain.chainID });
-              }
-              trackWallet.track("destination", dstChain.chainID, connector.id, dstChain.chainType);
-            } catch (error) {
-              console.error(error);
-              trackWallet.untrack("destination");
-              disconnect();
-            }
-          } else {
-            trackWallet.untrack("destination");
-            disconnect();
-          }
-        }
-        if (dstChain && dstChain.chainType === "svm") {
-          let wallet: (typeof wallets)[number] | undefined;
-          if (dstTrack?.chainType === "svm") {
-            wallet = wallets.find((w) => w.adapter.name === dstTrack?.walletName);
-          } else if (srcTrack?.chainType === "svm") {
-            wallet = wallets.find((w) => w.adapter.name === srcTrack?.walletName);
-          } else {
-            wallet = wallets.find((w) => w.adapter.connected);
-          }
-
-          if (wallet) {
-            wallet.adapter.connect();
-            trackWallet.track("destination", dstChain.chainID, wallet.adapter.name, dstChain.chainType);
-          } else {
-            trackWallet.untrack("destination");
-          }
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, [connector, disconnect, evmChain, getWalletRepo, srcChain, switchNetworkAsync, wallets]);
-
-  /**
-   * sync destination chain wallet connections on track wallet level
-   * @see {trackWallet}
-   */
-  useEffect(() => {
-    return trackWallet.subscribe(
-      (state) => state.source,
-      async (srcTrack) => {
-        const { sourceChain: srcChain, destinationChain: dstChain } = useSwapWidgetStore.getState();
-        const { destination: dstTrack } = trackWallet.get();
-        if (
-          srcChain?.chainType === "cosmos" &&
-          srcTrack?.chainType === "cosmos" &&
-          dstChain?.chainType === "cosmos" &&
-          dstTrack?.chainType !== "cosmos"
-        ) {
-          const { wallets } = getWalletRepo(dstChain.chainName);
-          const wallet = wallets.find((w) => {
-            return w.walletName === srcTrack.walletName;
-          });
-          if (wallet) {
-            try {
-              await gracefullyConnect(wallet);
-              trackWallet.track("destination", dstChain.chainID, wallet.walletName, dstChain.chainType);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        }
-        if (!srcTrack && dstChain?.chainType === "cosmos" && dstTrack?.chainType === "cosmos") {
-          const { wallets } = getWalletRepo(dstChain.chainName);
-          const wallet = wallets.find((w) => {
-            return w.walletName === dstTrack.walletName;
-          });
-          if (wallet) {
-            wallet.disconnect();
-            trackWallet.untrack("destination");
-          }
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, [getWalletRepo]);
-
   // #endregion
+
+  useEffect(() => {
+    if (route?.chainIDs) {
+      chainAddresses.init(route?.chainIDs);
+    }
+  }, [route?.chainIDs]);
 
   /////////////////////////////////////////////////////////////////////////////
 

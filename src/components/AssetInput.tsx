@@ -56,7 +56,7 @@ function AssetInput({
     return assetsByChainID(chain.chainID);
   }, [assetsByChainID, chain, getNativeAssets]);
 
-  const account = useAccount(context);
+  const account = useAccount(chain?.chainID);
 
   const isAnyDisclosureOpen = useAnyDisclosureOpen();
 
@@ -64,7 +64,7 @@ function AssetInput({
     address: account?.address,
     chain,
     assets,
-    enabled: !isAnyDisclosureOpen,
+    enabled: !isAnyDisclosureOpen && context === "source",
   });
 
   const selectedAssetBalance = useMemo(() => {
