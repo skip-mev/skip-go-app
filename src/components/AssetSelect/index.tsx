@@ -1,6 +1,5 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Asset } from "@skip-router/core";
-import Image from "next/image";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
@@ -36,7 +35,7 @@ function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalan
           data-testid="select-asset"
         >
           {asset && (
-            <Image
+            <img
               alt={asset.recommendedSymbol || "asset symbol"}
               height={24}
               width={24}

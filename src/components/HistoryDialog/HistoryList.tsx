@@ -73,7 +73,6 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(function Item(props, r
     })),
     enabled: !(data.status === "success" || data.status === "failed"),
   });
-
   useEffect(() => {
     if (errorUpdateCount > 4) {
       txHistory.remove(id);
