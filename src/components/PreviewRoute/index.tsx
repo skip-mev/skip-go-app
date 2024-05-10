@@ -53,6 +53,7 @@ export const PreviewRoute = ({
   const chainIDsWithAction = makeChainIDsWithAction({ route, actions });
 
   const chainAddressesStore = useChainAddressesStore((state) => state);
+
   const enabledSetAddressIndex = useMemo(() => {
     const values = Object.values(chainAddressesStore);
     if (values.length === 0) return;
@@ -61,6 +62,16 @@ export const PreviewRoute = ({
     }
     return values.findIndex((v) => !v?.address);
   }, [chainAddressesStore]);
+
+  const isSignRequired = useMemo(() => {
+    return Boolean(
+      enabledSetAddressIndex &&
+        chainIDsWithAction[enabledSetAddressIndex]?.transferAction?.signRequired &&
+        enabledSetAddressIndex !== 0 &&
+        chainIDsWithAction[enabledSetAddressIndex].transferAction?.id !==
+          chainIDsWithAction[enabledSetAddressIndex - 1].transferAction?.id,
+    );
+  }, [chainIDsWithAction, enabledSetAddressIndex]);
 
   const allAddressFilled = route.chainIDs
     .map((chainID, index) => {
@@ -224,13 +235,6 @@ export const PreviewRoute = ({
       );
     }
 
-    const isSignRequired =
-      enabledSetAddressIndex &&
-      chainIDsWithAction[enabledSetAddressIndex]?.transferAction?.signRequired &&
-      enabledSetAddressIndex !== 0 &&
-      chainIDsWithAction[enabledSetAddressIndex].transferAction?.id !==
-        chainIDsWithAction[enabledSetAddressIndex - 1].transferAction?.id;
-
     return (
       <button
         className={cn(
@@ -240,6 +244,10 @@ export const PreviewRoute = ({
           "disabled:cursor-not-allowed disabled:opacity-75",
         )}
         onClick={async () => {
+          if (!enabledSetAddressIndex) {
+            console.error("No address index found!");
+            return;
+          }
           if (isSignRequired) {
             try {
               const { cosmos, evm, svm } = trackWallet.get();
@@ -273,6 +281,8 @@ export const PreviewRoute = ({
                   address,
                   source: wallet,
                 });
+              } else {
+                setIndexIsSetAddressDialogOpen(enabledSetAddressIndex);
               }
             } catch (error) {
               setIndexIsSetAddressDialogOpen(enabledSetAddressIndex);
