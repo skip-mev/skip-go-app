@@ -423,7 +423,7 @@ export const PreviewRoute = ({
                 <>
                   <CheckCircleIcon className="h-8 w-8 text-green-500" />
                   <p className="text-sm font-semibold">
-                    Your transaction is being processed. You can safely navigate away from this page.
+                    You can safely navigate away from this page while your transaction is pending
                   </p>
                 </>
               ) : route.txsRequired > 1 ? (
