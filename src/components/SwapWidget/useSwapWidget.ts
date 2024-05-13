@@ -17,7 +17,6 @@ import { createWithEqualityFn as create } from "zustand/traditional";
 
 import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { useAssets } from "@/context/assets";
-import { chainAddresses } from "@/context/chainAddresses";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { trackWallet } from "@/context/track-wallet";
@@ -673,12 +672,6 @@ export function useSwapWidget() {
   }, [connector, disconnect, evmChain, getWalletRepo, switchNetworkAsync, wallets]);
 
   // #endregion
-
-  useEffect(() => {
-    if (route?.chainIDs) {
-      chainAddresses.init(route?.chainIDs);
-    }
-  }, [route?.chainIDs]);
 
   /////////////////////////////////////////////////////////////////////////////
 

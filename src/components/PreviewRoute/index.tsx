@@ -2,11 +2,10 @@ import { ArrowLeftIcon, CheckCircleIcon, FingerPrintIcon, InformationCircleIcon 
 import * as Sentry from "@sentry/react";
 import { RouteResponse } from "@skip-router/core";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useAssets } from "@/context/assets";
-import { chainAddresses, useChainAddressesStore } from "@/context/chainAddresses";
 import { useDisclosureKey } from "@/context/disclosures";
 import { useSettingsStore } from "@/context/settings";
 import { trackWallet, TrackWalletCtx } from "@/context/track-wallet";
@@ -24,6 +23,27 @@ import * as AlertCollapse from "./AlertCollapse";
 import { ChainStep } from "./ChainStep";
 import { makeActions } from "./make-actions";
 import { makeChainIDsWithAction } from "./make-chain-ids-with-actions";
+
+interface Wallet {
+  walletName: string;
+  walletPrettyName: string;
+  walletInfo: {
+    logo?:
+      | string
+      | {
+          major: string;
+          minor: string;
+        };
+  };
+  isLedger?: boolean | null;
+}
+
+export type ChainAddresses = {
+  chainID: string;
+  chainType?: TrackWalletCtx;
+  address?: string;
+  source?: "input" | Wallet;
+};
 export interface BroadcastedTx {
   chainID: string;
   txHash: string;
@@ -52,16 +72,69 @@ export const PreviewRoute = ({
   const actions = makeActions({ route });
   const chainIDsWithAction = makeChainIDsWithAction({ route, actions });
 
-  const chainAddressesStore = useChainAddressesStore((state) => state);
+  const [chainAddresses, _setChainAddresses] = useState<Record<number, ChainAddresses | undefined>>({});
+  useEffect(() => {
+    _setChainAddresses(() => {
+      const newState: Record<number, ChainAddresses> = {};
+      route.chainIDs.forEach((chainID) => {
+        newState[route.chainIDs.indexOf(chainID)] = {
+          chainID,
+        };
+      });
+      return newState;
+    });
+  }, [route.chainIDs]);
+
+  const setChainAddresses = ({
+    index,
+    address,
+    chainID,
+    chainType,
+    source,
+  }: {
+    index: number;
+    chainID: string;
+    chainType: TrackWalletCtx;
+    address: string;
+    source: "input" | Wallet;
+  }) => {
+    const current = chainAddresses[index];
+    if (current) {
+      _setChainAddresses((state) => {
+        return {
+          ...state,
+          [index]: {
+            ...current,
+            chainID,
+            chainType,
+            address,
+            source,
+          },
+        };
+      });
+    } else {
+      _setChainAddresses((state) => {
+        return {
+          ...state,
+          [index]: {
+            chainID,
+            chainType,
+            address,
+            source,
+          },
+        };
+      });
+    }
+  };
 
   const enabledSetAddressIndex = useMemo(() => {
-    const values = Object.values(chainAddressesStore);
+    const values = Object.values(chainAddresses);
     if (values.length === 0) return;
     if (!values[values.length - 1]?.address) {
       return values.length - 1;
     }
     return values.findIndex((v) => !v?.address);
-  }, [chainAddressesStore]);
+  }, [chainAddresses]);
 
   const isSignRequired = useMemo(() => {
     return Boolean(
@@ -75,7 +148,7 @@ export const PreviewRoute = ({
 
   const allAddressFilled = route.chainIDs
     .map((chainID, index) => {
-      const chainAddress = chainAddresses.get(index);
+      const chainAddress = chainAddresses[index];
 
       return (Boolean(chainAddress?.address) && chainAddress?.chainID === chainID) === true;
     })
@@ -100,7 +173,7 @@ export const PreviewRoute = ({
 
     const userAddresses: Record<string, string> = {};
     route.chainIDs.forEach((chainID, index) => {
-      const chainAddress = chainAddresses.get(index);
+      const chainAddress = chainAddresses[index];
       if (chainID === chainAddress?.chainID && chainAddress?.address) {
         userAddresses[chainID] = chainAddress?.address;
       }
@@ -153,7 +226,7 @@ export const PreviewRoute = ({
       }
       Sentry.withScope((scope) => {
         scope.setUser({
-          id: chainAddresses.get(0)?.address,
+          id: chainAddresses[0]?.address,
         });
         scope.setTransactionName("Swap.onSubmit");
         scope.setTags({
@@ -164,8 +237,8 @@ export const PreviewRoute = ({
           doesSwap: route.doesSwap,
         });
         scope.setExtras({
-          sourceAddress: chainAddresses.get(0)?.address,
-          destinationAddress: chainAddresses.get(route.chainIDs.length - 1)?.address,
+          sourceAddress: chainAddresses[0]?.address,
+          destinationAddress: chainAddresses[route.chainIDs.length - 1]?.address,
           sourceChain: route.sourceAssetChainID,
           destinationChain: route.destAssetChainID,
           userAddresses,
@@ -274,7 +347,7 @@ export const PreviewRoute = ({
                 if (!address) {
                   throw new Error("Address not found!");
                 }
-                chainAddresses.set({
+                setChainAddresses({
                   index: enabledSetAddressIndex,
                   chainID: chain.chainID,
                   chainType: chain.chainType as TrackWalletCtx,
@@ -293,7 +366,7 @@ export const PreviewRoute = ({
           setIsExpanded(true);
         }}
       >
-        {enabledSetAddressIndex === Object.values(chainAddressesStore).length - 1 || !isSignRequired
+        {enabledSetAddressIndex === Object.values(chainAddresses).length - 1 || !isSignRequired
           ? "Set Destination Address"
           : isSignRequired
             ? "Connect Wallet"
