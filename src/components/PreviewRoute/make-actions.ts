@@ -40,7 +40,7 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
         return true;
       } else {
         const prevOperation = route.operations[i - 1];
-        if (operation.txIndex !== prevOperation.txIndex) {
+        if (operation.txIndex > prevOperation.txIndex) {
           return true;
         }
         return false;

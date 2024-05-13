@@ -33,7 +33,7 @@ module.exports = {
         "slide-left-and-fade": `slide-left-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
         "spin-swap": `spin 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.27)`,
         "gradient-x": "gradient-x 3s ease infinite",
-        "gradient-y": "gradient-y 3s ease infinite",
+        "gradient-y": "gradient-y 2s infinite",
         "gradient-xy": "gradient-xy 3s ease infinite",
       },
       colors: {
@@ -85,11 +85,11 @@ module.exports = {
         },
         "gradient-y": {
           "0%, 100%": {
-            "background-size": "600% 140%",
+            "background-size": "30% 250%",
             "background-position": "top bottom",
           },
           "50%": {
-            "background-size": "200% 200%",
+            "background-size": "500% 500%",
             "background-position": "center center",
           },
         },

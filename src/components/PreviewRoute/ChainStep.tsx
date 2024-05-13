@@ -261,7 +261,7 @@ export const ChainStep = ({
                 className={cn(
                   "h-full w-1 transition-all",
                   isLoading
-                    ? "animate-gradient-y bg-neutral-200 bg-gradient-to-b from-green-600 from-10% via-[#FFDC61] via-50% to-neutral-200 to-65%"
+                    ? "animate-gradient-y bg-neutral-200 bg-gradient-to-b from-green-600 from-0% via-green-600 via-20% to-[#ffdc61] to-50%"
                     : isSuccess
                       ? "bg-green-600"
                       : "bg-neutral-200",

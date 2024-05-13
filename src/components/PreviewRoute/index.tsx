@@ -54,7 +54,7 @@ export const PreviewRoute = ({
   const getChain = (chainID: string) => chains?.find((chain) => chain.chainID === chainID);
   const { makeWallets } = useMakeWallets();
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(() => (route.chainIDs.length === 2 ? true : false));
   const [isOpen, control] = disclosure;
   const [indexSetAddressDialogOpen, setIndexIsSetAddressDialogOpen] = useState<number>();
 
@@ -130,7 +130,6 @@ export const PreviewRoute = ({
       return (Boolean(chainAddress?.address) && chainAddress?.chainID === chainID) === true;
     })
     .every((v) => v);
-  console.log({ allAddressFilled, chainAddresses });
 
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
   const { data: statusData } = useBroadcastedTxsStatus({
