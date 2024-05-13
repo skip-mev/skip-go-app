@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import { FaExternalLinkAlt, FaKeyboard } from "react-icons/fa";
 import { formatUnits } from "viem";
 
-import { chainAddresses } from "@/context/chainAddresses";
 import { useAccount } from "@/hooks/useAccount";
 import { useAutoSetAddress } from "@/hooks/useAutoSetAddress";
 import { useBridgeByID } from "@/hooks/useBridges";
@@ -18,11 +17,11 @@ import { cn } from "@/utils/ui";
 import { AdaptiveLink } from "../AdaptiveLink";
 import { ExpandArrow } from "../Icons/ExpandArrow";
 import { SimpleTooltip } from "../SimpleTooltip";
-import { BroadcastedTx } from ".";
 import { SwapAction, TransferAction } from "./make-actions";
 import { ChainIDWithAction } from "./make-chain-ids-with-actions";
 import { makeStepState } from "./make-step-state";
 import { SetAddressDialog } from "./SetAddressDialog";
+import { BroadcastedTx, ChainAddresses, SetChainAddressesParam } from "./types";
 
 export const ChainStep = ({
   chainID,
@@ -39,6 +38,8 @@ export const ChainStep = ({
   setIsAddressDialogOpen,
   isExpanded,
   setIsExpanded,
+  chainAddresses,
+  setChainAddresses,
 }: {
   chainID: string;
   index: number;
@@ -63,6 +64,8 @@ export const ChainStep = ({
   setIsAddressDialogOpen: (v: number | undefined) => void;
   isExpanded: boolean;
   setIsExpanded: Dispatch<SetStateAction<boolean>>;
+  chainAddresses: ChainAddresses;
+  setChainAddresses: (v: SetChainAddressesParam) => void;
 }) => {
   const { data: chain } = useChainByID(chainID);
 
@@ -76,7 +79,7 @@ export const ChainStep = ({
 
   const { data: bridge } = useBridgeByID(transferAction?.bridgeID);
 
-  const chainAddress = chainAddresses.get(index);
+  const chainAddress = chainAddresses[index];
 
   const previousChain = index !== 0 && chainIDsWithAction[index - 1];
   const signRequired = (() => {
@@ -95,6 +98,8 @@ export const ChainStep = ({
     index,
     enabled: isOpen,
     signRequired,
+    chainAddresses,
+    setChainAddresses,
   });
 
   // tx tracking
@@ -169,6 +174,8 @@ export const ChainStep = ({
         index={index}
         signRequired={Boolean(signRequired)}
         isDestination={isDestination}
+        chainAddresses={chainAddresses}
+        setChainAddresses={setChainAddresses}
       />
     );
   return (
@@ -394,6 +401,8 @@ export const ChainStep = ({
         index={index}
         signRequired={Boolean(signRequired)}
         isDestination={isDestination}
+        chainAddresses={chainAddresses}
+        setChainAddresses={setChainAddresses}
       />
     </div>
   );

@@ -148,9 +148,11 @@ export const useMakeWallets = () => {
                   return evmAddress;
                 }
               } else {
+                console.log("connecting");
                 await connectAsync({ connector, chainId: Number(chainID) });
                 trackWallet.track("evm", connector.id, chainType);
-                if (context && evmAddress) {
+
+                if (context) {
                   toast.success(`Successfully retrieve ${context} address from ${connector.name}`);
                 }
                 return evmAddress;

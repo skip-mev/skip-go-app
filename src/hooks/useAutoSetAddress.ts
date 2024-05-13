@@ -1,7 +1,7 @@
 import { Chain } from "@skip-router/core";
 import { useQuery } from "@tanstack/react-query";
 
-import { chainAddresses, useChainAddressesStore } from "@/context/chainAddresses";
+import { ChainAddresses, SetChainAddressesParam } from "@/components/PreviewRoute/types";
 import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wallet";
 
 import { useMakeWallets } from "./useMakeWallets";
@@ -12,18 +12,21 @@ export const useAutoSetAddress = ({
   index,
   enabled,
   signRequired,
+  chainAddresses,
+  setChainAddresses,
 }: {
   chain?: Chain;
   chainID: string;
   index: number;
   enabled?: boolean;
   signRequired?: boolean;
+  chainAddresses: ChainAddresses;
+  setChainAddresses: (v: SetChainAddressesParam) => void;
 }) => {
   const trackedWallets = useTrackWallet(chain?.chainType as TrackWalletCtx);
-  const addresses = useChainAddressesStore();
-  const source = addresses?.[0];
-  const destination = addresses?.[Object.values(addresses).length - 1];
-  const current = addresses?.[index];
+  const source = chainAddresses?.[0];
+  const destination = chainAddresses?.[Object.values(chainAddresses).length - 1];
+  const current = chainAddresses?.[index];
   const currentAcdress = current?.address;
   const isSameAsDestination =
     current?.source !== "input" &&
@@ -53,7 +56,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === cosmos?.walletName);
           const address = await walletSelected?.getAddress?.({ signRequired });
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -74,7 +77,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -86,7 +89,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === cosmos?.walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -102,7 +105,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === evm?.walletName);
           const address = await walletSelected?.getAddress?.({ signRequired });
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -122,7 +125,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -134,7 +137,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === evm?.walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -155,7 +158,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,
@@ -167,7 +170,7 @@ export const useAutoSetAddress = ({
           const walletSelected = wallets.find((wallet) => wallet.walletName === svm?.walletName);
           const address = await walletSelected?.getAddress?.({});
           if (walletSelected && address) {
-            chainAddresses.set({
+            setChainAddresses({
               index,
               chainID,
               chainType: chain.chainType as TrackWalletCtx,

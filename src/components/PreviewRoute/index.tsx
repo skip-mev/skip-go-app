@@ -23,8 +23,9 @@ import * as AlertCollapse from "./AlertCollapse";
 import { ChainStep } from "./ChainStep";
 import { makeActions } from "./make-actions";
 import { makeChainIDsWithAction } from "./make-chain-ids-with-actions";
+import { BroadcastedTx, ChainAddress, ChainAddresses, SetChainAddressesParam } from "./types";
 
-interface Wallet {
+export interface Wallet {
   walletName: string;
   walletPrettyName: string;
   walletInfo: {
@@ -36,18 +37,6 @@ interface Wallet {
         };
   };
   isLedger?: boolean | null;
-}
-
-export type ChainAddresses = {
-  chainID: string;
-  chainType?: TrackWalletCtx;
-  address?: string;
-  source?: "input" | Wallet;
-};
-export interface BroadcastedTx {
-  chainID: string;
-  txHash: string;
-  explorerLink: string;
 }
 
 export const PreviewRoute = ({
@@ -72,10 +61,10 @@ export const PreviewRoute = ({
   const actions = makeActions({ route });
   const chainIDsWithAction = makeChainIDsWithAction({ route, actions });
 
-  const [chainAddresses, _setChainAddresses] = useState<Record<number, ChainAddresses | undefined>>({});
+  const [chainAddresses, _setChainAddresses] = useState<ChainAddresses>({});
   useEffect(() => {
     _setChainAddresses(() => {
-      const newState: Record<number, ChainAddresses> = {};
+      const newState: Record<number, ChainAddress> = {};
       route.chainIDs.forEach((chainID) => {
         newState[route.chainIDs.indexOf(chainID)] = {
           chainID,
@@ -85,19 +74,7 @@ export const PreviewRoute = ({
     });
   }, [route.chainIDs]);
 
-  const setChainAddresses = ({
-    index,
-    address,
-    chainID,
-    chainType,
-    source,
-  }: {
-    index: number;
-    chainID: string;
-    chainType: TrackWalletCtx;
-    address: string;
-    source: "input" | Wallet;
-  }) => {
+  const setChainAddresses = ({ index, address, chainID, chainType, source }: SetChainAddressesParam) => {
     const current = chainAddresses[index];
     if (current) {
       _setChainAddresses((state) => {
@@ -153,6 +130,7 @@ export const PreviewRoute = ({
       return (Boolean(chainAddress?.address) && chainAddress?.chainID === chainID) === true;
     })
     .every((v) => v);
+  console.log({ allAddressFilled, chainAddresses });
 
   const [broadcastedTxs, setBroadcastedTxs] = useState<BroadcastedTx[]>([]);
   const { data: statusData } = useBroadcastedTxsStatus({
@@ -422,6 +400,8 @@ export const PreviewRoute = ({
               isExpanded={isExpanded}
               setIsExpanded={setIsExpanded}
               isOpen={isOpen}
+              chainAddresses={chainAddresses}
+              setChainAddresses={setChainAddresses}
             />
           ))}
         </div>

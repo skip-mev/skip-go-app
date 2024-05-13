@@ -9,13 +9,13 @@ import { FaKeyboard } from "react-icons/fa";
 import { MdCheck, MdClose } from "react-icons/md";
 import { isAddress } from "viem";
 
-import { chainAddresses } from "@/context/chainAddresses";
 import { TrackWalletCtx } from "@/context/track-wallet";
 import { useMakeWallets } from "@/hooks/useMakeWallets";
 import { cn } from "@/utils/ui";
 
 import { Dialog, DialogContent } from "../Dialog";
 import { WalletListItem } from "../WalletModal/WalletListItem";
+import { ChainAddresses, SetChainAddressesParam } from "./types";
 
 export const SetAddressDialog = ({
   open,
@@ -24,6 +24,8 @@ export const SetAddressDialog = ({
   index,
   signRequired,
   isDestination,
+  chainAddresses,
+  setChainAddresses,
 }: {
   open: boolean;
   onOpen: (v: boolean) => void;
@@ -31,6 +33,8 @@ export const SetAddressDialog = ({
   index: number;
   signRequired: boolean;
   isDestination: boolean;
+  chainAddresses: ChainAddresses;
+  setChainAddresses: (v: SetChainAddressesParam) => void;
 }) => {
   const { chainType, chainID, bech32Prefix } = chain;
   const { makeWallets } = useMakeWallets();
@@ -39,7 +43,7 @@ export const SetAddressDialog = ({
   const [address, setAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  const currentChainAddress = chainAddresses.get(index);
+  const currentChainAddress = chainAddresses[index];
 
   const validateAddress = (address: string) => {
     if (chainType === "cosmos") {
@@ -86,7 +90,7 @@ export const SetAddressDialog = ({
   const isValid = useMemo(() => validateAddress(address), [address]);
 
   const save = () => {
-    chainAddresses.set({
+    setChainAddresses({
       index,
       chainID,
       chainType: chain?.chainType as TrackWalletCtx,
@@ -98,7 +102,7 @@ export const SetAddressDialog = ({
   };
 
   const cancel = () => {
-    setAddress(chainAddresses.get(index)?.address || "");
+    setAddress(chainAddresses[index]?.address || "");
     setIsEditing(false);
   };
   return (
@@ -167,7 +171,7 @@ export const SetAddressDialog = ({
                           if (resAddress) {
                             setAddress(resAddress);
                             onOpen(false);
-                            chainAddresses.set({
+                            setChainAddresses({
                               index,
                               chainID,
                               chainType: chain?.chainType as TrackWalletCtx,
