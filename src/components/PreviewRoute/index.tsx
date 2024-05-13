@@ -406,7 +406,7 @@ export const PreviewRoute = ({
           ))}
         </div>
         <div className="flex-1 space-y-4">
-          {statusData?.isSuccess && submitMutation.isSuccess && (
+          {statusData?.isSuccess && submitMutation.isSuccess ? (
             <div className="flex flex-row items-center space-x-2 font-semibold">
               <CheckCircleIcon className="h-8 w-8 text-green-500" />
               <p>
@@ -422,7 +422,14 @@ export const PreviewRoute = ({
                   } from ${chains?.find((c) => c.chainID === route.sourceAssetChainID)?.prettyName} to ${chains?.find((c) => c.chainID === route.destAssetChainID)?.prettyName}`}
               </p>
             </div>
-          )}
+          ) : route.txsRequired === broadcastedTxs.length ? (
+            <div className="flex w-full items-center justify-center space-x-2 text-sm font-medium">
+              <CheckCircleIcon className="h-8 w-8 text-green-500" />
+              <p className="text-sm font-semibold">
+                You can safely navigate away from this page while your transaction is pending
+              </p>
+            </div>
+          ) : null}
 
           {estimatedFinalityTime !== "" && (
             <AlertCollapse.Root type="info">
@@ -482,14 +489,7 @@ export const PreviewRoute = ({
         <div className="space-y-4">
           {!submitMutation.isError && !submitMutation.isSuccess && (
             <div className="flex w-full items-center justify-center space-x-2 text-sm font-medium">
-              {route.txsRequired === broadcastedTxs.length ? (
-                <>
-                  <CheckCircleIcon className="h-8 w-8 text-green-500" />
-                  <p className="text-sm font-semibold">
-                    You can safely navigate away from this page while your transaction is pending
-                  </p>
-                </>
-              ) : route.txsRequired > 1 ? (
+              {route.txsRequired > 1 ? (
                 <>
                   <div className="relative rounded-full bg-[#FF486E] p-[4px]">
                     <div className="absolute h-6 w-6 animate-ping rounded-full bg-[#FF486E]" />
