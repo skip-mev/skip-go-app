@@ -350,7 +350,7 @@ export const PreviewRoute = ({
           setIsExpanded(true);
         }}
       >
-        {enabledSetAddressIndex === Object.values(chainAddresses).length - 1 || !isSignRequired
+        {enabledSetAddressIndex === Object.values(chainAddresses).length - 1 && !isSignRequired
           ? "Set Destination Address"
           : isSignRequired
             ? "Connect Wallet"
