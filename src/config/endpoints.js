@@ -151,6 +151,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "ununifi-beta-v1": true,
   "dimension_37-1": true,
   "coreum-mainnet-1": true,
+  "haqq_11235-1": true,
 };
 
 /**

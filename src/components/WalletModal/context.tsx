@@ -6,8 +6,7 @@ interface WalletModalContext {
   chainID: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  openWalletModal: (chainID: string, context: NonNullable<WalletModalContext["context"]>) => void;
-  context?: "source" | "destination";
+  openWalletModal: (chainID: string) => void;
 }
 
 const WalletModalContext = createContext<WalletModalContext | undefined>(undefined);
@@ -23,19 +22,16 @@ export function useWalletModal() {
 export function WalletModalProvider({ children }: { children: ReactNode }) {
   const [chainID, setChainID] = useState<WalletModalContext["chainID"]>("");
   const [isOpen, setIsOpen] = useState<WalletModalContext["isOpen"]>(false);
-  const [context, setContext] = useState<WalletModalContext["context"]>();
   return (
     <WalletModalContext.Provider
       value={{
         chainID,
         isOpen,
         setIsOpen,
-        openWalletModal: (_chainID, context) => {
+        openWalletModal: (_chainID) => {
           setIsOpen(true);
           setChainID(_chainID);
-          setContext(context);
         },
-        context,
       }}
     >
       <Dialog

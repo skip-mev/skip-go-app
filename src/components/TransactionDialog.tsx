@@ -5,15 +5,14 @@ import toast from "react-hot-toast";
 import { useDisclosureKey } from "@/context/disclosures";
 import { cn } from "@/utils/ui";
 
-import { PriceImpactWarning } from "../PriceImpactWarning";
-import TransactionDialogContent from "./TransactionDialogContent";
+import { PreviewRoute } from "./PreviewRoute";
+import { PriceImpactWarning } from "./PriceImpactWarning";
 
 export type ActionType = "NONE" | "TRANSFER" | "SWAP";
 
 interface Props {
   isLoading?: boolean;
   route?: RouteResponse;
-  transactionCount: number;
   isAmountError?: boolean | string;
   shouldShowPriceImpactWarning?: boolean;
   routeWarningMessage?: string;
@@ -25,15 +24,13 @@ function TransactionDialog({
   isLoading,
   route,
   isAmountError,
-  transactionCount,
   shouldShowPriceImpactWarning,
   routeWarningMessage,
   routeWarningTitle,
-  onAllTransactionComplete,
 }: Props) {
   const [hasDisplayedWarning, setHasDisplayedWarning] = useState(false);
-  const [isOpen, confirmControl] = useDisclosureKey("confirmSwapDialog");
-
+  const confirmDisclosure = useDisclosureKey("confirmSwapDialog");
+  const [isOpen, confirmControl] = confirmDisclosure;
   const [, priceImpactControl] = useDisclosureKey("priceImpactDialog");
 
   useEffect(() => {
@@ -82,15 +79,11 @@ function TransactionDialog({
           Preview Route
         </button>
         {isOpen && route && (
-          <div className="absolute inset-0 animate-fade-zoom-in rounded-3xl bg-white">
-            <TransactionDialogContent
-              route={route}
-              onClose={confirmControl.close}
-              isAmountError={isAmountError}
-              transactionCount={transactionCount}
-              onAllTransactionComplete={onAllTransactionComplete}
-            />
-          </div>
+          <PreviewRoute
+            route={route}
+            disclosure={confirmDisclosure}
+            isAmountError={isAmountError}
+          />
         )}
       </div>
       <PriceImpactWarning

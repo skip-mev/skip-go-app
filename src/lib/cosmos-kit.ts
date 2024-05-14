@@ -5,9 +5,8 @@ import { wallets as leap } from "@cosmos-kit/leap-extension";
 import { wallets as okxwallet } from "@cosmos-kit/okxwallet";
 import { wallets as station } from "@cosmos-kit/station";
 import { wallets as vectis } from "@cosmos-kit/vectis";
-import { wallets as xdefi } from "@cosmos-kit/xdefi";
 
-export const wallets = [...keplr, ...cosmostation, ...leap, ...okxwallet, ...station, ...vectis, ...xdefi];
+export const wallets = [...keplr, ...cosmostation, ...leap, ...okxwallet, ...station, ...vectis];
 
 export type MergedWalletClient =
   | import("@cosmos-kit/cosmostation-extension/cjs/extension/client").CosmostationClient
@@ -20,5 +19,4 @@ export type MergedWalletClient =
   | import("@cosmos-kit/okxwallet-extension/cjs/extension/client").OkxwalletClient
   | import("@cosmos-kit/station-extension/cjs/extension/client").StationClient
   | import("@cosmos-kit/vectis-extension/cjs/extension/client").VectisClient
-  | import("@cosmos-kit/xdefi-extension/cjs/extension/client").XDEFIClient
   | WalletClient;

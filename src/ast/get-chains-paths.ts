@@ -16,7 +16,7 @@ export async function getChainsPaths({ registryPath }: Args) {
 }
 
 export async function getInitiaChainsPaths({ registryPath }: Args) {
-  const devnetGlobs = ["devnets/*", "!devnets/_*"];
+  const devnetGlobs = ["testnets/*", "!testnets/_*"];
 
   const initiaPaths = await globby([...devnetGlobs], {
     cwd: registryPath,

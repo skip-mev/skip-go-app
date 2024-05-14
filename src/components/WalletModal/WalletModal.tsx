@@ -1,44 +1,26 @@
-import { useManager } from "@cosmos-kit/react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { ArrowLeftIcon, FaceFrownIcon } from "@heroicons/react/20/solid";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
-import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
-import toast from "react-hot-toast";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
 
-import { chainIdToName } from "@/chains/types";
 import { DialogContent } from "@/components/Dialog";
-import { trackWallet } from "@/context/track-wallet";
+import { trackWallet, TrackWalletCtx } from "@/context/track-wallet";
 import { useChainByID } from "@/hooks/useChains";
+import { MinimalWallet, useMakeWallets } from "@/hooks/useMakeWallets";
 import { cn } from "@/utils/ui";
-import { gracefullyConnect } from "@/utils/wallet";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import { useWalletModal } from "./context";
 import { useTotalWallets, WalletListItem } from "./WalletListItem";
 
-export interface MinimalWallet {
-  walletName: string;
-  walletPrettyName: string;
-  walletInfo: {
-    logo?: string | { major: string; minor: string };
-  };
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
-  isWalletConnected: boolean;
-  isAvailable?: boolean;
-}
-
 interface Props {
   chainType: string;
   wallets: MinimalWallet[];
   onClose: () => void;
+  chainID: string;
 }
 
 export function WalletModal({ chainType, onClose, wallets }: Props) {
-  const { context } = useWalletModal();
-
   async function onWalletConnect(wallet: MinimalWallet) {
     await wallet.connect();
     onClose();
@@ -58,9 +40,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
         >
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
-        <p className="text-center text-xl font-bold">
-          Connect {context && <span className="capitalize">{context}</span>} Wallet
-        </p>
+        <p className="text-center text-xl font-bold">Connect Wallet</p>
       </div>
       {totalWallets < 1 && (
         <div className="flex flex-col items-center space-y-4 py-16 text-center">
@@ -138,7 +118,7 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
                     onClick={async (event) => {
                       event.stopPropagation();
                       await wallet.disconnect();
-                      context && trackWallet.untrack(context);
+                      trackWallet.untrack(chainType as TrackWalletCtx);
                       onClose();
                     }}
                   >
@@ -167,31 +147,12 @@ export function WalletModal({ chainType, onClose, wallets }: Props) {
 }
 
 function WalletModalWithContext() {
-  const { connector: currentConnector } = useAccount();
-  const { chainID, context } = useWalletModal();
-  const { disconnectAsync } = useDisconnect();
-  // evm
-  const { connectors, connectAsync } = useConnect({
-    mutation: {
-      onError: (err) => {
-        toast.error(
-          <p>
-            <strong>Failed to connect!</strong>
-            <br />
-            {err.name}: {err.message}
-          </p>,
-        );
-      },
-    },
-  });
-  // cosmos
-  const { getWalletRepo } = useManager();
-  // solana
-  const { wallets: solanaWallets } = useWallet();
-
+  const { chainID } = useWalletModal();
   const { setIsOpen } = useWalletModal();
-
   const { data: chain } = useChainByID(chainID);
+
+  const { makeWallets } = useMakeWallets();
+  const wallets = makeWallets(chainID);
 
   if (!chain) {
     return null;
@@ -199,99 +160,13 @@ function WalletModalWithContext() {
 
   const { chainType } = chain;
 
-  let wallets: MinimalWallet[] = [];
-
-  if (chainType === "cosmos") {
-    const chainName = chainIdToName[chainID];
-    const walletRepo = getWalletRepo(chainName);
-    wallets = walletRepo.wallets.map((wallet) => ({
-      walletName: wallet.walletName,
-      walletPrettyName: wallet.walletPrettyName,
-      walletInfo: {
-        logo: wallet.walletInfo.logo,
-      },
-      connect: async () => {
-        try {
-          await gracefullyConnect(wallet);
-          context && trackWallet.track(context, chainID, wallet.walletName, chainType);
-        } catch (error) {
-          console.error(error);
-          context && trackWallet.untrack(context);
-        }
-      },
-      disconnect: async () => {
-        await wallet.disconnect();
-        context && trackWallet.untrack(context);
-      },
-      isWalletConnected: wallet.isWalletConnected,
-    }));
-  }
-
-  if (chainType === "evm") {
-    for (const connector of connectors) {
-      if (wallets.findIndex((wallet) => wallet.walletName === connector.id) !== -1) {
-        continue;
-      }
-
-      const minimalWallet: MinimalWallet = {
-        walletName: connector.id,
-        walletPrettyName: connector.name,
-        walletInfo: {
-          logo: connector.icon,
-        },
-        connect: async () => {
-          if (connector.id === currentConnector?.id) return;
-          try {
-            await connectAsync({ connector, chainId: Number(chainID) });
-            context && trackWallet.track(context, chainID, connector.id, chainType);
-          } catch (error) {
-            console.error(error);
-          }
-        },
-        disconnect: async () => {
-          await disconnectAsync();
-          context && trackWallet.untrack(context);
-        },
-        isWalletConnected: connector.id === currentConnector?.id,
-      };
-
-      wallets.push(minimalWallet);
-    }
-  }
-
-  if (chainType === "svm") {
-    for (const wallet of solanaWallets) {
-      const minimalWallet: MinimalWallet = {
-        walletName: wallet.adapter.name,
-        walletPrettyName: wallet.adapter.name,
-        walletInfo: {
-          logo: wallet.adapter.icon,
-        },
-        connect: async () => {
-          try {
-            await wallet.adapter.connect();
-            context && trackWallet.track(context, chainID, wallet.adapter.name, chainType);
-          } catch (error) {
-            console.error(error);
-          }
-        },
-        disconnect: async () => {
-          await wallet.adapter.disconnect();
-          context && trackWallet.untrack(context);
-        },
-        isWalletConnected: wallet.adapter.connected,
-        isAvailable: wallet.readyState === "Installed",
-      };
-      wallets.push(minimalWallet);
-    }
-  }
-
   return (
     <DialogContent>
       <WalletModal
         chainType={chainType}
         wallets={wallets}
         onClose={() => setIsOpen(false)}
+        chainID={chainID}
       />
     </DialogContent>
   );

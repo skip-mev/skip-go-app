@@ -210,7 +210,6 @@ export const useBroadcastedTxsStatus = ({
       }
     | undefined
   >(undefined);
-
   const queryKey = useMemo(() => ["solve-txs-status", txsRequired, txs] as const, [txs, txsRequired]);
 
   return useQuery({
@@ -223,7 +222,6 @@ export const useBroadcastedTxsStatus = ({
             chainID: tx.chainID,
             txHash: tx.txHash,
           });
-
           const cleanTransferSequence = _res.transferSequence.map((transfer) => {
             if ("ibcTransfer" in transfer) {
               return {
@@ -252,7 +250,7 @@ export const useBroadcastedTxsStatus = ({
                 }
               })();
               return {
-                srcChainID: transfer.cctpTransfer.dstChainID,
+                srcChainID: transfer.cctpTransfer.srcChainID,
                 destChainID: transfer.cctpTransfer.dstChainID,
                 txs: {
                   sendTx: transfer.cctpTransfer.txs.sendTx,
@@ -321,7 +319,6 @@ export const useBroadcastedTxsStatus = ({
               state: axelarState,
             };
           });
-
           return {
             state: _res.state,
             transferSequence: cleanTransferSequence,
