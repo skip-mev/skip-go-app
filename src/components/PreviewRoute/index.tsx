@@ -148,15 +148,22 @@ export const PreviewRoute = ({
     if (!allAddressFilled) throw new Error("All addresses must be filled");
     const historyId = randomId();
 
-    const userAddresses: Record<string, string> = {};
+    const userAddresses: { chainID: string; address: string }[] = [];
     route.chainIDs.forEach((chainID, index) => {
-      const chainAddress = chainAddresses[index];
-      if (chainID === chainAddress?.chainID && chainAddress?.address) {
-        userAddresses[chainID] = chainAddress?.address;
+      if (chainID !== chainAddresses[index]?.chainID) {
+        throw new Error("chainID does not match with chainAddresses's chainID");
       }
+      const chainAddress = chainAddresses[index];
+      if (!chainAddress || !chainAddress?.address) {
+        throw new Error("Chain address not found");
+      }
+      userAddresses.push({
+        chainID: chainAddress.chainID,
+        address: chainAddress.address,
+      });
     });
 
-    const isAddressError = route.chainIDs.some((chainID) => !userAddresses[chainID]);
+    const isAddressError = route.chainIDs.some((chainID, i) => !userAddresses[i]);
 
     if (isAddressError) {
       throw new Error("All addresses must be filled");
