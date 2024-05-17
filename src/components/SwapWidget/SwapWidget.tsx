@@ -17,6 +17,7 @@ import { Spinner } from "../Icons/Spinner";
 import { JsonDialog } from "../JsonDialog";
 import { SettingsButton } from "../SettingsButton";
 import { SettingsDialog } from "../SettingsDialog";
+import { ShareButton } from "../ShareButton";
 import { SimpleTooltip } from "../SimpleTooltip";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
@@ -62,6 +63,7 @@ export function SwapWidget() {
     sourceFeeAsset,
     swapPriceImpactPercent,
     usdDiffPercent,
+    shareableLink,
   } = useSwapWidget();
 
   const srcAccount = useAccount(sourceChain?.chainID);
@@ -97,6 +99,7 @@ export function SwapWidget() {
           <div className="flex h-8 items-center">
             <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
+            <ShareButton shareableLink={shareableLink} />
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
@@ -250,7 +253,7 @@ export function SwapWidget() {
           {sourceChain && isWalletConnected && (
             <div className="space-y-4">
               <TransactionDialog
-                isLoading={routeLoading}
+                isLoading={routeLoadingembeddable}
                 route={route}
                 isAmountError={isAmountError}
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
