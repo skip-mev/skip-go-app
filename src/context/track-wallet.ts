@@ -1,40 +1,39 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 
-export type TrackWalletCtx = "source" | "destination";
+export type TrackWalletCtx = "evm" | "cosmos" | "svm";
+
+interface WalletState {
+  walletName: string;
+  chainType: string;
+}
 
 interface TrackWalletStore {
-  source?: {
-    chainID: string;
-    walletName: string;
-    chainType: string;
-  };
-  destination?: {
-    chainID: string;
-    walletName: string;
-    chainType: string;
-  };
+  evm?: WalletState;
+  cosmos?: WalletState;
+  svm?: WalletState;
 }
 
 const defaultValues: TrackWalletStore = {
-  source: undefined,
-  destination: undefined,
+  evm: undefined,
+  cosmos: undefined,
+  svm: undefined,
 };
 
 const useStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "TrackWalletState",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => window.sessionStorage),
     }),
   ),
 );
 
 export const trackWallet = {
-  track: (ctx: TrackWalletCtx, chainID: string, walletName: string, chainType: string) => {
+  track: (ctx: TrackWalletCtx, walletName: string, chainType: string) => {
     useStore.setState({
-      [ctx]: { chainID, walletName, chainType },
+      [ctx]: { walletName, chainType },
     });
   },
   untrack: (ctx: TrackWalletCtx) => {
@@ -46,6 +45,6 @@ export const trackWallet = {
   subscribe: useStore.subscribe,
 };
 
-export function useTrackWallet(ctx: TrackWalletCtx) {
-  return useStore((state) => state[ctx]);
+export function useTrackWallet(ctx?: TrackWalletCtx) {
+  return useStore((state) => ctx && state[ctx]);
 }

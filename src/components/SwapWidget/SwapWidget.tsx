@@ -1,4 +1,4 @@
-import { ArrowsUpDownIcon } from "@heroicons/react/20/solid";
+import { ArrowsUpDownIcon, FingerPrintIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { ElementRef, useEffect, useRef } from "react";
 import type {} from "typed-query-selector";
@@ -13,9 +13,8 @@ import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
+import { Spinner } from "../Icons/Spinner";
 import { JsonDialog } from "../JsonDialog";
-import RouteLoadingBanner from "../RouteLoadingBanner";
-import RouteTransactionCountBanner from "../RouteTransactionCountBanner";
 import { SettingsButton } from "../SettingsButton";
 import { SettingsDialog } from "../SettingsDialog";
 import { SimpleTooltip } from "../SimpleTooltip";
@@ -65,10 +64,9 @@ export function SwapWidget() {
     usdDiffPercent,
   } = useSwapWidget();
 
-  const srcAccount = useAccount("source");
-  const destAccount = useAccount("destination");
+  const srcAccount = useAccount(sourceChain?.chainID);
 
-  const isWalletConnected = srcAccount?.isWalletConnected && destAccount?.isWalletConnected;
+  const isWalletConnected = srcAccount?.isWalletConnected;
 
   function promptDestAsset() {
     document.querySelector("[data-testid='destination'] button")?.click();
@@ -87,9 +85,7 @@ export function SwapWidget() {
     return () => ref.removeEventListener("animationend", listener);
   }, []);
 
-  const accountStateKey = `${
-    srcAccount?.isWalletConnected ? "src" : "no-src"
-  }-${destAccount?.isWalletConnected ? "dest" : "no-dest"}`;
+  const accountStateKey = `${srcAccount?.isWalletConnected ? "src" : "no-src"}`;
 
   return (
     <UsdDiff.Provider>
@@ -108,7 +104,7 @@ export function SwapWidget() {
               <SimpleTooltip label="Change Source Wallet">
                 <ConnectedWalletButton
                   address={srcAccount.address}
-                  onClick={() => sourceChain?.chainID && openWalletModal(sourceChain.chainID, "source")}
+                  onClick={() => sourceChain?.chainID && openWalletModal(sourceChain.chainID)}
                   walletName={srcAccount.wallet?.walletPrettyName}
                   walletLogo={
                     srcAccount.wallet.walletInfo
@@ -161,28 +157,6 @@ export function SwapWidget() {
               </button>
             </div>
             <p className="text-2xl font-semibold">To</p>
-            <div className="absolute inset-y-0 right-0 flex items-center">
-              {destAccount?.address && destAccount?.wallet ? (
-                <SimpleTooltip label="Change Destination Wallet">
-                  <ConnectedWalletButton
-                    address={destAccount.address}
-                    onClick={() => {
-                      destinationChain?.chainID && openWalletModal(destinationChain.chainID, "destination");
-                    }}
-                    walletName={destAccount.wallet?.walletPrettyName}
-                    walletLogo={
-                      destAccount.wallet.walletInfo
-                        ? typeof destAccount.wallet.walletInfo.logo === "string"
-                          ? destAccount.wallet.walletInfo.logo
-                          : destAccount.wallet.walletInfo.logo?.major || destAccount.wallet.walletInfo.logo?.minor
-                        : ""
-                    }
-                    className="animate-slide-left-and-fade"
-                    key={destAccount.address}
-                  />
-                </SimpleTooltip>
-              ) : null}
-            </div>
           </div>
           <div data-testid="destination">
             <AssetInput
@@ -217,8 +191,21 @@ export function SwapWidget() {
               sourceChain={sourceChain}
             />
           )}
-          {routeLoading && <RouteLoadingBanner />}
-          {route && !routeLoading && <RouteTransactionCountBanner numberOfTransactions={numberOfTransactions} />}
+          {routeLoading && (
+            <div className="flex w-full items-center justify-between space-x-2 text-sm font-medium uppercase">
+              <p className="text-neutral-400">Finding best route...</p>
+              <Spinner className=" h-5 w-5 text-neutral-200" />
+            </div>
+          )}
+          {route && !routeLoading && numberOfTransactions > 1 && (
+            <div className="flex w-full items-center justify-center space-x-2 text-sm font-medium uppercase">
+              <div className="relative rounded-full bg-[#FF486E] p-[4px]">
+                <div className="absolute h-6 w-6 animate-ping rounded-full bg-[#FF486E]" />
+                <FingerPrintIcon className="relative h-6 w-6 text-white" />
+              </div>
+              <p>{numberOfTransactions} Signature Required</p>
+            </div>
+          )}
           {!!routeError && (
             <div className="flex w-full items-center rounded-md bg-red-50 p-3 text-left text-xs font-medium uppercase text-red-500">
               <p className="flex-1">{routeError}</p>
@@ -243,15 +230,11 @@ export function SwapWidget() {
               disabled={!sourceChain}
               onClick={async () => {
                 if (sourceChain && !srcAccount?.isWalletConnected) {
-                  openWalletModal(sourceChain.chainID, "source");
+                  openWalletModal(sourceChain.chainID);
                   return;
                 }
                 if (!destinationChain) {
                   promptDestAsset();
-                  return;
-                }
-                if (destinationChain && !destAccount?.isWalletConnected) {
-                  openWalletModal(destinationChain.chainID, "destination");
                   return;
                 }
               }}
@@ -260,9 +243,7 @@ export function SwapWidget() {
                 key={accountStateKey}
                 className="animate-slide-up-and-fade"
               >
-                {!srcAccount?.isWalletConnected && !destAccount?.isWalletConnected && "Connect Wallet"}
-                {!srcAccount?.isWalletConnected && destAccount?.isWalletConnected && "Connect Source Wallet"}
-                {srcAccount?.isWalletConnected && !destAccount?.isWalletConnected && "Connect Destination Wallet"}
+                {!srcAccount?.isWalletConnected && "Connect Wallet"}
               </div>
             </button>
           )}
@@ -271,7 +252,6 @@ export function SwapWidget() {
               <TransactionDialog
                 isLoading={routeLoading}
                 route={route}
-                transactionCount={numberOfTransactions}
                 isAmountError={isAmountError}
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
                 routeWarningTitle={routeWarningTitle}

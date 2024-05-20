@@ -9,10 +9,10 @@ import { trackWallet, TrackWalletCtx, useTrackWallet } from "@/context/track-wal
 import { useChainByID } from "@/hooks/useChains";
 import { isReadyToCheckLedger, isWalletClientUsingLedger } from "@/utils/wallet";
 
-export function useAccount(context: TrackWalletCtx) {
-  const trackedWallet = useTrackWallet(context);
+export function useAccount(chainID?: string) {
+  const { data: chain } = useChainByID(chainID);
+  const trackedWallet = useTrackWallet(chain?.chainType as TrackWalletCtx);
 
-  const { data: chain } = useChainByID(trackedWallet?.chainID);
   const { getWalletRepo } = useCosmosManager();
 
   const cosmosWallet = useMemo(() => {
@@ -39,19 +39,13 @@ export function useAccount(context: TrackWalletCtx) {
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "cosmosWallet",
-      { context, cosmosWallet: cosmosWallet?.walletName, address: cosmosWallet?.address, chainID: chain?.chainID },
+      { cosmosWallet: cosmosWallet?.walletName, address: cosmosWallet?.address, chainID: chain?.chainID },
     ],
     queryFn: () => {
       if (!cosmosWallet?.client || !chain) return null;
       return getIsLedger(cosmosWallet.client, chain.chainID);
     },
-    enabled:
-      chain &&
-      chain.chainType === "cosmos" &&
-      !!cosmosWallet &&
-      context === "source" &&
-      readyToCheckLedger &&
-      !!cosmosWallet?.address,
+    enabled: chain && chain.chainType === "cosmos" && !!cosmosWallet && readyToCheckLedger && !!cosmosWallet?.address,
   });
 
   const account = useMemo(() => {
@@ -74,12 +68,12 @@ export function useAccount(context: TrackWalletCtx) {
         chainType: chain.chainType,
         connect: () => {
           return cosmosWallet.connect().then(() => {
-            trackWallet.track(context, chain.chainID, cosmosWallet.walletName, chain.chainType);
+            trackWallet.track("cosmos", cosmosWallet.walletName, chain.chainType);
           });
         },
         disconnect: () => {
           return cosmosWallet.disconnect().then(() => {
-            trackWallet.untrack(context);
+            trackWallet.untrack("cosmos");
           });
         },
       };
@@ -100,12 +94,12 @@ export function useAccount(context: TrackWalletCtx) {
         chainType: chain.chainType,
         connect: () => {
           return wagmiAccount.connector?.connect().then(() => {
-            trackWallet.track(context, chain.chainID, wagmiAccount.connector!.id, chain.chainType);
+            trackWallet.track("evm", wagmiAccount.connector!.id, chain.chainType);
           });
         },
         disconnect: () => {
           return wagmiAccount.connector?.disconnect().then(() => {
-            trackWallet.untrack(context);
+            trackWallet.untrack("evm");
           });
         },
       };
@@ -127,12 +121,12 @@ export function useAccount(context: TrackWalletCtx) {
         chainType: chain.chainType,
         connect: () => {
           return solanaWallet?.adapter.connect().then(() => {
-            trackWallet.track(context, chain.chainID, solanaWallet.adapter.name, chain.chainType);
+            trackWallet.track("svm", solanaWallet.adapter.name, chain.chainType);
           });
         },
         disconnect: () => {
           return solanaWallet?.adapter.disconnect().then(() => {
-            trackWallet.untrack(context);
+            trackWallet.untrack("svm");
           });
         },
       };
@@ -142,7 +136,6 @@ export function useAccount(context: TrackWalletCtx) {
     chain,
     cosmosWallet,
     cosmosWalletIsLedgerQuery.data,
-    context,
     wagmiAccount.address,
     wagmiAccount.isConnected,
     wagmiAccount.connector,

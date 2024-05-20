@@ -32,6 +32,9 @@ module.exports = {
         "slide-down-and-fade": `slide-down-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
         "slide-left-and-fade": `slide-left-and-fade 300ms cubic-bezier(0.16, 1, 0.3, 1)`,
         "spin-swap": `spin 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.27)`,
+        "gradient-x": "gradient-x 3s ease infinite",
+        "gradient-y": "gradient-y 2s infinite",
+        "gradient-xy": "gradient-xy 3s ease infinite",
       },
       colors: {
         ...blackA,
@@ -79,6 +82,36 @@ module.exports = {
         "slide-left-and-fade": {
           from: { opacity: 0, transform: "translateX(2px)" },
           to: { opacity: 1, transform: "translateX(0)" },
+        },
+        "gradient-y": {
+          "0%, 100%": {
+            "background-size": "30% 250%",
+            "background-position": "top bottom",
+          },
+          "50%": {
+            "background-size": "500% 500%",
+            "background-position": "center center",
+          },
+        },
+        "gradient-x": {
+          "0%, 100%": {
+            "background-size": "200% 200%",
+            "background-position": "left center",
+          },
+          "50%": {
+            "background-size": "200% 200%",
+            "background-position": "right center",
+          },
+        },
+        "gradient-xy": {
+          "0%, 100%": {
+            "background-size": "400% 400%",
+            "background-position": "left center",
+          },
+          "50%": {
+            "background-size": "200% 200%",
+            "background-position": "right center",
+          },
         },
       },
     },
