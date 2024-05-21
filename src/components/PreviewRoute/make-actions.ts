@@ -1,4 +1,4 @@
-import { BridgeType, RouteResponse, SwapVenue } from "@skip-router/core";
+import { BridgeType, RouteResponse } from "@skip-router/core";
 
 export interface TransferAction {
   type: "TRANSFER";
@@ -19,7 +19,6 @@ export interface SwapAction {
   denomIn: string;
   denomOut: string;
   chainID: string;
-  swapVenue: SwapVenue;
   id: string;
   signRequired: boolean;
   amountIn: string;
@@ -48,34 +47,18 @@ export const makeActions = ({ route }: { route: RouteResponse }): Action[] => {
     })();
 
     if ("swap" in operation) {
-      if ("swapIn" in operation.swap) {
-        _actions.push({
-          type: "SWAP",
-          denomIn: operation.swap.denomIn,
-          denomOut: operation.swap.denomOut,
-          chainID: operation.swap.chainID,
-          id: `swap-${swapCount}-${transferCount}-${i}`,
-          swapVenue: operation.swap.swapIn.swapVenue,
-          signRequired,
-          amountIn: operation.amountIn,
-          amountOut: operation.amountOut,
-          txIndex: operation.txIndex,
-        });
-      }
-      if ("swapOut" in operation.swap) {
-        _actions.push({
-          type: "SWAP",
-          denomIn: operation.swap.denomIn,
-          denomOut: operation.swap.denomOut,
-          chainID: operation.swap.chainID,
-          id: `swap-${swapCount}-${transferCount}-${i}`,
-          swapVenue: operation.swap.swapOut.swapVenue,
-          signRequired,
-          amountIn: operation.amountIn,
-          amountOut: operation.amountOut,
-          txIndex: operation.txIndex,
-        });
-      }
+      _actions.push({
+        type: "SWAP",
+        denomIn: operation.swap.denomIn,
+        denomOut: operation.swap.denomOut,
+        chainID: operation.swap.chainID,
+        id: `swap-${swapCount}-${transferCount}-${i}`,
+        signRequired,
+        amountIn: operation.amountIn,
+        amountOut: operation.amountOut,
+        txIndex: operation.txIndex,
+      });
+
       swapCount++;
       return;
     }
