@@ -271,7 +271,7 @@ export const ChainStep = ({
           )}
         </div>
         <div className="flex flex-1 flex-col space-y-0">
-          {swapAction && signRequired && !isSource ? (
+          {swapAction && signRequired && (!isSource || (isSource && route.chainIDs.length === 1)) ? (
             <AssetSwap
               in={{
                 amount: swapAction.amountIn,
