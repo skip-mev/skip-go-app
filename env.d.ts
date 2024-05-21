@@ -2,7 +2,6 @@ declare namespace NodeJS {
   interface ProcessEnv {
     readonly APP_URL?: string;
     readonly NEXT_PUBLIC_API_URL?: string;
-    readonly NEXT_PUBLIC_CLIENT_ID?: string;
 
     readonly POLKACHU_USER?: string;
     readonly POLKACHU_PASSWORD?: string;
