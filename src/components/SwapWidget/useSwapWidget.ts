@@ -872,7 +872,7 @@ export interface SwapWidgetStore {
   bridges: BridgeType[];
 }
 
-const defaultValues: SwapWidgetStore = {
+export const defaultValues: SwapWidgetStore = {
   amountIn: "",
   amountOut: "",
   direction: "swap-in",
