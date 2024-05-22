@@ -37,7 +37,7 @@ export const EmbedDialog = ({ embedLink }: { embedLink: string }) => {
             <ScrollArea.Viewport className="h-full w-full px-6">
               <div className="flex flex-col space-y-2">
                 <p>The swap widget can be embedded in your app by using the following code snippet:</p>
-                <pre className="w-full overflow-auto text-wrap rounded-lg border bg-neutral-50 p-2 font-mono text-xs">
+                <pre className="text-wrap break-all rounded-lg border bg-neutral-50 p-2 font-mono text-xs">
                   {embedCode}
                 </pre>
                 <button

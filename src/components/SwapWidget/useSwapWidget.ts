@@ -881,7 +881,7 @@ const defaultValues: SwapWidgetStore = {
 
 // TODO: move to src/context/
 // TODO: include all memoize values
-const useSwapWidgetStore = create(
+export const useSwapWidgetStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "SwapWidgetState",

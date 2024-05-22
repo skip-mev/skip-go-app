@@ -10,6 +10,7 @@ import { SwapWidget } from "@/components/SwapWidget";
 import { WalletModalProvider } from "@/components/WalletModal";
 import { metadata } from "@/constants/seo";
 import { AssetsProvider } from "@/context/assets";
+import { useIsInIframe } from "@/hooks/useIsInIframe";
 import { wallets } from "@/lib/cosmos-kit";
 import { persister, queryClient } from "@/lib/react-query";
 import { solanaWallets } from "@/lib/solana-wallet-adapter";
@@ -22,16 +23,18 @@ const assets = getAssetLists() as ChainProviderProps["assetLists"];
 const chains = getChains() as ChainProviderProps["chains"];
 
 export const Provider = ({ children }: { children: ReactNode }) => {
+  const isInIframe = useIsInIframe();
   return (
     <WalletProvider
       wallets={solanaWallets}
-      localStorageKey="solana-wallet"
+      localStorageKey="ibc-fun-solana-wallet"
       autoConnect
       key="skip-widget-solana-wallet"
     >
       <ChainProvider
         assetLists={assets}
         chains={chains}
+        disableIframe={true}
         sessionOptions={{
           duration: 1000 * 60 * 60 * 24, // 1 day
         }}
@@ -62,7 +65,7 @@ export const Provider = ({ children }: { children: ReactNode }) => {
               <AssetsProvider>
                 {children}
                 <Toaster
-                  position="top-right"
+                  position={isInIframe ? "top-center" : "top-right"}
                   toastOptions={{ duration: 1000 * 10 }}
                 />
               </AssetsProvider>
