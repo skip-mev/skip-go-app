@@ -683,12 +683,12 @@ export function useSwapWidget() {
   useEffect(() => {
     if (!chains || !isAssetsReady) return;
     if (srcChainQP) {
-      const findChain = chains.find((x) => x.chainID === decodeURI(srcChainQP).toLowerCase());
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
       if (findChain) {
         onSourceChainChange(findChain);
         if (srcAssetQP) {
           const assets = assetsByChainID(findChain.chainID);
-          const findAsset = assets.find((x) => x.denom === decodeURI(srcAssetQP).toLowerCase());
+          const findAsset = assets.find((x) => x.denom.toLowerCase() === decodeURI(srcAssetQP).toLowerCase());
           if (findAsset) {
             onSourceAssetChange(findAsset);
           }
@@ -718,11 +718,11 @@ export function useSwapWidget() {
   useEffect(() => {
     if (!chains || !isAssetsReady) return;
     if (destChainQP) {
-      const findChain = chains.find((x) => x.chainID === decodeURI(destChainQP).toLowerCase());
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(destChainQP).toLowerCase());
       if (findChain) {
         if (destAssetQP) {
           const assets = assetsByChainID(findChain.chainID);
-          const findAsset = assets.find((x) => x.denom === decodeURI(destAssetQP).toLowerCase());
+          const findAsset = assets.find((x) => x.denom.toLowerCase() === decodeURI(destAssetQP).toLowerCase());
           if (findAsset) {
             onDestinationChainChange(findChain, findAsset);
             setDestChainQP(null);
