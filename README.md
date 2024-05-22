@@ -20,11 +20,10 @@ cp .env.example .env
 
 ## Environment variables
 
-Make sure to set the following environment variables in `.env` file:
+Make sure to set the following environment variables in `.env` file:S
 
 ```bash
 NEXT_PUBLIC_API_URL="https://api.skip.money"
-NEXT_PUBLIC_CLIENT_ID=    # optional
 POLKACHU_USER=            # required
 POLKACHU_PASSWORD=        # required
 NEXT_PUBLIC_EDGE_CONFIG=  # required
