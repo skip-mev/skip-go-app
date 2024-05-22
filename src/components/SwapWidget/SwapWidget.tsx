@@ -6,6 +6,7 @@ import type {} from "typed-query-selector";
 import { disclosure } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
+import { useIsInIframe } from "@/hooks/useIsInIframe";
 import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "../AdaptiveLink";
@@ -65,7 +66,7 @@ export function SwapWidget() {
     sourceFeeAsset,
     swapPriceImpactPercent,
     usdDiffPercent,
-    shareableLink,
+    shareable,
   } = useSwapWidget();
 
   const srcAccount = useAccount(sourceChain?.chainID);
@@ -90,6 +91,7 @@ export function SwapWidget() {
   }, []);
 
   const accountStateKey = `${srcAccount?.isWalletConnected ? "src" : "no-src"}`;
+  const isInIframe = useIsInIframe();
 
   return (
     <UsdDiff.Provider>
@@ -101,8 +103,12 @@ export function SwapWidget() {
           <div className="flex h-8 items-center">
             <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
-            <EmbedButton />
-            <ShareButton shareableLink={shareableLink} />
+            {!isInIframe && (
+              <>
+                <EmbedButton />
+                <ShareButton shareableLink={shareable.link} />
+              </>
+            )}
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
@@ -267,12 +273,12 @@ export function SwapWidget() {
             </div>
           )}
         </div>
-        <EmbedDialog />
-        <HistoryDialog />
-        <SettingsDialog />
-        <JsonDialog />
       </Tooltip.Provider>
       <WalletModal />
+      <EmbedDialog embedLink={shareable.embedLink} />
+      <HistoryDialog />
+      <SettingsDialog />
+      <JsonDialog />
     </UsdDiff.Provider>
   );
 }

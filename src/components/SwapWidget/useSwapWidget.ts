@@ -776,7 +776,7 @@ export function useSwapWidget() {
     }
   }, [amountInQP, amountOutQP, onDestinationAmountChange, onSourceAmountChange, setAmountInQP, setAmountOutQP]);
 
-  const shareableLink = useMemo(() => {
+  const shareable = useMemo(() => {
     const params = new URLSearchParams();
     if (srcChain) {
       params.set("src_chain", srcChain.chainID.toLowerCase());
@@ -796,7 +796,10 @@ export function useSwapWidget() {
     if (amountOut) {
       params.set("amount_out", amountOut);
     }
-    return `${appUrl}?${params}`;
+    return {
+      link: `${appUrl}?${params}`,
+      embedLink: `${appUrl}/widget?${params}`,
+    };
   }, [srcChain, srcAsset, dstChain, dstAsset, amountIn, amountOut]);
 
   useEffect(() => {
@@ -847,7 +850,7 @@ export function useSwapWidget() {
     sourceFeeAsset: srcFeeAsset,
     swapPriceImpactPercent,
     usdDiffPercent,
-    shareableLink,
+    shareable,
   };
 }
 
