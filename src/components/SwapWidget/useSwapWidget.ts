@@ -3,7 +3,6 @@ import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { Asset, BridgeType } from "@skip-router/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BigNumber } from "bignumber.js";
-import { matchSorter } from "match-sorter";
 import { useQueryState } from "nuqs";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -677,26 +676,28 @@ export function useSwapWidget() {
   // #endregion
 
   // #region -- query params
+  const toastId = "url-params-toast";
+
   const [srcChainQP, setSrcChainQP] = useQueryState("src_chain");
   const [srcAssetQP, setSrcAssetQP] = useQueryState("src_asset");
   useEffect(() => {
     if (!chains || !isAssetsReady) return;
     if (srcChainQP) {
-      const findChain = matchSorter(chains, decodeURI(srcChainQP).toLowerCase(), {
-        keys: ["chainID", "chainName", "prettyName"],
-      });
-      if (findChain && findChain.length > 0) {
-        onSourceChainChange(findChain[0]);
+      const findChain = chains.find((x) => x.chainID === decodeURI(srcChainQP).toLowerCase());
+      if (findChain) {
+        onSourceChainChange(findChain);
         if (srcAssetQP) {
-          const assets = assetsByChainID(findChain[0].chainID);
-          const findAsset = matchSorter(assets || [], decodeURI(srcAssetQP).toLowerCase(), {
-            keys: ["symbol", "denom", "recommendedSymbol"],
-          });
-          if (findAsset && findAsset.length > 0) {
-            onSourceAssetChange(findAsset[0]);
+          const assets = assetsByChainID(findChain.chainID);
+          const findAsset = assets.find((x) => x.denom === decodeURI(srcAssetQP).toLowerCase());
+          if (findAsset) {
+            onSourceAssetChange(findAsset);
           }
         }
       }
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
       setSrcChainQP(null);
       setSrcAssetQP(null);
     }
@@ -717,24 +718,24 @@ export function useSwapWidget() {
   useEffect(() => {
     if (!chains || !isAssetsReady) return;
     if (destChainQP) {
-      const findChain = matchSorter(chains, decodeURI(destChainQP).toLowerCase(), {
-        keys: ["chainID", "chainName", "prettyName"],
-      });
-      if (findChain && findChain.length > 0) {
+      const findChain = chains.find((x) => x.chainID === decodeURI(destChainQP).toLowerCase());
+      if (findChain) {
         if (destAssetQP) {
-          const assets = assetsByChainID(findChain[0].chainID);
-          const findAsset = matchSorter(assets || [], decodeURI(destAssetQP).toLowerCase(), {
-            keys: ["symbol", "denom", "recommendedSymbol"],
-          });
-          if (findAsset && findAsset.length > 0) {
-            onDestinationChainChange(findChain[0], findAsset[0]);
+          const assets = assetsByChainID(findChain.chainID);
+          const findAsset = assets.find((x) => x.denom === decodeURI(destAssetQP).toLowerCase());
+          if (findAsset) {
+            onDestinationChainChange(findChain, findAsset);
             setDestChainQP(null);
             setDestAssetQP(null);
             return;
           }
         }
-        onDestinationChainChange(findChain[0]);
+        onDestinationChainChange(findChain);
       }
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
       setDestChainQP(null);
       setDestAssetQP(null);
     }
@@ -758,12 +759,20 @@ export function useSwapWidget() {
       onSourceAmountChange(amountInQP);
       setAmountOutQP(null);
       setAmountInQP(null);
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
       return;
     }
     if (amountOutQP) {
       onDestinationAmountChange(amountOutQP);
       setAmountOutQP(null);
       setAmountInQP(null);
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
     }
   }, [amountInQP, amountOutQP, onDestinationAmountChange, onSourceAmountChange, setAmountInQP, setAmountOutQP]);
 
@@ -773,13 +782,13 @@ export function useSwapWidget() {
       params.set("src_chain", srcChain.chainID.toLowerCase());
     }
     if (srcAsset) {
-      params.set("src_asset", (srcAsset.recommendedSymbol || srcAsset.symbol || srcAsset.denom).toLowerCase());
+      params.set("src_asset", srcAsset.denom.toLowerCase());
     }
     if (dstChain) {
       params.set("dest_chain", dstChain.chainID.toLowerCase());
     }
     if (dstAsset) {
-      params.set("dest_asset", (dstAsset.recommendedSymbol || dstAsset.symbol || dstAsset.denom).toLowerCase());
+      params.set("dest_asset", dstAsset.denom.toLowerCase());
     }
     if (amountIn) {
       params.set("amount_in", amountIn);
@@ -789,6 +798,19 @@ export function useSwapWidget() {
     }
     return `${appUrl}?${params}`;
   }, [srcChain, srcAsset, dstChain, dstAsset, amountIn, amountOut]);
+
+  useEffect(() => {
+    // this is a loading state when we are waiting for chains and assets to load when query params are present
+    if (
+      (!chains || !isAssetsReady) &&
+      (srcChainQP || srcAssetQP || destChainQP || destAssetQP || amountInQP || amountOutQP)
+    ) {
+      toast.loading("URL parameters are being processed...", {
+        id: toastId,
+        duration: Infinity,
+      });
+    }
+  }, [amountInQP, amountOutQP, chains, destAssetQP, destChainQP, isAssetsReady, srcAssetQP, srcChainQP]);
 
   // #endregion
   /////////////////////////////////////////////////////////////////////////////

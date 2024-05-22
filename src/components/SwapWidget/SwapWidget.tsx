@@ -253,7 +253,7 @@ export function SwapWidget() {
           {sourceChain && isWalletConnected && (
             <div className="space-y-4">
               <TransactionDialog
-                isLoading={routeLoadingembeddable}
+                isLoading={routeLoading}
                 route={route}
                 isAmountError={isAmountError}
                 shouldShowPriceImpactWarning={!!routeWarningTitle && !!routeWarningMessage}
