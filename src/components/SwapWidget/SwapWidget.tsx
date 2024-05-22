@@ -103,12 +103,8 @@ export function SwapWidget() {
           <div className="flex h-8 items-center">
             <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
-            {!isInIframe && (
-              <>
-                <EmbedButton />
-                <ShareButton shareableLink={shareable.link} />
-              </>
-            )}
+            {!isInIframe && <EmbedButton />}
+            <ShareButton shareableLink={shareable.link} />
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />

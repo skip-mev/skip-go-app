@@ -2,7 +2,6 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import toast from "react-hot-toast";
-import { FaCopy } from "react-icons/fa";
 
 import { useDisclosureKey } from "@/context/disclosures";
 import { cn } from "@/utils/ui";
