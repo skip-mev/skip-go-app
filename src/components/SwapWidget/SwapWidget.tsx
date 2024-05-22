@@ -11,6 +11,8 @@ import { cn } from "@/utils/ui";
 import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
+import { EmbedButton } from "../EmbedButton";
+import { EmbedDialog } from "../EmbedDialog";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
 import { Spinner } from "../Icons/Spinner";
@@ -99,6 +101,7 @@ export function SwapWidget() {
           <div className="flex h-8 items-center">
             <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
+            <EmbedButton />
             <ShareButton shareableLink={shareableLink} />
             <HistoryButton />
             <SettingsButton />
@@ -264,6 +267,7 @@ export function SwapWidget() {
             </div>
           )}
         </div>
+        <EmbedDialog />
         <HistoryDialog />
         <SettingsDialog />
         <JsonDialog />
