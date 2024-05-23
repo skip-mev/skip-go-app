@@ -576,30 +576,6 @@ export function useSwapWidget() {
   }, []);
 
   /**
-   * prefill source chain with {@link DEFAULT_SRC_CHAIN_ID} and trigger
-   * {@link onSourceChainChange} to sync source asset
-   */
-  useEffect(() => {
-    return useSwapWidgetStore.subscribe(
-      (state) => [state.sourceChain, state.sourceAsset] as const,
-      ([chain, asset]) => {
-        if (!chain) {
-          chain ??= (chains ?? []).find(({ chainID }) => {
-            return chainID === DEFAULT_SRC_CHAIN_ID;
-          });
-        }
-        if (chain && !asset) {
-          onSourceChainChange(chain);
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, [chains, onSourceChainChange]);
-
-  /**
    * sync source chain wallet connections
    * @see {srcChain}
    */
@@ -684,6 +660,7 @@ export function useSwapWidget() {
     if (!chains || !isAssetsReady) return;
     if (srcChainQP) {
       const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
+      console.log("findChain", findChain);
       if (findChain) {
         onSourceChainChange(findChain);
         if (srcAssetQP) {
@@ -816,6 +793,31 @@ export function useSwapWidget() {
   }, [amountInQP, amountOutQP, chains, destAssetQP, destChainQP, isAssetsReady, srcAssetQP, srcChainQP]);
 
   // #endregion
+
+  /**
+   * prefill source chain with {@link DEFAULT_SRC_CHAIN_ID} and trigger
+   * {@link onSourceChainChange} to sync source asset
+   */
+  useEffect(() => {
+    if (srcChainQP) return;
+    return useSwapWidgetStore.subscribe(
+      (state) => [state.sourceChain, state.sourceAsset] as const,
+      ([chain, asset]) => {
+        if (!chain) {
+          chain ??= (chains ?? []).find(({ chainID }) => {
+            return chainID === DEFAULT_SRC_CHAIN_ID;
+          });
+        }
+        if (chain && !asset) {
+          onSourceChainChange(chain);
+        }
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, [chains, onSourceChainChange, srcChainQP]);
   /////////////////////////////////////////////////////////////////////////////
 
   return {
