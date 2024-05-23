@@ -660,7 +660,6 @@ export function useSwapWidget() {
     if (!chains || !isAssetsReady) return;
     if (srcChainQP) {
       const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
-      console.log("findChain", findChain);
       if (findChain) {
         onSourceChainChange(findChain);
         if (srcAssetQP) {
