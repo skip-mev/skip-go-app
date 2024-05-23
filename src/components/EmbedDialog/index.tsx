@@ -9,7 +9,7 @@ import { cn } from "@/utils/ui";
 export const EmbedDialog = ({ embedLink }: { embedLink: string }) => {
   const [isOpen, { close }] = useDisclosureKey("embedDialog");
 
-  const embedCode = `<iframe src="${embedLink}" height="820" width="450" />`;
+  const embedCode = `<iframe allow="clipboard-read; clipboard-write" src="${embedLink}" height="820" width="450" />`;
 
   return (
     <Dialog.Root

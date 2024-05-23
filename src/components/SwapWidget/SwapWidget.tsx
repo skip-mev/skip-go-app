@@ -269,12 +269,12 @@ export function SwapWidget() {
             </div>
           )}
         </div>
+        <EmbedDialog embedLink={shareable.embedLink} />
+        <HistoryDialog />
+        <SettingsDialog />
+        <JsonDialog />
       </Tooltip.Provider>
       <WalletModal />
-      <EmbedDialog embedLink={shareable.embedLink} />
-      <HistoryDialog />
-      <SettingsDialog />
-      <JsonDialog />
     </UsdDiff.Provider>
   );
 }
