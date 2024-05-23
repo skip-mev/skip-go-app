@@ -16,7 +16,7 @@ export function DialogContent({ children, onInteractOutside }: Props) {
   return (
     <Dialog.Portal container={container.current}>
       <Dialog.Content
-        className="absolute inset-0 z-10 animate-fade-zoom-in rounded-3xl bg-white"
+        className="absolute inset-0 z-10 animate-fade-zoom-in bg-white"
         onInteractOutside={onInteractOutside}
       >
         {children}

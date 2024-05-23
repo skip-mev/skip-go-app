@@ -7,6 +7,7 @@ const defaultValues = {
   priceImpactDialog: false,
   settingsDialog: false,
   destinationDialog: false,
+  embedDialog: false,
   // TODO: port dialogs to new system
   // assetSelect: false,
   // chainSelect: false,

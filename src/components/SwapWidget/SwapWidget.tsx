@@ -6,17 +6,21 @@ import type {} from "typed-query-selector";
 import { disclosure } from "@/context/disclosures";
 import { useAccount } from "@/hooks/useAccount";
 import { useChains as useSkipChains } from "@/hooks/useChains";
+import { useIsInIframe } from "@/hooks/useIsInIframe";
 import { cn } from "@/utils/ui";
 
 import { AdaptiveLink } from "../AdaptiveLink";
 import AssetInput from "../AssetInput";
 import { ConnectedWalletButton } from "../ConnectedWalletButton";
+import { EmbedButton } from "../EmbedButton";
+import { EmbedDialog } from "../EmbedDialog";
 import { HistoryButton } from "../HistoryButton";
 import { HistoryDialog } from "../HistoryDialog";
 import { Spinner } from "../Icons/Spinner";
 import { JsonDialog } from "../JsonDialog";
 import { SettingsButton } from "../SettingsButton";
 import { SettingsDialog } from "../SettingsDialog";
+import { ShareButton } from "../ShareButton";
 import { SimpleTooltip } from "../SimpleTooltip";
 import TransactionDialog from "../TransactionDialog";
 import { UsdDiff } from "../UsdValue";
@@ -62,6 +66,7 @@ export function SwapWidget() {
     sourceFeeAsset,
     swapPriceImpactPercent,
     usdDiffPercent,
+    shareable,
   } = useSwapWidget();
 
   const srcAccount = useAccount(sourceChain?.chainID);
@@ -86,6 +91,7 @@ export function SwapWidget() {
   }, []);
 
   const accountStateKey = `${srcAccount?.isWalletConnected ? "src" : "no-src"}`;
+  const isInIframe = useIsInIframe();
 
   return (
     <UsdDiff.Provider>
@@ -97,6 +103,8 @@ export function SwapWidget() {
           <div className="flex h-8 items-center">
             <p className="text-2xl font-semibold">From</p>
             <div className="flex-grow" />
+            {!isInIframe && <EmbedButton />}
+            <ShareButton shareableLink={shareable.link} />
             <HistoryButton />
             <SettingsButton />
             <div className="w-2" />
@@ -261,6 +269,7 @@ export function SwapWidget() {
             </div>
           )}
         </div>
+        <EmbedDialog embedLink={shareable.embedLink} />
         <HistoryDialog />
         <SettingsDialog />
         <JsonDialog />

@@ -1,6 +1,5 @@
 import { ArrowRightIcon, FingerPrintIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
 import { RouteResponse } from "@skip-router/core";
-import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { FaExternalLinkAlt, FaKeyboard } from "react-icons/fa";
@@ -195,7 +194,7 @@ export const ChainStep = ({
             )}
           >
             <div className="flex h-full w-full items-center justify-center rounded-full bg-white p-1">
-              <Image
+              <img
                 src={chain?.logoURI || "/logo-fallback.png"}
                 width={48}
                 height={48}
@@ -307,14 +306,17 @@ export const ChainStep = ({
               <SimpleTooltip label={chainAddress.address}>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(chainAddress.address || "");
-                    toast.success("Address copied to clipboard");
+                    try {
+                      navigator.clipboard.writeText(chainAddress.address || "");
+                      toast.success("Address copied to clipboard");
+                    } catch (error) {
+                      toast.error("Failed to copy address to clipboard");
+                    }
                   }}
                   className="opacity-50"
                 >
                   {chainAddress?.source !== "input" ? (
-                    <Image
-                      unoptimized
+                    <img
                       height={16}
                       width={16}
                       alt={"wallet"}
@@ -347,8 +349,7 @@ export const ChainStep = ({
             {chainAddress?.address && !isIntermidiaryChain && (
               <>
                 {chainAddress?.source !== "input" ? (
-                  <Image
-                    unoptimized
+                  <img
                     height={16}
                     width={16}
                     alt={"wallet"}
@@ -369,8 +370,12 @@ export const ChainStep = ({
                 >
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(chainAddress.address || "");
-                      toast.success("Address copied to clipboard");
+                      try {
+                        navigator.clipboard.writeText(chainAddress.address || "");
+                        toast.success("Address copied to clipboard");
+                      } catch (error) {
+                        toast.error("Failed to copy address to clipboard");
+                      }
                     }}
                   >
                     <p className={cn("text-md font-semibold", isNotFocused && "font-normal text-neutral-400")}>
