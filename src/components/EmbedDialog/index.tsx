@@ -42,8 +42,12 @@ export const EmbedDialog = ({ embedLink }: { embedLink: string }) => {
                 </pre>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(embedCode);
-                    toast.success("Copied to clipboard");
+                    try {
+                      navigator.clipboard.writeText(embedCode);
+                      toast.success("Copied to clipboard");
+                    } catch (error) {
+                      toast.error("Failed to copy link to clipboard");
+                    }
                   }}
                   className={cn(
                     "self-end rounded-md bg-[#FF486E] px-2 py-1 text-xs font-semibold uppercase text-white disabled:bg-red-200",

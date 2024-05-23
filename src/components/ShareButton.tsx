@@ -10,8 +10,12 @@ export const ShareButton = ({ shareableLink }: { shareableLink: string }) => {
     <SimpleTooltip label="Share">
       <button
         onClick={() => {
-          navigator.clipboard.writeText(shareableLink);
-          toast.success("Link copied to clipboard");
+          try {
+            navigator.clipboard.writeText(shareableLink);
+            toast.success("Link copied to clipboard");
+          } catch (error) {
+            toast.error("Failed to copy link to clipboard");
+          }
         }}
         className={cn(
           "rounded-full p-2 text-black/80 hover:bg-neutral-100 hover:text-black/100",

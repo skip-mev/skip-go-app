@@ -306,8 +306,12 @@ export const ChainStep = ({
               <SimpleTooltip label={chainAddress.address}>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(chainAddress.address || "");
-                    toast.success("Address copied to clipboard");
+                    try {
+                      navigator.clipboard.writeText(chainAddress.address || "");
+                      toast.success("Address copied to clipboard");
+                    } catch (error) {
+                      toast.error("Failed to copy address to clipboard");
+                    }
                   }}
                   className="opacity-50"
                 >
@@ -366,8 +370,12 @@ export const ChainStep = ({
                 >
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(chainAddress.address || "");
-                      toast.success("Address copied to clipboard");
+                      try {
+                        navigator.clipboard.writeText(chainAddress.address || "");
+                        toast.success("Address copied to clipboard");
+                      } catch (error) {
+                        toast.error("Failed to copy address to clipboard");
+                      }
                     }}
                   >
                     <p className={cn("text-md font-semibold", isNotFocused && "font-normal text-neutral-400")}>
