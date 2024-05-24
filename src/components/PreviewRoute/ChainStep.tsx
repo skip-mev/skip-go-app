@@ -433,7 +433,18 @@ const Asset = ({
   }, [amount, decimals]);
   return (
     <div className="flex flex-row items-center space-x-1">
-      <p className="text-md font-medium">{amountDisplayed}</p>
+      <SimpleTooltip label={`${amountDisplayed} ${symbol}`}>
+        <div
+          className={cn(
+            amountDisplayed.length > 6 &&
+              "cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4",
+          )}
+        >
+          <p className="text-md font-medium">
+            {parseFloat(amountDisplayed).toLocaleString("en-US", { maximumFractionDigits: 6 })}
+          </p>
+        </div>
+      </SimpleTooltip>
       <img
         src={logoURI || "/logo-fallback.png"}
         width={16}
