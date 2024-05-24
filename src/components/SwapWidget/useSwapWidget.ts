@@ -506,7 +506,7 @@ export function useSwapWidget() {
             return denom === srcFeeAsset?.denom;
           });
 
-          if (!feeDenomPrices) {
+          if (!feeDenomPrices || !feeDenomPrices.gasPrice) {
             toast.error(`Unable to find gas prices for ${srcFeeAsset.denom} on ${srcChain.chainName}`);
             return;
           }
