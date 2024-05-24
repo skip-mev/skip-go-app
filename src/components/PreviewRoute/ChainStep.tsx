@@ -433,7 +433,10 @@ const Asset = ({
   }, [amount, decimals]);
   return (
     <div className="flex flex-row items-center space-x-1">
-      <SimpleTooltip label={`${amountDisplayed} ${symbol}`}>
+      <SimpleTooltip
+        enabled={amountDisplayed.length > 6}
+        label={`${amountDisplayed} ${symbol}`}
+      >
         <div
           className={cn(
             amountDisplayed.length > 6 &&
