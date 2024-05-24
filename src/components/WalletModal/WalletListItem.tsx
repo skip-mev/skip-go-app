@@ -49,6 +49,9 @@ const CosmosWalletListItem = ({
     if ("snapInstalled" in walletClient) {
       return walletClient.snapInstalled;
     }
+    if (wallet?.prettyName.toLowerCase() === "outer wallet") {
+      return false;
+    }
     if (_isMobile) {
       return isWalletConnect || walletClient;
     }
@@ -56,7 +59,7 @@ const CosmosWalletListItem = ({
       return !isWalletConnect;
     }
     return true;
-  }, [_isMobile, isWalletConnect, walletClient]);
+  }, [_isMobile, isWalletConnect, wallet?.prettyName, walletClient]);
 
   useEffect(() => {
     const unregister = () => {
