@@ -52,7 +52,7 @@ function AssetSelectContent({ assets = [], balances, onChange, onClose, showChai
   const filteredAssets = useMemo(() => {
     if (!searchValue) return sortedAssets;
     return matchSorter(sortedAssets || [], searchValue, {
-      keys: ["symbol", "denom"],
+      keys: ["recommendedSymbol", "symbol", "denom"],
     });
   }, [searchValue, sortedAssets]);
 
