@@ -1,7 +1,8 @@
 {
-  "name": "skip-ibcfun",
+  "name": "@skip-router/widget",
   "version": "0.0.1",
-  "description": "Provides the React widget that is used to power ibcdotfun",
+  "description": "React Widget SDK for ibc-dot-fun",
+  "repository": "https://github.com/skip-mev/ibc-dot-fun",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
@@ -23,5 +24,9 @@
     "typescript": "^5.4.5",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
