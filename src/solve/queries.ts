@@ -133,6 +133,9 @@ export function useRoute({
                 allowUnsafe: true,
                 experimentalFeatures,
                 smartRelay: true,
+                smartSwapOptions: {
+                  splitRoutes: true,
+                },
               }
             : {
                 amountOut: amount,
@@ -145,6 +148,9 @@ export function useRoute({
                 allowUnsafe: true,
                 experimentalFeatures,
                 smartRelay: true,
+                smartSwapOptions: {
+                  splitRoutes: true,
+                },
               },
         );
 

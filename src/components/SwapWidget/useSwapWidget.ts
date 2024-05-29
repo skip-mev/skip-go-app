@@ -3,6 +3,7 @@ import { useManager as useCosmosManager } from "@cosmos-kit/react";
 import { Asset, BridgeType } from "@skip-router/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BigNumber } from "bignumber.js";
+import { useQueryState } from "nuqs";
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { formatUnits } from "viem";
@@ -15,6 +16,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn as create } from "zustand/traditional";
 
+import { appUrl } from "@/constants/api";
 import { EVMOS_GAS_AMOUNT, isChainIdEvmos } from "@/constants/gas";
 import { useAssets } from "@/context/assets";
 import { useAnyDisclosureOpen } from "@/context/disclosures";
@@ -44,7 +46,7 @@ export function useSwapWidget() {
 
   const skipClient = useSkipClient();
 
-  const { assetsByChainID, getFeeAsset } = useAssets();
+  const { assetsByChainID, getFeeAsset, isReady: isAssetsReady } = useAssets();
   const { data: chains } = useChains();
 
   const { getWalletRepo } = useCosmosManager();
@@ -285,7 +287,7 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onDestinationChainChange = useCallback(
-    async (chain: Chain) => {
+    async (chain: Chain, injectAsset?: Asset) => {
       const { destinationAsset: currentDstAsset } = useSwapWidgetStore.getState();
       const assets = assetsByChainID(chain.chainID);
 
@@ -317,7 +319,7 @@ export function useSwapWidget() {
 
       useSwapWidgetStore.setState({
         destinationChain: chain,
-        destinationAsset: asset,
+        destinationAsset: injectAsset ? injectAsset : asset,
       });
     },
 
@@ -574,30 +576,6 @@ export function useSwapWidget() {
   }, []);
 
   /**
-   * prefill source chain with {@link DEFAULT_SRC_CHAIN_ID} and trigger
-   * {@link onSourceChainChange} to sync source asset
-   */
-  useEffect(() => {
-    return useSwapWidgetStore.subscribe(
-      (state) => [state.sourceChain, state.sourceAsset] as const,
-      ([chain, asset]) => {
-        if (!chain) {
-          chain ??= (chains ?? []).find(({ chainID }) => {
-            return chainID === DEFAULT_SRC_CHAIN_ID;
-          });
-        }
-        if (chain && !asset) {
-          onSourceChainChange(chain);
-        }
-      },
-      {
-        equalityFn: shallow,
-        fireImmediately: true,
-      },
-    );
-  }, [chains, onSourceChainChange]);
-
-  /**
    * sync source chain wallet connections
    * @see {srcChain}
    */
@@ -673,6 +651,172 @@ export function useSwapWidget() {
 
   // #endregion
 
+  // #region -- query params
+  const toastId = "url-params-toast";
+
+  const [srcChainQP, setSrcChainQP] = useQueryState("src_chain");
+  const [srcAssetQP, setSrcAssetQP] = useQueryState("src_asset");
+  useEffect(() => {
+    if (!chains || !isAssetsReady) return;
+    if (srcChainQP) {
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
+      if (findChain) {
+        onSourceChainChange(findChain);
+        if (srcAssetQP) {
+          const assets = assetsByChainID(findChain.chainID);
+          const findAsset = assets.find((x) => x.denom.toLowerCase() === decodeURI(srcAssetQP).toLowerCase());
+          if (findAsset) {
+            onSourceAssetChange(findAsset);
+          }
+        }
+      }
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
+      setSrcChainQP(null);
+      setSrcAssetQP(null);
+    }
+  }, [
+    assetsByChainID,
+    chains,
+    isAssetsReady,
+    onSourceAssetChange,
+    onSourceChainChange,
+    setSrcAssetQP,
+    setSrcChainQP,
+    srcAssetQP,
+    srcChainQP,
+  ]);
+
+  const [destChainQP, setDestChainQP] = useQueryState("dest_chain");
+  const [destAssetQP, setDestAssetQP] = useQueryState("dest_asset");
+  useEffect(() => {
+    if (!chains || !isAssetsReady) return;
+    if (destChainQP) {
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(destChainQP).toLowerCase());
+      if (findChain) {
+        if (destAssetQP) {
+          const assets = assetsByChainID(findChain.chainID);
+          const findAsset = assets.find((x) => x.denom.toLowerCase() === decodeURI(destAssetQP).toLowerCase());
+          if (findAsset) {
+            onDestinationChainChange(findChain, findAsset);
+            setDestChainQP(null);
+            setDestAssetQP(null);
+            return;
+          }
+        }
+        onDestinationChainChange(findChain);
+      }
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
+      setDestChainQP(null);
+      setDestAssetQP(null);
+    }
+  }, [
+    assetsByChainID,
+    chains,
+    isAssetsReady,
+    onDestinationAssetChange,
+    onDestinationChainChange,
+    setDestAssetQP,
+    setDestChainQP,
+    destAssetQP,
+    destChainQP,
+  ]);
+
+  const [amountInQP, setAmountInQP] = useQueryState("amount_in");
+  const [amountOutQP, setAmountOutQP] = useQueryState("amount_out");
+
+  useEffect(() => {
+    if (amountInQP) {
+      onSourceAmountChange(amountInQP);
+      setAmountOutQP(null);
+      setAmountInQP(null);
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
+      return;
+    }
+    if (amountOutQP) {
+      onDestinationAmountChange(amountOutQP);
+      setAmountOutQP(null);
+      setAmountInQP(null);
+      toast.success("URL parameters processed successfully", {
+        id: toastId,
+        duration: 5000,
+      });
+    }
+  }, [amountInQP, amountOutQP, onDestinationAmountChange, onSourceAmountChange, setAmountInQP, setAmountOutQP]);
+
+  const shareable = useMemo(() => {
+    const params = new URLSearchParams();
+    if (srcChain) {
+      params.set("src_chain", srcChain.chainID.toLowerCase());
+    }
+    if (srcAsset) {
+      params.set("src_asset", srcAsset.denom.toLowerCase());
+    }
+    if (dstChain) {
+      params.set("dest_chain", dstChain.chainID.toLowerCase());
+    }
+    if (dstAsset) {
+      params.set("dest_asset", dstAsset.denom.toLowerCase());
+    }
+    if (amountIn) {
+      params.set("amount_in", amountIn);
+    }
+    if (amountOut) {
+      params.set("amount_out", amountOut);
+    }
+    return {
+      link: `${appUrl}?${params}`,
+      embedLink: `${appUrl}/widget?${params}`,
+    };
+  }, [srcChain, srcAsset, dstChain, dstAsset, amountIn, amountOut]);
+
+  useEffect(() => {
+    // this is a loading state when we are waiting for chains and assets to load when query params are present
+    if (
+      (!chains || !isAssetsReady) &&
+      (srcChainQP || srcAssetQP || destChainQP || destAssetQP || amountInQP || amountOutQP)
+    ) {
+      toast.loading("URL parameters are being processed...", {
+        id: toastId,
+        duration: Infinity,
+      });
+    }
+  }, [amountInQP, amountOutQP, chains, destAssetQP, destChainQP, isAssetsReady, srcAssetQP, srcChainQP]);
+
+  // #endregion
+
+  /**
+   * prefill source chain with {@link DEFAULT_SRC_CHAIN_ID} and trigger
+   * {@link onSourceChainChange} to sync source asset
+   */
+  useEffect(() => {
+    if (srcChainQP) return;
+    return useSwapWidgetStore.subscribe(
+      (state) => [state.sourceChain, state.sourceAsset] as const,
+      ([chain, asset]) => {
+        if (!chain) {
+          chain ??= (chains ?? []).find(({ chainID }) => {
+            return chainID === DEFAULT_SRC_CHAIN_ID;
+          });
+        }
+        if (chain && !asset) {
+          onSourceChainChange(chain);
+        }
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: true,
+      },
+    );
+  }, [chains, onSourceChainChange, srcChainQP]);
   /////////////////////////////////////////////////////////////////////////////
 
   return {
@@ -707,6 +851,7 @@ export function useSwapWidget() {
     sourceFeeAsset: srcFeeAsset,
     swapPriceImpactPercent,
     usdDiffPercent,
+    shareable,
   };
 }
 
@@ -728,7 +873,7 @@ export interface SwapWidgetStore {
   bridges: BridgeType[];
 }
 
-const defaultValues: SwapWidgetStore = {
+export const defaultValues: SwapWidgetStore = {
   amountIn: "",
   amountOut: "",
   direction: "swap-in",
@@ -737,7 +882,7 @@ const defaultValues: SwapWidgetStore = {
 
 // TODO: move to src/context/
 // TODO: include all memoize values
-const useSwapWidgetStore = create(
+export const useSwapWidgetStore = create(
   subscribeWithSelector(
     persist(() => defaultValues, {
       name: "SwapWidgetState",
