@@ -11,5 +11,4 @@ export const IbcWidget: React.FC<IbcWidgetProps> = ({ children }) => {
       {children}
     </div>
   );
-};
- 
+}; 
