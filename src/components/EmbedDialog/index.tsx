@@ -60,7 +60,7 @@ export const EmbedDialog = ({ embedLink }: { embedLink: string }) => {
                   <strong>Note: </strong>You can customize the default swap route by modifying the query parameters for
                   more information visit the{" "}
                   <a
-                    href="https://api-docs.skip.money/docs"
+                    href="https://api-docs.skip.money/docs/embed-a-swap-widget"
                     target="_blank"
                     rel="noreferrer"
                     className="text-[#FF486E]"
