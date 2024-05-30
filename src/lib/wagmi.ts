@@ -25,6 +25,8 @@ import {
   sepolia,
 } from "wagmi/chains";
 
+import { forma } from "@/constants/wagmi";
+
 // Update EVM_CHAINS in src/constants/wagmi.ts as well
 export const config = createConfig({
   chains: [
@@ -50,6 +52,7 @@ export const config = createConfig({
     arbitrumSepolia,
     blast,
     blastSepolia,
+    forma,
   ],
   transports: {
     [arbitrum.id]: http(),
@@ -74,5 +77,6 @@ export const config = createConfig({
     [arbitrumSepolia.id]: http(),
     [blast.id]: http(),
     [blastSepolia.id]: http(),
+    [forma.id]: http(),
   },
 });

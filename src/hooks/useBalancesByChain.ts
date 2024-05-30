@@ -98,6 +98,37 @@ export async function getEvmChainBalances(
 
   const chainAssets = assets[chainID];
 
+  if (chainID === "984122") {
+    const balances: bigint[] = [];
+
+    for (const asset of chainAssets) {
+      if (asset.tokenContract) {
+        const balance = await publicClient.readContract({
+          address: asset.tokenContract as `0x${string}`,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [address as `0x${string}`],
+        });
+
+        balances.push(balance);
+      }
+
+      const balance = await publicClient.getBalance({
+        address: address as `0x${string}`,
+      });
+
+      balances.push(balance);
+    }
+
+    return chainAssets.reduce<Record<string, string>>(
+      (acc, asset, i) => ({
+        ...acc,
+        [asset.denom]: balances[i].toString() || "0",
+      }),
+      {},
+    );
+  }
+
   const balances = await publicClient.multicall({
     multicallAddress: "0xcA11bde05977b3631167028862bE2a173976CA11",
     contracts: chainAssets.map((asset) => {

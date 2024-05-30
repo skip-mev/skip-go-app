@@ -1,3 +1,4 @@
+import { defineChain } from "viem";
 import {
   arbitrum,
   arbitrumSepolia,
@@ -24,6 +25,18 @@ import {
   sepolia,
 } from "wagmi/chains";
 
+export const forma = /*#__PURE__*/ defineChain({
+  id: 984122,
+  name: "Forma Mainnet",
+  nativeCurrency: { name: "TIA", symbol: "TIA", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.forma.art"],
+    },
+  },
+  testnet: false,
+});
+
 export const EVM_CHAINS: Chain[] = [
   arbitrum,
   avalanche,
@@ -47,4 +60,5 @@ export const EVM_CHAINS: Chain[] = [
   arbitrumSepolia,
   blast,
   blastSepolia,
+  forma,
 ];
