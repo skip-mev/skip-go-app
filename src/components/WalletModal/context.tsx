@@ -1,12 +1,6 @@
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useContext,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
-import { Dialog } from "@/elements/Dialog";
+import { Dialog } from "@/components/Dialog";
 
 interface WalletModalContext {
   chainID: string;
@@ -15,9 +9,7 @@ interface WalletModalContext {
   openWalletModal: (chainID: string) => void;
 }
 
-const WalletModalContext = createContext<WalletModalContext | undefined>(
-  undefined,
-);
+const WalletModalContext = createContext<WalletModalContext | undefined>(undefined);
 
 export function useWalletModal() {
   const context = useContext(WalletModalContext);
@@ -27,25 +19,27 @@ export function useWalletModal() {
   return context;
 }
 
-export const WalletModalProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [chainID, setChainID] = useState("cosmoshub-4");
-
+export function WalletModalProvider({ children }: { children: ReactNode }) {
+  const [chainID, setChainID] = useState<WalletModalContext["chainID"]>("");
+  const [isOpen, setIsOpen] = useState<WalletModalContext["isOpen"]>(false);
   return (
     <WalletModalContext.Provider
       value={{
         chainID,
         isOpen,
+        setIsOpen,
         openWalletModal: (_chainID) => {
           setIsOpen(true);
           setChainID(_chainID);
         },
-        setIsOpen,
       }}
     >
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      >
         {children}
       </Dialog>
     </WalletModalContext.Provider>
   );
-};
+}

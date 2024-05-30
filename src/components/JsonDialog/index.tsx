@@ -1,12 +1,9 @@
-import {
-  ArrowLeftIcon,
-  CheckIcon,
-  ClipboardDocumentIcon,
-} from "@heroicons/react/20/solid";
-import { clsx } from "clsx";
+import { ArrowLeftIcon, CheckIcon, ClipboardDocumentIcon } from "@heroicons/react/20/solid";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useMemo, useState } from "react";
 
 import { useJsonDisclosure } from "@/context/disclosures";
+import { cn } from "@/utils/ui";
 
 export const JsonDialog = () => {
   const [state, { close }] = useJsonDisclosure();
@@ -28,38 +25,43 @@ export const JsonDialog = () => {
   if (!state) return null;
 
   return (
-    <div className="absolute inset-0 bg-white rounded-3xl z-[999] overflow-hidden">
-      <button
-        className={clsx(
-          "absolute top-5 right-4",
-          "text-sm px-2 py-1 border rounded-lg transition-colors",
-          "flex items-center justify-center space-x-1 flex-grow",
-          {
-            "bg-gray-100 hover:bg-gray-200": !copied,
-            "bg-green-100 hover:bg-green-200": copied,
-            "border-green-400 text-green-900": copied,
-          },
-        )}
-        onClick={onCopy}
-      >
-        <span>Copy to clipboard</span>
-        <ClipboardIcon className="w-4 h-4" />
-      </button>
-      <div className="h-full px-4 py-6 overflow-y-auto scrollbar-hide">
-        <div className="flex items-center gap-4 pb-2">
-          <button
-            className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-            onClick={close}
-          >
-            <ArrowLeftIcon className="w-6 h-6" />
-          </button>
-          <h3 className="font-bold text-xl">{state.title || "JSON Viewer"}</h3>
-          <div className="flex-grow" />
+    <Dialog.Root
+      modal
+      open
+    >
+      <Dialog.Content className="absolute inset-0 overflow-hidden rounded-3xl bg-white">
+        <button
+          className={cn(
+            "absolute right-4 top-5",
+            "rounded-lg border px-2 py-1 text-sm transition-colors",
+            "flex flex-grow items-center justify-center space-x-1",
+            {
+              "bg-neutral-100 hover:bg-neutral-200": !copied,
+              "bg-green-100 hover:bg-green-200": copied,
+              "border-green-400 text-green-900": copied,
+            },
+          )}
+          onClick={onCopy}
+        >
+          <span>Copy to clipboard</span>
+          <ClipboardIcon className="h-4 w-4" />
+        </button>
+        <div className="h-full overflow-y-auto px-4 py-6 scrollbar-hide">
+          <div className="flex items-center gap-4 pb-2">
+            <button
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
+              onClick={close}
+            >
+              <ArrowLeftIcon className="h-6 w-6" />
+            </button>
+            <h3 className="text-xl font-bold">{state.title || "JSON Viewer"}</h3>
+            <div className="flex-grow" />
+          </div>
+          <pre className="overflow-auto rounded-lg border p-2 font-mono text-xs">
+            {JSON.stringify(state.data, null, 2)}
+          </pre>
         </div>
-        <pre className="border font-mono p-2 rounded-lg text-xs overflow-auto">
-          {JSON.stringify(state.data, null, 2)}
-        </pre>
-      </div>
-    </div>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 };

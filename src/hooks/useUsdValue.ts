@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { getAssets } from "@/chains";
 import { raise } from "@/utils/assert";
-import { getUsdPrice } from "@/utils/llama";
+import { getUsdPrice } from "@/utils/usd";
 
 export type Args = {
   chainId: string;
@@ -48,10 +48,7 @@ export function useUsdDiffValue([args1, args2]: [Args, Args]) {
       return [key, ...Object.values(args1), ...Object.values(args2)].join("-");
     },
     queryFn: async ({ queryKey: [, args1, args2] }) => {
-      const [v1, v2] = await Promise.all([
-        getUsdValue(args1),
-        getUsdValue(args2),
-      ]);
+      const [v1, v2] = await Promise.all([getUsdValue(args1), getUsdValue(args2)]);
       // return percentage difference
       return ((v2 - v1) / v1) * 100;
     },
@@ -71,10 +68,7 @@ async function getUsdValue(args: Args) {
       assets.find((asset) => asset.base === args.denom) ||
       raise(`getUsdValue error: ${args.denom} not found in ${args.chainId}`);
     coingeckoID =
-      asset.coingecko_id ||
-      raise(
-        `getUsdValue error: ${args.denom} does not have a 'coingecko_id' in ${args.chainId}`,
-      );
+      asset.coingecko_id || raise(`getUsdValue error: ${args.denom} does not have a 'coingecko_id' in ${args.chainId}`);
   }
 
   const usd = await getUsdPrice({ coingeckoID });

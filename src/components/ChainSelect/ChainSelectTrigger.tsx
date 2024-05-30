@@ -1,28 +1,32 @@
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { ForwardedRef, forwardRef } from "react";
+import { forwardRef } from "react";
 
-import { Chain } from "@/api/queries";
+import { Chain } from "@/hooks/useChains";
+import { cn } from "@/utils/ui";
 
 interface Props {
   chain?: Chain;
 }
 
-const ChainSelectTrigger = forwardRef(function ChainSelectTrigger(
-  { chain, ...props }: Props,
-  ref: ForwardedRef<HTMLButtonElement>,
-) {
-  return (
-    <button
-      className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center p-4 w-full transition-colors"
-      ref={ref}
-      {...props}
-    >
-      <span className="flex-1">
-        {chain ? chain.prettyName : "Select Chain"}
-      </span>
-      <ChevronDownIcon className="mt-0.5 h-4 w-4" />
-    </button>
-  );
-});
+const ChainSelectTrigger = forwardRef<HTMLButtonElement, Props>(
+  function ChainSelectTrigger({ chain, ...props }, ref) {
+    return (
+      <button
+        className={cn(
+          "flex w-full items-center px-4 py-2 sm:py-4",
+          "whitespace-nowrap rounded-md bg-neutral-100 text-left font-semibold transition-colors",
+          "border border-neutral-200 hover:border-neutral-300",
+        )}
+        ref={ref}
+        data-testid={"select-chain"}
+        {...props}
+      >
+        <span className="flex-1">{chain ? chain.prettyName : "Select Chain"}</span>
+        <ChevronDownIcon className="mt-0.5 h-4 w-4" />
+      </button>
+    );
+  },
+  //
+);
 
 export default ChainSelectTrigger;

@@ -6,6 +6,7 @@
 .sentryclirc
 .turbo
 .vercel
+.visdeps
 .vscode
 *.log
 *.pem

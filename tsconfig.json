@@ -23,13 +23,6 @@
     "strict": true,
     "target": "es2020"
   },
-  "exclude": ["node_modules"],
-  "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "env.d.ts",
-    "window.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "exclude": ["node_modules", "chain-registry", "initia-registry"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "env.d.ts", "window.d.ts", "**/*.ts", "**/*.tsx"]
 }

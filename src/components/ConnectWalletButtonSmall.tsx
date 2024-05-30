@@ -1,18 +1,20 @@
-import { PlusSmallIcon } from "@heroicons/react/20/solid";
-import { FC } from "react";
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { ComponentProps } from "react";
 
-interface Props {
-  onClick?: () => void;
-}
+import { cn } from "@/utils/ui";
 
-export const ConnectWalletButtonSmall: FC<Props> = ({ onClick }) => {
+export function ConnectWalletButtonSmall({ className, ...props }: ComponentProps<"button">) {
   return (
     <button
-      className="bg-[#FF486E]/20 hover:bg-[#FF486E]/30 text-[#FF486E] text-xs font-semibold rounded-lg py-1 px-2.5 pr-1 flex items-center gap-1 transition-colors focus:outline-none"
-      onClick={onClick}
+      className={cn(
+        "bg-[#FF486E]/20 text-[#FF486E] hover:bg-[#FF486E]/30",
+        "flex items-center gap-1 rounded-md px-2.5 py-1 pr-1 text-xs font-semibold transition-colors focus:outline-none",
+        className,
+      )}
+      {...props}
     >
       <span>Connect Wallet</span>
-      <PlusSmallIcon className="w-5 h-5" />
+      <PlusIcon className="h-4 w-4" />
     </button>
   );
-};
+}

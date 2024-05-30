@@ -4,9 +4,7 @@
 const APP_URL =
   process.env.APP_URL ||
   (process.env.VERCEL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`) ||
-  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${
-    process.env.PORT || 3000
-  }`;
+  `${process.env.PROTOCOL || "http"}://${process.env.HOST || "localhost"}:${process.env.PORT || 3000}`;
 
 /**
  * @type {import('next').NextConfig}
@@ -20,7 +18,24 @@ let nextConfig = {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
   productionBrowserSourceMaps: true,
-  rewrites: async () => [],
+  rewrites: async () => [
+    {
+      source: "/.well-known/walletconnect.txt",
+      destination: "/api/walletconnect/verify",
+    },
+    {
+      source: "/api/rest/(.*)",
+      destination: "/api/rest/handler",
+    },
+    {
+      source: "/api/rpc/(.*)",
+      destination: "/api/rpc/handler",
+    },
+    {
+      source: "/api/skip/(.*)",
+      destination: "/api/skip/handler",
+    },
+  ],
   transpilePackages:
     process.env.NODE_ENV === "test"
       ? [
@@ -45,6 +60,15 @@ let nextConfig = {
           "uuid",
         ]
       : [],
+  images: {
+    dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
   webpack: (config, { dev, isServer }) => {
     if (dev && isServer) checkEnv();
     return config;
@@ -86,15 +110,8 @@ function checkEnv() {
 
   const log = require("next/dist/build/output/log");
 
-  if (!process.env.NEXT_PUBLIC_API_URL) {
-    log.warn(
-      'env NEXT_PUBLIC_API_URL is not set, using SKIP_API_URL from "@skip-router/core"',
-    );
-  }
   if (!process.env.POLKACHU_USER || !process.env.POLKACHU_PASSWORD) {
-    log.warn(
-      "env POLKACHU_USER or POLKACHU_PASSWORD is not set, /nodes/[chainID] will not work",
-    );
+    log.warn("env POLKACHU_USER or POLKACHU_PASSWORD is not set, will use public nodes");
   }
 
   checkEnv.once = true;

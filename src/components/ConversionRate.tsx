@@ -1,10 +1,9 @@
+import { Asset } from "@skip-router/core";
 import { ReactNode, useCallback, useMemo, useState } from "react";
 
-import { AssetWithMetadata } from "@/context/assets";
-
 export interface Props {
-  srcAsset: AssetWithMetadata;
-  destAsset: AssetWithMetadata;
+  srcAsset: Asset;
+  destAsset: Asset;
   amountIn: string;
   amountOut: string;
   defaultDirection?: ConvDirection;
@@ -13,8 +12,8 @@ export interface Props {
 }
 
 interface RenderArgs {
-  left: AssetWithMetadata;
-  right: AssetWithMetadata;
+  left: Asset;
+  right: Asset;
   conversion: number;
   toggle: () => void;
 }
@@ -31,9 +30,7 @@ export const ConversionRate = ({
 
   const toggle = useCallback(() => {
     setState((prev) => {
-      return prev === ConvDirection.DEST_SRC
-        ? ConvDirection.SRC_DEST
-        : ConvDirection.DEST_SRC;
+      return prev === ConvDirection.DEST_SRC ? ConvDirection.SRC_DEST : ConvDirection.DEST_SRC;
     });
   }, []);
 

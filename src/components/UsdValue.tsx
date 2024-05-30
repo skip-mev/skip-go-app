@@ -2,12 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useRef } from "react";
 import { create } from "zustand";
 
 import { Args, useUsdDiffValue, useUsdValue } from "@/hooks/useUsdValue";
-
-const { format } = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 6,
-});
+import { formatUSD } from "@/utils/intl";
 
 type UsdValueProps = Args & {
   error?: ReactNode;
@@ -15,12 +10,7 @@ type UsdValueProps = Args & {
   context?: "src" | "dest";
 };
 
-export const UsdValue = ({
-  error = "Price not available",
-  loading = "...",
-  context,
-  ...args
-}: UsdValueProps) => {
+export const UsdValue = ({ error = "Price not available", loading = "...", context, ...args }: UsdValueProps) => {
   const { data: usdValue = 0, isError, isLoading } = useUsdValue(args);
 
   const prevValue = useRef(usdValue);
@@ -45,10 +35,10 @@ export const UsdValue = ({
   }
 
   if (isLoading && prevValue.current) {
-    return <>{format(prevValue.current)}</>;
+    return <>{formatUSD(prevValue.current)}</>;
   }
 
-  return <>{isLoading ? loading : format(usdValue)}</>;
+  return <>{isLoading ? loading : formatUSD(usdValue)}</>;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +91,13 @@ export const UsdDiff = {
       return <>{props.onUndefined ?? null}</>;
     }
 
-    return <UsdDiffValue src={src} dest={dest} {...props} />;
+    return (
+      <UsdDiffValue
+        src={src}
+        dest={dest}
+        {...props}
+      />
+    );
   },
 };
 

@@ -1,95 +1,93 @@
-import { useWalletClient } from "@cosmos-kit/react";
+import { useManager } from "@cosmos-kit/react";
 import { SkipRouter } from "@skip-router/core";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { getWalletClient } from "@wagmi/core";
-import { createContext, FC, PropsWithChildren } from "react";
-import { useNetwork } from "wagmi";
+import { createContext, ReactNode } from "react";
+import { WalletClient } from "viem";
 
-import { API_URL } from "@/constants/api";
-import { getNodeProxyEndpoint } from "@/utils/api";
-import {
-  getOfflineSigner,
-  getOfflineSignerOnlyAmino,
-  isLedger,
-} from "@/utils/utils";
+import { chainIdToName } from "@/chains/types";
+import { appUrl } from "@/constants/api";
+import { trackWallet } from "@/context/track-wallet";
+import { config } from "@/lib/wagmi";
+import { gracefullyConnect, isWalletClientUsingLedger } from "@/utils/wallet";
 
-export const SkipContext = createContext<
-  | {
-      skipClient: SkipRouter;
-    }
-  | undefined
->(undefined);
+export const SkipContext = createContext<{ skipClient: SkipRouter } | undefined>(undefined);
 
-export const SkipProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { client: walletClient } = useWalletClient();
-  const { chains } = useNetwork();
+export function SkipProvider({ children }: { children: ReactNode }) {
+  const { getWalletRepo } = useManager();
+  const { wallets } = useWallet();
 
   const skipClient = new SkipRouter({
-    apiURL: API_URL,
+    apiURL: `${appUrl}/api/skip`,
     getCosmosSigner: async (chainID) => {
-      if (!walletClient) {
-        throw new Error("No offline signer available");
+      const chainName = chainIdToName[chainID];
+      if (!chainName) {
+        throw new Error(`getCosmosSigner error: unknown chainID '${chainID}'`);
       }
 
-      const signerIsLedger = await isLedger(walletClient, chainID);
+      const walletName = (() => {
+        const { cosmos } = trackWallet.get();
+        if (cosmos?.chainType === "cosmos") return cosmos.walletName;
+      })();
 
-      if (signerIsLedger) {
-        return getOfflineSignerOnlyAmino(walletClient, chainID);
-      }
-
-      return getOfflineSigner(walletClient, chainID);
-    },
-    getEVMSigner: async (chainID) => {
-      const result = await getWalletClient({
-        chainId: parseInt(chainID),
+      const wallet = getWalletRepo(chainName).wallets.find((w) => {
+        return w.walletName === walletName;
       });
 
-      if (!result) {
-        throw new Error("No offline signer available");
+      if (!wallet) {
+        throw new Error(`getCosmosSigner error: unable to find wallets connected to '${chainID}'`);
       }
 
-      const chain = chains.find((c) => c.id === parseInt(chainID));
-      if (!chain) {
-        throw new Error("No chain found");
+      if (!wallet.isWalletConnected || wallet.isWalletDisconnected) {
+        await gracefullyConnect(wallet);
       }
-      result.chain = chain;
 
-      return result;
+      const isLedger = await isWalletClientUsingLedger(wallet.client, chainID);
+      await wallet.initOfflineSigner(isLedger ? "amino" : "direct");
+
+      if (!wallet.offlineSigner) {
+        throw new Error(`getCosmosSigner error: no offline signer for walletName '${walletName}'`);
+      }
+
+      wallet.client.setDefaultSignOptions?.({
+        preferNoSetFee: true,
+      });
+
+      return wallet.offlineSigner;
+    },
+    getEVMSigner: async (chainID) => {
+      const evmWalletClient = (await getWalletClient(config, {
+        chainId: parseInt(chainID),
+      })) as WalletClient;
+
+      if (!evmWalletClient) {
+        throw new Error(`getEVMSigner error: no wallet client available for chain ${chainID}`);
+      }
+
+      return evmWalletClient;
+    },
+    getSVMSigner: async () => {
+      const walletName = (() => {
+        const { svm } = trackWallet.get();
+        if (svm?.chainType === "svm") return svm.walletName;
+      })();
+      const solanaWallet = wallets.find((w) => w.adapter.name === walletName);
+
+      if (!solanaWallet?.adapter) {
+        throw new Error(`getSVMSigner error: no wallet client available`);
+      }
+
+      return solanaWallet.adapter;
     },
     endpointOptions: {
       getRpcEndpointForChain: async (chainID) => {
-        const testnets: Record<string, string> = {
-          "osmo-test-5": "https://osmosis-testnet-rpc.polkachu.com",
-          "pion-1": "https://neutron-testnet-rpc.polkachu.com",
-          "axelar-testnet-lisbon-3": "https://axelar-testnet-rpc.polkachu.com",
-        };
-
-        if (testnets[chainID]) {
-          return testnets[chainID];
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return `${appUrl}/api/rpc/${chainID}`;
       },
       getRestEndpointForChain: async (chainID) => {
-        if (chainID === "injective-1") {
-          return "https://lcd.injective.network";
-        }
-
-        if (chainID === "evmos_9001-2") {
-          return "https://evmos-api.polkachu.com";
-        }
-
-        return getNodeProxyEndpoint(chainID);
+        return `${appUrl}/api/rest/${chainID}`;
       },
     },
   });
 
-  return (
-    <SkipContext.Provider
-      value={{
-        skipClient: skipClient,
-      }}
-    >
-      {children}
-    </SkipContext.Provider>
-  );
-};
+  return <SkipContext.Provider value={{ skipClient }}>{children}</SkipContext.Provider>;
+}

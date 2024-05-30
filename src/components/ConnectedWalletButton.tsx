@@ -1,29 +1,40 @@
-import { FC } from "react";
+import { ComponentProps, forwardRef } from "react";
 
-interface Props {
+import { cn } from "@/utils/ui";
+
+type Props = ComponentProps<"button"> & {
   address: string;
-  onClick: () => void;
   walletName: string;
   walletLogo?: string;
-}
-
-export const ConnectedWalletButton: FC<Props> = ({
-  address,
-  onClick,
-  walletLogo,
-  walletName,
-}) => {
-  return (
-    <button
-      className="flex items-center gap-2 border border-gray-300 hover:bg-gray-50 rounded-lg py-2 px-2.5 focus:outline-none transition-colors"
-      onClick={onClick}
-    >
-      {walletLogo && (
-        <img alt={walletName} className="w-4 h-4" src={walletLogo} />
-      )}
-      <span className="text-xs font-bold">
-        {address.slice(0, 8)}...{address.slice(-5)}
-      </span>
-    </button>
-  );
 };
+
+export const ConnectedWalletButton = forwardRef<HTMLButtonElement, Props>(
+  function Component(props, ref) {
+    const { address, walletLogo, walletName, className, ...rest } = props;
+    return (
+      <button
+        className={cn(
+          "flex items-center gap-2 transition-colors focus:outline-none",
+          "rounded-lg border border-neutral-200 px-2 py-1.5 hover:border-neutral-300 hover:bg-neutral-50",
+          className,
+        )}
+        {...rest}
+        ref={ref}
+      >
+        {walletLogo && (
+          <img
+            height={16}
+            width={16}
+            alt={walletName}
+            className="object-contain"
+            src={walletLogo}
+          />
+        )}
+        <span className="font-mono text-xs font-semibold tabular-nums">
+          {address.slice(0, 8)}...{address.slice(-5)}
+        </span>
+      </button>
+    );
+  },
+  //
+);

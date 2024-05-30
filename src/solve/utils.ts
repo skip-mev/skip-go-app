@@ -1,31 +1,27 @@
 import { Asset } from "@skip-router/core";
 
-import { AssetWithMetadata } from "@/context/assets";
+export function isAssetWithMetadata(asset: Asset): asset is AssetWithMetadata {
+  const { chainID, decimals, denom, name, recommendedSymbol, symbol } = asset;
 
-export function assetHasMetadata(asset: Asset) {
-  if (!asset.decimals) {
-    return false;
+  const identifier = recommendedSymbol || symbol || name || denom;
+
+  if (!recommendedSymbol) {
+    return console.warn(`asset error: ${identifier} on '${chainID}' is missing 'recommendedSymbol'`), false;
   }
 
-  if (!asset.symbol) {
-    return false;
+  if (!name) {
+    return console.warn(`asset error: ${identifier} on '${chainID}' is missing 'name'`), false;
   }
 
-  if (!asset.name) {
-    return false;
+  if (!decimals) {
+    return console.warn(`asset error: ${identifier} on '${chainID}' is missing 'decimals'`), false;
   }
-
-  // if (!asset.logoURI) {
-  //   return false;
-  // }
 
   return true;
 }
 
-export function isAssetWithMetadata(asset: Asset): asset is AssetWithMetadata {
-  return assetHasMetadata(asset);
-}
-
-export function filterAssetsWithMetadata(assets: Asset[]) {
-  return assets.filter(isAssetWithMetadata);
-}
+export type AssetWithMetadata = Asset & {
+  recommendedSymbol: NonNullable<Asset["recommendedSymbol"]>;
+  name: NonNullable<Asset["name"]>;
+  decimals: NonNullable<Asset["decimals"]>;
+};

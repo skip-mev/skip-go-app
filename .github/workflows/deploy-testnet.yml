@@ -1,0 +1,36 @@
+name: Deploy (testnet)
+on:
+  pull_request:
+    branches: [staging]
+    types: [closed]
+  push:
+    branches: [testnet]
+  repository_dispatch:
+    types: [deploy-testnet]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: testnet
+
+      - id: pull-staging
+        name: Pull latest 'staging'
+        run: git pull --ff-only origin staging
+
+      - id: diff-check
+        name: Check if 'testnet' is behind 'staging'
+        run: git diff --exit-code origin/staging
+
+      - id: fast-forward
+        name: Fast forward 'staging' → 'testnet'
+        run: git merge --ff-only origin/staging
+
+      - id: push-testnet
+        name: Push latest 'testnet'
+        run: git push --set-upstream origin testnet

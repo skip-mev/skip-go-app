@@ -1,27 +1,17 @@
-import { Asset } from "@skip-router/core";
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useContext,
-  useMemo,
-} from "react";
+import { Asset, FeeAsset } from "@skip-router/core";
+import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
 
-import { Chain, useChains } from "@/api/queries";
+import { useChains } from "@/hooks/useChains";
+import { sortFeeAssets } from "@/utils/chain";
 
-import {
-  filterAssetsWithMetadata,
-  useAssets as useSolveAssets,
-} from "../solve";
-
-export type AssetWithMetadata = Required<Asset>;
+import { useAssets as useSolveAssets } from "../solve";
 
 interface AssetsContext {
-  assets: Record<string, AssetWithMetadata[]>;
-  assetsByChainID: (chainID: string) => AssetWithMetadata[];
-  getAsset(denom: string, chainID: string): AssetWithMetadata | undefined;
-  getFeeDenom(chainID: string): AssetWithMetadata | undefined;
-  getNativeAssets(): AssetWithMetadata[];
+  assets: Record<string, Asset[]>;
+  assetsByChainID: (chainID?: string) => Asset[];
+  getAsset(denom: string, chainID: string): Asset | undefined;
+  getFeeAsset(chainID: string): Promise<Asset | undefined>;
+  getNativeAssets(): Asset[];
   isReady: boolean;
 }
 
@@ -29,167 +19,62 @@ export const AssetsContext = createContext<AssetsContext>({
   assets: {},
   assetsByChainID: () => [],
   getAsset: () => undefined,
-  getFeeDenom: () => undefined,
+  getFeeAsset: async () => undefined,
   getNativeAssets: () => [],
   isReady: false,
 });
 
-function getAssetSymbolSuffix(originDenom: string, originChainName: string) {
-  switch (originChainName) {
-    case "Axelar":
-      if (originDenom.includes("polygon-")) {
-        return ".axl (Polygon)";
+export function AssetsProvider({ children }: { children: ReactNode }) {
+  const { data: chains } = useChains();
+  const { data: assets = {} } = useSolveAssets();
+
+  const assetsByChainID: AssetsContext["assetsByChainID"] = useCallback(
+    (chainID?: string) => {
+      const chainAssets = chainID ? assets[chainID] || [] : [];
+      return /* console.log(chainAssets), */ chainAssets;
+    },
+    [assets],
+  );
+
+  const getAsset = useCallback(
+    (denom: string, chainID: string) => {
+      const asset = assets[chainID]?.find((asset) => asset.denom === denom);
+      return asset;
+    },
+    [assets],
+  );
+
+  const getFeeAsset = useCallback(
+    async (chainID: string) => {
+      const cached = feeAssetCache[chainID];
+      if (cached) return cached;
+
+      let feeAsset: FeeAsset | undefined;
+
+      if (!feeAsset) {
+        const chain = (chains ?? []).find((chain) => chain.chainID === chainID);
+        if (!chain) return;
+        else if (chainID === "carbon-1") {
+          feeAsset = chain.feeAssets.find((v) => v.denom == "swth");
+        } else {
+          [feeAsset] = chain.feeAssets.sort(sortFeeAssets);
+        }
       }
-      if (originDenom.includes("avalanche-")) {
-        return ".axl (Avalanche)";
-      }
-      return ".axl";
-    case "Sifchain":
-      return ".sif";
-    case "Gravity Bridge":
-      return ".grv";
-    case "Neutron":
-    case "Noble":
-      return "";
-    default:
-      return ` ${originChainName}`;
-  }
-}
-
-function getAssetSymbol(
-  asset: AssetWithMetadata,
-  assets: Asset[],
-  chains: Chain[],
-) {
-  if (asset.originChainID === "axelar-dojo-1") {
-    if (asset.originDenom === "uaxl") {
-      return asset.symbol ?? asset.denom;
-    }
-
-    const originChain = chains.find((c) => c.chainID === asset.originChainID);
-    const originChainName = originChain?.prettyName ?? asset.originChainID;
-
-    return `${asset.symbol?.replace("axl", "")}${getAssetSymbolSuffix(
-      asset.originDenom,
-      originChainName,
-    )}`.replace("..", ".");
-  }
-
-  if (asset.originChainID === "gravity-bridge-3") {
-    if (asset.chainID === "core-1") {
-      return asset.symbol ?? asset.denom;
-    }
-    if (asset.originDenom === "ugraviton") {
-      return asset.symbol ?? asset.denom;
-    }
-
-    const originChain = chains.find((c) => c.chainID === asset.originChainID);
-    const originChainName = originChain?.prettyName ?? asset.originChainID;
-
-    return `${asset.symbol}${getAssetSymbolSuffix(
-      asset.originDenom,
-      originChainName,
-    )}`;
-  }
-
-  if (asset.originChainID === "sifchain-1") {
-    const originChain = chains.find((c) => c.chainID === asset.originChainID);
-    const originChainName = originChain?.prettyName ?? asset.originChainID;
-
-    if (asset.originDenom === "rowan") {
-      return asset.symbol ?? asset.denom;
-    }
-
-    return `${asset.symbol}${getAssetSymbolSuffix(
-      asset.originDenom,
-      originChainName,
-    )}`;
-  }
-
-  // this just handles a weird EVM token edge case
-  if (asset.symbol?.startsWith("axl")) {
-    return `${asset.symbol.replace("axl", "")}.axl`;
-  }
-
-  const hasDuplicates =
-    (assets?.filter((a) => a.symbol === asset.symbol).length ?? 0) > 1;
-
-  if (hasDuplicates) {
-    const originChain = chains.find((c) => c.chainID === asset.originChainID);
-    const originChainName = originChain?.prettyName ?? asset.originChainID;
-
-    return `${asset.symbol}${getAssetSymbolSuffix(
-      asset.originDenom,
-      originChainName,
-    )}`;
-  }
-
-  return asset.symbol ?? asset.denom;
-}
-
-export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { chains } = useChains();
-
-  const { data: solveAssets } = useSolveAssets();
-
-  const assets = useMemo(() => {
-    if (!solveAssets || !chains) {
-      return {};
-    }
-
-    return Object.entries(solveAssets).reduce(
-      (acc, [chainID, assets]) => {
-        return {
-          ...acc,
-          [chainID]: filterAssetsWithMetadata(assets).map((asset) => ({
-            ...asset,
-            symbol: getAssetSymbol(asset, assets, chains),
-            logoURI:
-              asset.originDenom === "utia"
-                ? "https://raw.githubusercontent.com/cosmostation/chainlist/main/chain/celestia/asset/tia.png"
-                : asset.logoURI,
-          })),
-        };
-      },
-      {} as Record<string, AssetWithMetadata[]>,
-    );
-  }, [chains, solveAssets]);
-
-  function assetsByChainID(chainID: string) {
-    return assets[chainID] || [];
-  }
-
-  function getAsset(denom: string, chainID: string) {
-    const asset = assets[chainID]?.find((asset) => asset.denom === denom);
-
-    return asset;
-  }
-
-  function getFeeDenom(chainID: string) {
-    const chain = (chains ?? []).find((c) => c.chainID === chainID);
-
-    if (!chain || chain.feeAssets.length === 0) {
-      return undefined;
-    }
-
-    // prioritize non-ibc assets
-    const sortedFeeDenoms = [...chain.feeAssets].sort((a, b) => {
-      if (a.denom.includes("ibc/")) {
-        return 1;
+      if (!feeAsset) {
+        return;
       }
 
-      if (b.denom.includes("ibc/")) {
-        return -1;
-      }
+      const asset = getAsset(feeAsset.denom, chainID);
+      if (!asset) return;
 
-      return 0;
-    });
+      feeAssetCache[chainID] = asset;
+      return asset;
+    },
+    [chains, getAsset],
+  );
 
-    return getAsset(sortedFeeDenoms[0].denom, chainID);
-  }
-
-  function getNativeAssets() {
-    const nativeAssets: AssetWithMetadata[] = [];
+  const getNativeAssets = useCallback(() => {
+    const nativeAssets: Asset[] = [];
 
     for (const chainAssetList of Object.values(assets)) {
       for (const asset of chainAssetList) {
@@ -200,9 +85,24 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return nativeAssets;
-  }
+  }, [assets]);
 
   const isReady = useMemo(() => Object.keys(assets).length > 0, [assets]);
+
+  // useEffect(() => {
+  //   if (!isReady || !chains || !assets) return;
+  //   const load = (src: string) => {
+  //     const img = new Image();
+  //     img.src = src;
+  //     img.onload = () => img.remove();
+  //   };
+  //   chains.forEach(({ chainID, logoURI }) => {
+  //     logoURI && load(logoURI);
+  //     (assets[chainID] || []).forEach(({ logoURI }) => {
+  //       logoURI && load(logoURI);
+  //     });
+  //   });
+  // }, [assets, chains, isReady]);
 
   return (
     <AssetsContext.Provider
@@ -210,7 +110,7 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
         assets,
         assetsByChainID,
         getAsset,
-        getFeeDenom,
+        getFeeAsset,
         getNativeAssets,
         isReady,
       }}
@@ -218,8 +118,10 @@ export const AssetsProvider: FC<PropsWithChildren> = ({ children }) => {
       {children}
     </AssetsContext.Provider>
   );
-};
+}
 
 export function useAssets() {
   return useContext(AssetsContext);
 }
+
+const feeAssetCache: Record<string, Asset> = {};

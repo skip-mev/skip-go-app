@@ -25,9 +25,7 @@ export async function prepareKeplr() {
 }
 
 async function getKeplrReleases() {
-  const response = await axios.get<Release[]>(
-    "https://api.github.com/repos/chainapsis/keplr-wallet/releases",
-  );
+  const response = await axios.get<Release[]>("https://api.github.com/repos/chainapsis/keplr-wallet/releases");
 
   const filename = response.data[0].assets[0].name;
   const downloadUrl = response.data[0].assets[0].browser_download_url;
@@ -51,9 +49,7 @@ async function createDirIfNotExist(path: string) {
       return true;
     }
 
-    throw new Error(
-      `[createDirIfNotExist] Unhandled error from fs.access() with following error:\n${e}`,
-    );
+    throw new Error(`[createDirIfNotExist] Unhandled error from fs.access() with following error:\n${e}`);
   }
 }
 
@@ -67,8 +63,6 @@ async function checkDirOrFileExist(path: string) {
       return false;
     }
 
-    throw new Error(
-      `[checkDirOrFileExist] Unhandled error from fs.access() with following error:\n${e}`,
-    );
+    throw new Error(`[checkDirOrFileExist] Unhandled error from fs.access() with following error:\n${e}`);
   }
 }

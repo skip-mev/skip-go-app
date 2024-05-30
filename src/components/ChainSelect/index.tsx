@@ -1,7 +1,7 @@
 import { FC, Fragment, useState } from "react";
 
-import { Chain } from "@/api/queries";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
+import { Chain } from "@/hooks/useChains";
 
 import ChainSelectContent from "./ChainSelectContent";
 import ChainSelectTrigger from "./ChainSelectTrigger";
@@ -14,10 +14,12 @@ interface Props {
 
 const ChainSelect: FC<Props> = ({ chain, chains, onChange = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Fragment>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      >
         <DialogTrigger>
           <ChainSelectTrigger chain={chain} />
         </DialogTrigger>

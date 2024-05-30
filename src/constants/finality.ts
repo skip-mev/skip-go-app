@@ -32,6 +32,6 @@ const finalityTimeMap: Record<string, string> = {
 };
 
 /** @see https://docs.axelar.dev/learn/txduration#common-finality-time-for-interchain-transactions */
-export const getFinalityTime = (id: string | number) => {
+export function getFinalityTime(id: string | number) {
   return finalityTimeMap[`${id}`] || "~30 minutes";
-};
+}

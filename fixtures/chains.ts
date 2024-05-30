@@ -11,8 +11,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png",
+      logo_uri: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png",
       bech32_prefix: "",
       fee_assets: [],
       chain_type: "evm",
@@ -28,8 +27,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
+      logo_uri: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
       bech32_prefix: "",
       fee_assets: [],
       chain_type: "evm",
@@ -45,8 +43,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/loyal/images/lyl.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/loyal/images/lyl.png",
       bech32_prefix: "loyal",
       fee_assets: [],
       chain_type: "cosmos",
@@ -62,8 +59,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmosis-chain-logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmosis-chain-logo.png",
       bech32_prefix: "osmo",
       fee_assets: [
         {
@@ -88,8 +84,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/kichain/images/xki.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/kichain/images/xki.png",
       bech32_prefix: "ki",
       fee_assets: [],
       chain_type: "cosmos",
@@ -105,8 +100,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/archway/images/archway.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/archway/images/archway.png",
       bech32_prefix: "archway",
       fee_assets: [
         {
@@ -131,8 +125,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/injective/images/inj.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/injective/images/inj.png",
       bech32_prefix: "inj",
       fee_assets: [
         {
@@ -157,8 +150,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/akash/images/akt.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/akash/images/akt.png",
       bech32_prefix: "akash",
       fee_assets: [
         {
@@ -179,8 +171,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/nyx/images/nyx.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/nyx/images/nyx.png",
       bech32_prefix: "n",
       fee_assets: [
         {
@@ -205,8 +196,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/lumnetwork/images/lum.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/lumnetwork/images/lum.png",
       bech32_prefix: "lum",
       fee_assets: [
         {
@@ -231,13 +221,11 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/noble/images/stake.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/noble/images/stake.png",
       bech32_prefix: "noble",
       fee_assets: [
         {
-          denom:
-            "ibc/EF48E6B1A1A19F47ECAEA62F5670C37C0580E86A9E88498B7E393EB6F49F33C0",
+          denom: "ibc/EF48E6B1A1A19F47ECAEA62F5670C37C0580E86A9E88498B7E393EB6F49F33C0",
           gas_price: {
             low: "0.001",
             average: "0.001",
@@ -266,8 +254,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/planq/images/planq.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/planq/images/planq.png",
       bech32_prefix: "plq",
       fee_assets: [
         {
@@ -292,8 +279,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/secretnetwork/images/scrt.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/secretnetwork/images/scrt.png",
       bech32_prefix: "secret",
       fee_assets: [
         {
@@ -318,8 +304,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/fetchhub/images/fet.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/fetchhub/images/fet.png",
       bech32_prefix: "fetch",
       fee_assets: [
         {
@@ -344,8 +329,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qck.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qck.png",
       bech32_prefix: "quick",
       fee_assets: [
         {
@@ -370,8 +354,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/assetmantle/images/AM_Logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/assetmantle/images/AM_Logo.png",
       bech32_prefix: "mantle",
       fee_assets: [
         {
@@ -413,8 +396,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/aura/images/Aura-logo-2.2.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/aura/images/Aura-logo-2.2.png",
       bech32_prefix: "aura",
       fee_assets: [
         {
@@ -439,8 +421,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/umee/images/umee.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/umee/images/umee.png",
       bech32_prefix: "umee",
       fee_assets: [
         {
@@ -465,8 +446,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/neutron/images/neutron-black-logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/neutron/images/neutron-black-logo.png",
       bech32_prefix: "neutron",
       fee_assets: [
         {
@@ -478,8 +458,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
+          denom: "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
           gas_price: {
             low: "0.005",
             average: "0.005",
@@ -487,8 +466,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349",
+          denom: "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349",
           gas_price: {
             low: "0.05",
             average: "0.05",
@@ -509,8 +487,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/passage/images/pasg.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/passage/images/pasg.png",
       bech32_prefix: "pasg",
       fee_assets: [],
       chain_type: "cosmos",
@@ -526,8 +503,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra/images/luna.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra/images/luna.png",
       bech32_prefix: "terra",
       fee_assets: [
         {
@@ -560,8 +536,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/agoric/images/Agoric-logo-color.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/agoric/images/Agoric-logo-color.png",
       bech32_prefix: "agoric",
       fee_assets: [
         {
@@ -594,8 +569,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/chihuahua/images/huahua.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/chihuahua/images/huahua.png",
       bech32_prefix: "chihuahua",
       fee_assets: [
         {
@@ -620,8 +594,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/nois/images/nois.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/nois/images/nois.png",
       bech32_prefix: "nois",
       fee_assets: [
         {
@@ -646,8 +619,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/ununifi/images/ununifi.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/ununifi/images/ununifi.png",
       bech32_prefix: "ununifi",
       fee_assets: [],
       chain_type: "cosmos",
@@ -663,8 +635,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.png",
       bech32_prefix: "canto",
       fee_assets: [
         {
@@ -689,13 +660,11 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/crescent/images/cre.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/crescent/images/cre.png",
       bech32_prefix: "cre",
       fee_assets: [
         {
-          denom:
-            "ibc/61DF64ADF65230540C14C63D64897BE08A3DC9A516A91425913F01240E2F432F",
+          denom: "ibc/61DF64ADF65230540C14C63D64897BE08A3DC9A516A91425913F01240E2F432F",
           gas_price: {
             low: "0.008146",
             average: "0.020365",
@@ -711,8 +680,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/764D1629980B02BAFF3D25BEE4FB1E0C5E350AFA252FDF66E68E10D2179A826A",
+          denom: "ibc/764D1629980B02BAFF3D25BEE4FB1E0C5E350AFA252FDF66E68E10D2179A826A",
           gas_price: {
             low: "200000000",
             average: "500000000",
@@ -720,8 +688,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/9EC8A1701813BB7B73BFED2496009ABB2C8BF187E6CDFA788D77F68E08BC05CD",
+          denom: "ibc/9EC8A1701813BB7B73BFED2496009ABB2C8BF187E6CDFA788D77F68E08BC05CD",
           gas_price: {
             low: "0.000842",
             average: "0.002105",
@@ -729,8 +696,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/C814F0B662234E24248AE3B2FE2C1B54BBAF12934B757F6E7BC5AEC119963895",
+          denom: "ibc/C814F0B662234E24248AE3B2FE2C1B54BBAF12934B757F6E7BC5AEC119963895",
           gas_price: {
             low: "0.000568",
             average: "0.00142",
@@ -738,8 +704,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/D64F87FAE0B35C1954DD7921BA7A2939705DE77CBF72B8002F2E3552EDE4DE52",
+          denom: "ibc/D64F87FAE0B35C1954DD7921BA7A2939705DE77CBF72B8002F2E3552EDE4DE52",
           gas_price: {
             low: "0.00006",
             average: "0.00015",
@@ -747,8 +712,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/CD01034D6749F20AAC5330EF4FD8B8CA7C40F7527AB8C4A302FBD2A070852EE1",
+          denom: "ibc/CD01034D6749F20AAC5330EF4FD8B8CA7C40F7527AB8C4A302FBD2A070852EE1",
           gas_price: {
             low: "0.000842",
             average: "0.002105",
@@ -756,8 +720,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/8F865D9760B482FF6254EDFEC1FF2F1273B9AB6873A7DE484F89639795D73D75",
+          denom: "ibc/8F865D9760B482FF6254EDFEC1FF2F1273B9AB6873A7DE484F89639795D73D75",
           gas_price: {
             low: "0.0004",
             average: "0.001",
@@ -765,8 +728,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/BFF0D3805B50D93E2FA5C0B2DDF7E0B30A631076CD80BC12A48C0E95404B4A41",
+          denom: "ibc/BFF0D3805B50D93E2FA5C0B2DDF7E0B30A631076CD80BC12A48C0E95404B4A41",
           gas_price: {
             low: "0.000842",
             average: "0.002105",
@@ -774,8 +736,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/0634D0993744740D675AD01E81156EAC945AEAAE17C074918DC7FF52F41B263E",
+          denom: "ibc/0634D0993744740D675AD01E81156EAC945AEAAE17C074918DC7FF52F41B263E",
           gas_price: {
             low: "0.0014",
             average: "0.0035",
@@ -783,8 +744,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/5A76568E079A31FA12165E4559BA9F1E9D4C97F9C2060B538C84DCD503815E30",
+          denom: "ibc/5A76568E079A31FA12165E4559BA9F1E9D4C97F9C2060B538C84DCD503815E30",
           gas_price: {
             low: "3350000000",
             average: "8375000000",
@@ -792,8 +752,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/11F940BCDFD7CFBFD7EDA13F25DA95D308286D441209D780C9863FD4271514EB",
+          denom: "ibc/11F940BCDFD7CFBFD7EDA13F25DA95D308286D441209D780C9863FD4271514EB",
           gas_price: {
             low: "0.002",
             average: "0.005",
@@ -801,8 +760,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/4627AD2524E3E0523047E35BB76CC90E37D9D57ACF14F0FCBCEB2480705F3CB8",
+          denom: "ibc/4627AD2524E3E0523047E35BB76CC90E37D9D57ACF14F0FCBCEB2480705F3CB8",
           gas_price: {
             low: "5",
             average: "12.5",
@@ -810,8 +768,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
+          denom: "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
           gas_price: {
             low: "0.000063",
             average: "0.0001575",
@@ -819,8 +776,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/C950356239AD2A205DE09FDF066B1F9FF19A7CA7145EA48A5B19B76EE47E52F7",
+          denom: "ibc/C950356239AD2A205DE09FDF066B1F9FF19A7CA7145EA48A5B19B76EE47E52F7",
           gas_price: {
             low: "0.065405",
             average: "0.1635125",
@@ -828,8 +784,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/CA1261224952DF089EFD363D8DBB30A8AB6D8CD181E60EE9E68E432F8DE14FE3",
+          denom: "ibc/CA1261224952DF089EFD363D8DBB30A8AB6D8CD181E60EE9E68E432F8DE14FE3",
           gas_price: {
             low: "0.000842",
             average: "0.002105",
@@ -858,8 +813,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/xpla/images/xpla.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/xpla/images/xpla.png",
       bech32_prefix: "xpla",
       fee_assets: [
         {
@@ -884,8 +838,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/bitsong/images/btsg.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/bitsong/images/btsg.png",
       bech32_prefix: "bitsong",
       fee_assets: [],
       chain_type: "cosmos",
@@ -901,8 +854,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/mars/images/mars-protocol.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/mars/images/mars-protocol.png",
       bech32_prefix: "mars",
       fee_assets: [
         {
@@ -927,8 +879,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.png",
       bech32_prefix: "gravity",
       fee_assets: [
         {
@@ -972,13 +923,11 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/00F2B62EB069321A454B708876476AFCD9C23C8C9C4A5A206DDF1CD96B645057",
+          denom: "ibc/00F2B62EB069321A454B708876476AFCD9C23C8C9C4A5A206DDF1CD96B645057",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/29A7122D024B5B8FA8A2EFBB4FA47272C25C8926AA005A96807127208082DAB3",
+          denom: "ibc/29A7122D024B5B8FA8A2EFBB4FA47272C25C8926AA005A96807127208082DAB3",
           gas_price: null,
         },
         {
@@ -990,8 +939,7 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/5012B1C96F286E8A6604A87037CE51241C6F1CA195B71D1E261FCACB69FB6BC2",
+          denom: "ibc/5012B1C96F286E8A6604A87037CE51241C6F1CA195B71D1E261FCACB69FB6BC2",
           gas_price: null,
         },
         {
@@ -1003,8 +951,7 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/D157AD8A50DAB0FC4EB95BBE1D9407A590FA2CDEE04C90A76C005089BF76E519",
+          denom: "ibc/D157AD8A50DAB0FC4EB95BBE1D9407A590FA2CDEE04C90A76C005089BF76E519",
           gas_price: null,
         },
         {
@@ -1016,8 +963,7 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/2E5D0AC026AC1AFA65A23023BA4F24BB8DDF94F118EDC0BAD6F625BFC557CDED",
+          denom: "ibc/2E5D0AC026AC1AFA65A23023BA4F24BB8DDF94F118EDC0BAD6F625BFC557CDED",
           gas_price: null,
         },
         {
@@ -1077,13 +1023,11 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/0C273962C274B2C05B22D9474BFE5B84D6A6FCAD198CB9B0ACD35EA521A36606",
+          denom: "ibc/0C273962C274B2C05B22D9474BFE5B84D6A6FCAD198CB9B0ACD35EA521A36606",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/4F393C3FCA4190C0A6756CE7F6D897D5D1BE57D6CCB80D0BC87393566A7B6602",
+          denom: "ibc/4F393C3FCA4190C0A6756CE7F6D897D5D1BE57D6CCB80D0BC87393566A7B6602",
           gas_price: null,
         },
         {
@@ -1095,8 +1039,7 @@ export const CHAINS_RESPONSE = {
           gas_price: null,
         },
         {
-          denom:
-            "ibc/048BE20AE2E6BFD4142C547E04F17E5F94363003A12B7B6C084E08101BFCF7D1",
+          denom: "ibc/048BE20AE2E6BFD4142C547E04F17E5F94363003A12B7B6C084E08101BFCF7D1",
           gas_price: null,
         },
         {
@@ -1149,8 +1092,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/cronos/images/cronos.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cronos/images/cronos.png",
       bech32_prefix: "crc",
       fee_assets: [],
       chain_type: "cosmos",
@@ -1166,8 +1108,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/omniflixhub/images/flix.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/omniflixhub/images/flix.png",
       bech32_prefix: "omniflix",
       fee_assets: [
         {
@@ -1192,8 +1133,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/jackal/images/jkl.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/jackal/images/jkl.png",
       bech32_prefix: "jkl",
       fee_assets: [
         {
@@ -1218,8 +1158,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/nolus/images/nolus.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/nolus/images/nolus.png",
       bech32_prefix: "nolus",
       fee_assets: [
         {
@@ -1244,8 +1183,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/meme/images/meme.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/meme/images/meme.png",
       bech32_prefix: "meme",
       fee_assets: [
         {
@@ -1270,8 +1208,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/comdex/images/cmdx.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/comdex/images/cmdx.png",
       bech32_prefix: "comdex",
       fee_assets: [
         {
@@ -1296,13 +1233,11 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/quasar/images/quasar.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/quasar/images/quasar.png",
       bech32_prefix: "quasar",
       fee_assets: [
         {
-          denom:
-            "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
+          denom: "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
           gas_price: {
             low: "0.01",
             average: "0.01",
@@ -1310,8 +1245,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/FA7775734CC73176B7425910DE001A1D2AD9B6D9E93129A5D0750EAD13E4E63A",
+          denom: "ibc/FA7775734CC73176B7425910DE001A1D2AD9B6D9E93129A5D0750EAD13E4E63A",
           gas_price: {
             low: "0.01",
             average: "0.01",
@@ -1319,8 +1253,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/FA0006F056DB6719B8C16C551FC392B62F5729978FC0B125AC9A432DBB2AA1A5",
+          denom: "ibc/FA0006F056DB6719B8C16C551FC392B62F5729978FC0B125AC9A432DBB2AA1A5",
           gas_price: {
             low: "0.01",
             average: "0.01",
@@ -1341,8 +1274,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/evmos/images/evmos.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/evmos/images/evmos.png",
       bech32_prefix: "evmos",
       fee_assets: [
         {
@@ -1367,8 +1299,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/bitcanna/images/bcna.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/bitcanna/images/bcna.png",
       bech32_prefix: "bcna",
       fee_assets: [
         {
@@ -1393,8 +1324,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: false,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/sifchain/images/rowan.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/sifchain/images/rowan.png",
       bech32_prefix: "sif",
       fee_assets: [
         {
@@ -1419,8 +1349,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/8ball/images/8ball.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/8ball/images/8ball.png",
       bech32_prefix: "8ball",
       fee_assets: [
         {
@@ -1441,8 +1370,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/teritori/images/chain.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/teritori/images/chain.png",
       bech32_prefix: "tori",
       fee_assets: [
         {
@@ -1467,8 +1395,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/migaloo/images/migaloo-light.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/migaloo/images/migaloo-light.png",
       bech32_prefix: "migaloo",
       fee_assets: [
         {
@@ -1493,8 +1420,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/persistence/images/xprt.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/persistence/images/xprt.png",
       bech32_prefix: "persistence",
       fee_assets: [
         {
@@ -1519,8 +1445,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/shentu/images/ctk.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/shentu/images/ctk.png",
       bech32_prefix: "shentu",
       fee_assets: [],
       chain_type: "cosmos",
@@ -1536,8 +1461,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/axelar/images/axelar-chain-logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/axelar/images/axelar-chain-logo.png",
       bech32_prefix: "axelar",
       fee_assets: [
         {
@@ -1562,13 +1486,11 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/stride-chain-logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/stride-chain-logo.png",
       bech32_prefix: "stride",
       fee_assets: [
         {
-          denom:
-            "ibc/D24B4564BCD51D3D02D9987D92571EAC5915676A9BD6D9B0C1D0254CB8A5EA34",
+          denom: "ibc/D24B4564BCD51D3D02D9987D92571EAC5915676A9BD6D9B0C1D0254CB8A5EA34",
           gas_price: {
             low: "0.001",
             average: "0.01",
@@ -1576,8 +1498,7 @@ export const CHAINS_RESPONSE = {
           },
         },
         {
-          denom:
-            "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+          denom: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
           gas_price: {
             low: "0.0001",
             average: "0.001",
@@ -1622,63 +1543,51 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/kujira/images/kujira-chain-logo.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/kujira/images/kujira-chain-logo.png",
       bech32_prefix: "kujira",
       fee_assets: [
         {
-          denom:
-            "ibc/295548A78785A1007F232DE286149A6FF512F180AF5657780FC89C009E2C348F",
+          denom: "ibc/295548A78785A1007F232DE286149A6FF512F180AF5657780FC89C009E2C348F",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/A358D7F19237777AF6D8AD0E0F53268F8B18AE8A53ED318095C14D6D7F3B2DB5",
+          denom: "ibc/A358D7F19237777AF6D8AD0E0F53268F8B18AE8A53ED318095C14D6D7F3B2DB5",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/EFF323CC632EC4F747C61BCE238A758EFDB7699C3226565F7C20DA06509D59A5",
+          denom: "ibc/EFF323CC632EC4F747C61BCE238A758EFDB7699C3226565F7C20DA06509D59A5",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/004EBF085BBED1029326D56BE8A2E67C08CECE670A94AC1947DF413EF5130EB2",
+          denom: "ibc/004EBF085BBED1029326D56BE8A2E67C08CECE670A94AC1947DF413EF5130EB2",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/47BD209179859CDE4A2806763D7189B6E6FE13A17880FE2B42DE1E6C1E329E23",
+          denom: "ibc/47BD209179859CDE4A2806763D7189B6E6FE13A17880FE2B42DE1E6C1E329E23",
           gas_price: null,
         },
         {
-          denom:
-            "factory/kujira1qk00h5atutpsv900x202pxx42npjr9thg58dnqpa72f2p7m2luase444a7/uusk",
+          denom: "factory/kujira1qk00h5atutpsv900x202pxx42npjr9thg58dnqpa72f2p7m2luase444a7/uusk",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/F3AA7EF362EC5E791FE78A0F4CCC69FEE1F9A7485EB1A8CAB3F6601C00522F10",
+          denom: "ibc/F3AA7EF362EC5E791FE78A0F4CCC69FEE1F9A7485EB1A8CAB3F6601C00522F10",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+          denom: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/1B38805B1C75352B28169284F96DF56BDEBD9E8FAC005BDCC8CF0378C82AA8E7",
+          denom: "ibc/1B38805B1C75352B28169284F96DF56BDEBD9E8FAC005BDCC8CF0378C82AA8E7",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/3607EB5B5E64DD1C0E12E07F077FF470D5BC4706AFCBC98FE1BA960E5AE4CE07",
+          denom: "ibc/3607EB5B5E64DD1C0E12E07F077FF470D5BC4706AFCBC98FE1BA960E5AE4CE07",
           gas_price: null,
         },
         {
-          denom:
-            "ibc/4F393C3FCA4190C0A6756CE7F6D897D5D1BE57D6CCB80D0BC87393566A7B6602",
+          denom: "ibc/4F393C3FCA4190C0A6756CE7F6D897D5D1BE57D6CCB80D0BC87393566A7B6602",
           gas_price: null,
         },
         {
@@ -1699,8 +1608,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png",
       bech32_prefix: "terra",
       fee_assets: [
         {
@@ -1725,8 +1633,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png",
       bech32_prefix: "cosmos",
       fee_assets: [
         {
@@ -1751,8 +1658,7 @@ export const CHAINS_RESPONSE = {
         feegrant: false,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/kava/images/kava.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/kava/images/kava.png",
       bech32_prefix: "kava",
       fee_assets: [
         {
@@ -1777,8 +1683,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/sommelier/images/somm.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/sommelier/images/somm.png",
       bech32_prefix: "somm",
       fee_assets: [
         {
@@ -1799,8 +1704,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/cronos/images/cronos.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cronos/images/cronos.png",
       bech32_prefix: "cro",
       fee_assets: [
         {
@@ -1825,8 +1729,7 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/stargaze/images/stars.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/stargaze/images/stars.png",
       bech32_prefix: "stars",
       fee_assets: [
         {
@@ -1851,13 +1754,11 @@ export const CHAINS_RESPONSE = {
         feegrant: true,
       },
       supports_memo: true,
-      logo_uri:
-        "https://raw.githubusercontent.com/cosmos/chain-registry/master/juno/images/juno.png",
+      logo_uri: "https://raw.githubusercontent.com/cosmos/chain-registry/master/juno/images/juno.png",
       bech32_prefix: "juno",
       fee_assets: [
         {
-          denom:
-            "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
+          denom: "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
           gas_price: {
             low: "0.003",
             average: "0.003",

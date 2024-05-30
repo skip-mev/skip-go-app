@@ -1,4 +1,6 @@
-export const multicall3ABI = [
+import { Abi } from "viem";
+
+export const multicall3ABI: Abi = [
   {
     inputs: [
       {
@@ -122,9 +124,7 @@ export const multicall3ABI = [
   {
     inputs: [],
     name: "getBlockNumber",
-    outputs: [
-      { internalType: "uint256", name: "blockNumber", type: "uint256" },
-    ],
+    outputs: [{ internalType: "uint256", name: "blockNumber", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },

@@ -1,4 +1,4 @@
-name: Deploy (dev.ibc.fun)
+name: Deploy (dev)
 on:
   pull_request:
     branches: [main]
@@ -19,9 +19,13 @@ jobs:
         with:
           ref: dev
 
+      - id: configure
+        name: configure
+        run: git config pull.ff true
+
       - id: pull-main
         name: Pull latest 'main'
-        run: git pull origin main
+        run: git pull --ff-only origin main
 
       - id: diff-check
         name: Check if 'dev' is behind 'main'

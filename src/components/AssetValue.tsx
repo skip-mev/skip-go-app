@@ -1,34 +1,32 @@
-import { BigNumberish, formatUnits } from "ethers";
 import { useMemo } from "react";
+import { formatUnits } from "viem";
 
-import { ChainIdOrName } from "@/chains";
 import { useAssets } from "@/context/assets";
 import { raise } from "@/utils/assert";
 
 interface Props {
-  chainId: ChainIdOrName;
+  chainId: string;
   denom: string;
-  value: BigNumberish;
+  value: string;
 }
 
-export const AssetValue = ({ chainId, denom, value }: Props) => {
+export function AssetValue({ chainId, denom, value }: Props) {
   const { getAsset } = useAssets();
 
-  const { decimals, symbol } = useMemo(() => {
-    return getAsset(denom, chainId) || raise(`No asset found for ${denom}`);
+  const { decimals = 6, recommendedSymbol } = useMemo(() => {
+    return getAsset(denom, chainId) || raise(`AssetValue error: no asset found for '${denom}' on '${chainId}'`);
   }, [chainId, denom, getAsset]);
 
   const formattedValue = useMemo(() => {
-    let v = formatUnits(value, decimals);
-    v = format(parseFloat(v));
-    return v;
+    const v = formatUnits(BigInt(value), decimals);
+    return parseFloat(v).toLocaleString("en-US", {
+      maximumFractionDigits: 2,
+    });
   }, [decimals, value]);
 
   return (
     <span className="tabular-nums">
-      {formattedValue} {symbol}
+      {formattedValue} {recommendedSymbol}
     </span>
   );
-};
-
-const { format } = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+}

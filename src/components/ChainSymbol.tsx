@@ -1,20 +1,18 @@
 import { CubeIcon } from "@heroicons/react/20/solid";
 import { useMemo } from "react";
 
-import { useChainByID } from "@/api/queries";
-import { ChainIdOrName } from "@/chains";
-import { getChainLogo } from "@/cosmos";
+import { useChainByID } from "@/hooks/useChains";
 
 interface Props {
-  chainId: ChainIdOrName;
+  chainId: string;
 }
 
 export const ChainSymbol = ({ chainId }: Props) => {
-  const { chain } = useChainByID(chainId);
+  const { data: chain } = useChainByID(chainId);
 
   const src = useMemo(() => {
     if (!chain) return;
-    return getChainLogo(chain);
+    return chain.logoURI;
   }, [chain]);
 
   const alt = chain?.prettyName || chain?.chainName || "UNKNOWN";
@@ -24,7 +22,10 @@ export const ChainSymbol = ({ chainId }: Props) => {
 
   return (
     <div className="flex items-center space-x-1">
-      <Icon className="w-4 h-4" {...iconProps} />
+      <Icon
+        className="h-4 w-4"
+        {...iconProps}
+      />
       <span className="font-semibold">{alt}</span>
     </div>
   );

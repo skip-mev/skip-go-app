@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { matchSorter } from "match-sorter";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Chain } from "@/api/queries";
-import { getChainLogo } from "@/cosmos";
-import { useWindowSize } from "@/hooks/useWindowSize";
+import { Chain } from "@/hooks/useChains";
+import { cn } from "@/utils/ui";
 
 interface Props {
   chains: Chain[];
@@ -12,120 +12,106 @@ interface Props {
   onClose: () => void;
 }
 
-const ChainSelectContent: FC<Props> = ({ chains, onChange, onClose }) => {
-  const { width } = useWindowSize();
+function ChainSelectContent({ chains, onChange, onClose }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const inputEl = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (width >= 768) {
-      inputEl.current?.focus();
-    }
-  }, [width]);
+  useEffect(() => inputRef.current?.focus(), []);
 
   const [searchValue, setSearchValue] = useState("");
 
   const filteredChains = useMemo(() => {
     if (!searchValue) return chains;
-    return chains.filter((chain) => {
-      if (
-        chain.chainID &&
-        chain.chainID.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        return true;
-      }
-
-      if (
-        chain.chainName &&
-        chain.chainName.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        return true;
-      }
-
-      return chain.chainName.toLowerCase().includes(searchValue.toLowerCase());
+    return matchSorter(chains, searchValue, {
+      keys: ["chainID", "chainName", "prettyName"],
     });
   }, [chains, searchValue]);
 
   return (
-    <div className="flex flex-col h-full px-4 py-6 space-y-6">
-      <div>
-        <div className="flex items-center gap-4">
-          <button
-            className="hover:bg-neutral-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-            onClick={onClose}
+    <div className="isolate flex h-full flex-col p-6 pb-2">
+      <div className="mb-4 flex items-center gap-4">
+        <button
+          className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
+          onClick={onClose}
+        >
+          <ArrowLeftIcon className="h-6 w-6" />
+        </button>
+        <p className="text-xl font-bold">Select Network</p>
+      </div>
+      <input
+        className="z-20 w-full rounded-md border px-4 py-2"
+        type="text"
+        placeholder="Search for a chain"
+        onChange={(e) => setSearchValue(e.target.value)}
+        value={searchValue}
+        ref={inputRef}
+      />
+      {chains.length < 1 ? (
+        <div className="flex flex-grow justify-center pt-9">
+          <svg
+            className="inline-block h-7 w-7 animate-spin text-neutral-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <ArrowLeftIcon className="w-6 h-6" />
-          </button>
-          <p className="font-bold text-xl">Select Network</p>
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              fill="currentColor"
+            />
+          </svg>
         </div>
-      </div>
-      <div>
-        <input
-          className="w-full border p-4 rounded-md"
-          type="text"
-          placeholder="Search for a chain"
-          onChange={(e) => setSearchValue(e.target.value)}
-          value={searchValue}
-          ref={inputEl}
-        />
-      </div>
-      <div className="flex-1 overflow-hidden">
-        {chains.length === 0 ? (
-          <div className="h-full flex justify-center pt-9">
-            <svg
-              className="animate-spin h-7 w-7 inline-block text-neutral-300"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </div>
-        ) : (
-          <div className="h-full overflow-y-auto scrollbar-hide">
-            {filteredChains.map((chain) => {
-              const chainLogo = getChainLogo(chain);
-              return (
-                <button
-                  className="flex text-left w-full items-center gap-4 hover:bg-[#ECD9D9] p-4 rounded-lg transition-colors"
-                  key={chain.chainID}
-                  onClick={() => {
-                    onChange(chain);
-                  }}
-                >
-                  <img
-                    alt={chain.prettyName}
-                    className="w-12 h-12 rounded-full"
-                    src={chainLogo}
-                    onError={(e) =>
-                      (e.currentTarget.src =
-                        "https://api.dicebear.com/6.x/shapes/svg")
-                    }
-                  />
-                  <div>
-                    <p className="font-semibold text-lg">{chain.prettyName}</p>
-                    <p className="text-sm text-neutral-500">{chain.chainID}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
+      ) : (
+        <ScrollArea.Root
+          className={cn(
+            "relative isolate flex-grow overflow-hidden",
+            "before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-2",
+            "before:bg-gradient-to-b before:from-white before:to-transparent",
+            "after:absolute after:inset-x-0 after:bottom-0 after:z-10 after:h-2",
+            "before:to-transparent after:bg-gradient-to-t after:from-white",
+          )}
+        >
+          <ScrollArea.Viewport className="h-full w-full py-4">
+            {filteredChains.map((chain) => (
+              <button
+                className="flex w-full items-center gap-4 rounded-xl p-4 text-left transition-colors hover:bg-[#ECD9D9] focus:-outline-offset-2"
+                key={chain.chainID}
+                onClick={() => onChange(chain)}
+                data-testid="chain-item"
+              >
+                <img
+                  alt={chain.prettyName}
+                  className="h-[48px] w-[48px] rounded-full object-contain"
+                  width={48}
+                  height={48}
+                  src={chain.logoURI || "/logo-fallback.png"}
+                />
+
+                <div>
+                  <p className="text-lg font-semibold">{chain.prettyName}</p>
+                  <p className="text-sm text-neutral-500">{chain.chainID}</p>
+                </div>
+              </button>
+            ))}
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar
+            className="z-20 flex touch-none select-none py-4 transition-colors ease-out data-[orientation=horizontal]:h-2 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col"
+            orientation="vertical"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-[10px] bg-neutral-500/50 transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-2 before:w-2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-neutral-500" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner />
+        </ScrollArea.Root>
+      )}
     </div>
   );
-};
+}
 
 export default ChainSelectContent;

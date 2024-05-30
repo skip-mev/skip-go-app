@@ -5,7 +5,7 @@ let browser: Browser;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let _mainWindow: Page;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let _keplrPopupWindow: Page;
+let _keplrPopupWindow: Page | undefined;
 let _keplrWindow: Page;
 // let metamaskNotificationWindow;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -21,6 +21,16 @@ const extensionsData: Record<
 
 export function keplrWindow() {
   return _keplrWindow;
+}
+
+export function keplrPopupWindow() {
+  return _keplrPopupWindow;
+}
+
+export function close() {
+  if (browser) {
+    browser.close();
+  }
 }
 
 export async function init(playwrightInstance?: BrowserType) {
@@ -44,6 +54,18 @@ export async function init(playwrightInstance?: BrowserType) {
   return browser.isConnected();
 }
 
+export async function watchKeplrPopupApproveWindow() {
+  while (browser) {
+    assignWindows();
+    if (_keplrPopupWindow) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await _keplrPopupWindow?.getByRole("button", { name: "Approve" }).click();
+      _keplrPopupWindow = undefined;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
+
 export async function assignActiveTabName(tabName: string) {
   _activeTabName = tabName;
 }
@@ -53,30 +75,17 @@ export async function assignWindows() {
 
   const keplrExtensionData = extensionsData.keplr;
 
-  const pages = await browser.contexts()[0].pages();
+  const pages = await browser.contexts()[0]?.pages();
+  if (!pages) return;
 
   for (const page of pages) {
     if (page.url().includes("specs/runner")) {
       _mainWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(`chrome-extension://${keplrExtensionData.id}/register.html`)
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/register.html`)) {
       _keplrWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(
-          `chrome-extension://${keplrExtensionData.id}/notification.html`,
-        )
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/notification.html`)) {
       //     metamaskNotificationWindow = page;
-    } else if (
-      page
-        .url()
-        .includes(`chrome-extension://${keplrExtensionData.id}/popup.html`)
-    ) {
+    } else if (page.url().includes(`chrome-extension://${keplrExtensionData.id}/popup.html`)) {
       _keplrPopupWindow = page;
     }
   }
@@ -103,22 +112,14 @@ export async function getExtensionsData() {
 
   for (const extensionData of extensionDataItems) {
     const extensionName = (
-      (await extensionData
-        .locator("#name-and-version")
-        .locator("#name")
-        .textContent()) as string
+      (await extensionData.locator("#name-and-version").locator("#name").textContent()) as string
     ).toLowerCase();
 
     const extensionVersion = (
-      (await extensionData
-        .locator("#name-and-version")
-        .locator("#version")
-        .textContent()) as string
+      (await extensionData.locator("#name-and-version").locator("#version").textContent()) as string
     ).replace(/(\n| )/g, "");
 
-    const extensionId = (
-      (await extensionData.locator("#extension-id").textContent()) as string
-    ).replace("ID: ", "");
+    const extensionId = ((await extensionData.locator("#extension-id").textContent()) as string).replace("ID: ", "");
 
     extensionsData[extensionName] = {
       version: extensionVersion,

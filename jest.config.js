@@ -13,15 +13,12 @@ const customJestConfig = {
   moduleNameMapper: {
     isows: "<rootDir>/node_modules/isows/_cjs/index.js", // https://github.com/wagmi-dev/viem/issues/1329
     tinykeys: "<rootDir>/node_modules/tinykeys/dist/tinykeys.js",
+    uuid: require.resolve("uuid"),
   },
   setupFiles: ["<rootDir>/jest.polyfills.js"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jest-environment-jsdom",
-  testPathIgnorePatterns: [
-    "<rootDir>/.next/",
-    "<rootDir>/node_modules/",
-    "<rootDir>/tests/",
-  ],
+  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/", "<rootDir>/tests/"],
   transform: {
     "^.+\\.[tj]sx?$": ["ts-jest", { useESM: true }],
   },

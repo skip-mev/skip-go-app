@@ -1,50 +1,52 @@
-/* eslint-disable @next/next/no-img-element */
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { FC, useState } from "react";
+import { Asset } from "@skip-router/core";
+import { useState } from "react";
 
-import { AssetWithMetadata } from "@/context/assets";
-import { Dialog, DialogContent, DialogTrigger } from "@/elements/Dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/Dialog";
+import { cn } from "@/utils/ui";
 
 import AssetSelectContent from "./AssetSelectContent";
 
 interface Props {
-  asset?: AssetWithMetadata;
-  assets?: AssetWithMetadata[];
+  asset?: Asset;
+  assets?: Asset[];
   balances?: Record<string, string>;
-  onChange?: (asset: AssetWithMetadata) => void;
+  onChange?: (asset: Asset) => void;
   showChainInfo?: boolean;
+  isBalancesLoading?: boolean;
 }
 
-const AssetSelect: FC<Props> = ({
-  asset,
-  assets,
-  balances,
-  onChange,
-  showChainInfo,
-}) => {
+function AssetSelect({ asset, assets, balances, onChange, showChainInfo, isBalancesLoading }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={setIsOpen}
+    >
       <DialogTrigger>
         <button
-          className="font-semibold text-left whitespace-nowrap bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-md flex items-center gap-2 p-4 w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={cn(
+            "whitespace-nowrap text-left font-semibold",
+            "flex w-full items-center gap-2 rounded-md bg-neutral-100 px-4 py-2 transition-colors sm:py-4",
+            "border border-neutral-200 hover:border-neutral-300",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+          )}
           disabled={!assets || assets.length === 0}
+          data-testid="select-asset"
         >
           {asset && (
             <img
-              alt={asset.symbol}
-              className="w-6 h-6 rounded-full"
-              src={asset.logoURI}
-              onError={(e) =>
-                (e.currentTarget.src =
-                  "https://api.dicebear.com/6.x/shapes/svg")
-              }
+              alt={asset.recommendedSymbol || "asset symbol"}
+              height={24}
+              width={24}
+              className="h-6 w-6 rounded-full object-contain"
+              src={asset.logoURI || "/logo-fallback.png"}
+              onError={(event) => (event.currentTarget.src = "https://api.dicebear.com/6.x/shapes/svg")}
             />
           )}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             {!asset && <span>Select Token</span>}
-            {asset && <div className="truncate">{asset.symbol}</div>}
+            {asset && <div className="truncate">{asset.recommendedSymbol}</div>}
           </div>
           <div>
             <ChevronDownIcon className="h-4 w-4" />
@@ -58,10 +60,11 @@ const AssetSelect: FC<Props> = ({
           onChange={onChange}
           onClose={() => setIsOpen(false)}
           showChainInfo={showChainInfo}
+          isBalancesLoading={isBalancesLoading}
         />
       </DialogContent>
     </Dialog>
   );
-};
+}
 
 export default AssetSelect;
