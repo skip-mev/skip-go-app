@@ -35,6 +35,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       }
 
       const uri = [data.endpoint, ...args].join("/");
+      console.log(data, args);
       return fetch(uri, {
         body: req.body,
         headers,
