@@ -141,8 +141,9 @@ export const ChainStep = ({
     getAsset(swapAction.chainID, isSource && totalChains !== 1 ? swapAction.denomIn : swapAction.denomOut);
   const transferAsset =
     transferAction &&
-    (getAsset(transferAction.fromChainID, transferAction.denomIn) ||
-      getAsset(transferAction.toChainID, transferAction.denomOut));
+    (isSource
+      ? getAsset(transferAction.fromChainID, transferAction.denomIn)
+      : getAsset(transferAction.toChainID, transferAction.denomOut));
 
   const { data: chains } = useChains();
   const getChain = (chainID: string) => chains?.find((c) => c.chainID === chainID);
