@@ -98,12 +98,17 @@ export async function getEvmChainBalances(
 
   const chainAssets = assets[chainID];
 
+  const isForma = chainID === "984122";
   const balances = await publicClient.multicall({
-    multicallAddress: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    multicallAddress: isForma
+      ? "0xd53C6FFB123F7349A32980F87faeD8FfDc9ef079"
+      : "0xcA11bde05977b3631167028862bE2a173976CA11",
     contracts: chainAssets.map((asset) => {
       if (!asset.tokenContract) {
         return {
-          address: "0xcA11bde05977b3631167028862bE2a173976CA11" as `0x${string}`,
+          address: isForma
+            ? "0xd53C6FFB123F7349A32980F87faeD8FfDc9ef079"
+            : ("0xcA11bde05977b3631167028862bE2a173976CA11" as `0x${string}`),
           abi: multicall3ABI,
           functionName: "getEthBalance",
           args: [address as `0x${string}`],
