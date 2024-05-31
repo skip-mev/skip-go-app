@@ -141,8 +141,9 @@ export const ChainStep = ({
     getAsset(swapAction.chainID, isSource && totalChains !== 1 ? swapAction.denomIn : swapAction.denomOut);
   const transferAsset =
     transferAction &&
-    (getAsset(transferAction.fromChainID, transferAction.denomIn) ||
-      getAsset(transferAction.toChainID, transferAction.denomOut));
+    (isSource
+      ? getAsset(transferAction.fromChainID, transferAction.denomIn)
+      : getAsset(transferAction.toChainID, transferAction.denomOut));
 
   const { data: chains } = useChains();
   const getChain = (chainID: string) => chains?.find((c) => c.chainID === chainID);
@@ -443,6 +444,10 @@ const Asset = ({
               "cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4",
           )}
         >
+          <p>
+            {" "}
+            {amount} decimals {decimals}
+          </p>
           <p className="text-md font-medium">
             {parseFloat(amountDisplayed).toLocaleString("en-US", { maximumFractionDigits: 6 })}
           </p>
