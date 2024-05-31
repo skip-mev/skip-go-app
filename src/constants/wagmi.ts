@@ -24,6 +24,8 @@ import {
   sepolia,
 } from "wagmi/chains";
 
+import { forma, formaTestnet } from "@/lib/viem/chains";
+
 export const EVM_CHAINS: Chain[] = [
   arbitrum,
   avalanche,
@@ -47,4 +49,6 @@ export const EVM_CHAINS: Chain[] = [
   arbitrumSepolia,
   blast,
   blastSepolia,
+  forma,
+  formaTestnet,
 ];
