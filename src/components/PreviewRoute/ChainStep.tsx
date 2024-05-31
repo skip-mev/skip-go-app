@@ -444,10 +444,6 @@ const Asset = ({
               "cursor-help tabular-nums underline decoration-neutral-400 decoration-dotted underline-offset-4",
           )}
         >
-          <p>
-            {" "}
-            {amount} decimals {decimals}
-          </p>
           <p className="text-md font-medium">
             {parseFloat(amountDisplayed).toLocaleString("en-US", { maximumFractionDigits: 6 })}
           </p>
