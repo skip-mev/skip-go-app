@@ -668,6 +668,10 @@ export function useSwapWidget() {
             onSourceChainChange(findChain, findAsset);
             setSrcChainQP(null);
             setSrcAssetQP(null);
+            toast.success("URL parameters processed successfully", {
+              id: toastId,
+              duration: 5000,
+            });
             return;
           }
         }
@@ -706,6 +710,10 @@ export function useSwapWidget() {
             onDestinationChainChange(findChain, findAsset);
             setDestChainQP(null);
             setDestAssetQP(null);
+            toast.success("URL parameters processed successfully", {
+              id: toastId,
+              duration: 5000,
+            });
             return;
           }
         }
