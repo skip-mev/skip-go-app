@@ -1,15 +1,22 @@
+import { createClient } from "@vercel/edge-config";
 import { NextRequest, NextResponse } from "next/server";
-
-import { allowedOrigins } from "./constants/allowed-origins";
+import { z } from "zod";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Check the origin from the request
   const origin = request.headers.get("origin") ?? "";
+
+  if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
+    throw new Error("NEXT_PUBLIC_EDGE_CONFIG is not set");
+  }
+  const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
+  const allowedOriginsData = await client.get("allowed-origins");
+  const allowedOrigins = await stringArraySchema.parseAsync(allowedOriginsData);
   const isAllowedOrigin = allowedOrigins.includes(origin);
 
   // Handle preflighted requests
@@ -36,6 +43,8 @@ export function middleware(request: NextRequest) {
 
   return response;
 }
+
+const stringArraySchema = z.array(z.string()).default([]);
 
 export const config = {
   matcher: "/api/(.*)",

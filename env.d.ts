@@ -14,6 +14,7 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_IS_TESTNET?: boolean;
 
     readonly SKIP_API_KEY?: string;
+    readonly ALLOWED_LIST_EDGE_CONFIG?: string;
   }
 }
 
