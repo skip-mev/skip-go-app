@@ -231,7 +231,7 @@ export function useSwapWidget() {
    * - if not, select first available asset
    */
   const onSourceChainChange = useCallback(
-    async (chain: Chain) => {
+    async (chain: Chain, injectAsset?: Asset) => {
       let feeAsset: Asset | undefined = undefined;
       if (chain.chainType === "cosmos") {
         feeAsset = await getFeeAsset(chain.chainID);
@@ -253,7 +253,7 @@ export function useSwapWidget() {
 
       useSwapWidgetStore.setState({
         sourceChain: chain,
-        sourceAsset: asset,
+        sourceAsset: injectAsset ? injectAsset : asset,
         sourceFeeAsset: feeAsset,
         sourceGasPrice: undefined,
         gasRequired: undefined,
@@ -661,14 +661,17 @@ export function useSwapWidget() {
     if (srcChainQP) {
       const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
       if (findChain) {
-        onSourceChainChange(findChain);
         if (srcAssetQP) {
           const assets = assetsByChainID(findChain.chainID);
           const findAsset = assets.find((x) => x.denom.toLowerCase() === decodeURI(srcAssetQP).toLowerCase());
           if (findAsset) {
-            onSourceAssetChange(findAsset);
+            onSourceChainChange(findChain, findAsset);
+            setSrcChainQP(null);
+            setSrcAssetQP(null);
+            return;
           }
         }
+        onSourceChainChange(findChain);
       }
       toast.success("URL parameters processed successfully", {
         id: toastId,
@@ -798,7 +801,6 @@ export function useSwapWidget() {
    * {@link onSourceChainChange} to sync source asset
    */
   useEffect(() => {
-    if (srcChainQP) return;
     return useSwapWidgetStore.subscribe(
       (state) => [state.sourceChain, state.sourceAsset] as const,
       ([chain, asset]) => {
@@ -807,7 +809,7 @@ export function useSwapWidget() {
             return chainID === DEFAULT_SRC_CHAIN_ID;
           });
         }
-        if (chain && !asset) {
+        if (chain && !asset && (!srcChainQP || !srcAssetQP)) {
           onSourceChainChange(chain);
         }
       },
@@ -816,7 +818,7 @@ export function useSwapWidget() {
         fireImmediately: true,
       },
     );
-  }, [chains, onSourceChainChange, srcChainQP]);
+  }, [chains, onSourceChainChange, srcChainQP, srcAssetQP]);
   /////////////////////////////////////////////////////////////////////////////
 
   return {
