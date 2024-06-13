@@ -24,7 +24,7 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
       const chains = await skipClient.chains({
         includeEVM: true,
         includeSVM: true,
-        includeTestnets: process.env.NEXT_PUBLIC_IS_TESTNET ? true : false,
+        onlyTestnets: process.env.NEXT_PUBLIC_IS_TESTNET ? true : false,
       });
 
       return chains
