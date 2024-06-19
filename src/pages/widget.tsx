@@ -1,15 +1,27 @@
-import { useLayoutEffect } from "react";
+import { SwapWidget } from "@skip-go/widget";
 
-import { defaultValues, useSwapWidgetStore } from "@/components/SwapWidget/useSwapWidget";
-import { Widget } from "@/widget";
+import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 
 export default function WidgetPage() {
-  useLayoutEffect(() => {
-    useSwapWidgetStore.setState(defaultValues);
-  }, []);
+  const defaultRoute = useURLQueryParams();
   return (
     <div className="relative bg-white p-6 scrollbar-hide">
-      <Widget />
+      <SwapWidget
+        className=""
+        defaultRoute={{
+          srcChainID: defaultRoute?.srcChain || "cosmoshub-4",
+          srcAssetDenom: defaultRoute?.srcAssetDenom,
+          destChainID: defaultRoute?.destChain,
+          destAssetDenom: defaultRoute?.destAssetDenom,
+          amountIn: Number(defaultRoute?.amountIn),
+          amountOut: Number(defaultRoute?.amountOut),
+        }}
+        settings={{
+          customGasAmount: 200_000,
+          slippage: 3,
+        }}
+        onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
+      />
     </div>
   );
 }
