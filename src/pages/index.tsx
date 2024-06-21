@@ -1,4 +1,5 @@
-import { SwapWidget } from "@skip-go/widget";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
 import Header from "@/components/Header";
 import { Help } from "@/components/Help";
@@ -9,6 +10,8 @@ import { cn } from "@/utils/ui";
 
 export default function Home() {
   const defaultRoute = useURLQueryParams();
+
+  const Widget = dynamic(() => import("@skip-go/widget").then((res) => res.SwapWidget));
   return (
     <div
       className={cn(
@@ -23,22 +26,24 @@ export default function Home() {
         <Header />
         <div className="flex flex-grow flex-col items-center">
           <div className="relative w-screen overflow-hidden bg-white p-2 shadow-xl sm:max-w-[450px] sm:rounded-3xl">
-            <SwapWidget
-              className=""
-              defaultRoute={{
-                srcChainID: defaultRoute?.srcChain || "cosmoshub-4",
-                srcAssetDenom: defaultRoute?.srcAssetDenom,
-                destChainID: defaultRoute?.destChain,
-                destAssetDenom: defaultRoute?.destAssetDenom,
-                amountIn: Number(defaultRoute?.amountIn),
-                amountOut: Number(defaultRoute?.amountOut),
-              }}
-              settings={{
-                customGasAmount: 200_000,
-                slippage: 3,
-              }}
-              onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Widget
+                className=""
+                defaultRoute={{
+                  srcChainID: defaultRoute?.srcChain || "cosmoshub-4",
+                  srcAssetDenom: defaultRoute?.srcAssetDenom,
+                  destChainID: defaultRoute?.destChain,
+                  destAssetDenom: defaultRoute?.destAssetDenom,
+                  amountIn: Number(defaultRoute?.amountIn),
+                  amountOut: Number(defaultRoute?.amountOut),
+                }}
+                settings={{
+                  customGasAmount: 200_000,
+                  slippage: 3,
+                }}
+                onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
+              />
+            </Suspense>
           </div>
         </div>
       </main>
