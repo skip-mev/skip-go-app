@@ -1,3 +1,5 @@
+import "@skip-go/widget/style.css";
+
 import { SwapWidget } from "@skip-go/widget";
 
 import Header from "@/components/Header";
