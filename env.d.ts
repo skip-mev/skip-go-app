@@ -12,6 +12,7 @@ declare namespace NodeJS {
     readonly WALLETCONNECT_VERIFY_KEY?: string;
     readonly WORD_PHRASE_KEY?: string;
     readonly NEXT_PUBLIC_IS_TESTNET?: boolean;
+    readonly WIDGET_SKIP_API_KEY?: string;
 
     readonly SKIP_API_KEY?: string;
     readonly ALLOWED_LIST_EDGE_CONFIG?: string;
