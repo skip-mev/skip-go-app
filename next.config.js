@@ -35,6 +35,10 @@ let nextConfig = {
       source: "/api/skip/(.*)",
       destination: "/api/skip/handler",
     },
+    {
+      source: "/api/widget/skip/(.*)",
+      destination: "/api/widget/skip/handler",
+    },
   ],
   transpilePackages:
     process.env.NODE_ENV === "test"
