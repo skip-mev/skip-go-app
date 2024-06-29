@@ -19,6 +19,8 @@ export const useURLQueryParams = () => {
 
   const [srcChainQP, setSrcChainQP] = useQueryState("src_chain");
   const [srcAssetQP, setSrcAssetQP] = useQueryState("src_asset");
+  const [destChainQP, setDestChainQP] = useQueryState("dest_chain");
+
   useEffect(() => {
     if (!chains || !isReady) return;
     if (srcChainQP) {
@@ -46,10 +48,22 @@ export const useURLQueryParams = () => {
       });
       setSrcChainQP(null);
       setSrcAssetQP(null);
+    } else {
+      if (destChainQP || state?.destChain) return;
+      setState((prev) => ({ ...prev, srcChain: "cosmoshub-4" }));
     }
-  }, [assetsByChainID, chains, isReady, setSrcAssetQP, setSrcChainQP, srcAssetQP, srcChainQP]);
+  }, [
+    assetsByChainID,
+    chains,
+    destChainQP,
+    isReady,
+    setSrcAssetQP,
+    setSrcChainQP,
+    srcAssetQP,
+    srcChainQP,
+    state?.destChain,
+  ]);
 
-  const [destChainQP, setDestChainQP] = useQueryState("dest_chain");
   const [destAssetQP, setDestAssetQP] = useQueryState("dest_asset");
   useEffect(() => {
     if (!chains || !isReady) return;

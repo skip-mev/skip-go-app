@@ -28,7 +28,7 @@ export default function Home() {
             <SwapWidget
               className=""
               defaultRoute={{
-                srcChainID: defaultRoute?.srcChain || "cosmoshub-4",
+                srcChainID: defaultRoute?.srcChain,
                 srcAssetDenom: defaultRoute?.srcAssetDenom,
                 destChainID: defaultRoute?.destChain,
                 destAssetDenom: defaultRoute?.destAssetDenom,
