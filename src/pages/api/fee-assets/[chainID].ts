@@ -1,4 +1,4 @@
-import { FeeAsset } from "@skip-router/core";
+import { FeeAsset } from "@skip-go/core";
 import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
