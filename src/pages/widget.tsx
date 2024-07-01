@@ -1,3 +1,5 @@
+import "@skip-go/widget/style.css";
+
 import { SwapWidget } from "@skip-go/widget";
 
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
@@ -9,7 +11,7 @@ export default function WidgetPage() {
       <SwapWidget
         className=""
         defaultRoute={{
-          srcChainID: defaultRoute?.srcChain || "cosmoshub-4",
+          srcChainID: defaultRoute?.srcChain,
           srcAssetDenom: defaultRoute?.srcAssetDenom,
           destChainID: defaultRoute?.destChain,
           destAssetDenom: defaultRoute?.destAssetDenom,
