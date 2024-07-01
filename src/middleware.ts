@@ -12,7 +12,8 @@ export async function middleware(request: NextRequest) {
   const origin = request.headers.get("origin") ?? "";
 
   if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
-    throw new Error("NEXT_PUBLIC_EDGE_CONFIG is not set");
+    console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
+    return NextResponse.next();
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
   const allowedOriginsData = await client.get("allowed-origins");
