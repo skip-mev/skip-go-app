@@ -4,7 +4,7 @@ export const Help = () => {
       <p className="text-center text-sm">
         Need Help? Join our{" "}
         <a
-          href="https://skip.money/discord"
+          href="https://skip.build/discord"
           target="_blank"
           rel="noreferrer"
           className="text-blue-500 hover:text-blue-600 hover:underline"
