@@ -5,7 +5,7 @@ export const metadata = {
   shortName: "ibc.fun",
   description: "Interchain transfers and swaps on any Cosmos chain",
   domain: APP_DOMAIN,
-  email: "support@skip.money",
+  email: "support@skip.build",
   url: `${APP_PROTOCOL}://${APP_DOMAIN}`,
   github: {
     username: "skip-mev",
