@@ -1,8 +1,8 @@
 ![ibc.fun](https://github.com/skip-mev/ibc-dot-fun/blob/staging/public/social.png?raw=true)
 
-# ibc.fun
+# Skip Go App
 
-Interchain transfers and swaps on any Cosmos chain. This is the repository for [ibc.fun](https://ibc.fun) website.
+The Skip Go App is your one stop shop for all interchain transferring, bridging, and swapping needs across Cosmos, Solana, Ethereum mainnet/L2s, and more! This is the repository for [go.skip.build](https://go.skip.build).
 
 ## Prerequisites
 
@@ -12,8 +12,8 @@ Interchain transfers and swaps on any Cosmos chain. This is the repository for [
 ## Clone and setup
 
 ```bash
-git clone https://github.com/skip-mev/ibc-dot-fun
-cd ibc-dot-fun
+git clone https://github.com/skip-mev/skip-go-app
+cd skip-go-app
 npm install
 cp .env.example .env
 ```
@@ -23,13 +23,13 @@ cp .env.example .env
 Make sure to set the following environment variables in `.env` file:S
 
 ```bash
-NEXT_PUBLIC_API_URL="https://api.skip.money"
+NEXT_PUBLIC_API_URL="https://api.skip.build"
 POLKACHU_USER=            # required
 POLKACHU_PASSWORD=        # required
 NEXT_PUBLIC_EDGE_CONFIG=  # required
 ```
 
-To retrieve `NEXT_PUBLIC_EDGE_CONFIG`, visit the [edge config token setup page](https://link.skip.money/ibc-fun-edge-config-token).
+To retrieve `NEXT_PUBLIC_EDGE_CONFIG`, visit the [edge config token setup page](https://link.skip.build/skip-go-app-edge-config-token).
 
 Read more on all available environment variables in [`.env.example`](.env.example) file.
 
@@ -52,4 +52,4 @@ Feel free to open an issue or submit a pull request for any bugs and/or improvem
 
 ## Contact
 
-Reach out by joining our [Discord](https://skip.money/discord) server.
+Reach out by joining our [Discord](https://skip.build/discord) server.
