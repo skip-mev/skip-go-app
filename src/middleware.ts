@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client",
 };
 
 export async function middleware(request: NextRequest) {
