@@ -1,4 +1,4 @@
-![go.skip.build](https://github.com/skip-mev/ibc-dot-fun/blob/staging/public/social.png?raw=true)
+![go.skip.build](https://github.com/skip-mev/skip-go-app/blob/staging/public/social.png?raw=true)
 
 # Skip Go App
 
