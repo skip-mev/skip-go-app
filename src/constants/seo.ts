@@ -15,5 +15,5 @@ export const metadata = {
     username: "@SkipProtocol",
     url: "https://twitter.com/SkipProtocol",
   },
-  themeColor: "#ffdc61",
+  themeColor: "##ff86ff",
 };
