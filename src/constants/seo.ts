@@ -9,7 +9,7 @@ export const metadata = {
   url: `${APP_PROTOCOL}://${APP_DOMAIN}`,
   github: {
     username: "skip-mev",
-    url: "https://github.com/skip-mev/ibc-dot-fun",
+    url: "https://github.com/skip-mev/skip-go-app",
   },
   twitter: {
     username: "@SkipProtocol",
