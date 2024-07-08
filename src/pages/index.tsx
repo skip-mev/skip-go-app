@@ -28,7 +28,7 @@ export default function Home() {
             <DiscordButton />
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-24">
+        <div className="flex flex-grow flex-col items-center pt-16">
           <div className="relative w-screen overflow-hidden bg-white p-2 shadow-xl sm:max-w-[450px] sm:rounded-3xl">
             <SwapWidget
               className=""
