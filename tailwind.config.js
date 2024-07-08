@@ -41,6 +41,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Jost", ...defaultTheme.fontFamily.sans],
+        diatype: ["ABCDiatype", "sans-serif"],
+        diatypeMono: ["ABCDiatypeMono", "monospace"],
       },
       keyframes: {
         "accordion-open": {
