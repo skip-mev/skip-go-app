@@ -1,9 +1,9 @@
 import { APP_DOMAIN, APP_PROTOCOL } from "./api";
 
 export const metadata = {
-  name: "ibc.fun",
-  shortName: "ibc.fun",
-  description: "Interchain transfers and swaps on any Cosmos chain",
+  name: "Skip:Go - Anything Anywhere",
+  shortName: "Skip:Go",
+  description: "Everything you need to seamlessly connect your application, protocol, or ecosystem across chains.",
   domain: APP_DOMAIN,
   email: "support@skip.build",
   url: `${APP_PROTOCOL}://${APP_DOMAIN}`,
