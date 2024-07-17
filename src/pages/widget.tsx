@@ -1,15 +1,13 @@
-import "@skip-go/widget/style.css";
-
 import { SwapWidget } from "@skip-go/widget";
 
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
+import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 
 export default function WidgetPage() {
   const defaultRoute = useURLQueryParams();
   return (
     <div className="relative bg-white p-6 scrollbar-hide">
       <SwapWidget
-        className=""
         defaultRoute={{
           srcChainID: defaultRoute?.srcChain,
           srcAssetDenom: defaultRoute?.srcAssetDenom,
@@ -23,6 +21,11 @@ export default function WidgetPage() {
           slippage: 3,
         }}
         onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
+        colors={{
+          primary: "#FF4FFF",
+        }}
+        endpointOptions={endpointOptions}
+        apiURL={apiURL}
       />
     </div>
   );
