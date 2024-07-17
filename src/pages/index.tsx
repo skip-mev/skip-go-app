@@ -1,5 +1,3 @@
-import "@skip-go/widget/style.css";
-
 import { SwapWidget } from "@skip-go/widget";
 
 import DiscordButton from "@/components/DiscordButton";
@@ -7,6 +5,7 @@ import { LogoGo } from "@/components/LogoGo";
 import { VersionCheck } from "@/components/VersionCheck";
 import WidgetButton from "@/components/WidgetButton";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
+import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
 
 export default function Home() {
@@ -48,6 +47,8 @@ export default function Home() {
               colors={{
                 primary: "#FF4FFF",
               }}
+              endpointOptions={endpointOptions}
+              apiURL={apiURL}
             />
           </div>
         </div>
