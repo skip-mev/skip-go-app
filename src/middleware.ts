@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
     if (isPreview(domain)) {
       const allowedPreviewData = await client.get("preview-namespace");
       const allowedPreview = await stringArraySchema.parseAsync(allowedPreviewData);
-      if (allowedPreview.find((d) => d.includes(domain))) {
+      if (allowedPreview.find((d) => domain.includes(d))) {
         return true;
       }
     }
