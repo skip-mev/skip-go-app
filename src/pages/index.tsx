@@ -1,6 +1,4 @@
-import "@skip-go/widget/style.css";
-
-import { SwapWidget } from "@skip-go/widget";
+import { SwapWidgetWithoutProviders } from "@skip-go/widget";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
@@ -30,7 +28,7 @@ export default function Home() {
         </div>
         <div className="flex flex-grow flex-col items-center pt-16">
           <div className="relative w-screen overflow-hidden bg-white p-2 shadow-xl sm:max-w-[450px] sm:rounded-3xl">
-            <SwapWidget
+            <SwapWidgetWithoutProviders
               className=""
               defaultRoute={{
                 srcChainID: defaultRoute?.srcChain,
