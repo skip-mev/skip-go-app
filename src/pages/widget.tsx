@@ -1,6 +1,4 @@
-import "@skip-go/widget/style.css";
-
-import { SwapWidget } from "@skip-go/widget";
+import { SwapWidgetWithoutProviders } from "@skip-go/widget";
 
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 
@@ -8,7 +6,7 @@ export default function WidgetPage() {
   const defaultRoute = useURLQueryParams();
   return (
     <div className="relative bg-white p-6 scrollbar-hide">
-      <SwapWidget
+      <SwapWidgetWithoutProviders
         className=""
         defaultRoute={{
           srcChainID: defaultRoute?.srcChain,
