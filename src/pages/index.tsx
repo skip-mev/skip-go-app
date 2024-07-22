@@ -43,8 +43,8 @@ export default function Home() {
                 slippage: 3,
               }}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
-              colors={{
-                primary: "#FF4FFF",
+              theme={{
+                brandColor: "#FF4FFF",
               }}
             />
           </div>
