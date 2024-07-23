@@ -19,7 +19,6 @@
     "visdeps": "bash ./src/scripts/visdeps.sh"
   },
   "dependencies": {
-    "@cosmos-kit/react": "^2.18.0",
     "@fontsource/jost": "^5.0.16",
     "@graz-sh/types": "^0.0.14",
     "@heroicons/react": "^2.1.1",
