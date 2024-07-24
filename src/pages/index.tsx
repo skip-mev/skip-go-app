@@ -35,9 +35,9 @@ export default function Home() {
                 customGasAmount: 200_000,
                 slippage: 3,
               }}
-              // endpointOptions={endpointOptions}
-              // apiURL={apiURL}
-              // onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
+              endpointOptions={endpointOptions}
+              apiURL={apiURL}
+              onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
               theme={{
                 brandColor: "#FF4FFF",
               }}
