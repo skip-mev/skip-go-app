@@ -1,14 +1,15 @@
-import { SwapWidgetWithoutProviders } from "@skip-go/widget";
+import { SwapWidget } from "@skip-go/widget";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
 import { VersionCheck } from "@/components/VersionCheck";
 import WidgetButton from "@/components/WidgetButton";
-import { useURLQueryParams } from "@/hooks/useURLQueryParams";
+// import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { cn } from "@/utils/ui";
+import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 
 export default function Home() {
-  const defaultRoute = useURLQueryParams();
+  // const defaultRoute = useURLQueryParams();
   return (
     <div
       className={cn(
@@ -28,20 +29,14 @@ export default function Home() {
         </div>
         <div className="flex flex-grow flex-col items-center pt-16">
           <div className="relative min-h-[650px] w-screen overflow-hidden bg-white p-2 shadow-xl sm:w-[450px] sm:rounded-3xl">
-            <SwapWidgetWithoutProviders
+            <SwapWidget
               className=""
-              defaultRoute={{
-                srcChainID: defaultRoute?.srcChain,
-                srcAssetDenom: defaultRoute?.srcAssetDenom,
-                destChainID: defaultRoute?.destChain,
-                destAssetDenom: defaultRoute?.destAssetDenom,
-                amountIn: Number(defaultRoute?.amountIn),
-                amountOut: Number(defaultRoute?.amountOut),
-              }}
               settings={{
                 customGasAmount: 200_000,
                 slippage: 3,
               }}
+              endpointOptions={endpointOptions}
+              apiURL={apiURL}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
               theme={{
                 brandColor: "#FF4FFF",
@@ -50,7 +45,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <VersionCheck />
+      {/* <VersionCheck /> */}
     </div>
   );
 }

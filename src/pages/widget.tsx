@@ -1,6 +1,6 @@
 import { SwapWidget } from "@skip-go/widget";
 
-import { useURLQueryParams } from "@/hooks/useURLQueryParams";
+// import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 
 export default function WidgetPage() {
