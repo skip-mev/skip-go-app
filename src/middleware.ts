@@ -45,6 +45,7 @@ const isPreview = (str: string) => {
 };
 
 export async function middleware(request: NextRequest) {
+  console.log(request);
   // Check the origin from the request
   const origin = request.headers.get("origin") ?? "";
 
@@ -80,6 +81,7 @@ export async function middleware(request: NextRequest) {
   // Handle simple requests
   const response = NextResponse.next();
 
+  console.log("is allowed: " + isAllowed);
   if (isAllowed) {
     response.headers.set("Access-Control-Allow-Origin", origin);
   }
