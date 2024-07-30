@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
 
 import { DefaultSeo } from "@/components/DefaultSeo";
-import { apiURL, endpointOptions, praxWallet } from "@/lib/skip-go-widget";
+import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -15,12 +15,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <SwapWidgetProvider
         endpointOptions={endpointOptions}
         apiURL={apiURL}
-        makeDestinationWallets={(chainID) => {
-          if (chainID.includes("penumbra")) {
-            return [praxWallet];
-          }
-          return [];
-        }}
       >
         <Component {...pageProps} />
       </SwapWidgetProvider>

@@ -1,4 +1,3 @@
-import { Chain } from "@skip-go/core";
 import { useAssets, useChains } from "@skip-go/widget";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
@@ -25,7 +24,7 @@ export const useURLQueryParams = () => {
   useEffect(() => {
     if (!chains || !isReady) return;
     if (srcChainQP) {
-      const findChain = chains.find((x: Chain) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(srcChainQP).toLowerCase());
       if (findChain) {
         if (srcAssetQP) {
           const assets = assetsByChainID(findChain.chainID);
@@ -69,7 +68,7 @@ export const useURLQueryParams = () => {
   useEffect(() => {
     if (!chains || !isReady) return;
     if (destChainQP) {
-      const findChain = chains.find((x: Chain) => x.chainID.toLowerCase() === decodeURI(destChainQP).toLowerCase());
+      const findChain = chains.find((x) => x.chainID.toLowerCase() === decodeURI(destChainQP).toLowerCase());
       if (findChain) {
         if (destAssetQP) {
           const assets = assetsByChainID(findChain.chainID);
