@@ -23,3 +23,5 @@ test-results/
 tests/downloads/
 
 !.env.example
+
+certificates
