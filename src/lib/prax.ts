@@ -1,6 +1,7 @@
 import { createPromiseClient, PromiseClient, Transport } from "@connectrpc/connect";
 import { PenumbraProviderNotAvailableError } from "@penumbra-zone/client";
-import { assertGlobalPresent, assertProviderConnected, getPenumbraPort } from "@penumbra-zone/client/create";
+import { assertGlobalPresent, assertProviderConnected } from "@penumbra-zone/client/assert";
+import { getPenumbraPort } from "@penumbra-zone/client/create";
 import { jsonOptions, PenumbraService } from "@penumbra-zone/protobuf";
 import { ChannelTransportOptions, createChannelTransport } from "@penumbra-zone/transport-dom/create";
 
