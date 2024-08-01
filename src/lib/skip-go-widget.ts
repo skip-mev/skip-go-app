@@ -1,4 +1,5 @@
 import { bech32mAddress } from "@penumbra-zone/bech32m/penumbra";
+import { bech32CompatAddress } from "@penumbra-zone/bech32m/penumbracompat1";
 import { ViewService } from "@penumbra-zone/protobuf";
 import { MinimalWallet, SwapWidgetProviderProps } from "@skip-go/widget";
 import toast from "react-hot-toast";
@@ -18,6 +19,18 @@ export const endpointOptions: SwapWidgetProviderProps["endpointOptions"] = {
 
 export const apiURL = `${appUrl}/api/skip`;
 
+const penumbraBech32ChainIDs = ["noble-1", "grand-1"];
+const getPenumbraCompatibleAddress = ({
+  chainID,
+  address,
+}: {
+  chainID?: string;
+  address: { inner: Uint8Array };
+}): string => {
+  if (!chainID) return bech32mAddress(address);
+  return penumbraBech32ChainIDs.includes(chainID) ? bech32CompatAddress(address) : bech32mAddress(address);
+};
+
 export const praxWallet: MinimalWallet = {
   walletName: "prax",
   walletPrettyName: "Prax Wallet",
@@ -29,7 +42,9 @@ export const praxWallet: MinimalWallet = {
     toast.error("Prax wallet is not supported for connect");
   },
   getAddress: async (props) => {
-    const penumbraWalletIndex = props?.penumbraWalletIndex;
+    const penumbraWalletIndex = props?.praxWallet?.index;
+    const sourceChainID = props?.praxWallet?.sourceChainID;
+
     try {
       const isInstalled = await isPraxInstalled();
       if (!isInstalled) {
@@ -43,7 +58,10 @@ export const praxWallet: MinimalWallet = {
         },
       });
       if (!address.address) throw new Error("No address found");
-      const bech32Address = bech32mAddress(address.address);
+      const bech32Address = getPenumbraCompatibleAddress({
+        address: address.address,
+        chainID: sourceChainID,
+      });
       return bech32Address;
     } catch (error) {
       console.error(error);
