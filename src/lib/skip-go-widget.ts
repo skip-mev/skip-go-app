@@ -44,7 +44,7 @@ export const praxWallet: MinimalWallet = {
   getAddress: async (props) => {
     const penumbraWalletIndex = props?.praxWallet?.index;
     const sourceChainID = props?.praxWallet?.sourceChainID;
-    console.log(props);
+
     try {
       const isInstalled = await isPraxInstalled();
       if (!isInstalled) {
