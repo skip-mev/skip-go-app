@@ -40,11 +40,14 @@ Read more on all available environment variables in [`.env.example`](.env.exampl
 - lint sources: `npm run lint`
 - build production bundle: `npm run build`
 - run production server: `npm run start` (must run `build` first)
+- run dev server in https `npm run dev:https`
 
 ## Testing
 
 `npm run test` will run the unit tests.
 `npm run test:e2e` will run the automated end-to-end tests. Make sure you have `WORD_PHRASE_KEY=""`(12 word phrase key) in your `.env` file. This will be used to importing the wallet and perform the tests.
+
+if you want to test prax wallet/penumbra, you need to run dev server in https `npm run dev:https` and set `APP_URL=https://localhost:3000` in your `.env` file.
 
 ## Contributing
 
