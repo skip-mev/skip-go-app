@@ -45,7 +45,7 @@ const isPreview = (str: string) => {
 };
 
 // Donetsk and Luhansk Regions of Ukraine, Russia, Crimea, Cuba, Iran, North Korea or Syria
-const BLOCKED_COUNTRY = ["RU", "CU", "IR", "KP", "SY", "PK"];
+const BLOCKED_COUNTRY = ["RU", "CU", "IR", "KP", "SY"];
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
