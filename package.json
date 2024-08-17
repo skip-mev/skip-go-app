@@ -20,15 +20,10 @@
     "visdeps": "bash ./src/scripts/visdeps.sh"
   },
   "dependencies": {
-    "@connectrpc/connect": "1.4.0",
     "@fontsource/jost": "^5.0.16",
     "@graz-sh/types": "^0.0.14",
     "@heroicons/react": "^2.1.1",
     "@keplr-wallet/types": "^0.12.66",
-    "@penumbra-zone/bech32m": "6.1.1",
-    "@penumbra-zone/client": "14.0.0",
-    "@penumbra-zone/protobuf": "5.5.0",
-    "@penumbra-zone/transport-dom": "7.4.0",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-collapsible": "^1.0.3",
@@ -36,7 +31,7 @@
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.99.0",
-    "@skip-go/widget": "^2.3.7",
+    "@skip-go/widget": "^2.4.3",
     "@solana/spl-token": "^0.4.1",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-wallets": "^0.19.31",
@@ -72,7 +67,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tinykeys": "^2.1.0",
     "undici": "^6.6.1",
-    "viem": "^2.7.16",
+    "viem": "^2.16.4",
     "wagmi": "^2.5.7",
     "zod": "^3.22.4",
     "zustand": "^4.5.0"
