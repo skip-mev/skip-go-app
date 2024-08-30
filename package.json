@@ -31,7 +31,7 @@
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.99.0",
-    "@skip-go/widget": "^2.4.3",
+    "@skip-go/widget": "^2.4.4",
     "@solana/spl-token": "^0.4.1",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-wallets": "^0.19.31",
