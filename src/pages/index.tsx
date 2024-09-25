@@ -39,7 +39,6 @@ export default function Home() {
                 amountOut: Number(defaultRoute?.amountOut),
               }}
               settings={{
-                customGasAmount: 200_000,
                 slippage: 3,
               }}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
