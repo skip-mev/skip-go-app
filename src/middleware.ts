@@ -30,6 +30,13 @@ const isVercelPreview = (str: string) => {
   return false;
 };
 
+const isNetlifyPreview = (str: string) => {
+  if (str.endsWith("netlify.app")) {
+    return true;
+  }
+  return false;
+};
+
 const isCloudflarePreview = (str: string) => {
   if (str.endsWith("pages.dev")) {
     return true;
@@ -38,7 +45,7 @@ const isCloudflarePreview = (str: string) => {
 };
 
 const isPreview = (str: string) => {
-  if (isVercelPreview(str) || isCloudflarePreview(str)) {
+  if (isVercelPreview(str) || isCloudflarePreview(str) || isNetlifyPreview(str)) {
     return true;
   }
   return false;
