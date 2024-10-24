@@ -1,4 +1,5 @@
 import { createClient } from "@vercel/edge-config";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -54,6 +55,40 @@ const isPreview = (str: string) => {
 // Donetsk and Luhansk Regions of Ukraine, Russia, Crimea, Cuba, Iran, North Korea or Syria
 const BLOCKED_COUNTRY = ["RU", "CU", "IR", "KP", "SY"];
 
+const TREATMENT_BUCKET_PERCENTAGE = 0.1;
+const COOKIE_NAME = "ab-test"; // name of the cookie to store the variant
+
+const handleABTest = (request: NextRequest) => {
+  const randomlySetBucket: RequestCookie =
+    Math.random() < TREATMENT_BUCKET_PERCENTAGE
+      ? {
+          name: COOKIE_NAME,
+          value: "new",
+        }
+      : {
+          name: COOKIE_NAME,
+          value: "old",
+        };
+
+  const url = request.nextUrl.clone();
+
+  const RequestCookie = request.cookies.get(COOKIE_NAME) || randomlySetBucket;
+
+  console.log(RequestCookie);
+  let response = NextResponse.next();
+
+  if (RequestCookie.value === "new") {
+    url.pathname = "/widgetv2";
+    console.log(url);
+    response = NextResponse.rewrite(url);
+  }
+
+  if (!request.cookies.get(COOKIE_NAME)) {
+    response.cookies.set(RequestCookie);
+  }
+  return response;
+};
+
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
     const country = request.geo?.country || "US";
@@ -74,7 +109,8 @@ export async function middleware(request: NextRequest) {
 
   if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
     console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
-    return NextResponse.next();
+
+    return handleABTest(request);
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
   const isAllowed = await (async () => {
@@ -102,7 +138,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Handle simple requests
-  const response = NextResponse.next();
+  const response = handleABTest(request);
 
   if (isAllowed) {
     response.headers.set("Access-Control-Allow-Origin", origin);
