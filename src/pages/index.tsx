@@ -1,8 +1,7 @@
-import { Widget } from "widgetv2";
+import { SwapWidget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
-import { VersionCheck } from "@/components/VersionCheck";
 import WidgetButton from "@/components/WidgetButton";
 import { cn } from "@/utils/ui";
 
@@ -54,16 +53,13 @@ export default function Home() {
               transform: 'translateY(-185px)',
             }}
           >
-            <Widget
-              theme={theme}
-              defaultRoute={defaultRoute}
+            <SwapWidget
               endpointOptions={endpointOptions}
               apiURL={apiURL}
             />
           </div>
         </div>
       </main>
-      <VersionCheck />
     </div>
   );
 }
