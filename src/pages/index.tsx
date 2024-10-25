@@ -1,4 +1,4 @@
-import { SwapWidget } from "widgetv2";
+import { defaultTheme, lightTheme, Widget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
@@ -53,7 +53,8 @@ export default function Home() {
               transform: 'translateY(-185px)',
             }}
           >
-            <SwapWidget
+            <Widget
+              theme={theme === 'dark' ? defaultTheme : lightTheme}
               endpointOptions={endpointOptions}
               apiURL={apiURL}
             />
