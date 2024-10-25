@@ -9,9 +9,9 @@ export default function WidgetPage() {
       <SwapWidgetWithoutProviders
         className=""
         defaultRoute={{
-          srcChainID: defaultRoute?.srcChain,
+          srcChainID: defaultRoute?.srcChainID,
           srcAssetDenom: defaultRoute?.srcAssetDenom,
-          destChainID: defaultRoute?.destChain,
+          destChainID: defaultRoute?.destChainID,
           destAssetDenom: defaultRoute?.destAssetDenom,
           amountIn: Number(defaultRoute?.amountIn),
           amountOut: Number(defaultRoute?.amountOut),
