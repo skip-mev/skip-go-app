@@ -1,4 +1,4 @@
-import { SwapWidgetProviderProps } from "@skip-go/widget";
+import { SwapWidgetProviderProps } from "widgetv1";
 
 import { appUrl } from "@/constants/api";
 
