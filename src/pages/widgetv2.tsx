@@ -22,7 +22,6 @@ export default function WidgetV2() {
       window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => {
         const newColorScheme = event.matches ? "light" : "dark";
         setTheme(newColorScheme);
-        console.log(newColorScheme);
       });
     }
   }, []);
