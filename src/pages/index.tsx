@@ -1,4 +1,4 @@
-import { SwapWidgetWithoutProviders } from "@skip-go/widget";
+import { SwapWidgetWithoutProviders } from "widgetv1";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";

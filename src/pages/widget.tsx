@@ -1,4 +1,4 @@
-import { SwapWidgetWithoutProviders } from "@skip-go/widget";
+import { SwapWidgetWithoutProviders } from "widgetv1";
 
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 
