@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <div
       className={cn(
-        "font-sans subpixel-antialiased",
+        "bg-[#191919] font-sans subpixel-antialiased",
         "relative overflow-x-hidden overflow-y-hidden",
         "before:fixed before:inset-x-0 before:bottom-0 before:h-[100vh] before:content-['']",
         "before:bg-cover before:bg-[center_top] before:bg-no-repeat",
