@@ -10,7 +10,7 @@ import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { useEffect, useState } from "react";
 
 export default function WidgetV2() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>();
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
@@ -29,11 +29,11 @@ export default function WidgetV2() {
   return (
     <div
       className={cn(
-        "bg-[#ff86ff] font-sans subpixel-antialiased",
+        "font-sans subpixel-antialiased",
         "relative overflow-x-hidden overflow-y-hidden",
         "before:fixed before:inset-x-0 before:bottom-0 before:h-[100vh] before:content-['']",
         "before:bg-cover before:bg-[center_top] before:bg-no-repeat",
-        theme === 'dark' ? 'before:bg-[url(/widgetv2-dark-bg.svg)]' : 'before:bg-[url(/widgetv2-light-bg.svg)]'
+        theme === 'dark' ? 'before:bg-[url(/widgetv2-dark-bg.svg)]' : theme === 'light' ? 'before:bg-[url(/widgetv2-light-bg.svg)]' : ''
       )}
     >
       <main className="relative flex min-h-screen flex-col items-center">
