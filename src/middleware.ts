@@ -151,7 +151,7 @@ export async function middleware(request: NextRequest) {
 
   geoBlockMiddleware(request);
   response = await corsMiddleware(request, response);
-  response = abTestMiddleware(request, response);
+  // response = abTestMiddleware(request, response);
   
   return response;
 }

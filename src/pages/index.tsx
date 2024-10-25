@@ -8,8 +8,10 @@ import { cn } from "@/utils/ui";
 
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { useEffect, useState } from "react";
+import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 
-export default function WidgetV2() {
+export default function Home() {
+  const defaultRoute = useURLQueryParams();
   const [theme, setTheme] = useState<'light' | 'dark'>();
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -53,7 +55,7 @@ export default function WidgetV2() {
           >
             <Widget
               theme={theme}
-              brandColor="#FF4FFF"
+              defaultRoute={defaultRoute}
               endpointOptions={endpointOptions}
               apiURL={apiURL}
             />
