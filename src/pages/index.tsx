@@ -27,6 +27,7 @@ export default function Home() {
       });
     }
   }, []);
+  if (!theme) return null;
   return (
     <div
       className={cn(
