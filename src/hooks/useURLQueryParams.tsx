@@ -13,7 +13,7 @@ export const useURLQueryParams = () => {
     srcAssetDenom: srcAssetQP ?? undefined,
     destChainID: destChainQP ?? undefined,
     destAssetDenom: destAssetQP ?? undefined,
-    amountIn: amountInQP ?? undefined,
-    amountOut: amountOutQP ?? undefined,
+    amountIn: amountInQP ? Number(amountInQP) : undefined,
+    amountOut: amountOutQP ? Number(amountOutQP) : undefined,
   };
 };
