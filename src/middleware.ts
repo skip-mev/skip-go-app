@@ -58,7 +58,7 @@ const BLOCKED_COUNTRY = ["RU", "CU", "IR", "KP", "SY"];
 const TREATMENT_BUCKET_PERCENTAGE = 0.1;
 const COOKIE_NAME = "ab-test"; // name of the cookie to store the variant
 
-const handleABTest = (request: NextRequest) => {
+const abTestMiddleware = (request: NextRequest, response: NextResponse) => {
   const randomlySetBucket: RequestCookie =
     Math.random() < TREATMENT_BUCKET_PERCENTAGE
       ? {
@@ -74,12 +74,8 @@ const handleABTest = (request: NextRequest) => {
 
   const RequestCookie = request.cookies.get(COOKIE_NAME) || randomlySetBucket;
 
-  console.log(RequestCookie);
-  let response = NextResponse.next();
-
   if (RequestCookie.value === "new") {
     url.pathname = "/widgetv2";
-    console.log(url);
     response = NextResponse.rewrite(url);
   }
 
@@ -89,7 +85,7 @@ const handleABTest = (request: NextRequest) => {
   return response;
 };
 
-export async function middleware(request: NextRequest) {
+const geoBlockMiddleware = (request: NextRequest) => {
   if (request.nextUrl.pathname === "/") {
     const country = request.geo?.country || "US";
 
@@ -103,14 +99,16 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next();
   }
+}
 
+const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   // Check the origin from the request
   const origin = request.headers.get("origin") ?? "";
 
   if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
     console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
 
-    return handleABTest(request);
+    return NextResponse.next();
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
   const isAllowed = await (async () => {
@@ -137,9 +135,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  // Handle simple requests
-  const response = handleABTest(request);
-
   if (isAllowed) {
     response.headers.set("Access-Control-Allow-Origin", origin);
   }
@@ -148,6 +143,16 @@ export async function middleware(request: NextRequest) {
     response.headers.set(key, value);
   });
 
+  return response;
+}
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next();
+
+  geoBlockMiddleware(request);
+  response = await corsMiddleware(request, response);
+  response = abTestMiddleware(request, response);
+  
   return response;
 }
 
