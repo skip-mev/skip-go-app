@@ -1,8 +1,7 @@
-import { Widget } from "widgetv2";
+import { defaultTheme, lightTheme, Widget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
-import { VersionCheck } from "@/components/VersionCheck";
 import WidgetButton from "@/components/WidgetButton";
 import { cn } from "@/utils/ui";
 
@@ -55,15 +54,13 @@ export default function Home() {
             }}
           >
             <Widget
-              theme={theme}
-              defaultRoute={defaultRoute}
+              theme={theme === 'dark' ? defaultTheme : lightTheme}
               endpointOptions={endpointOptions}
               apiURL={apiURL}
             />
           </div>
         </div>
       </main>
-      <VersionCheck />
     </div>
   );
 }
