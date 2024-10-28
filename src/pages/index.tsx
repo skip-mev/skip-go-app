@@ -74,8 +74,10 @@ export default function Home() {
                 top: "50%",
               }}
             >
-              <div className={`text-center ${theme === "dark" ? "text-white" : "text-blackA10"}`}>
-                Skip go app is not yet available on mobile.
+              <div
+                className={`mx-2 rounded-2xl p-5 py-3 text-center text-[24px] font-medium ${theme === "dark" ? "bg-black text-gray-400" : "bg-white text-gray-400"}`}
+              >
+                Mobile support coming soon!
               </div>
             </div>
           )}
