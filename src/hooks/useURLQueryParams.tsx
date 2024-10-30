@@ -8,10 +8,14 @@ export const useURLQueryParams = () => {
   const [amountInQP] = useQueryState("amount_in");
   const [amountOutQP] = useQueryState("amount_out");
 
+  if (!srcChainQP && !srcAssetQP && !destChainQP && !destAssetQP && !amountInQP && !amountOutQP) {
+    return;
+  }
+
   return {
-    srcChainID: srcChainQP ?? undefined,
+    srcChainId: srcChainQP ?? undefined,
     srcAssetDenom: srcAssetQP ?? undefined,
-    destChainID: destChainQP ?? undefined,
+    destChainId: destChainQP ?? undefined,
     destAssetDenom: destAssetQP ?? undefined,
     amountIn: amountInQP ? Number(amountInQP) : undefined,
     amountOut: amountOutQP ? Number(amountOutQP) : undefined,
