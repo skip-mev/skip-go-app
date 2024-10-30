@@ -65,6 +65,7 @@ export default function Home() {
                 theme={theme === "dark" ? defaultTheme : lightTheme}
                 endpointOptions={endpointOptions}
                 apiURL={apiURL}
+                defaultRoute={defaultRoute}
               />
             </div>
           ) : (
