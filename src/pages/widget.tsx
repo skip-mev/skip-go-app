@@ -7,11 +7,11 @@ import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 export default function WidgetPage() {
   const defaultRoute = useURLQueryParams();
   return (
-    <div className="relative bg-white p-6 scrollbar-hide">
-      <SwapWidgetProvider
-        endpointOptions={endpointOptions}
-        apiURL={apiURL}
-      >
+    <SwapWidgetProvider
+      endpointOptions={endpointOptions}
+      apiURL={apiURL}
+    >
+      <div className="relative bg-white p-6 scrollbar-hide">
         <SwapWidgetWithoutProviders
           className=""
           defaultRoute={{
@@ -27,7 +27,7 @@ export default function WidgetPage() {
           }}
           onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET ? true : false}
         />
-      </SwapWidgetProvider>
-    </div>
+      </div>
+    </SwapWidgetProvider>
   );
 }
