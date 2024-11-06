@@ -1,9 +1,9 @@
 import styles from "./LogoGo.module.css";
 
 export const LogoGo = ({
-  color = "black"
+  color = "black",
 }: {
-  color?: string
+  color?: string;
 } = {}) => (
   <svg
     className={styles.gologo}
