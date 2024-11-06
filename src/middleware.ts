@@ -99,7 +99,7 @@ const geoBlockMiddleware = (request: NextRequest) => {
 
     return NextResponse.next();
   }
-}
+};
 
 const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   // Check the origin from the request
@@ -144,7 +144,7 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   });
 
   return response;
-}
+};
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next();
@@ -152,7 +152,7 @@ export async function middleware(request: NextRequest) {
   geoBlockMiddleware(request);
   response = await corsMiddleware(request, response);
   // response = abTestMiddleware(request, response);
-  
+
   return response;
 }
 

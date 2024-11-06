@@ -64,7 +64,7 @@ export default function Home() {
               <Widget
                 theme={theme === "dark" ? defaultTheme : lightTheme}
                 endpointOptions={endpointOptions}
-                apiURL={apiURL}
+                apiUrl={apiURL}
                 defaultRoute={defaultRoute}
               />
             </div>
