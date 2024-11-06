@@ -15,7 +15,7 @@ export function DefaultSeo(props: DefaultSeoProps) {
         description: metadata.description,
         type: "website",
         site_name: metadata.name,
-        images: [{ url: `${metadata.url}/social.png` }],
+        images: [{ url: `${metadata.url}/social-thumbnail.png` }],
       }}
       twitter={{
         cardType: "summary_large_image",
