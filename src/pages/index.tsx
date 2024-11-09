@@ -66,6 +66,9 @@ export default function Home() {
                 endpointOptions={endpointOptions}
                 apiUrl={apiURL}
                 defaultRoute={defaultRoute}
+                routeConfig={{
+                  goFast: true,
+                }}
               />
             </div>
           ) : (
