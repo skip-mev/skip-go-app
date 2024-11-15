@@ -1,5 +1,4 @@
 import { createClient } from "@vercel/edge-config";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -54,36 +53,6 @@ const isPreview = (str: string) => {
 
 // Donetsk and Luhansk Regions of Ukraine, Russia, Crimea, Cuba, Iran, North Korea or Syria
 const BLOCKED_COUNTRY = ["RU", "CU", "IR", "KP", "SY"];
-
-const TREATMENT_BUCKET_PERCENTAGE = 0.5;
-const COOKIE_NAME = "ab-test"; // name of the cookie to store the variant
-
-const abTestMiddleware = (request: NextRequest, response: NextResponse) => {
-  const randomlySetBucket: RequestCookie =
-    Math.random() < TREATMENT_BUCKET_PERCENTAGE
-      ? {
-          name: COOKIE_NAME,
-          value: "new",
-        }
-      : {
-          name: COOKIE_NAME,
-          value: "old",
-        };
-
-  const url = request.nextUrl.clone();
-
-  const RequestCookie = request.cookies.get(COOKIE_NAME) || randomlySetBucket;
-
-  if (RequestCookie.value === "new") {
-    url.pathname = "/widgetv2";
-    response = NextResponse.rewrite(url);
-  }
-
-  if (!request.cookies.get(COOKIE_NAME)) {
-    response.cookies.set(RequestCookie);
-  }
-  return response;
-};
 
 const geoBlockMiddleware = (request: NextRequest) => {
   if (request.nextUrl.pathname === "/") {
