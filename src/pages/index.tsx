@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { defaultTheme, lightTheme, Widget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
 import WidgetButton from "@/components/WidgetButton";
+import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
+import { useTheme } from "@/hooks/useTheme";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { isMobile } from "@/utils/os";
@@ -11,22 +13,8 @@ import { cn } from "@/utils/ui";
 
 export default function Home() {
   const defaultRoute = useURLQueryParams();
-  const [theme, setTheme] = useState<"light" | "dark">();
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
-        setTheme("light");
-      } else {
-        setTheme("dark");
-      }
-
-      window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
-        const newColorScheme = event.matches ? "light" : "dark";
-        setTheme(newColorScheme);
-      });
-    }
-  }, []);
-
+  const goFast = useFeatureEnabled("goFastEnabled");
+  const theme = useTheme();
   const mobile = useMemo(() => isMobile(), []);
 
   if (!theme) return null;
@@ -67,7 +55,7 @@ export default function Home() {
                 apiUrl={apiURL}
                 defaultRoute={defaultRoute}
                 routeConfig={{
-                  goFast: true,
+                  goFast,
                 }}
               />
             </div>
