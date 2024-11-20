@@ -14,9 +14,7 @@ export function useFeatureEnabled(featureName: string): boolean {
       if (featureEnabled === undefined) {
         const randomNumber = Math.random() * 100;
         featureEnabled = randomNumber < rolloutPercentage ? "true" : "false";
-
-        // Set the cookie for 1 day
-        setCookie(featureName, featureEnabled, 1);
+        setCookie(featureName, featureEnabled);
       }
 
       setIsFeatureEnabled(featureEnabled === "true");
