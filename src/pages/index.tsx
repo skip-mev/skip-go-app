@@ -47,6 +47,9 @@ export default function Home() {
                 position: "absolute",
                 top: "50%",
                 transform: "translateY(-185px)",
+                width: "100%",
+                maxWidth: "500px",
+                padding: "0 10px",
               }}
             >
               <Widget
