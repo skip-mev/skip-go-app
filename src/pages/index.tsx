@@ -41,41 +41,26 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-grow flex-col items-center pt-16">
-          {!mobile ? (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-185px)",
-                width: "100%",
-                maxWidth: "500px",
-                padding: "0 10px",
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-185px)",
+              width: "100%",
+              maxWidth: "500px",
+              padding: "0 10px",
+            }}
+          >
+            <Widget
+              theme={theme === "dark" ? defaultTheme : lightTheme}
+              endpointOptions={endpointOptions}
+              apiUrl={apiURL}
+              defaultRoute={defaultRoute}
+              routeConfig={{
+                goFast,
               }}
-            >
-              <Widget
-                theme={theme === "dark" ? defaultTheme : lightTheme}
-                endpointOptions={endpointOptions}
-                apiUrl={apiURL}
-                defaultRoute={defaultRoute}
-                routeConfig={{
-                  goFast,
-                }}
-              />
-            </div>
-          ) : (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-              }}
-            >
-              <div
-                className={`mx-2 rounded-2xl p-5 py-3 text-center text-[24px] font-medium ${theme === "dark" ? "bg-black text-gray-400" : "bg-white text-gray-400"}`}
-              >
-                Mobile support coming soon!
-              </div>
-            </div>
-          )}
+            />
+          </div>
         </div>
       </main>
     </div>
