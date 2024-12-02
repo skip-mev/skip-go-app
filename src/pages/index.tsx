@@ -59,6 +59,7 @@ export default function Home() {
               routeConfig={{
                 goFast,
               }}
+              onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
             />
           </div>
         </div>

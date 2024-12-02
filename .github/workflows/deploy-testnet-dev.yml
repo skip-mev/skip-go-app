@@ -1,10 +1,10 @@
 name: Deploy (testnet-dev)
 on:
   pull_request:
-    branches: [staging]
+    branches: [main]
     types: [closed]
   push:
-    branches: [testnet-dev]
+    branches: [main]
   repository_dispatch:
     types: [deploy-testnet-dev]
   workflow_dispatch:
@@ -23,17 +23,17 @@ jobs:
         name: configure
         run: git config pull.ff true
 
-      - id: pull-staging
-        name: Pull latest 'staging'
-        run: git pull origin staging
+      - id: pull-main
+        name: Pull latest 'main'
+        run: git pull --ff-only origin main
 
       - id: diff-check
-        name: Check if 'testnet' is behind 'staging'
-        run: git diff --exit-code origin/staging
+        name: Check if 'testnet-dev' is behind 'main'
+        run: git diff --exit-code origin/main
 
       - id: fast-forward
-        name: Fast forward 'staging' → 'testnet-dev'
-        run: git merge --ff-only origin/staging
+        name: Fast forward 'main' → 'testnet-dev'
+        run: git merge --ff-only origin/main
 
       - id: push-testnet-dev
         name: Push latest 'testnet-dev'
