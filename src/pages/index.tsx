@@ -3,6 +3,7 @@ import { defaultTheme, lightTheme, Widget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
+import TryAPIButton from "@/components/TryAPIButton";
 import WidgetButton from "@/components/WidgetButton";
 import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
 import { useTheme } from "@/hooks/useTheme";
@@ -36,6 +37,7 @@ export default function Home() {
         <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
+            <TryAPIButton />
             <WidgetButton />
             <DiscordButton />
           </div>
