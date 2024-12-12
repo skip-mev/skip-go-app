@@ -1,7 +1,6 @@
 if (typeof window !== "undefined") {
   throw new Error("edge-config.ts should only be imported on the server");
 }
-import { ExperimentalFeature } from "@skip-go/client";
 import { createClient } from "@vercel/edge-config";
 import { z } from "zod";
 
@@ -12,7 +11,7 @@ export function client() {
   return createClient(process.env.NEXT_PUBLIC_EDGE_CONFIG);
 }
 
-export async function getExperimentalFeatures(): Promise<ExperimentalFeature[]> {
+export async function getExperimentalFeatures() {
   try {
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
     const key = (() => {
@@ -29,7 +28,7 @@ export async function getExperimentalFeatures(): Promise<ExperimentalFeature[]> 
     })();
 
     const data = await client().get(key);
-    const value = (await stringArraySchema.parseAsync(data)) as ExperimentalFeature[];
+    const value = (await stringArraySchema.parseAsync(data)) as string[];
     return value;
   } catch (error) {
     console.error(error);
