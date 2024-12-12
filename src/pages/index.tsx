@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { defaultTheme, lightTheme, Widget } from "widgetv2";
+import { Widget } from "@skip-go/widget";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
@@ -8,14 +7,12 @@ import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
 import { useTheme } from "@/hooks/useTheme";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
-import { isMobile } from "@/utils/os";
 import { cn } from "@/utils/ui";
 
 export default function Home() {
   const defaultRoute = useURLQueryParams();
   const goFast = useFeatureEnabled("goFastEnabled");
   const theme = useTheme();
-  const mobile = useMemo(() => isMobile(), []);
 
   if (!theme) return null;
   return (
@@ -25,11 +22,7 @@ export default function Home() {
         "relative overflow-x-hidden overflow-y-hidden",
         "before:fixed before:inset-x-0 before:bottom-0 before:h-[100vh] before:content-['']",
         "before:bg-cover before:bg-[center_top] before:bg-no-repeat",
-        theme === "dark"
-          ? "before:bg-[url(/widgetv2-dark-bg.svg)]"
-          : theme === "light"
-            ? "before:bg-[url(/widgetv2-light-bg.svg)]"
-            : "",
+        theme === "dark" ? "before:bg-[url(/dark-bg.svg)]" : theme === "light" ? "before:bg-[url(/light-bg.svg)]" : "",
       )}
     >
       <main className="relative flex min-h-screen flex-col items-center">
@@ -52,7 +45,7 @@ export default function Home() {
             }}
           >
             <Widget
-              theme={theme === "dark" ? defaultTheme : lightTheme}
+              theme={theme}
               endpointOptions={endpointOptions}
               apiUrl={apiURL}
               defaultRoute={defaultRoute}
