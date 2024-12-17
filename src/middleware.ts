@@ -19,7 +19,6 @@ const cleanOrigin = (str: string) => {
 
     return domain;
   } catch (error) {
-    console.error("error", error);
     return str; // Return the original string if it's not a valid URL
   }
 };
@@ -39,7 +38,7 @@ const isNetlifyPreview = (str: string) => {
 };
 
 const isCloudflarePreview = (str: string) => {
-  if (str.endsWith("pages.dev") || "trycloudflare.com") {
+  if (str.endsWith("pages.dev") || str.endsWith("trycloudflare.com")) {
     return true;
   }
   return false;
