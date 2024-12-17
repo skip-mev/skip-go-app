@@ -19,6 +19,7 @@ const cleanOrigin = (str: string) => {
 
     return domain;
   } catch (error) {
+    console.error("error", error);
     return str; // Return the original string if it's not a valid URL
   }
 };
@@ -38,7 +39,7 @@ const isNetlifyPreview = (str: string) => {
 };
 
 const isCloudflarePreview = (str: string) => {
-  if (str.endsWith("pages.dev")) {
+  if (str.endsWith("pages.dev") || "trycloudflare.com") {
     return true;
   }
   return false;
@@ -94,6 +95,7 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
     const allowedOrigins = await stringArraySchema.parseAsync(allowedOriginsData);
     return allowedOrigins.includes(domain);
   })();
+
   // Handle preflighted requests
   const isPreflight = request.method === "OPTIONS";
   if (isPreflight) {
