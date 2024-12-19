@@ -1,8 +1,8 @@
-import { SwapWidgetProviderProps } from "widgetv1";
+import { WidgetProps } from "@skip-go/widget";
 
 import { appUrl } from "@/constants/api";
 
-export const endpointOptions: SwapWidgetProviderProps["endpointOptions"] = {
+export const endpointOptions: WidgetProps["endpointOptions"] = {
   getRpcEndpointForChain: async (chainID) => {
     return `${appUrl}/api/rpc/${chainID}`;
   },
