@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage",
 };
 
 const cleanOrigin = (str: string) => {
@@ -38,7 +38,7 @@ const isNetlifyPreview = (str: string) => {
 };
 
 const isCloudflarePreview = (str: string) => {
-  if (str.endsWith("pages.dev") || str.endsWith("trycloudflare.com")) {
+  if (str.endsWith("pages.dev")) {
     return true;
   }
   return false;
@@ -94,7 +94,6 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
     const allowedOrigins = await stringArraySchema.parseAsync(allowedOriginsData);
     return allowedOrigins.includes(domain);
   })();
-
   // Handle preflighted requests
   const isPreflight = request.method === "OPTIONS";
   if (isPreflight) {
