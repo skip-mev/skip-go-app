@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace",
 };
 
 const cleanOrigin = (str: string) => {
