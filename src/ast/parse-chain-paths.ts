@@ -39,6 +39,8 @@ export async function parseChainPaths({
       parseAssetListJson({ registryPath: _registryPath, chainPath }),
       parseChainJson({ registryPath: _registryPath, chainPath }),
     ]);
+    if (!assetlist) return;
+    if (!chain) return;
 
     chains.push(chain);
     assetlists.push(assetlist);
