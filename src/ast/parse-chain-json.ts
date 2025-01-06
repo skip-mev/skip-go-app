@@ -12,11 +12,7 @@ export async function parseChainJson({ registryPath, chainPath }: Args) {
   const jsonPath = path.resolve(registryPath, chainPath, "chain.json");
 
   const content = await fs.readFile(jsonPath, "utf-8");
-  try {
-    const data: Chain = await chainSchema.parseAsync(JSON.parse(content));
-    return data;
-  } catch (error) {
-    console.error("Error parsing chain.json", error);
-    return null;
-  }
+  const data: Chain = await chainSchema.parseAsync(JSON.parse(content));
+
+  return data;
 }
