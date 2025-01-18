@@ -3,8 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 const SENTRY_HOST = "o4504768725909504.ingest.us.sentry.io";
 const SENTRY_PROJECT_IDS = ["4508485201231872"];
 
-export const route = "/api/sentry";
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
