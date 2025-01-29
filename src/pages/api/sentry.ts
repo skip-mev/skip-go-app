@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const upstream_sentry_url = `https://${SENTRY_HOST}/api/${project_id}/envelope/`;
 
-    await fetch(upstream_sentry_url, {
+    const response = await fetch(upstream_sentry_url, {
       method: "POST",
       body: envelopeBytes,
       headers: {
@@ -35,7 +35,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    res.status(200).json({});
+    console.log(response);
+
+    res.status(response.status).json({});
   } catch (e) {
     console.error("Error tunneling to Sentry:", e);
     res.status(500).json({ error: "Error tunneling to Sentry" });
