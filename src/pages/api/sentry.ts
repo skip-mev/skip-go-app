@@ -10,6 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const requestBody = req.body;
+    const encoder = new TextEncoder();
+    const envelopeBytes = encoder.encode(requestBody);
     const [headerPiece] = requestBody.split("\n");
     const header = JSON.parse(headerPiece);
     const dsn = new URL(header["dsn"]);
@@ -24,11 +26,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const upstream_sentry_url = `https://${SENTRY_HOST}/api/${project_id}/envelope/`;
+
     await fetch(upstream_sentry_url, {
       method: "POST",
-      body: requestBody,
+      body: envelopeBytes,
       headers: {
-        "Content-Type": req.headers["content-type"] || "application/octet-stream",
+        "Content-Type": "application/octet-stream",
       },
     });
 
