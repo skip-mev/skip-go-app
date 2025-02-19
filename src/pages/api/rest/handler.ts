@@ -1,6 +1,6 @@
 import { PageConfig } from "next";
 
-import { chainRecord } from "@/chains/chains";
+import chains from "@/chains/all-chains.json";
 import { createProxyHandler } from "@/utils/api";
 
 export const config: PageConfig = {
@@ -12,6 +12,6 @@ export const config: PageConfig = {
 };
 
 export default createProxyHandler("api", (chainID) => ({
-  endpoint: chainRecord[chainID]?.apis?.rest?.[0]?.address,
+  endpoint: chains.find((chain) => chain.chainId === chainID)?.rest,
   isPrivate: false,
 }));
