@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "chains:update": "git submodule init && git submodule update --remote",
-    "chains:generate": "tsx ./src/scripts/codegen.ts",
+    "chains:generate": "node ./src/scripts/generate-chains.cjs",
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
@@ -17,12 +16,14 @@
     "test:e2e-1": "playwright test 1nobleUSDCToInjectiveINJ.spec.ts --project=chromium",
     "test:e2e-2": "playwright test 2injectiveINJToCosmoshubATOM.spec.ts --project=chromium",
     "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.ts --project=chromium",
-    "visdeps": "bash ./src/scripts/visdeps.sh"
+    "visdeps": "bash ./src/scripts/visdeps.sh",
+    "update-registries": "npm update @initia/initia-registry chain-registry && npm run chains:generate"
+
   },
   "dependencies": {
-    "@fontsource/jost": "^5.0.16",
-    "@graz-sh/types": "^0.0.14",
     "@heroicons/react": "^2.1.1",
+    "@initia/initia-registry": "^0.2.3",
+    "@keplr-wallet/cosmos": "0.12.189",
     "@keplr-wallet/types": "^0.12.66",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -44,13 +45,11 @@
     "@vercel/edge-config": "^0.4.1",
     "autoprefixer": "^10.4.17",
     "axios": "^1.6.7",
-    "chain-registry": "latest",
+    "chain-registry": "^1.69.129",
     "clsx": "^2.1.0",
-    "cosmjs-types": "0.8.x",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
     "download": "^8.0.0",
-    "match-sorter": "^6.3.3",
     "next": "^14.1.0",
     "next-seo": "^6.4.0",
     "nuqs": "^1.17.4",
@@ -66,8 +65,7 @@
     "undici": "^6.6.1",
     "viem": "^2.16.4",
     "wagmi": "^2.5.7",
-    "zod": "^3.22.4",
-    "zustand": "^4.5.0"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
