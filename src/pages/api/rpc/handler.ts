@@ -1,6 +1,6 @@
 import { PageConfig } from "next";
 
-import chains from "@/chains/all-chains.json";
+import chains from "@/chains/rpc.json";
 import { createProxyHandler } from "@/utils/api";
 
 export const config: PageConfig = {

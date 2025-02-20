@@ -1,42 +1,35 @@
 /* eslint-disable */
 
-const fs = require('fs/promises');
-const path = require('path');
-const { Bech32Address } = require('@keplr-wallet/cosmos');
-const outPath = path.resolve(__dirname, '../chains');
+const fs = require("fs/promises");
+const path = require("path");
+const outPath = path.resolve(__dirname, "../chains");
 
 const registries = [
   {
-    packageName: 'chain-registry',
-    registryPath: path.resolve(__dirname, '../../node_modules/chain-registry'),
+    packageName: "chain-registry",
+    registryPath: path.resolve(__dirname, "../../node_modules/chain-registry"),
   },
   {
-    packageName: 'initia-registry',
-    registryPath: path.resolve(__dirname, '../../node_modules/@initia/initia-registry/main'),
-  }
+    packageName: "initia-registry",
+    registryPath: path.resolve(__dirname, "../../node_modules/@initia/initia-registry/main"),
+  },
 ];
 
 async function collectMainnetChains({ registryPath, packageName }) {
-  const mainnetDir = path.join(registryPath, 'mainnet');
-  const mainnetChains = await collectChainData(mainnetDir, packageName, 'mainnet');
-  return mainnetChains
+  const mainnetDir = path.join(registryPath, "mainnet");
+  const mainnetRpc = await collectChainData(mainnetDir, packageName, "mainnet", "rpc");
+  const mainnetRest = await collectChainData(mainnetDir, packageName, "mainnet", "rest");
+  return { rpc: mainnetRpc, rest: mainnetRest };
 }
 
 async function collectTestnetChains({ registryPath, packageName }) {
-  const testnetDir = path.join(registryPath, 'testnet');
-  const testnetChains = await collectChainData(testnetDir, packageName, 'testnet');
-  return testnetChains
+  const testnetDir = path.join(registryPath, "testnet");
+  const testnetRpc = await collectChainData(testnetDir, packageName, "testnet", "rpc");
+  const testnetRest = await collectChainData(testnetDir, packageName, "testnet", "rest");
+  return { rpc: testnetRpc, rest: testnetRest };
 }
 
-async function collectExplorers({ registryPath, packageName }) {
-  const mainnetDir = path.join(registryPath, 'mainnet');
-  const mainnetChains = await collectChainData(mainnetDir, packageName, 'mainnet', true);
-  const testnetDir = path.join(registryPath, 'testnet');
-  const testnetChains = await collectChainData(testnetDir, packageName, 'testnet', true);
-  return mainnetChains.concat(testnetChains);
-}
-
-async function collectChainData(directory, packageName, networkType, isGetExplorers) {
+async function collectChainData(directory, packageName, networkType, apiType) {
   const chains = [];
   try {
     const dirEntries = await fs.readdir(directory, { withFileTypes: true });
@@ -45,24 +38,13 @@ async function collectChainData(directory, packageName, networkType, isGetExplor
       if (dirent.isDirectory()) {
         const chainName = dirent.name;
         try {
-          const chainJsPath = path.join(directory, chainName, 'chain.js');
+          const chainJsPath = path.join(directory, chainName, "chain.js");
           const chainModule = require(chainJsPath);
           const chainData = chainModule.default || chainModule;
           const chainArray = Array.isArray(chainData) ? chainData : [chainData];
-          const chain = chainArray[0]
-          if (isGetExplorers) {
-            const extractedData = extractExplorerUrl(chain);
-            chains.push(extractedData);
-          } else {
-            const assetJsPath = path.join(directory, chainName, 'assets.js');
-            const assetModule = require(assetJsPath);
-            const assetData = assetModule.default || assetModule;
-            const assetArray = Array.isArray(assetData) ? assetData : [assetData];
-            const asset = assetArray[0];
-            const extractedData = extractProperties(chain, asset);
-            chains.push(extractedData);
-          }
-
+          const chain = chainArray[0];
+          const extractedData = apiType === "rpc" ? extractRpc(chain) : extractRest(chain);
+          chains.push(extractedData);
         } catch (error) {
           console.warn(`Error generating chain info for ${chainName} in ${packageName}:`, error.message);
         }
@@ -75,96 +57,56 @@ async function collectChainData(directory, packageName, networkType, isGetExplor
   return chains;
 }
 
-function extractProperties(chain, asset) {
-  const { assets } = asset
-  const mainAsset = assets[0]
-  /** @type{import("@keplr-wallet/types").Currency} */
-  const stakeCurrency = {
-    coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom,
-    coinMinimalDenom: mainAsset.denom_units[0].denom,
-    coinDecimals: mainAsset.denom_units[mainAsset.denom_units.length - 1].exponent,
-  };
-
-  const feeCurrencies = chain.fees?.fee_tokens.map((token) => {
-    const isGasPriceStepAvailable = token.low_gas_price && token.average_gas_price && token.high_gas_price;
-    const feeAsset = assets.find((asset) => asset.base === token.denom);
-    if (isGasPriceStepAvailable) {
-      return {
-        coinDenom:
-          feeAsset.denom_units[feeAsset.denom_units.length - 1]?.denom || token.denom,
-        coinMinimalDenom:
-          feeAsset.denom_units[0]?.denom || token.denom,
-        coinDecimals: Number(feeAsset.denom_units[feeAsset.denom_units.length - 1]?.exponent),
-        gasPriceStep: {
-          low: Number(token.low_gas_price),
-          average: Number(token.average_gas_price),
-          high: Number(token.high_gas_price),
-        },
-      };
-    }
-    return {
-      coinDenom:
-        feeAsset?.denom_units[feeAsset.denom_units.length - 1]?.denom || token.denom,
-      coinMinimalDenom:
-        feeAsset?.denom_units[0]?.denom || token.denom,
-      coinDecimals: Number(feeAsset.denom_units[feeAsset.denom_units.length - 1]?.exponent),
-    };
-  });
-
-  if (!feeCurrencies) {
-    throw new Error(`⚠️\t${chain.name} has no fee currencies, skipping codegen...`);
-  }
-
-  /** @type{import("@keplr-wallet/types").ChainInfo} */
+function extractRpc(chain) {
   const chainInfo = {
     chainId: chain.chain_id,
-    currencies: assets.map((asset) => ({
-      coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
-      coinMinimalDenom: asset.denom_units[0].denom,
-      coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
-    })),
-    rest: chain.apis.rest[0].address,
     rpc: chain.apis.rpc[0].address,
-    bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
     chainName: chain.chain_name,
-    feeCurrencies,
-    stakeCurrency: stakeCurrency,
-    bip44: {
-      coinType: chain.slip44 ?? 0,
-    },
-  }
+  };
 
   return chainInfo;
 }
 
-function extractExplorerUrl(chain) {
-  return {
+function extractRest(chain) {
+  const chainInfo = {
     chainId: chain.chain_id,
-    explorers: chain.explorers
-  }
+    rest: chain.apis.rest[0].address,
+    chainName: chain.chain_name,
+  };
+
+  return chainInfo;
 }
 
-
 async function codegen() {
-  console.log('Getting mainnet chain info files...');
-  let mainnetChains = [];
+  console.log("Getting mainnet rpc files...");
+  let mainnetRpc = [];
+  let mainnetRest = [];
   for (const registry of registries) {
-    const chains = await collectMainnetChains(registry);
-    mainnetChains = mainnetChains.concat(chains);
+    const { rpc, rest } = await collectMainnetChains(registry);
+    mainnetRpc = mainnetRpc.concat(rpc);
+    mainnetRest = mainnetRest.concat(rest);
   }
 
-  console.log('Getting testnet chain info files...');
-  let testnetChains = [];
+  console.log("Getting testnet rest files...");
+  let testnetRpc = [];
+  let testnetRest = [];
   for (const registry of registries) {
-    const chains = await collectTestnetChains(registry);
-    testnetChains = testnetChains.concat(chains);
+    const { rpc, rest } = await collectTestnetChains(registry);
+    testnetRpc = testnetRpc.concat(rpc);
+    testnetRest = testnetRest.concat(rest);
   }
 
-  const allChains = mainnetChains.concat(testnetChains);
-  const allChainsOutputFilePath = path.resolve(outPath, 'all-chains.json');
-  await fs.writeFile(allChainsOutputFilePath, JSON.stringify(allChains), 'utf-8');
-  console.log(`Generated all chains file at ${allChainsOutputFilePath}`);
+  const rest = mainnetRest.concat(testnetRest);
+  const restOutputFilePath = path.resolve(outPath, "rest.json");
+  await fs.writeFile(restOutputFilePath, JSON.stringify(rest), "utf-8");
+  console.log(`Generated rest file at ${restOutputFilePath}`);
 
+  const rpc = mainnetRpc.concat(testnetRpc);
+  const rpcOutputFilePath = path.resolve(outPath, "rpc.json");
+  await fs.writeFile(rpcOutputFilePath, JSON.stringify(rpc), "utf-8");
+  console.log(`Generated rpc file at ${rpcOutputFilePath}`);
+
+  console.log(`Generated all chains file at ${outPath}`);
 }
 
 void codegen();
