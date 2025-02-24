@@ -18,7 +18,6 @@
     "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.ts --project=chromium",
     "visdeps": "bash ./src/scripts/visdeps.sh",
     "update-registries": "npm update @initia/initia-registry chain-registry && npm run chains:generate"
-
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
@@ -31,8 +30,8 @@
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@skip-go/client": "^0.16.12",
-    "@skip-go/widget": "^3.3.5",
+    "@skip-go/client": "^0.16.13",
+    "@skip-go/widget": "^3.3.6",
     "@solana/web3.js": "^1.95.8",
     "@tailwindcss/forms": "^0.5.7",
     "@tanstack/query-sync-storage-persister": "^5.18.1",
