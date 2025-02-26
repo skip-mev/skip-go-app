@@ -18,7 +18,7 @@ const ShareButton = ({ onClick }: { onClick?: () => void }) => {
       onClick={handleOnClick}
       className={`${styles.skipbutton} ${styles.widgetButton} font-diatype`}
     >
-      {isShowingCopyToClipboardFeedback ? "Copied to clipboard!" : "Share"}
+      {isShowingCopyToClipboardFeedback ? "Copied!" : "Share"}
     </button>
   )
 };
