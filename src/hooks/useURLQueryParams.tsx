@@ -1,4 +1,5 @@
 import { useQueryState } from "nuqs";
+import { useMemo } from "react";
 
 export const useURLQueryParams = () => {
   const [srcChainQP] = useQueryState("src_chain");
@@ -8,16 +9,20 @@ export const useURLQueryParams = () => {
   const [amountInQP] = useQueryState("amount_in");
   const [amountOutQP] = useQueryState("amount_out");
 
+  const queryParams = useMemo(() => {
+    return {
+      srcChainId: srcChainQP ?? undefined,
+      srcAssetDenom: srcAssetQP ?? undefined,
+      destChainId: destChainQP ?? undefined,
+      destAssetDenom: destAssetQP ?? undefined,
+      amountIn: amountInQP ? Number(amountInQP) : undefined,
+      amountOut: amountOutQP ? Number(amountOutQP) : undefined,
+    };
+  }, [amountInQP, amountOutQP, destAssetQP, destChainQP, srcAssetQP, srcChainQP]);
+
   if (!srcChainQP && !srcAssetQP && !destChainQP && !destAssetQP && !amountInQP && !amountOutQP) {
     return;
   }
 
-  return {
-    srcChainId: srcChainQP ?? undefined,
-    srcAssetDenom: srcAssetQP ?? undefined,
-    destChainId: destChainQP ?? undefined,
-    destAssetDenom: destAssetQP ?? undefined,
-    amountIn: amountInQP ? Number(amountInQP) : undefined,
-    amountOut: amountOutQP ? Number(amountOutQP) : undefined,
-  };
+  return queryParams;
 };

@@ -1,7 +1,9 @@
 import { Widget } from "@skip-go/widget";
+import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
+import ShareButton from "@/components/ShareButton";
 import WidgetButton from "@/components/WidgetButton";
 // import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
 import { useTheme } from "@/hooks/useTheme";
@@ -12,6 +14,36 @@ import { cn } from "@/utils/ui";
 export default function Home() {
   const defaultRoute = useURLQueryParams();
   const theme = useTheme();
+  const [queryParamsString, setQueryParamsString] = useState<string>();
+
+  const onClickedShareButton = () => {
+    if (queryParamsString) {
+      navigator.clipboard.writeText(`${window.location.origin}?${queryParamsString}`);
+      window.history.replaceState({}, "", `${window.location.pathname}?${queryParamsString}`);
+    }
+  };
+
+  const onRouteUpdated = (props: {
+    srcChainId?: string;
+    srcAssetDenom?: string;
+    destChainId?: string;
+    destAssetDenom?: string;
+    amountIn?: string;
+    amountOut?: string;
+  }) => {
+    const params = new URLSearchParams({
+      src_asset: props?.srcAssetDenom ?? "",
+      src_chain: props?.srcChainId ?? "",
+      dest_asset: props?.destAssetDenom ?? "",
+      dest_chain: props?.destChainId ?? "",
+      amount_in: props?.amountIn ?? "",
+      amount_out: props?.amountOut ?? "",
+    });
+
+    const queryString = params.toString();
+
+    setQueryParamsString(queryString);
+  };
 
   if (!theme) return null;
   return (
@@ -28,6 +60,7 @@ export default function Home() {
         <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
+            <ShareButton onClick={onClickedShareButton} />
             <WidgetButton />
             <DiscordButton />
           </div>
@@ -50,6 +83,10 @@ export default function Home() {
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
               enableSentrySessionReplays
+              onRouteUpdated={onRouteUpdated}
+              settings={{
+                useUnlimitedApproval: true,
+              }}
             />
           </div>
         </div>
