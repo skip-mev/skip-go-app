@@ -17,7 +17,7 @@
     "test:e2e-2": "playwright test 2injectiveINJToCosmoshubATOM.spec.ts --project=chromium",
     "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.ts --project=chromium",
     "visdeps": "bash ./src/scripts/visdeps.sh",
-    "update-registries": "npm update @initia/initia-registry chain-registry && npm run chains:generate"
+    "update-registries": "npx npm-check-updates chain-registry @initia/initia-registry -u && npm i && npm run chains:generate"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
@@ -44,7 +44,7 @@
     "@vercel/edge-config": "^0.4.1",
     "autoprefixer": "^10.4.17",
     "axios": "^1.6.7",
-    "chain-registry": "^1.69.129",
+    "chain-registry": "^1.69.141",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
