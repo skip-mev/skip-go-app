@@ -6,3 +6,5 @@ updates:
       interval: "daily"
     allow:
       - dependency-name: "@skip-go/widget"
+      - dependency-name: "chain-registry"
+      - dependency-name: "@initia/initia-registry"
