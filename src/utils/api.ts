@@ -29,7 +29,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
         return new Response(null, { status: 404 }); // Not Found
       }
 
-      if (data.isApiKey && data.endpoint && typeof data.endpoint === "string") {
+      if (data.isApiKey && data.endpoint) {
         const url = new URL(data.endpoint);
         url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
         return fetch(url, {
