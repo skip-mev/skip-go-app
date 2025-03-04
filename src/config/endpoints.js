@@ -5,7 +5,7 @@
  */
 
 /**
- * @typedef {(chainID: string) => MaybePromise<EndpointConfig>} FallbackEndpointFn
+ * @typedef {(chainID: string) => MaybePromise<{endpoint: string[] | undefined; isPrivate: boolean; }>} FallbackEndpointFn
  */
 
 /**
