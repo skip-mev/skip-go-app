@@ -60,7 +60,7 @@ async function collectChainData(directory, packageName, networkType, apiType) {
 function extractRpc(chain) {
   const chainInfo = {
     chainId: chain.chain_id,
-    rpc: chain.apis.rpc[0].address,
+    rpc: chain.apis.rpc.map((rpc) => rpc.address),
     chainName: chain.chain_name,
   };
 
@@ -70,7 +70,7 @@ function extractRpc(chain) {
 function extractRest(chain) {
   const chainInfo = {
     chainId: chain.chain_id,
-    rest: chain.apis.rest[0].address,
+    rest: chain.apis.rest.map((rest) => rest.address),
     chainName: chain.chain_name,
   };
 

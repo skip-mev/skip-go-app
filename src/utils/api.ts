@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 
 import { type FallbackEndpointFn, getWhitelabelEndpoint } from "@/config/endpoints";
 
+import { findFirstWorkingEndpoint } from "./endpoint";
+
 export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEndpointFn) {
   return async function handler(req: NextRequest) {
     try {
@@ -14,13 +16,20 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       const [chainID, ...args] = req.url.split(splitter).pop()!.split("/");
 
       let data = getWhitelabelEndpoint(chainID, type);
-      fallbackFn && (data ??= await fallbackFn(chainID));
+
+      if (!data && fallbackFn) {
+        const { endpoint } = await fallbackFn(chainID);
+        if (!endpoint) throw new Error(`No endpoint found for chainID: ${chainID}`);
+        const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+        if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
+        data = { endpoint: workingEndpoint, isPrivate: false };
+      }
 
       if (!data) {
         return new Response(null, { status: 404 }); // Not Found
       }
 
-      if (data.isApiKey && data.endpoint) {
+      if (data.isApiKey && data.endpoint && typeof data.endpoint === "string") {
         const url = new URL(data.endpoint);
         url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
         return fetch(url, {
