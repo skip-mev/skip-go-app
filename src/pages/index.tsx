@@ -83,6 +83,7 @@ export default function Home() {
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
               enableSentrySessionReplays
+              enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
               settings={{
                 useUnlimitedApproval: true,
