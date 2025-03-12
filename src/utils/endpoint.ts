@@ -4,7 +4,7 @@ export async function findFirstWorkingEndpoint(endpoints: string[], type: "rpc" 
       const url = (() => {
         switch (type) {
           case "rpc": {
-            const rpc = new URL("health", endpoint);
+            const rpc = new URL(endpoint);
             return rpc.toString();
           }
           case "rest": {
@@ -16,7 +16,6 @@ export async function findFirstWorkingEndpoint(endpoints: string[], type: "rpc" 
         }
       })();
       const response = await fetch(url);
-
       if (response.ok) {
         return endpoint;
       } else {
