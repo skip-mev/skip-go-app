@@ -88,6 +88,7 @@ export default function Home() {
               settings={{
                 useUnlimitedApproval: true,
               }}
+              disableShadowDom
             />
           </div>
         </div>
