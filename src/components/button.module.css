@@ -15,8 +15,6 @@
   border: none;
 
   font-family: var(--f-sans);
-
-  text-decoration: none;
 }
 .skipbutton:hover{
 

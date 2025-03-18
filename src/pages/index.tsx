@@ -85,7 +85,6 @@ export default function Home() {
               enableSentrySessionReplays
               enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
-              disableShadowDom
               settings={{
                 useUnlimitedApproval: true,
               }}
