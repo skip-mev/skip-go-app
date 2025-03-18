@@ -91,7 +91,42 @@ export default function Home() {
             />
           </div>
         </div>
+        {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
+        process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
+        process.env.NEXT_PUBLIC_BANNER_TITLE ? (
+          <Banner />
+        ) : null}
       </main>
     </div>
   );
 }
+
+export const Banner = () => {
+  return (
+    // fixed bottom left
+    <div className="fixed bottom-0 flex w-full items-center justify-center p-4">
+      <div className="bg-white px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+        <p className="text-sm/6 text-black">
+          <a
+            href={process.env.NEXT_PUBLIC_BANNER_LINK}
+            target="_blank"
+          >
+            <strong className="font-semibold">{process.env.NEXT_PUBLIC_BANNER_TITLE}</strong>
+            <svg
+              viewBox="0 0 2 2"
+              aria-hidden="true"
+              className="mx-2 inline size-0.5 fill-current"
+            >
+              <circle
+                r={1}
+                cx={1}
+                cy={1}
+              />
+            </svg>
+            {process.env.NEXT_PUBLIC_BANNER_MESSAGE}
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+};

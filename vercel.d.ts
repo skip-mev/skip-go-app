@@ -57,5 +57,9 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_VERCEL_GIT_COMMIT_AUTHOR_LOGIN?: string;
     readonly NEXT_PUBLIC_VERCEL_GIT_COMMIT_AUTHOR_NAME?: string;
     readonly NEXT_PUBLIC_VERCEL_GIT_PULL_REQUEST_ID?: string;
+    readonly NEXT_PUBLIC_SHOW_BANNER?: string;
+    readonly NEXT_PUBLIC_BANNER_MESSAGE?: string;
+    readonly NEXT_PUBLIC_BANNER_LINK?: string;
+    readonly NEXT_PUBLIC_BANNER_TITLE?: string;
   }
 }
