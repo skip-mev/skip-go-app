@@ -103,9 +103,9 @@ export default function Home() {
 
 export const Banner = () => {
   return (
-    <div className="fixed bottom-0 flex w-full items-center justify-center p-4">
-      <div className="bg-white px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-        <p className="text-sm/6 text-black">
+    <div className="fixed bottom-0 flex w-full items-center justify-center p-0 sm:p-4">
+      <div className="bg-white px-3 py-2.5 sm:rounded-xl sm:px-4 sm:py-3">
+        <p className="text-xs/5 text-black sm:text-sm/6">
           <a
             href={process.env.NEXT_PUBLIC_BANNER_LINK}
             target="_blank"
