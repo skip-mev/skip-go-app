@@ -103,7 +103,6 @@ export default function Home() {
 
 export const Banner = () => {
   return (
-    // fixed bottom left
     <div className="fixed bottom-0 flex w-full items-center justify-center p-4">
       <div className="bg-white px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
         <p className="text-sm/6 text-black">
