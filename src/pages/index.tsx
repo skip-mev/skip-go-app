@@ -85,6 +85,9 @@ export default function Home() {
               enableSentrySessionReplays
               enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
+              routeConfig={{
+                experimentalFeatures: ["eureka"],
+              }}
               settings={{
                 useUnlimitedApproval: true,
               }}
