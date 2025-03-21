@@ -85,6 +85,9 @@ export default function Home() {
               enableSentrySessionReplays
               enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
+              routeConfig={{
+                experimentalFeatures: ["hyperlane", "stargate", "eureka"],
+              }}
               settings={{
                 useUnlimitedApproval: true,
               }}
