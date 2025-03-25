@@ -31,14 +31,14 @@ export default function Home() {
     amountIn?: string;
     amountOut?: string;
   }) => {
-    const params = new URLSearchParams({
-      src_asset: props?.srcAssetDenom ?? "",
-      src_chain: props?.srcChainId ?? "",
-      dest_asset: props?.destAssetDenom ?? "",
-      dest_chain: props?.destChainId ?? "",
-      amount_in: props?.amountIn ?? "",
-      amount_out: props?.amountOut ?? "",
-    });
+    const params = new URLSearchParams();
+    
+    if (props?.srcAssetDenom) params.set("src_asset", props.srcAssetDenom);
+    if (props?.srcChainId) params.set("src_chain", props.srcChainId);
+    if (props?.destAssetDenom) params.set("dest_asset", props.destAssetDenom);
+    if (props?.destChainId) params.set("dest_chain", props.destChainId);
+    if (props?.amountIn) params.set("amount_in", props.amountIn);
+    if (props?.amountOut) params.set("amount_out", props.amountOut);
 
     const queryString = params.toString();
 
