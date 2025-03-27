@@ -82,6 +82,7 @@ export default function Home() {
               apiUrl={apiURL}
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
+              disableShadowDom={true}
               enableSentrySessionReplays
               enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
