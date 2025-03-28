@@ -62,6 +62,7 @@ export function CosmosPage() {
         <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
+            <p>THIS IS COSMOS.NETWORK</p>
             <ShareButton onClick={onClickedShareButton} />
             <WidgetButton />
             <DiscordButton />
