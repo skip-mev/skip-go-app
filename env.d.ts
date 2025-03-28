@@ -16,7 +16,7 @@ declare namespace NodeJS {
 
     readonly SKIP_API_KEY?: string;
     readonly ALLOWED_LIST_EDGE_CONFIG?: string;
-    readonly COSMOS_DOMAIN?: string;
+    readonly NEXT_PUBLIC_COSMOS_DOMAIN?: string;
   }
 }
 
