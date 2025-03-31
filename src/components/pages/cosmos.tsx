@@ -64,7 +64,7 @@ export function CosmosPage() {
       )}
     >
       <main className="relative flex min-h-screen flex-col items-center">
-        <div className="z-2 flex w-full flex-row items-center justify-between px-12 py-8">
+        <div className="z-10 flex w-full flex-row items-center justify-between px-12 py-8">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
             <ShareButton onClick={onClickedShareButton} />
