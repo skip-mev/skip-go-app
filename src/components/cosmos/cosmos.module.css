@@ -30,7 +30,7 @@
   cursor: pointer;
 }
 
-.cosmosbannerborder {
+.cosmosBannerContainer {
   position: relative;
   display: flex;
   width: 480px;
@@ -41,10 +41,9 @@
   z-index: 0;
 }
 
-.cosmosbannerborder:before {
+.cosmosBannerContainer:before {
   content: '';
   border-radius: 57.359px;
-  --eureka-border: conic-gradient(from 90deg at 50% 50%, #49D6DD 0deg, #FF663C 120.6000030040741deg, #D466FF 251.99999570846558deg, #49D6DD 360deg);
   background: var(--eureka-border);
   filter: blur(20px);
 
@@ -55,7 +54,7 @@
   z-index: -1;
 }
 
-.cosmosbanner {
+.cosmosBannerBorder {
   position: relative;
   display: flex;
   width: 100%;
@@ -65,9 +64,41 @@
   gap: 10px;
   color: white;
   border-radius: 15px;
-  border: 2px solid #49D6DD;
-
-  background: rgba(0, 0, 0, 0.57);
   height: 66px;
   line-height: 18px;
+
+  background: none;
+  border: none;
+  z-index: 0;
+}
+
+.cosmosBannerBorder::before {
+  --eureka-border: conic-gradient(
+    from 90deg at 50% 50%,
+    #49D6DD 0deg,
+    #FF663C 120.6deg,
+    #D466FF 252deg,
+    #49D6DD 360deg
+  );
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  padding: 2px;
+  border-radius: 15px;
+  background: var(--eureka-border);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+.cosmosBannerBorder::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  border-radius: 13px;
+  background: rgba(0, 0, 0, 0.57);
 }

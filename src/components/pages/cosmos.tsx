@@ -11,8 +11,8 @@ import { cn } from "@/utils/ui";
 import { Banner } from "../Banner";
 import cosmosStyles from "../cosmos/cosmos.module.css";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
-import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
 import { ShareIcon } from "../cosmos/ShareIcon";
+import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -72,8 +72,8 @@ export function CosmosPage() {
           </div>
         </div>
         <div className="absolute flex w-full flex-row items-center justify-center px-12 py-8">
-          <div className={cosmosStyles.cosmosbannerborder}>
-            <div className={cosmosStyles.cosmosbanner}>
+          <div className={cosmosStyles.cosmosBannerContainer}>
+            <div className={cosmosStyles.cosmosBannerBorder}>
               <ThinArrowIcon color="white" />
               IBC Eureka V2 is now live! Try new routes for bridging Bitcoin LSTs to Babylon and more.
               <ShareIcon />
