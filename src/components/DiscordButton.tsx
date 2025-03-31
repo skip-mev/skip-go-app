@@ -1,14 +1,18 @@
+import { isCosmosDomain } from "@/pages";
+
 import ArrowIcon from "./ArrowIcon";
 import styles from "./button.module.css";
+import cosmosStyles from "./cosmos/cosmos.module.css";
+import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
 
 const DiscordButton = () => (
   <a
-    className={`${styles.skipbutton} font-diatype`}
+    className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} font-diatype`}
     href="https://skip.build/discord"
     target="_blank"
   >
     Need Help?
-    <ArrowIcon />
+    {isCosmosDomain ? <ThinArrowIcon /> : <ArrowIcon />}
   </a>
 );
 
