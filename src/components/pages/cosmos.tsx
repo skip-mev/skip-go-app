@@ -71,7 +71,7 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="absolute flex w-full flex-row items-center justify-center px-12 py-8">
+        <div className="relative flex w-full flex-row items-center justify-center px-12 py-8 xl:absolute">
           <div className={cosmosStyles.cosmosBannerContainer}>
             <div className={cosmosStyles.cosmosBannerBorder}>
               <ThinArrowIcon color="white" />
@@ -108,6 +108,11 @@ export function CosmosPage() {
               }}
             />
           </div>
+        </div>
+        <div className="fixed bottom-0 flex w-full items-center justify-center p-0 sm:p-4">
+          <p className="text-[13px] text-white opacity-50">
+            <u>go.cosmos.network</u>{" is powered by Cosmos Hub, ATOM, IBC Eureka & Skip:Go <3"}
+          </p>
         </div>
         {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
         process.env.NEXT_PUBLIC_BANNER_MESSAGE &&

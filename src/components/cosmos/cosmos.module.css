@@ -47,7 +47,7 @@
   background: var(--eureka-border);
   filter: blur(20px);
 
-  width: 465px;
+  width: 97%;
   height: 85px;
   flex-shrink: 0;
   position: absolute;
