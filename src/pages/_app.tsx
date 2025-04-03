@@ -1,5 +1,3 @@
-import "@/styles/globals.css";
-
 import { GoogleTagManager } from "@next/third-parties/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
@@ -8,8 +6,12 @@ import React from "react";
 
 import { DefaultSeo } from "@/components/DefaultSeo";
 
+export const isCosmosDomain = process.env.NEXT_PUBLIC_COSMOS_DOMAIN === "true";
+
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = React.useState(() => new QueryClient());
+
+  isCosmosDomain ? require("../styles/cosmosGlobals.css") : require("../styles/globals.css");
 
   return (
     <>
