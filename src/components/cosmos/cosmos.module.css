@@ -1,0 +1,101 @@
+
+.cosmosbutton {
+  font-size: 18px;
+  padding: 16px 20px;
+  gap: 8px;
+  font-weight: normal;
+  height: 47px;
+  color: black;
+  background-color: white;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.15rem;
+
+  appearance: none;
+  border: none;
+
+  font-family: "ABCDiatype", sans-serif;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  text-decoration: none;
+}
+
+.cosmosbutton:hover{
+  color: white;
+  background-color: black;
+  cursor: pointer;
+}
+
+.cosmosbutton:hover > svg > path {
+  fill: white;
+}
+
+.cosmosBannerContainer {
+  position: relative;
+  display: flex;
+  width: 480px;
+  box-sizing: content-box;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  z-index: 0;
+}
+
+.cosmosBannerContainer:before {
+  content: '';
+  border-radius: 57.359px;
+  background: var(--eureka-border);
+  filter: blur(20px);
+
+  width: 97%;
+  height: 85px;
+  flex-shrink: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.cosmosBannerBorder {
+  position: relative;
+  display: flex;
+  width: 100%;
+  padding: 18px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  border-radius: 15px;
+  height: 66px;
+  line-height: 18px;
+
+  background: none;
+  border: none;
+  z-index: 0;
+}
+
+.cosmosBannerBorder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  padding: 2px;
+  border-radius: 15px;
+  background: var(--eureka-border);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+.cosmosBannerBorder::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  border-radius: 13px;
+  background: rgba(0, 0, 0, 0.57);
+}

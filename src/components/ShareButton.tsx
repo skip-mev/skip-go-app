@@ -1,6 +1,9 @@
 import { useState } from "react";
 
+import { isCosmosDomain } from "@/pages";
+
 import styles from "./button.module.css";
+import cosmosStyles from "./cosmos/cosmos.module.css";
 
 const ShareButton = ({ onClick }: { onClick?: () => void }) => {
   const [isShowingCopyToClipboardFeedback, setIsShowingCopyToClipboardFeedback] = useState(false);
@@ -16,11 +19,11 @@ const ShareButton = ({ onClick }: { onClick?: () => void }) => {
   return (
     <button
       onClick={handleOnClick}
-      className={`${styles.skipbutton} ${styles.widgetButton} font-diatype`}
+      className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} ${styles.widgetButton} font-diatype`}
     >
-      {isShowingCopyToClipboardFeedback ? "Copied!" : "Share"}
+      {isShowingCopyToClipboardFeedback ? "Link Copied!" : "Share this route"}
     </button>
-  )
+  );
 };
 
 export default ShareButton;

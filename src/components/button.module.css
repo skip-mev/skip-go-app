@@ -42,6 +42,6 @@
 
 @media screen and (max-width: 580px) /* Mobile */ {
   .widgetButton{
-    display: none;
+    display: none !important;
   }
 }

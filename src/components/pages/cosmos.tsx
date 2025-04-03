@@ -2,16 +2,17 @@ import { Widget } from "@skip-go/widget";
 import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
-import { LogoGo } from "@/components/LogoGo";
 import ShareButton from "@/components/ShareButton";
-import WidgetButton from "@/components/WidgetButton";
-// import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
 import { useTheme } from "@/hooks/useTheme";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
 
 import { Banner } from "../Banner";
+import cosmosStyles from "../cosmos/cosmos.module.css";
+import { CosmosIcon } from "../cosmos/CosmosIcon";
+import { ShareIcon } from "../cosmos/ShareIcon";
+import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -55,17 +56,28 @@ export function CosmosPage() {
         "relative overflow-x-hidden overflow-y-hidden",
         "before:fixed before:inset-x-0 before:bottom-0 before:h-[100vh] before:content-['']",
         "before:bg-cover before:bg-[center_top] before:bg-no-repeat",
-        theme === "dark" ? "before:bg-[url(/dark-bg.svg)]" : theme === "light" ? "before:bg-[url(/light-bg.svg)]" : "",
+        theme === "dark"
+          ? "before:bg-[url(/cosmos-dark.jpg)]"
+          : theme === "light"
+            ? "before:bg-[url(/cosmos-light.jpg)]"
+            : "",
       )}
     >
       <main className="relative flex min-h-screen flex-col items-center">
-        <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
-          <LogoGo color={theme === "dark" ? "white" : "black"} />
+        <div className="z-10 flex w-full flex-row items-center justify-between px-12 py-8">
+          <CosmosIcon color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
-            <p>THIS IS COSMOS.NETWORK</p>
             <ShareButton onClick={onClickedShareButton} />
-            <WidgetButton />
             <DiscordButton />
+          </div>
+        </div>
+        <div className="relative flex w-full flex-row items-center justify-center px-2 py-8 xl:absolute">
+          <div className={cosmosStyles.cosmosBannerContainer}>
+            <div className={cosmosStyles.cosmosBannerBorder}>
+              <ThinArrowIcon color="white" />
+              IBC Eureka V2 is now live! Try new routes for bridging Bitcoin LSTs to Babylon and more.
+              <ShareIcon />
+            </div>
           </div>
         </div>
         <div className="flex flex-grow flex-col items-center pt-16">
@@ -94,8 +106,16 @@ export function CosmosPage() {
               settings={{
                 useUnlimitedApproval: true,
               }}
+              disableShadowDom
+              ibcEurekaHighlightedAssets={process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(",")}
+              assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
             />
           </div>
+        </div>
+        <div className="fixed bottom-0 flex w-full items-center justify-center px-2 sm:p-4">
+          <p className="text-center text-[13px] text-white opacity-50">
+            <u>go.cosmos.network</u> {" is powered by Cosmos Hub, ATOM, IBC Eureka & Skip:Go <3"}
+          </p>
         </div>
         {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
         process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
