@@ -30,6 +30,10 @@
   cursor: pointer;
 }
 
+.cosmosbutton:hover > svg > path {
+  fill: white;
+}
+
 .cosmosBannerContainer {
   position: relative;
   display: flex;

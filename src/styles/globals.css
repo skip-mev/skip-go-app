@@ -8,7 +8,3 @@
 body {
     margin: 0;
 }
-
-:root {
-    --eureka-border: conic-gradient(from 90deg at 50% 50%, #49D6DD 0deg, #FF663C 120.6000030040741deg, #D466FF 251.99999570846558deg, #49D6DD 360deg);
-}

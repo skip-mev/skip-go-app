@@ -106,6 +106,21 @@ export function CosmosPage() {
               settings={{
                 useUnlimitedApproval: true,
               }}
+              disableShadowDom
+              ibcEurekaHighlightedAssets={process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(",")}
+              assetSymbolsSortedToTop={[
+                "LBTC",
+                "PumpBTC",
+                "WBTC",
+                "ATOM",
+                "USDC",
+                "USDT",
+                "ETH",
+                "TIA",
+                "OSMO",
+                "NTRN",
+                "INJ",
+              ]}
             />
           </div>
         </div>
