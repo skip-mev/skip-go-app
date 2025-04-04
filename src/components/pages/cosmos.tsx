@@ -78,7 +78,7 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="relative my-8 flex w-full flex-row items-center justify-center px-8 xl:absolute">
+        <div className="relative flex w-full flex-row items-center justify-center px-8 xl:absolute xl:my-8">
           <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
             <a
               href="https://cosmos.network/ibc-eureka"
@@ -100,9 +100,9 @@ export function CosmosPage() {
             </a>
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center justify-center">
+        <div className="flex flex-grow flex-col items-center">
           <div
-            className="lg:absolute lg:-translate-y-1/2"
+            className="mt-16 xl:absolute xl:-translate-y-1/2"
             style={{
               top: "50%",
               width: "100%",
