@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
-    "@initia/initia-registry": "^0.2.3",
+    "@initia/initia-registry": "^0.2.4",
     "@keplr-wallet/cosmos": "0.12.189",
     "@keplr-wallet/types": "^0.12.66",
     "@next/third-parties": "^15.2.3",
@@ -45,7 +45,7 @@
     "@vercel/edge-config": "^0.4.1",
     "autoprefixer": "^10.4.17",
     "axios": "^1.6.7",
-    "chain-registry": "^1.69.162",
+    "chain-registry": "^1.69.173",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
