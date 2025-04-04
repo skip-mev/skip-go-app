@@ -13,6 +13,7 @@ import cosmosStyles from "../cosmos/cosmos.module.css";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
 import { ShareIcon } from "../cosmos/ShareIcon";
 import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
+import Head from 'next/head';
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -63,6 +64,12 @@ export function CosmosPage() {
             : "",
       )}
     >
+       <Head>
+        <link
+          rel="icon"
+          href="/cosmos-favicon.svg"
+        />
+      </Head>
       <main className="relative flex min-h-screen flex-col items-center">
         <div className="z-10 flex w-full flex-row items-center justify-between px-12 py-8">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
@@ -114,7 +121,7 @@ export function CosmosPage() {
         </div>
         <div className="fixed bottom-0 flex w-full items-center justify-center px-2 sm:p-4">
           <p className="text-center text-[13px] text-white opacity-50">
-            <u>go.cosmos.network</u> {" is powered by Cosmos Hub, ATOM, IBC Eureka & Skip:Go <3"}
+            <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
         </div>
         {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
