@@ -70,7 +70,7 @@ export function CosmosPage() {
           href="/cosmos-favicon.svg"
         />
       </Head>
-      <main className="relative flex min-h-screen flex-col items-center">
+      <main className="relative flex min-h-[600px] flex-col items-center lg:h-screen">
         <div className="z-10 flex w-full flex-row items-center justify-between px-8 py-8 xl:px-12 ">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
@@ -78,7 +78,7 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="relative flex w-full flex-row items-center justify-center px-8 xl:absolute xl:py-8">
+        <div className="relative my-8 flex w-full flex-row items-center justify-center px-8 xl:absolute xl:py-8">
           <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
             <a
               href="https://cosmos.network/ibc-eureka"
@@ -96,12 +96,11 @@ export function CosmosPage() {
             </a>
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-16">
+        <div className="flex flex-grow flex-col items-center justify-center">
           <div
+            className="lg:absolute lg:-translate-y-1/2"
             style={{
-              position: "absolute",
               top: "50%",
-              transform: "translateY(-185px)",
               width: "100%",
               maxWidth: "500px",
               padding: "0 10px",
@@ -128,7 +127,7 @@ export function CosmosPage() {
             />
           </div>
         </div>
-        <div className="fixed bottom-0 flex w-full items-center justify-center px-2 sm:p-4">
+        <div className="flex w-full items-center justify-center px-2 py-4 lg:fixed lg:bottom-0">
           <p className="text-center text-[13px] text-white opacity-50">
             <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
