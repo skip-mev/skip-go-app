@@ -71,14 +71,14 @@ export function CosmosPage() {
         />
       </Head>
       <main className="relative flex min-h-screen flex-col items-center">
-        <div className="z-10 flex w-full flex-row items-center justify-between px-12 py-8">
+        <div className="z-10 flex w-full flex-row items-center justify-between px-8 py-8 xl:px-12 ">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
             <ShareButton onClick={onClickedShareButton} />
             <DiscordButton />
           </div>
         </div>
-        <div className="relative flex w-full flex-row items-center justify-center px-2 py-8 xl:absolute">
+        <div className="relative flex w-full flex-row items-center justify-center px-8 xl:absolute xl:py-8">
           <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
             <a
               href="https://cosmos.network/ibc-eureka"
