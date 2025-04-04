@@ -58,7 +58,7 @@ export function SkipPage() {
         theme === "dark" ? "before:bg-[url(/dark-bg.svg)]" : theme === "light" ? "before:bg-[url(/light-bg.svg)]" : "",
       )}
     >
-      <main className="relative flex min-h-screen flex-col items-center">
+      <main className="relative flex min-h-[600px] flex-col items-center lg:h-screen">
         <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
@@ -67,12 +67,11 @@ export function SkipPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-16">
+        <div className="flex flex-grow flex-col items-center justify-center">
           <div
+            className="md:absolute md:-translate-y-1/2"
             style={{
-              position: "absolute",
               top: "50%",
-              transform: "translateY(-185px)",
               width: "100%",
               maxWidth: "500px",
               padding: "0 10px",
