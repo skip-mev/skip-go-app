@@ -1,4 +1,5 @@
 import { Widget } from "@skip-go/widget";
+import Head from "next/head";
 import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
@@ -13,7 +14,6 @@ import cosmosStyles from "../cosmos/cosmos.module.css";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
 import { ShareIcon } from "../cosmos/ShareIcon";
 import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
-import Head from "next/head";
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -78,7 +78,7 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="relative my-8 flex w-full flex-row items-center justify-center px-8 xl:absolute xl:py-8">
+        <div className="relative my-8 flex w-full flex-row items-center justify-center px-8 xl:absolute">
           <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
             <a
               href="https://cosmos.network/ibc-eureka"
@@ -88,8 +88,12 @@ export function CosmosPage() {
                 textDecoration: "inherit",
               }}
             >
-              <div className={cosmosStyles.cosmosBannerBorder}>
-                <ThinArrowIcon color="white" />
+              <div
+                className={`${cosmosStyles.cosmosBannerBorder} ${
+                  theme === "dark" ? cosmosStyles.darkBanner : cosmosStyles.lightBanner
+                }`}
+              >
+                <ThinArrowIcon />
                 IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
                 <ShareIcon />
               </div>
@@ -128,7 +132,7 @@ export function CosmosPage() {
           </div>
         </div>
         <div className="flex w-full items-center justify-center px-2 py-4 lg:fixed lg:bottom-0">
-          <p className="text-center text-[13px] text-white opacity-50">
+          <p className={`text-center text-[13px] opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
             <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
         </div>

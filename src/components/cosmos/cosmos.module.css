@@ -64,10 +64,10 @@
   display: flex;
   width: 100%;
   padding: 15px 18px;
+  font-weight: 500;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  color: white;
   border-radius: 15px;
   line-height: 18px;
 
@@ -97,5 +97,16 @@
   inset: 2px;
   z-index: -1;
   border-radius: 13px;
-  background: rgba(0, 0, 0, 0.57);
+  background: var(--cosmos-banner-bg);
+}
+
+
+.lightBanner {
+  --cosmos-banner-bg: rgba(255, 255, 255, 0.83);
+  color: black;
+}
+
+.darkBanner {
+  --cosmos-banner-bg: rgba(0, 0, 0, 0.57);
+  color: white;
 }
