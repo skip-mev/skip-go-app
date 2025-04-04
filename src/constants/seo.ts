@@ -32,8 +32,8 @@ export const cosmosMetadata = {
     url: "https://github.com/skip-mev/skip-go-app",
   },
   twitter: {
-    username: "@SkipProtocol",
-    url: "https://twitter.com/SkipProtocol",
+    username: "@interchain_io",
+    url: "https://x.com/interchain_io",
   },
   themeColor: "##ff86ff",
 };

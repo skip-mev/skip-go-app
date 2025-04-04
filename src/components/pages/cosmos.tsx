@@ -13,7 +13,7 @@ import cosmosStyles from "../cosmos/cosmos.module.css";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
 import { ShareIcon } from "../cosmos/ShareIcon";
 import { ThinArrowIcon } from "../cosmos/ThinArrowIcon";
-import Head from 'next/head';
+import Head from "next/head";
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -64,7 +64,7 @@ export function CosmosPage() {
             : "",
       )}
     >
-       <Head>
+      <Head>
         <link
           rel="icon"
           href="/cosmos-favicon.svg"
@@ -79,12 +79,21 @@ export function CosmosPage() {
           </div>
         </div>
         <div className="relative flex w-full flex-row items-center justify-center px-2 py-8 xl:absolute">
-          <div className={cosmosStyles.cosmosBannerContainer}>
-            <div className={cosmosStyles.cosmosBannerBorder}>
-              <ThinArrowIcon color="white" />
-              IBC Eureka V2 is now live! Try new routes for bridging Bitcoin LSTs to Babylon and more.
-              <ShareIcon />
-            </div>
+          <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
+            <a
+              href="https://cosmos.network/ibc-eureka"
+              target="_blank"
+              style={{
+                color: "inherit",
+                textDecoration: "inherit",
+              }}
+            >
+              <div className={cosmosStyles.cosmosBannerBorder}>
+                <ThinArrowIcon color="white" />
+                IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
+                <ShareIcon />
+              </div>
+            </a>
           </div>
         </div>
         <div className="flex flex-grow flex-col items-center pt-16">
