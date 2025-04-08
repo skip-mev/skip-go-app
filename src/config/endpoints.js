@@ -164,6 +164,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   gitopia: true,
   nyx: true,
   wormchain: true,
+  "bbn-1": true,
 };
 
 /**
