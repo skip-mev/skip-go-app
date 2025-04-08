@@ -8,7 +8,7 @@ import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
 const DiscordButton = () => (
   <a
     className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} font-diatype`}
-    href="https://skip.build/discord"
+    href={isCosmosDomain ? "https://discord.gg/interchain" : "https://skip.build/discord"}
     target="_blank"
   >
     Need Help?

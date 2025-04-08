@@ -1,4 +1,5 @@
 import { Widget } from "@skip-go/widget";
+import Head from "next/head";
 import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
@@ -63,29 +64,47 @@ export function CosmosPage() {
             : "",
       )}
     >
+      <Head>
+        <link
+          rel="icon"
+          href="/cosmos-favicon.svg"
+        />
+      </Head>
       <main className="relative flex min-h-screen flex-col items-center">
-        <div className="z-10 flex w-full flex-row items-center justify-between px-12 py-8">
+        <div className="z-10 flex w-full flex-row items-center justify-between px-8 py-8 xl:px-12 ">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-row space-x-2">
             <ShareButton onClick={onClickedShareButton} />
             <DiscordButton />
           </div>
         </div>
-        <div className="relative flex w-full flex-row items-center justify-center px-2 py-8 xl:absolute">
-          <div className={cosmosStyles.cosmosBannerContainer}>
-            <div className={cosmosStyles.cosmosBannerBorder}>
-              <ThinArrowIcon color="white" />
-              IBC Eureka V2 is now live! Try new routes for bridging Bitcoin LSTs to Babylon and more.
-              <ShareIcon />
-            </div>
+        <div className="relative flex w-full flex-row items-center justify-center px-8 pb-8 xl:absolute xl:my-8">
+          <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
+            <a
+              href="https://cosmos.network/ibc-eureka"
+              target="_blank"
+              style={{
+                color: "inherit",
+                textDecoration: "inherit",
+              }}
+            >
+              <div
+                className={`${cosmosStyles.cosmosBannerBorder} ${
+                  theme === "dark" ? cosmosStyles.darkBanner : cosmosStyles.lightBanner
+                }`}
+              >
+                <ThinArrowIcon />
+                IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
+                <ShareIcon />
+              </div>
+            </a>
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-16">
+        <div className="flex flex-grow flex-col items-center justify-center">
           <div
+            className="xl:absolute xl:-translate-y-1/2"
             style={{
-              position: "absolute",
               top: "50%",
-              transform: "translateY(-185px)",
               width: "100%",
               maxWidth: "500px",
               padding: "0 10px",
@@ -112,9 +131,9 @@ export function CosmosPage() {
             />
           </div>
         </div>
-        <div className="fixed bottom-0 flex w-full items-center justify-center px-2 sm:p-4">
-          <p className="text-center text-[13px] text-white opacity-50">
-            <u>go.cosmos.network</u> {" is powered by Cosmos Hub, ATOM, IBC Eureka & Skip:Go <3"}
+        <div className="flex w-full items-center justify-center px-2 py-4 lg:fixed lg:bottom-0">
+          <p className={`text-center text-[13px] opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
+            <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
         </div>
         {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&

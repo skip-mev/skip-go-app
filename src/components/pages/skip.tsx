@@ -67,12 +67,11 @@ export function SkipPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-16">
+        <div className="flex flex-grow flex-col items-center justify-center">
           <div
+            className="xl:absolute xl:-translate-y-1/2"
             style={{
-              position: "absolute",
               top: "50%",
-              transform: "translateY(-185px)",
               width: "100%",
               maxWidth: "500px",
               padding: "0 10px",
