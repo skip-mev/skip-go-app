@@ -1,5 +1,4 @@
 import { Widget } from "@skip-go/widget";
-import Head from "next/head";
 import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
@@ -64,12 +63,6 @@ export function CosmosPage() {
             : "",
       )}
     >
-      <Head>
-        <link
-          rel="icon"
-          href="/cosmos-favicon.svg"
-        />
-      </Head>
       <main className="relative flex min-h-screen flex-col items-center">
         <div className="z-10 flex w-full flex-row items-center justify-between px-8 py-8 xl:px-12 ">
           <CosmosIcon color={theme === "dark" ? "white" : "black"} />
