@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <link
           rel="icon"
-          href={isCosmosDomain ? "/cosmos-favicon.svg" : "/skip-favicon.ico"}
+          href={isCosmosDomain ? "/cosmos-favicon.ico" : "/skip-favicon.ico"}
         />
       </Head>
       <DefaultSeo />
