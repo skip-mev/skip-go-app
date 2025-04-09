@@ -93,13 +93,7 @@ export function CosmosPage() {
           </div>
         </div>
         <div className="flex flex-grow flex-col items-center justify-center">
-          <div
-            className="widget-container xl:absolute"
-            style={{
-              top: "50%",
-              padding: "0 10px",
-            }}
-          >
+          <div className="widget-container">
             <Widget
               theme={theme}
               endpointOptions={endpointOptions}
