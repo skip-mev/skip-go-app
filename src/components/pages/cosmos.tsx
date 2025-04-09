@@ -71,7 +71,7 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="relative flex w-full flex-row items-center justify-center px-8 pb-8 xl:absolute xl:my-8">
+        <div className="relative flex w-full flex-row items-center justify-center px-2 pb-2 xl:absolute xl:my-8">
           <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
             <a
               href="https://cosmos.network/ibc-eureka"
@@ -86,7 +86,7 @@ export function CosmosPage() {
                   theme === "dark" ? cosmosStyles.darkBanner : cosmosStyles.lightBanner
                 }`}
               >
-                <ThinArrowIcon />
+                {/* <ThinArrowIcon /> */}
                 IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
                 <ShareIcon />
               </div>
@@ -124,7 +124,7 @@ export function CosmosPage() {
             />
           </div>
         </div>
-        <div className="flex w-full items-center justify-center px-2 py-4 lg:fixed lg:bottom-0">
+        <div className="flex w-full items-center justify-center px-10 py-4 lg:bottom-0">
           <p className={`text-center text-[13px] opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
             <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
