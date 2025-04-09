@@ -22,5 +22,9 @@ body {
     width: 500px;
     @media screen and (max-width: 500px) /* Mobile */ {
         width: 100vw;
-      }
+    }
+
+    @media (min-width: 1280px) {
+        transform: translateY(-185px);
+    }
 }
