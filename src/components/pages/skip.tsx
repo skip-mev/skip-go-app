@@ -18,6 +18,8 @@ export function SkipPage() {
   const theme = useTheme();
   const [queryParamsString, setQueryParamsString] = useState<string>();
 
+  const showLedgerMainnet = process.env.NEXT_PUBLIC_SHOW_LEDGER_MAINNET === "true";
+
   const onClickedShareButton = () => {
     if (queryParamsString) {
       navigator.clipboard.writeText(`${window.location.origin}?${queryParamsString}`);
@@ -85,9 +87,13 @@ export function SkipPage() {
                 useUnlimitedApproval: true,
               }}
               filterOut={{
+                source: {
+                  ...(showLedgerMainnet ? {} : { "ledger-mainnet-1": undefined }),
+                },
                 destination: {
                   "pacific-1": ["ibc/6C00E4AA0CC7618370F81F7378638AE6C48EFF8C9203CE1C2357012B440EBDB7"],
                   "1329": ["0xB75D0B03c06A926e488e2659DF1A861F860bD3d1"],
+                  ...(showLedgerMainnet ? {} : { "ledger-mainnet-1": undefined }),
                 },
               }}
             />
