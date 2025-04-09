@@ -19,7 +19,31 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <link
           rel="icon"
-          href={isCosmosDomain ? "/cosmos-favicon.ico" : "/skip-favicon.ico"}
+          type="image/png"
+          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon-96x96.png`}
+          sizes="96x96"
+        />
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon.svg`}
+        />
+        <link
+          rel="shortcut icon"
+          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon.ico`}
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}apple-touch-icon.png`}
+        />
+        <meta
+          name="apple-mobile-web-app-title"
+          content={isCosmosDomain ? "IBC Eureka" : "Skip Go"}
+        />
+        <link
+          rel="manifest"
+          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}site.webmanifest`}
         />
       </Head>
       <DefaultSeo />
