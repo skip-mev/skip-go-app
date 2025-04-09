@@ -86,7 +86,6 @@ export function CosmosPage() {
                   theme === "dark" ? cosmosStyles.darkBanner : cosmosStyles.lightBanner
                 }`}
               >
-                {/* <ThinArrowIcon /> */}
                 IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
                 <ShareIcon />
               </div>
