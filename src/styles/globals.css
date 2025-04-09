@@ -9,3 +9,18 @@
 body {
     margin: 0;
 }
+
+.widget-container {
+    padding: 0 10px;
+
+    @media screen and (min-height: 600px) /* absolute positioning */ {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-185px);
+    }
+    
+    width: 500px;
+    @media screen and (max-width: 500px) /* Mobile */ {
+        width: 100vw;
+    }
+}

@@ -68,15 +68,7 @@ export function SkipPage() {
           </div>
         </div>
         <div className="flex flex-grow flex-col items-center justify-center">
-          <div
-            className="xl:absolute xl:-translate-y-1/2"
-            style={{
-              top: "50%",
-              width: "100%",
-              maxWidth: "500px",
-              padding: "0 10px",
-            }}
-          >
+          <div className="widget-container">
             <Widget
               theme={theme}
               endpointOptions={endpointOptions}
