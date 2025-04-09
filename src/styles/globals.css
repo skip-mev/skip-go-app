@@ -9,3 +9,10 @@
 body {
     margin: 0;
 }
+
+.widget-container {
+    width: 500px;
+    @media screen and (max-width: 500px) /* Mobile */ {
+        width: 100vw;
+      }
+}
