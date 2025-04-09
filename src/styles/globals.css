@@ -12,15 +12,19 @@ body {
 
 .widget-container {
     padding: 0 10px;
-
-    @media screen and (min-height: 600px) /* absolute positioning */ {
+    width: 500px;
+}
+  
+@media screen and (min-height: 600px) {
+    .widget-container {
         position: absolute;
         top: 50%;
         transform: translateY(-185px);
     }
-    
-    width: 500px;
-    @media screen and (max-width: 500px) /* Mobile */ {
+}
+  
+@media screen and (max-width: 500px) {
+    .widget-container {
         width: 100vw;
     }
 }
