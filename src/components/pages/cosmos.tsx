@@ -127,7 +127,27 @@ export function CosmosPage() {
                 },
               }}
               disableShadowDom
-              ibcEurekaHighlightedAssets={process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(",")}
+              ibcEurekaHighlightedAssets={{
+                LBTC: ["1", "cosmoshub-4", "bbn-1"],
+                SolvBTC: ["1", "cosmoshub-4", "bbn-1"],
+                xSolvBTC: ["1", "cosmoshub-4", "bbn-1"],
+                pumpBTC: ["1", "cosmoshub-4", "bbn-1"],
+                stBTC: ["1", "cosmoshub-4", "bbn-1"],
+                enzoBTC: ["1", "cosmoshub-4", "bbn-1"],
+                mBTC: ["1", "cosmoshub-4", "bbn-1"],
+                kBTC: ["1", "cosmoshub-4", "bbn-1"],
+                eBTC: ["1", "cosmoshub-4", "bbn-1"],
+                WETH: ["1", "cosmoshub-4", "elys-1"],
+                WBTC: ["1", "cosmoshub-4", "bbn-1", "elys-1"],
+                USDT: ["1", "cosmoshub-4", "elys-1"],
+                PAXG: ["1", "cosmoshub-4", "elys-1"],
+                sUSDS: ["1", "cosmoshub-4"],
+                NIL: ["1", "cosmoshub-4", "nillion-1"],
+                SEDA: ["1", "cosmoshub-4", "seda-1"],
+                ORAI: ["1", "cosmoshub-4", "Oraichain"],
+                BABY: ["1", "cosmoshub-4", "bbn-1"],
+                ATOM: undefined,
+              }}
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
             />
           </div>
