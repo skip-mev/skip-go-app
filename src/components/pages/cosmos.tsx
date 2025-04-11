@@ -127,7 +127,9 @@ export function CosmosPage() {
                 },
               }}
               disableShadowDom
-              ibcEurekaHighlightedAssets={process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(",")}
+              ibcEurekaHighlightedAssets={{
+                "1": process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(","),
+              }}
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
             />
           </div>
