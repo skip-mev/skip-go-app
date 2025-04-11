@@ -128,7 +128,23 @@ export function CosmosPage() {
               }}
               disableShadowDom
               ibcEurekaHighlightedAssets={{
-                "1": process.env.NEXT_PUBLIC_IBC_EUREKA_ASSETS?.split(","),
+                SolvBTC: ["1"],
+                xSolvBTC: ["1"],
+                pumpBTC: ["1"],
+                stBTC: ["1"],
+                mBTC: ["1"],
+                kBTC: ["1"],
+                eBTC: ["1"],
+                NIL: ["1"],
+                SEDA: ["1"],
+                WETH: ["1"],
+                WBTC: ["1"],
+                USDT: ["1"],
+                ORAI: ["1"],
+                BABY: ["1"],
+                sUSDS: ["1"],
+                ATOM: ["1"],
+                LBTC: ["1"],
               }}
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
             />
