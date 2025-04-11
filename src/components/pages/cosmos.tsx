@@ -126,6 +126,12 @@ export function CosmosPage() {
                     : { "ledger-mainnet-1": undefined, 1: ["0xbf45a5029d081333407cc52a84be5ed40e181c46"] }),
                 },
               }}
+              filterOutUnlessUserHasBalance={{
+                source: {
+                  "1": ["0xbf45a5029d081333407cc52a84be5ed40e181c46"],
+                  "1329": ["0xB75D0B03c06A926e488e2659DF1A861F860bD3d1"],
+                },
+              }}
               disableShadowDom
               ibcEurekaHighlightedAssets={{
                 LBTC: ["1", "cosmoshub-4", "bbn-1"],
