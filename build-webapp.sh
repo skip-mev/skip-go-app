@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT_DIR=".next/static"
+OUTPUT_DIR="./out"
 DEST_DIR=${1:-/data}
 
 if [[ -d "$DEST_DIR" ]]; then
