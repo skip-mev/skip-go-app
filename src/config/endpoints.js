@@ -165,6 +165,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   nyx: true,
   wormchain: true,
   "bbn-1": true,
+  "interwoven-1": true,
 };
 
 /**
