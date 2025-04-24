@@ -83,8 +83,8 @@ async function codegen() {
   let mainnetRest = [];
   for (const registry of registries) {
     const { rpc, rest } = await collectMainnetChains(registry);
-    mainnetRpc = mainnetRpc.concat(rpc);
-    mainnetRest = mainnetRest.concat(rest);
+    mainnetRpc = mergeArrays(mainnetRpc, rpc);
+    mainnetRest = mergeArrays(mainnetRest, rest);
   }
 
   console.log("Getting testnet rest files...");
@@ -92,21 +92,32 @@ async function codegen() {
   let testnetRest = [];
   for (const registry of registries) {
     const { rpc, rest } = await collectTestnetChains(registry);
-    testnetRpc = testnetRpc.concat(rpc);
-    testnetRest = testnetRest.concat(rest);
+    testnetRpc = mergeArrays(testnetRpc, rpc);
+    testnetRest = mergeArrays(testnetRest, rest);
   }
 
-  const rest = mainnetRest.concat(testnetRest);
+  const rest = mergeArrays(mainnetRest, testnetRest);
   const restOutputFilePath = path.resolve(outPath, "rest.json");
   await fs.writeFile(restOutputFilePath, JSON.stringify(rest), "utf-8");
   console.log(`Generated rest file at ${restOutputFilePath}`);
 
-  const rpc = mainnetRpc.concat(testnetRpc);
+  const rpc = mergeArrays(mainnetRpc, testnetRpc);
   const rpcOutputFilePath = path.resolve(outPath, "rpc.json");
   await fs.writeFile(rpcOutputFilePath, JSON.stringify(rpc), "utf-8");
   console.log(`Generated rpc file at ${rpcOutputFilePath}`);
 
   console.log(`Generated all chains file at ${outPath}`);
 }
+
+const mergeArrays = (arr1, arr2) => {
+  const merged = [...arr1, ...arr2];
+  const map = new Map();
+
+  merged.forEach((item) => {
+    map.set(item.chainId, item); // second occurrence overwrites first
+  });
+
+  return Array.from(map.values());
+};
 
 void codegen();
