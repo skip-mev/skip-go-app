@@ -9,9 +9,7 @@ import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
 
 import { Banner } from "../Banner";
-import cosmosStyles from "../cosmos/cosmos.module.css";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
-import { ShareIcon } from "../cosmos/ShareIcon";
 
 export function CosmosPage() {
   const defaultRoute = useURLQueryParams();
@@ -72,27 +70,6 @@ export function CosmosPage() {
             <DiscordButton />
           </div>
         </div>
-        <div className="relative flex w-full flex-row items-center justify-center px-2 pb-2 xl:absolute xl:my-8">
-          <div className={`z-10 ${cosmosStyles.cosmosBannerContainer}`}>
-            <a
-              href="https://cosmos.network/ibc-eureka"
-              target="_blank"
-              style={{
-                color: "inherit",
-                textDecoration: "inherit",
-              }}
-            >
-              <div
-                className={`${cosmosStyles.cosmosBannerBorder} ${
-                  theme === "dark" ? cosmosStyles.darkBanner : cosmosStyles.lightBanner
-                }`}
-              >
-                IBC Eureka is live now! Use highlighted routes to bridge from Ethereum to Babylon and more.
-                <ShareIcon />
-              </div>
-            </a>
-          </div>
-        </div>
         <div className="flex flex-grow flex-col items-center justify-center">
           <div className="widget-container">
             <Widget
@@ -129,27 +106,6 @@ export function CosmosPage() {
                 },
               }}
               disableShadowDom
-              ibcEurekaHighlightedAssets={{
-                LBTC: ["1", "cosmoshub-4", "bbn-1"],
-                SolvBTC: ["1", "cosmoshub-4", "bbn-1"],
-                xSolvBTC: ["1", "cosmoshub-4", "bbn-1"],
-                pumpBTC: ["1", "cosmoshub-4", "bbn-1"],
-                stBTC: ["1", "cosmoshub-4", "bbn-1"],
-                enzoBTC: ["1", "cosmoshub-4", "bbn-1"],
-                mBTC: ["1", "cosmoshub-4", "bbn-1"],
-                kBTC: ["1", "cosmoshub-4", "bbn-1"],
-                eBTC: ["1", "cosmoshub-4", "bbn-1"],
-                WETH: ["1", "cosmoshub-4", "elys-1"],
-                WBTC: ["1", "cosmoshub-4", "bbn-1", "elys-1"],
-                USDT: ["1", "cosmoshub-4", "elys-1"],
-                PAXG: ["1", "cosmoshub-4", "elys-1"],
-                sUSDS: ["1", "cosmoshub-4"],
-                NIL: ["1", "cosmoshub-4", "nillion-1"],
-                SEDA: ["1", "cosmoshub-4", "seda-1"],
-                ORAI: ["1", "cosmoshub-4", "Oraichain"],
-                BABY: ["1", "cosmoshub-4", "bbn-1"],
-                ATOM: undefined,
-              }}
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
             />
           </div>
