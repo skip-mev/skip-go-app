@@ -23,7 +23,7 @@ body {
     width: 500px;
   }
   
-@media screen and (min-height: 800px) {
+@media screen and (min-height: 600px) {
     .widget-container {
         position: absolute;
         top: 50%;
