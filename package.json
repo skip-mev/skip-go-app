@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
-    "@initia/initia-registry": "^1.0.2",
+    "@initia/initia-registry": "^1.0.4",
     "@keplr-wallet/cosmos": "0.12.189",
     "@keplr-wallet/types": "^0.12.66",
     "@next/third-parties": "^15.2.3",
