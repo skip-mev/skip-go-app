@@ -17,7 +17,8 @@
     "test:e2e-2": "playwright test 2injectiveINJToCosmoshubATOM.spec.ts --project=chromium",
     "test:e2e-3": "playwright test 3cosmoshubAtomToNobleUSDC.spec.ts --project=chromium",
     "visdeps": "bash ./src/scripts/visdeps.sh",
-    "update-registries": "npx npm-check-updates chain-registry @initia/initia-registry -u && npm i && npm run chains:generate"
+    "update-registries": "npx npm-check-updates chain-registry @initia/initia-registry -u && npm i && npm run chains:generate",
+    "update-skip-go": "npx npm-check-updates @skip-go/client @skip-go/widget -u && npm i"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
@@ -31,8 +32,8 @@
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@skip-go/client": "^0.16.34",
-    "@skip-go/widget": "^3.8.6",
+    "@skip-go/client": "^0.17.0",
+    "@skip-go/widget": "^3.8.7",
     "@solana/web3.js": "^1.95.8",
     "@tailwindcss/forms": "^0.5.7",
     "@tanstack/query-sync-storage-persister": "^5.18.1",
