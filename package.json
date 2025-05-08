@@ -47,7 +47,7 @@
     "@vercel/edge-config": "^0.4.1",
     "autoprefixer": "^10.4.17",
     "axios": "^1.6.7",
-    "chain-registry": "^1.69.206",
+    "chain-registry": "^1.69.207",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
