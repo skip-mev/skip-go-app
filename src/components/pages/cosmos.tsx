@@ -64,7 +64,13 @@ export function CosmosPage() {
     >
       <main className="relative flex min-h-screen flex-col items-center">
         <div className="z-10 flex w-full flex-row items-center justify-between px-8 py-8 xl:px-12 ">
-          <CosmosIcon color={theme === "dark" ? "white" : "black"} />
+          <a
+            href="https://cosmos.network"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <CosmosIcon color={theme === "dark" ? "white" : "black"} />
+          </a>
           <div className="flex flex-row space-x-2">
             <ShareButton onClick={onClickedShareButton} />
             <DiscordButton />
