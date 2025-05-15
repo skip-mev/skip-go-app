@@ -79,6 +79,7 @@ export function SkipPage() {
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
               enableSentrySessionReplays
               enableAmplitudeAnalytics
+              disableShadowDom
               onRouteUpdated={onRouteUpdated}
               routeConfig={{
                 experimentalFeatures: ["hyperlane", "stargate", "eureka"],
