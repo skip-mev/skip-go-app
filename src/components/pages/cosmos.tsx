@@ -88,7 +88,7 @@ export function CosmosPage() {
               enableAmplitudeAnalytics
               onRouteUpdated={onRouteUpdated}
               routeConfig={{
-                experimentalFeatures: ["hyperlane", "stargate", "eureka"],
+                experimentalFeatures: ["hyperlane", "stargate", "eureka", "layer_zero"],
               }}
               settings={{
                 useUnlimitedApproval: true,
