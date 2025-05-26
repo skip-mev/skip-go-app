@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage, x-api-key",
 };
 
 const cleanOrigin = (str: string) => {
@@ -80,33 +80,39 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
     return NextResponse.next();
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
-  const isAllowed = await (async () => {
+  const apiKey = await (async () => {
     const domain = cleanOrigin(origin) || "";
     if (isPreview(domain)) {
-      const allowedPreviewData = await client.get("preview-namespace");
-      const allowedPreview = await stringArraySchema.parseAsync(allowedPreviewData);
-      if (allowedPreview.find((d) => domain.includes(d))) {
-        return true;
+      const allowedPreviewData = await client.get("testing-namespace");
+      const allowedPreview = await stringRecordSchema.parseAsync(allowedPreviewData);
+      const apiKey = allowedPreview[domain];
+      if (apiKey) {
+        return apiKey;
       }
     }
 
-    const allowedOriginsData = await client.get("allowed-origins");
-    const allowedOrigins = await stringArraySchema.parseAsync(allowedOriginsData);
-    return allowedOrigins.includes(domain);
+    const allowedOriginsData = await client.get("testing-origins");
+    const allowedOrigins = await stringRecordSchema.parseAsync(allowedOriginsData);
+    const apiKey = allowedOrigins[domain];
+    if (apiKey) {
+      return apiKey;
+    }
+    return undefined;
   })();
 
   // Handle preflighted requests
   const isPreflight = request.method === "OPTIONS";
   if (isPreflight) {
     const preflightHeaders = {
-      ...(isAllowed && { "Access-Control-Allow-Origin": origin }),
+      ...(apiKey && { "Access-Control-Allow-Origin": origin, "x-api-key": apiKey }),
       ...corsOptions,
     };
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  if (isAllowed) {
+  if (apiKey) {
     response.headers.set("Access-Control-Allow-Origin", origin);
+    response.headers.set("x-api-key", apiKey);
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
@@ -122,11 +128,10 @@ export async function middleware(request: NextRequest) {
   geoBlockMiddleware(request);
   response = await corsMiddleware(request, response);
   // response = abTestMiddleware(request, response);
-
   return response;
 }
 
-const stringArraySchema = z.array(z.string()).default([]);
+const stringRecordSchema = z.record(z.string());
 
 export const config = {
   matcher: ["/api/(.*)", "/"],
