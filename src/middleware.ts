@@ -104,7 +104,7 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   const isPreflight = request.method === "OPTIONS";
   if (isPreflight) {
     const preflightHeaders = {
-      ...(apiKey && { "Access-Control-Allow-Origin": origin, "x-api-key": apiKey }),
+      ...(apiKey && { "Access-Control-Allow-Origin": origin }),
       ...corsOptions,
     };
     return NextResponse.json({}, { headers: preflightHeaders });
@@ -112,7 +112,13 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
 
   if (apiKey) {
     response.headers.set("Access-Control-Allow-Origin", origin);
-    response.headers.set("x-api-key", apiKey);
+    response.cookies.set("x-api-key", apiKey, {
+      httpOnly: true, // Prevent access from JS
+      sameSite: "strict", // Avoid CSRF risk
+      path: "/api", // Limit to API routes
+      secure: true, // Only over HTTPS
+      maxAge: 60, // Short-lived (optional)
+    });
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
