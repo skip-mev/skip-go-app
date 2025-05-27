@@ -43,6 +43,8 @@ export default async function handler(req: NextApiRequest) {
       }
       return undefined;
     })();
+    console.warn("cleanOrigin", cleanOrigin(origin));
+    console.warn("whitelistedDomains", whitelistedDomains?.clientName);
 
     if (whitelistedDomains?.apiKey) {
       console.warn("Using whitelisted API key for request", whitelistedDomains.clientName);
