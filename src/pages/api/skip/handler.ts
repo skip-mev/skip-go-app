@@ -1,8 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import cookie from "cookie";
-import { NextApiRequest, PageConfig } from "next";
+import { createClient } from "@vercel/edge-config";
+import type { NextApiRequest } from "next";
+import { PageConfig } from "next";
 
 import { API_URL } from "@/constants/api";
+import { client } from "@/lib/edge-config";
+import { cleanOrigin, edgeConfigResponse, isPreview } from "@/utils/api";
 
 export const config: PageConfig = {
   api: {
@@ -15,16 +18,38 @@ export const config: PageConfig = {
 export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
-    const cookies = cookie.parse(req.headers.cookie || "");
-    const apiKey = cookies["x-api-key"];
 
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();
-    if (apiKey) {
-      headers.set("authorization", apiKey);
+
+    const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
+    const whitelistedDomains = await (async () => {
+      const domain = cleanOrigin(origin) || "";
+      if (isPreview(domain)) {
+        const allowedPreviewData = await client.get("testing-namespace");
+        const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
+        const apiKey = allowedPreview[domain];
+        if (apiKey) {
+          return apiKey;
+        }
+      }
+
+      const allowedOriginsData = await client.get("testing-origins");
+      const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
+      const apiKey = allowedOrigins[domain];
+      if (apiKey) {
+        return apiKey;
+      }
+      return undefined;
+    })();
+
+    if (whitelistedDomains?.apiKey) {
+      headers.set("authorization", whitelistedDomains.apiKey);
+    } else if (process.env.SKIP_API_KEY) {
+      headers.set("authorization", process.env.SKIP_API_KEY);
     }
-    console.warn("API Key:", apiKey);
+
     return fetch(uri, {
       body: req.body,
       method: req.method,
