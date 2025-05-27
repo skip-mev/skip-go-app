@@ -70,7 +70,7 @@ const geoBlockMiddleware = (request: NextRequest) => {
   }
 };
 
-const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
+const corsMiddleware = async (request: NextRequest) => {
   // Check the origin from the request
   const origin = request.headers.get("origin") ?? "";
 
@@ -99,6 +99,7 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
     }
     return undefined;
   })();
+  const headers = new Headers(request.headers);
 
   // Handle preflighted requests
   const isPreflight = request.method === "OPTIONS";
@@ -111,31 +112,25 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   }
 
   if (apiKey) {
-    response.headers.set("Access-Control-Allow-Origin", origin);
-    response.cookies.set("x-api-key", apiKey, {
-      httpOnly: true, // Prevent access from JS
-      sameSite: "strict", // Avoid CSRF risk
-      path: "/api", // Limit to API routes
-      secure: true, // Only over HTTPS
-      maxAge: 60, // Short-lived (optional)
-    });
+    headers.set("x-api-key", apiKey);
+    headers.set("Access-Control-Allow-Origin", origin);
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
-    response.headers.set(key, value);
+    headers.set(key, value);
   });
   console.warn("cleanOrigin:", cleanOrigin(origin));
   console.warn("CORS Origin:", origin);
   console.warn("middleware API Key:", apiKey);
 
-  return response;
+  return NextResponse.next({
+    headers: headers,
+  });
 };
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next();
-
   geoBlockMiddleware(request);
-  response = await corsMiddleware(request, response);
+  const response = await corsMiddleware(request);
   // response = abTestMiddleware(request, response);
   return response;
 }
