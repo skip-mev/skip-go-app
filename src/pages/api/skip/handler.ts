@@ -16,8 +16,9 @@ export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
 
-    const cookies = cookie.parse(req.headers.cookie || "");
-    const apiKey = cookies["x-api-key"];
+    const cookies = req.headers.cookie;
+    const apiKey = "test";
+    console.warn("cookies:", cookies);
 
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
@@ -25,8 +26,6 @@ export default async function handler(req: NextApiRequest) {
     if (apiKey) {
       headers.set("authorization", apiKey);
     }
-    console.warn("headers:", JSON.stringify(req.headers));
-    console.warn("API Key:", apiKey);
     return fetch(uri, {
       body: req.body,
       method: req.method,
