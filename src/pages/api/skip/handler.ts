@@ -20,10 +20,9 @@ export default async function handler(req: Request) {
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();
     if (apiKey) {
-      console.log("API Key:", apiKey);
       headers.set("authorization", apiKey);
     }
-
+    console.warn("API Key:", apiKey);
     return fetch(uri, {
       body: req.body,
       method: req.method,
