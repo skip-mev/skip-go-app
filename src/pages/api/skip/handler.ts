@@ -22,6 +22,7 @@ export default async function handler(req: Request) {
     if (apiKey) {
       headers.set("authorization", apiKey);
     }
+    console.warn("headers:", req.headers);
     console.warn("API Key:", apiKey);
     return fetch(uri, {
       body: req.body,
