@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { PageConfig } from "next";
+import cookie from "cookie";
+import { NextApiRequest, PageConfig } from "next";
 
 import { API_URL } from "@/constants/api";
 
@@ -11,11 +12,12 @@ export const config: PageConfig = {
   runtime: "edge",
 };
 
-export default async function handler(req: Request) {
+export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
+    const cookies = cookie.parse(req.headers.cookie || "");
+    const apiKey = cookies["x-api-key"];
 
-    const apiKey = req.headers.get("x-api-key");
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();

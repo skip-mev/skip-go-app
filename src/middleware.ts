@@ -112,7 +112,6 @@ const corsMiddleware = async (request: NextRequest) => {
   }
 
   if (apiKey) {
-    headers.set("x-api-key", apiKey);
     headers.set("Access-Control-Allow-Origin", origin);
   }
 
@@ -123,9 +122,18 @@ const corsMiddleware = async (request: NextRequest) => {
   console.warn("CORS Origin:", origin);
   console.warn("middleware API Key:", apiKey);
 
-  return NextResponse.next({
+  const response = NextResponse.next({
     headers: headers,
   });
+  if (apiKey) {
+    response.cookies.set("x-api-key", apiKey, {
+      httpOnly: true,
+      secure: true,
+      path: "/api",
+      maxAge: 60, // 1 min
+    });
+  }
+  return response;
 };
 
 export async function middleware(request: NextRequest) {
