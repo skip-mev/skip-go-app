@@ -45,6 +45,7 @@ export default async function handler(req: NextApiRequest) {
     })();
 
     if (whitelistedDomains?.apiKey) {
+      console.warn("Using whitelisted API key for request", whitelistedDomains.clientName);
       headers.set("authorization", whitelistedDomains.apiKey);
     } else if (process.env.SKIP_API_KEY) {
       headers.set("authorization", process.env.SKIP_API_KEY);
