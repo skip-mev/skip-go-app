@@ -2,9 +2,9 @@
 import { createClient } from "@vercel/edge-config";
 import type { NextApiRequest } from "next";
 import { PageConfig } from "next";
+import { NextRequest } from "next/server";
 
 import { API_URL } from "@/constants/api";
-import { client } from "@/lib/edge-config";
 import { cleanOrigin, edgeConfigResponse, isPreview } from "@/utils/api";
 
 export const config: PageConfig = {
@@ -15,9 +15,13 @@ export const config: PageConfig = {
   runtime: "edge",
 };
 
-export default async function handler(req: NextApiRequest) {
+export default async function handler(req: NextRequest) {
   try {
     const splitter = "/api/skip/";
+    const _origin = req.headers.get("origin");
+    if (!_origin) {
+      return new Response("Origin header is missing", { status: 400 });
+    }
 
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
@@ -25,7 +29,7 @@ export default async function handler(req: NextApiRequest) {
 
     const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
     const whitelistedDomains = await (async () => {
-      const domain = cleanOrigin(origin) || "";
+      const domain = cleanOrigin(_origin) || "";
       if (isPreview(domain)) {
         const allowedPreviewData = await client.get("testing-namespace");
         const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
@@ -43,7 +47,7 @@ export default async function handler(req: NextApiRequest) {
       }
       return undefined;
     })();
-    console.warn("cleanOrigin", cleanOrigin(origin));
+    console.warn("cleanOrigin", cleanOrigin(_origin));
     console.warn("whitelistedDomains", whitelistedDomains?.clientName);
 
     if (whitelistedDomains?.apiKey) {
