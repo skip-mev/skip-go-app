@@ -118,6 +118,8 @@ const corsMiddleware = async (request: NextRequest, response: NextResponse) => {
   Object.entries(corsOptions).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
+  console.warn("cleanOrigin:", cleanOrigin(origin));
+  console.warn("CORS Origin:", origin);
   console.warn("middleware API Key:", apiKey);
 
   return response;
