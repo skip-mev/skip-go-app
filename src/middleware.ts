@@ -66,7 +66,9 @@ const corsMiddleware = async (request: NextRequest) => {
       ...(whitelistedDomains && { "Access-Control-Allow-Origin": origin }),
       ...corsOptions,
     };
-    return NextResponse.json({}, { headers: preflightHeaders });
+    return NextResponse.rewrite(url, {
+      headers: preflightHeaders,
+    });
   }
 
   if (whitelistedDomains) {
@@ -77,7 +79,9 @@ const corsMiddleware = async (request: NextRequest) => {
     headers.set(key, value);
   });
 
-  return NextResponse.rewrite(url);
+  return NextResponse.rewrite(url, {
+    headers: headers,
+  });
 };
 
 export async function middleware(request: NextRequest) {
