@@ -16,52 +16,43 @@ export const config: PageConfig = {
 
 export default async function handler(req: NextApiRequest) {
   try {
-    const { origin: _origin } = req.query;
-    const origin = typeof _origin === "string" ? _origin : _origin?.[0];
-
     const splitter = "/api/skip/";
-    if (!origin) {
-      return new Response("This domain is not whitelisted, please our contact support", { status: 403 });
-    }
-
+    const _apiKey = req.headers["x-api-key"];
+    const apiKey = typeof _apiKey === "string" ? _apiKey : undefined;
+    console.warn("x-api-key", apiKey);
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
-    const url = new URL(uri);
-    url.searchParams.delete("origin");
     const headers = new Headers();
 
-    const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
-    const whitelistedDomains = await (async () => {
-      const domain = cleanOrigin(origin) || "";
-      if (isPreview(domain)) {
-        const allowedPreviewData = await client.get("testing-namespace");
-        const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
-        const apiKey = allowedPreview[domain];
-        if (apiKey) {
-          return apiKey;
-        }
-      }
+    // const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
+    // const whitelistedDomains = await (async () => {
+    //   const domain = cleanOrigin(origin) || "";
+    //   if (isPreview(domain)) {
+    //     const allowedPreviewData = await client.get("testing-namespace");
+    //     const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
+    //     const apiKey = allowedPreview[domain];
+    //     if (apiKey) {
+    //       return apiKey;
+    //     }
+    //   }
 
-      const allowedOriginsData = await client.get("testing-origins");
-      const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
-      const apiKey = allowedOrigins[domain];
-      if (apiKey) {
-        return apiKey;
-      }
-      return undefined;
-    })();
-    console.warn("cleanOrigin", cleanOrigin(origin));
-    console.warn("whitelistedDomains", whitelistedDomains?.clientName);
+    //   const allowedOriginsData = await client.get("testing-origins");
+    //   const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
+    //   const apiKey = allowedOrigins[domain];
+    //   if (apiKey) {
+    //     return apiKey;
+    //   }
+    //   return undefined;
+    // })();
 
-    if (whitelistedDomains?.apiKey) {
-      console.warn("Using whitelisted API key for request", whitelistedDomains.clientName);
-      headers.set("authorization", whitelistedDomains.apiKey);
+    if (apiKey) {
+      console.warn("Using whitelisted API key for request", apiKey);
+      headers.set("authorization", apiKey);
     } else if (process.env.SKIP_API_KEY) {
-      console.warn("Using default SKIP_API_KEY for request");
       headers.set("authorization", process.env.SKIP_API_KEY);
     }
     headers.set("Keep-Trace", "true");
-    return fetch(url, {
+    return fetch(uri, {
       body: req.body,
       method: req.method,
       headers,

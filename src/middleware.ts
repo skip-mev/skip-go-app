@@ -30,11 +30,10 @@ const geoBlockMiddleware = (request: NextRequest) => {
 const corsMiddleware = async (request: NextRequest) => {
   // Check the origin from the request
   const origin = request.headers.get("origin") ?? "";
-  const url = request.nextUrl.clone();
-  url.searchParams.set("origin", origin);
 
   if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
     console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
+
     return NextResponse.next();
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
@@ -66,21 +65,23 @@ const corsMiddleware = async (request: NextRequest) => {
       ...(whitelistedDomains && { "Access-Control-Allow-Origin": origin }),
       ...corsOptions,
     };
-    return NextResponse.rewrite(url, {
-      headers: preflightHeaders,
-    });
+    return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  if (whitelistedDomains) {
+  if (whitelistedDomains?.apiKey) {
     headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("x-api-key", whitelistedDomains.apiKey);
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
     headers.set(key, value);
   });
 
-  return NextResponse.rewrite(url, {
+  return NextResponse.next({
     headers: headers,
+    request: {
+      headers: headers,
+    },
   });
 };
 
