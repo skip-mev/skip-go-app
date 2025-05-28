@@ -79,10 +79,7 @@ const corsMiddleware = async (request: NextRequest) => {
   const response = NextResponse.next({
     headers: headers,
   });
-  response.cookies.set({
-    name: "origin",
-    value: origin,
-  });
+  response.cookies.set("origin", origin);
   return response;
 };
 
