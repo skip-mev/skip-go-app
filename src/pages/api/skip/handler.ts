@@ -2,7 +2,6 @@
 import { createClient } from "@vercel/edge-config";
 import type { NextApiRequest } from "next";
 import { PageConfig } from "next";
-import { NextRequest } from "next/server";
 
 import { API_URL } from "@/constants/api";
 import { cleanOrigin, edgeConfigResponse, isPreview } from "@/utils/api";
@@ -15,21 +14,25 @@ export const config: PageConfig = {
   runtime: "edge",
 };
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: NextApiRequest) {
   try {
+    const { origin: _origin } = req.query;
+    const origin = typeof _origin === "string" ? _origin : _origin?.[0];
+
     const splitter = "/api/skip/";
-    const _origin = req.headers.get("origin");
-    if (!_origin) {
-      return new Response("Origin header is missing", { status: 400 });
+    if (!origin) {
+      return new Response("This domain is not whitelisted, please our contact support", { status: 403 });
     }
 
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
+    const url = new URL(uri);
+    url.searchParams.delete("origin");
     const headers = new Headers();
 
     const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
     const whitelistedDomains = await (async () => {
-      const domain = cleanOrigin(_origin) || "";
+      const domain = cleanOrigin(origin) || "";
       if (isPreview(domain)) {
         const allowedPreviewData = await client.get("testing-namespace");
         const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
@@ -47,17 +50,18 @@ export default async function handler(req: NextRequest) {
       }
       return undefined;
     })();
-    console.warn("cleanOrigin", cleanOrigin(_origin));
+    console.warn("cleanOrigin", cleanOrigin(origin));
     console.warn("whitelistedDomains", whitelistedDomains?.clientName);
 
     if (whitelistedDomains?.apiKey) {
       console.warn("Using whitelisted API key for request", whitelistedDomains.clientName);
       headers.set("authorization", whitelistedDomains.apiKey);
     } else if (process.env.SKIP_API_KEY) {
+      console.warn("Using default SKIP_API_KEY for request");
       headers.set("authorization", process.env.SKIP_API_KEY);
     }
     headers.set("Keep-Trace", "true");
-    return fetch(uri, {
+    return fetch(url, {
       body: req.body,
       method: req.method,
       headers,
