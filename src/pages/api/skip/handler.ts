@@ -60,6 +60,7 @@ export default async function handler(req: NextApiRequest) {
       headers,
     });
   } catch (error) {
+    console.error("Error in handler:", error);
     const data = JSON.stringify({ error });
     return new Response(data, { status: 500 });
   }
