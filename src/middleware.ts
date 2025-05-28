@@ -77,9 +77,7 @@ const corsMiddleware = async (request: NextRequest) => {
     headers.set(key, value);
   });
 
-  return NextResponse.rewrite(url, {
-    headers: headers,
-  });
+  return NextResponse.rewrite(url);
 };
 
 export async function middleware(request: NextRequest) {
