@@ -5,7 +5,7 @@ import { cleanOrigin, edgeConfigResponse, isPreview } from "./utils/api";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage, x-api-key",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage",
 };
 
 // Donetsk and Luhansk Regions of Ukraine, Russia, Crimea, Cuba, Iran, North Korea or Syria
@@ -79,11 +79,7 @@ const corsMiddleware = async (request: NextRequest) => {
   const response = NextResponse.next({
     headers: headers,
   });
-  response.cookies.set("widget-test", "test");
-  response.cookies.set({
-    name: "widget-test-2",
-    value: "test2",
-  });
+  response.cookies.set("origin", origin);
   return response;
 };
 

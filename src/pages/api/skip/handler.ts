@@ -17,41 +17,38 @@ export const config: PageConfig = {
 export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
-    const _apiKey = req.cookies;
-    console.warn("Cookies:", req.cookies);
-    console.warn("req:", req);
-    console.warn("Headers:", req.headers);
-    console.warn("origin:", req.headers.origin);
-    const apiKey = typeof _apiKey === "string" ? _apiKey : undefined;
-    console.warn("x-api-key", apiKey);
+    const origin = req.cookies["origin"];
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();
+    if (!origin) {
+      throw new Error("Origin is missing");
+    }
 
-    // const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
-    // const whitelistedDomains = await (async () => {
-    //   const domain = cleanOrigin(origin) || "";
-    //   if (isPreview(domain)) {
-    //     const allowedPreviewData = await client.get("testing-namespace");
-    //     const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
-    //     const apiKey = allowedPreview[domain];
-    //     if (apiKey) {
-    //       return apiKey;
-    //     }
-    //   }
+    const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
+    const whitelistedDomains = await (async () => {
+      const domain = cleanOrigin(origin) || "";
+      if (isPreview(domain)) {
+        const allowedPreviewData = await client.get("testing-namespace");
+        const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
+        const apiKey = allowedPreview[domain];
+        if (apiKey) {
+          return apiKey;
+        }
+      }
 
-    //   const allowedOriginsData = await client.get("testing-origins");
-    //   const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
-    //   const apiKey = allowedOrigins[domain];
-    //   if (apiKey) {
-    //     return apiKey;
-    //   }
-    //   return undefined;
-    // })();
+      const allowedOriginsData = await client.get("testing-origins");
+      const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
+      const apiKey = allowedOrigins[domain];
+      if (apiKey) {
+        return apiKey;
+      }
+      return undefined;
+    })();
 
-    if (apiKey) {
-      console.warn("Using whitelisted API key for request", apiKey);
-      headers.set("authorization", apiKey);
+    if (whitelistedDomains?.apiKey) {
+      console.warn("Using whitelisted API key for request", whitelistedDomains?.apiKey);
+      headers.set("authorization", whitelistedDomains?.apiKey);
     } else if (process.env.SKIP_API_KEY) {
       headers.set("authorization", process.env.SKIP_API_KEY);
     }
