@@ -18,6 +18,7 @@ export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
     const _apiKey = req.headers["x-api-key"];
+    console.warn(req.headers);
     const apiKey = typeof _apiKey === "string" ? _apiKey : undefined;
     console.warn("x-api-key", apiKey);
     const [...args] = req.url!.split(splitter).pop()!.split("/");
