@@ -70,19 +70,21 @@ const corsMiddleware = async (request: NextRequest) => {
 
   if (whitelistedDomains?.apiKey) {
     headers.set("Access-Control-Allow-Origin", origin);
-    headers.set("x-api-key", whitelistedDomains.apiKey);
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
     headers.set(key, value);
   });
 
-  return NextResponse.next({
+  const response = NextResponse.next({
     headers: headers,
-    request: {
-      headers: headers,
-    },
   });
+  response.cookies.set("widget-test", "test");
+  response.cookies.set({
+    name: "widget-test-2",
+    value: "test2",
+  });
+  return response;
 };
 
 export async function middleware(request: NextRequest) {

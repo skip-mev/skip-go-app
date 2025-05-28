@@ -17,7 +17,9 @@ export const config: PageConfig = {
 export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
-    const _apiKey = req.headers["x-api-key"];
+    const _apiKey = req.cookies;
+    console.warn("Cookies:", req.cookies);
+    console.warn("req:", req);
     console.warn(req.headers);
     const apiKey = typeof _apiKey === "string" ? _apiKey : undefined;
     console.warn("x-api-key", apiKey);
