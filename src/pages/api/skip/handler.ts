@@ -20,7 +20,8 @@ export default async function handler(req: NextApiRequest) {
     const _apiKey = req.cookies;
     console.warn("Cookies:", req.cookies);
     console.warn("req:", req);
-    console.warn(req.headers);
+    console.warn("Headers:", req.headers);
+    console.warn("origin:", req.headers.origin);
     const apiKey = typeof _apiKey === "string" ? _apiKey : undefined;
     console.warn("x-api-key", apiKey);
     const [...args] = req.url!.split(splitter).pop()!.split("/");
