@@ -18,6 +18,8 @@ export default async function handler(req: NextApiRequest) {
   try {
     const splitter = "/api/skip/";
     const origin = req.cookies["origin"];
+    console.warn("req", req);
+    console.warn("cookies", req.cookies);
     console.warn("origin", origin);
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
