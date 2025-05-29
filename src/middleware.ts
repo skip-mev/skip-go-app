@@ -42,17 +42,17 @@ const corsMiddleware = async (request: NextRequest) => {
     if (isPreview(domain)) {
       const allowedPreviewData = await client.get("new-preview-namespace");
       const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
-      const apiKey = allowedPreview[domain];
-      if (apiKey) {
-        return apiKey;
+      const isAllowed = allowedPreview[domain];
+      if (isAllowed) {
+        return isAllowed;
       }
     }
 
     const allowedOriginsData = await client.get("new-allowed-origins");
     const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
-    const apiKey = allowedOrigins[domain];
-    if (apiKey) {
-      return apiKey;
+    const isAllowed = allowedOrigins[domain];
+    if (isAllowed) {
+      return isAllowed;
     }
     return undefined;
   })();
@@ -68,7 +68,7 @@ const corsMiddleware = async (request: NextRequest) => {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  if (whitelistedDomains?.apiKey) {
+  if (whitelistedDomains) {
     headers.set("Access-Control-Allow-Origin", origin);
   }
 
