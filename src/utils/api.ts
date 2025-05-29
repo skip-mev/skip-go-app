@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 
 import { type FallbackEndpointFn, getWhitelabelEndpoint } from "@/config/endpoints";
 
@@ -63,3 +64,54 @@ export function getPrivateAuthHeader() {
   const userpass = `${process.env.POLKACHU_USER}:${process.env.POLKACHU_PASSWORD}`;
   return `Basic ${Buffer.from(userpass).toString("base64")}`;
 }
+
+export const edgeConfigResponse = z.record(
+  z.object({
+    clientName: z.string().optional(),
+    apiKey: z.string().optional(),
+  }),
+);
+
+export const cleanOrigin = (str: string) => {
+  try {
+    const url = new URL(str);
+    let domain = url.hostname;
+
+    // Remove www.
+    if (domain.startsWith("www.")) {
+      domain = domain.slice(4);
+    }
+
+    return domain;
+  } catch (error) {
+    return str; // Return the original string if it's not a valid URL
+  }
+};
+
+export const isVercelPreview = (str: string) => {
+  if (str.endsWith("vercel.app")) {
+    return true;
+  }
+  return false;
+};
+
+export const isNetlifyPreview = (str: string) => {
+  if (str.endsWith("netlify.app")) {
+    return true;
+  }
+  return false;
+};
+
+export const isCloudflarePreview = (str: string) => {
+  if (str.endsWith("pages.dev") || str.endsWith("trycloudflare.com")) {
+    return true;
+  }
+  return false;
+};
+
+export const isPreview = (str: string) => {
+  if (isVercelPreview(str) || isCloudflarePreview(str) || isNetlifyPreview(str)) {
+    return true;
+  }
+  return false;
+};
