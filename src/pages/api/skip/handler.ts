@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { createClient } from "@vercel/edge-config";
-import type { NextApiRequest } from "next";
 import { PageConfig } from "next";
 import { NextRequest } from "next/server";
 
@@ -44,7 +43,7 @@ export default async function handler(req: NextRequest) {
         }
       }
 
-      const allowedOriginsData = await client.get("origins");
+      const allowedOriginsData = await client.get("allowed-origins");
       const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
       const apiKey = allowedOrigins[domain];
       if (apiKey) {
