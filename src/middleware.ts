@@ -42,7 +42,7 @@ const corsMiddleware = async (request: NextRequest) => {
     if (isPreview(domain)) {
       const allowedPreviewData = await client.get("new-preview-namespace");
       const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
-      const isAllowed = allowedPreview[domain];
+      const isAllowed = Object.keys(allowedPreview).find((key) => domain.includes(key));
       if (isAllowed) {
         return isAllowed;
       }
