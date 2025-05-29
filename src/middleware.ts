@@ -40,7 +40,7 @@ const corsMiddleware = async (request: NextRequest) => {
   const whitelistedDomains = await (async () => {
     const domain = cleanOrigin(origin) || "";
     if (isPreview(domain)) {
-      const allowedPreviewData = await client.get("testing-namespace");
+      const allowedPreviewData = await client.get("preview-namespace");
       const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
       const apiKey = allowedPreview[domain];
       if (apiKey) {
@@ -48,7 +48,7 @@ const corsMiddleware = async (request: NextRequest) => {
       }
     }
 
-    const allowedOriginsData = await client.get("testing-origins");
+    const allowedOriginsData = await client.get("allowed-origins");
     const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
     const apiKey = allowedOrigins[domain];
     if (apiKey) {

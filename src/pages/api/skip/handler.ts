@@ -36,7 +36,7 @@ export default async function handler(req: NextRequest) {
     const whitelistedDomains = await (async () => {
       const domain = cleanOrigin(origin) || "";
       if (isPreview(domain)) {
-        const allowedPreviewData = await client.get("testing-namespace");
+        const allowedPreviewData = await client.get("preview-namespace");
         const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
         const apiKey = allowedPreview[domain];
         if (apiKey) {
@@ -44,7 +44,7 @@ export default async function handler(req: NextRequest) {
         }
       }
 
-      const allowedOriginsData = await client.get("testing-origins");
+      const allowedOriginsData = await client.get("origins");
       const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
       const apiKey = allowedOrigins[domain];
       if (apiKey) {
@@ -54,10 +54,8 @@ export default async function handler(req: NextRequest) {
     })();
 
     if (whitelistedDomains?.apiKey) {
-      console.warn("Using whitelisted API key for request", whitelistedDomains?.clientName);
       headers.set("authorization", whitelistedDomains?.apiKey);
     } else if (process.env.SKIP_API_KEY) {
-      console.warn("Using default SKIP_API_KEY for request");
       headers.set("authorization", process.env.SKIP_API_KEY);
     }
     headers.set("Keep-Trace", "true");
