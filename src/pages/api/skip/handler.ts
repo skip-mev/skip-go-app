@@ -18,14 +18,10 @@ export default async function handler(req: NextRequest) {
   try {
     const splitter = "/api/skip/";
     const origin = req.headers.get("origin") ?? "";
-    console.warn("origin", origin);
 
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();
-    if (!origin) {
-      throw new Error("Origin is missing");
-    }
 
     if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
       throw new Error("ALLOWED_LIST_EDGE_CONFIG is not set");
@@ -35,7 +31,7 @@ export default async function handler(req: NextRequest) {
     const whitelistedDomains = await (async () => {
       const domain = cleanOrigin(origin) || "";
       if (isPreview(domain)) {
-        const allowedPreviewData = await client.get("preview-namespace");
+        const allowedPreviewData = await client.get("new-preview-namespace");
         const allowedPreview = await edgeConfigResponse.parseAsync(allowedPreviewData);
         const apiKey = allowedPreview[domain];
         if (apiKey) {
@@ -43,7 +39,7 @@ export default async function handler(req: NextRequest) {
         }
       }
 
-      const allowedOriginsData = await client.get("allowed-origins");
+      const allowedOriginsData = await client.get("new-allowed-origins");
       const allowedOrigins = await edgeConfigResponse.parseAsync(allowedOriginsData);
       const apiKey = allowedOrigins[domain];
       if (apiKey) {
