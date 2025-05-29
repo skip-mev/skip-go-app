@@ -2,6 +2,7 @@
 import { createClient } from "@vercel/edge-config";
 import type { NextApiRequest } from "next";
 import { PageConfig } from "next";
+import { headers as nextHeaders } from "next/headers";
 
 import { API_URL } from "@/constants/api";
 import { cleanOrigin, edgeConfigResponse, isPreview } from "@/utils/api";
@@ -11,11 +12,14 @@ export const config: PageConfig = {
     externalResolver: true,
     bodyParser: false,
   },
-  runtime: "edge",
+  runtime: "nodejs",
 };
 
 export default async function handler(req: NextApiRequest) {
   try {
+    const headersList = nextHeaders();
+    console.log("Headers List:", headersList);
+
     const splitter = "/api/skip/";
     const origin = req.cookies["origin"];
     console.warn("req", req);
