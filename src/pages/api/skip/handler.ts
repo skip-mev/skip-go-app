@@ -20,7 +20,12 @@ export default async function handler(req: NextApiRequest) {
     const origin = req.cookies["origin"];
     console.warn("req", req);
     console.warn("cookies", req.cookies);
+
     console.warn("origin", origin);
+
+    console.warn("req.headers.origin", req.headers.origin);
+    console.warn("req.", req.headers.referer);
+
     const [...args] = req.url!.split(splitter).pop()!.split("/");
     const uri = [API_URL, ...args].join("/");
     const headers = new Headers();
