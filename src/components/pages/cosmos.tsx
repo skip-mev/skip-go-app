@@ -113,6 +113,7 @@ export function CosmosPage() {
               }}
               disableShadowDom
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
+              hideAssetsUnlessWalletTypeConnected={true}
             />
           </div>
         </div>
