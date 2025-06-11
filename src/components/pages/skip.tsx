@@ -105,6 +105,7 @@ export function SkipPage() {
                   "1329": ["0xB75D0B03c06A926e488e2659DF1A861F860bD3d1"],
                 },
               }}
+              hideAssetsUnlessWalletTypeConnected={true}
             />
           </div>
         </div>
