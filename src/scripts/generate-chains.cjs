@@ -8,28 +8,30 @@ const registries = [
   {
     packageName: "chain-registry",
     registryPath: path.resolve(__dirname, "../../node_modules/chain-registry"),
+    isCamelCase: true,
   },
   {
     packageName: "initia-registry",
     registryPath: path.resolve(__dirname, "../../node_modules/@initia/initia-registry/main"),
+    isCamelCase: false,
   },
 ];
 
-async function collectMainnetChains({ registryPath, packageName }) {
+async function collectMainnetChains({ registryPath, packageName, isCamelCase }) {
   const mainnetDir = path.join(registryPath, "mainnet");
-  const mainnetRpc = await collectChainData(mainnetDir, packageName, "mainnet", "rpc");
-  const mainnetRest = await collectChainData(mainnetDir, packageName, "mainnet", "rest");
+  const mainnetRpc = await collectChainData(mainnetDir, packageName, "mainnet", "rpc", isCamelCase);
+  const mainnetRest = await collectChainData(mainnetDir, packageName, "mainnet", "rest", isCamelCase);
   return { rpc: mainnetRpc, rest: mainnetRest };
 }
 
-async function collectTestnetChains({ registryPath, packageName }) {
+async function collectTestnetChains({ registryPath, packageName, isCamelCase }) {
   const testnetDir = path.join(registryPath, "testnet");
-  const testnetRpc = await collectChainData(testnetDir, packageName, "testnet", "rpc");
-  const testnetRest = await collectChainData(testnetDir, packageName, "testnet", "rest");
+  const testnetRpc = await collectChainData(testnetDir, packageName, "testnet", "rpc", isCamelCase);
+  const testnetRest = await collectChainData(testnetDir, packageName, "testnet", "rest", isCamelCase);
   return { rpc: testnetRpc, rest: testnetRest };
 }
 
-async function collectChainData(directory, packageName, networkType, apiType) {
+async function collectChainData(directory, packageName, networkType, apiType, isCamelCase) {
   const chains = [];
   try {
     const dirEntries = await fs.readdir(directory, { withFileTypes: true });
@@ -43,8 +45,14 @@ async function collectChainData(directory, packageName, networkType, apiType) {
           const chainData = chainModule.default || chainModule;
           const chainArray = Array.isArray(chainData) ? chainData : [chainData];
           const chain = chainArray[0];
-          const extractedData = apiType === "rpc" ? extractRpc(chain) : extractRest(chain);
-          chains.push(extractedData);
+          if (isCamelCase) {
+            const extractedData = apiType === "rpc" ? extractCamelCaseRpc(chain) : extractCamelCaseRest(chain);
+            chains.push(extractedData);
+          } else {
+            const extractedData = apiType === "rpc" ? extractRpc(chain) : extractRest(chain);
+            chains.push(extractedData);
+          }
+
         } catch (error) {
           console.warn(`Error generating chain info for ${chainName} in ${packageName}:`, error.message);
         }
@@ -72,6 +80,26 @@ function extractRest(chain) {
     chainId: chain.chain_id,
     rest: chain.apis.rest.map((rest) => rest.address),
     chainName: chain.chain_name,
+  };
+
+  return chainInfo;
+}
+
+function extractCamelCaseRpc(chain) {
+  const chainInfo = {
+    chainId: chain.chainId,
+    rpc: chain.apis.rpc.map((rpc) => rpc.address),
+    chainName: chain.chainName,
+  };
+
+  return chainInfo;
+}
+
+function extractCamelCaseRest(chain) {
+  const chainInfo = {
+    chainId: chain.chainId,
+    rest: chain.apis.rest.map((rest) => rest.address),
+    chainName: chain.chainName,
   };
 
   return chainInfo;
