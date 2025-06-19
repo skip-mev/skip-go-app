@@ -1,21 +1,23 @@
-import { useMemo } from "react";
 import { defaultTheme, lightTheme, Widget } from "widgetv2";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
+import { ProInterface } from "@/components/ProInterface";
+import { ProToggle } from "@/components/ProToggle";
 import WidgetButton from "@/components/WidgetButton";
 import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
+import { useProMode } from "@/contexts/ProModeContext";
 import { useTheme } from "@/hooks/useTheme";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
-import { isMobile } from "@/utils/os";
 import { cn } from "@/utils/ui";
 
 export default function Home() {
   const defaultRoute = useURLQueryParams();
   const goFast = useFeatureEnabled("goFastEnabled");
   const theme = useTheme();
-  const mobile = useMemo(() => isMobile(), []);
+  const { isProMode } = useProMode();
+
 
   if (!theme) return null;
   return (
@@ -35,34 +37,43 @@ export default function Home() {
       <main className="relative flex min-h-screen flex-col items-center">
         <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
-          <div className="flex flex-row space-x-2">
-            <WidgetButton />
-            <DiscordButton />
+          <div className="flex flex-row items-center space-x-4">
+            <ProToggle />
+            <div className="flex flex-row space-x-2">
+              <WidgetButton />
+              <DiscordButton />
+            </div>
           </div>
         </div>
-        <div className="flex flex-grow flex-col items-center pt-16">
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              transform: "translateY(-185px)",
-              width: "100%",
-              maxWidth: "500px",
-              padding: "0 10px",
-            }}
-          >
-            <Widget
-              theme={theme === "dark" ? defaultTheme : lightTheme}
-              endpointOptions={endpointOptions}
-              apiUrl={apiURL}
-              defaultRoute={defaultRoute}
-              routeConfig={{
-                goFast,
+        {isProMode ? (
+          <div className="flex-grow w-full px-6 pb-6">
+            <ProInterface isOpen={isProMode} />
+          </div>
+        ) : (
+          <div className="flex flex-grow flex-col items-center pt-16">
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-185px)",
+                width: "100%",
+                maxWidth: "500px",
+                padding: "0 10px",
               }}
-              onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
-            />
+            >
+              <Widget
+                theme={theme === "dark" ? defaultTheme : lightTheme}
+                endpointOptions={endpointOptions}
+                apiUrl={apiURL}
+                defaultRoute={defaultRoute}
+                routeConfig={{
+                  goFast,
+                }}
+                onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
