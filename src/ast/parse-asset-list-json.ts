@@ -11,11 +11,15 @@ interface Args {
 export async function parseAssetListJson({ registryPath, chainPath }: Args) {
   const jsonPath = path.resolve(registryPath, chainPath, "assetlist.json");
 
+  // TODO: Revisit initia assetlist config parsing - improve validation and error handling
+  // for initia-specific asset structures and ensure all asset types (CW20, ERC20) are properly included
+  
   let data: AssetList;
   try {
     const content = await fs.readFile(jsonPath, "utf-8");
     data = await assetListSchema.parseAsync(JSON.parse(content));
   } catch (error) {
+    console.warn(`Skipping asset list for ${chainPath}:`, error instanceof Error ? error.message : error);
     data = {
       chain_name: chainPath,
       assets: [],

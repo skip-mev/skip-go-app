@@ -35,30 +35,35 @@ export async function parseChainPaths({
   const chainInfosRecord: Record<string, ChainInfo> = {};
 
   async function loadChainPath(_registryPath: string, chainPath: string) {
-    const [assetlist, chain] = await Promise.all([
-      parseAssetListJson({ registryPath: _registryPath, chainPath }),
-      parseChainJson({ registryPath: _registryPath, chainPath }),
-    ]);
+    try {
+      const [assetlist, chain] = await Promise.all([
+        parseAssetListJson({ registryPath: _registryPath, chainPath }),
+        parseChainJson({ registryPath: _registryPath, chainPath }),
+      ]);
 
-    chains.push(chain);
-    assetlists.push(assetlist);
+      chains.push(chain);
+      assetlists.push(assetlist);
 
-    chainIds.push(chain.chain_id);
-    chainNames.push(chain.chain_name);
+      chainIds.push(chain.chain_id);
+      chainNames.push(chain.chain_name);
 
-    chainIdToName[chain.chain_id] = chain.chain_name;
-    chainIdToPrettyName[chain.chain_id] = chain.pretty_name;
+      chainIdToName[chain.chain_id] = chain.chain_name;
+      chainIdToPrettyName[chain.chain_id] = chain.pretty_name;
 
-    chainNameToId[chain.chain_name] = chain.chain_id;
+      chainNameToId[chain.chain_name] = chain.chain_id;
 
-    chainRecord[chain.chain_id] = chain;
-    assetsRecord[chain.chain_id] = assetlist.assets;
-    explorersRecord[chain.chain_id] = chain.explorers || [];
-    if (assetlist.assets.length > 0)
-      chainInfosRecord[chain.chain_id] = chainToChainInfo({
-        chain,
-        assetlist,
-      });
+      chainRecord[chain.chain_id] = chain;
+      assetsRecord[chain.chain_id] = assetlist.assets;
+      explorersRecord[chain.chain_id] = chain.explorers || [];
+      if (assetlist.assets.length > 0)
+        chainInfosRecord[chain.chain_id] = chainToChainInfo({
+          chain,
+          assetlist,
+        });
+    } catch (error) {
+      // TODO: Revisit chain parsing validation - improve error handling for chains with invalid schemas
+      console.warn(`Skipping chain ${chainPath} due to parsing error:`, error instanceof Error ? error.message : error);
+    }
   }
 
   await pMap(chainPaths, (i) => loadChainPath(registryPath, i), { concurrency });

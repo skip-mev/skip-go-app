@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { blackA } = require("@radix-ui/colors");
+const { blackA, violet, whiteA } = require("@radix-ui/colors");
 
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
@@ -38,6 +38,16 @@ module.exports = {
       },
       colors: {
         ...blackA,
+        ...violet,
+        ...whiteA,
+        foreground: {
+          DEFAULT: "#000000",
+          dark: "#ffffff",
+        },
+        background: {
+          DEFAULT: "#ffffff",
+          dark: "#191919",
+        },
       },
       fontFamily: {
         sans: ["Jost", ...defaultTheme.fontFamily.sans],

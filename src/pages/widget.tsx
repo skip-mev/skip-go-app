@@ -1,7 +1,7 @@
 import { SwapWidgetWithoutProviders } from "widgetv1";
+import { SwapWidgetProvider } from "widgetv1";
 
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
-import { SwapWidgetProvider } from "widgetv1";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 
 export default function WidgetPage() {
