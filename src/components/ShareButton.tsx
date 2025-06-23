@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { isCosmosDomain } from "@/pages";
+import { track } from "@/lib/amplitude";
 
 import styles from "./button.module.css";
 import cosmosStyles from "./cosmos/cosmos.module.css";
@@ -10,6 +11,7 @@ const ShareButton = ({ onClick }: { onClick?: () => void }) => {
 
   const handleOnClick = () => {
     onClick?.();
+    track("connect eco row: share button - clicked");
     setIsShowingCopyToClipboardFeedback(true);
     setTimeout(() => {
       setIsShowingCopyToClipboardFeedback(false);

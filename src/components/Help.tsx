@@ -1,3 +1,5 @@
+import { track } from "@/lib/amplitude";
+
 export const Help = () => {
   return (
     <div className="fixed bottom-2 right-2 rounded-full bg-white px-4 py-2 shadow-xl">
@@ -8,6 +10,7 @@ export const Help = () => {
           target="_blank"
           rel="noreferrer"
           className="text-blue-500 hover:text-blue-600 hover:underline"
+          onClick={() => track("connect eco row: help button - clicked")}
         >
           Discord
         </a>

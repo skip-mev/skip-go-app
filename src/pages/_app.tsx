@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React from "react";
+import { initAmplitude } from "@/lib/amplitude";
 
 import { DefaultSeo } from "@/components/DefaultSeo";
 
@@ -11,6 +12,10 @@ export const isCosmosDomain = process.env.NEXT_PUBLIC_COSMOS_DOMAIN === "true";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = React.useState(() => new QueryClient());
+
+  React.useEffect(() => {
+    initAmplitude();
+  }, []);
 
   isCosmosDomain ? require("../styles/cosmosGlobals.css") : require("../styles/globals.css");
 
