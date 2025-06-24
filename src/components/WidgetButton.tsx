@@ -1,5 +1,5 @@
-import ArrowIcon from "./ArrowIcon";
 import styles from "./button.module.css";
+import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
 
 const WidgetButton = () => (
   <a
@@ -8,7 +8,7 @@ const WidgetButton = () => (
     target="_blank"
   >
     Build with Skip:Go
-    <ArrowIcon />
+    <ThinArrowIcon />
   </a>
 );
 

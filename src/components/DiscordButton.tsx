@@ -1,6 +1,5 @@
 import { isCosmosDomain } from "@/pages";
 
-import ArrowIcon from "./ArrowIcon";
 import styles from "./button.module.css";
 import cosmosStyles from "./cosmos/cosmos.module.css";
 import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
@@ -12,7 +11,7 @@ const DiscordButton = () => (
     target="_blank"
   >
     Need Help?
-    {isCosmosDomain ? <ThinArrowIcon /> : <ArrowIcon />}
+    <ThinArrowIcon />
   </a>
 );
 

@@ -60,10 +60,10 @@ export function SkipPage() {
         theme === "dark" ? "before:bg-[url(/dark-bg.svg)]" : theme === "light" ? "before:bg-[url(/light-bg.svg)]" : "",
       )}
     >
-      <main className="relative flex min-h-screen flex-col items-center">
-        <div className="flex h-20 w-full flex-row items-center justify-between px-6 py-4">
+      <main className="relative flex min-h-screen flex-col">
+        <div className="flex w-full flex-row justify-between px-6 py-4">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
-          <div className="flex flex-row space-x-2">
+          <div className="flex flex-col items-end gap-[10px]">
             <ShareButton onClick={onClickedShareButton} />
             <WidgetButton />
             <DiscordButton />
@@ -107,13 +107,14 @@ export function SkipPage() {
               }}
               hideAssetsUnlessWalletTypeConnected={true}
             />
+            {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
+            process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
+            process.env.NEXT_PUBLIC_BANNER_TITLE ? (
+              <Banner />
+            ) : null}
           </div>
         </div>
-        {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
-        process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
-        process.env.NEXT_PUBLIC_BANNER_TITLE ? (
-          <Banner />
-        ) : null}
+
       </main>
     </div>
   );
