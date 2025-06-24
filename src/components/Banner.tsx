@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import styles from "./Banner.module.css";
 import { CloseIcon } from "./CloseIcon";
 
-export const Banner = (theme: "dark" | "light") => {
+export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [bannerRoot, setBannerRoot] = useState<HTMLElement | null>(null);
   const [showBanner, setShowBanner] = useState(true);
@@ -28,14 +28,12 @@ export const Banner = (theme: "dark" | "light") => {
     setBannerRoot(el);
   }, []);
 
-  console.log(process.env.NEXT_PUBLIC_BANNER_MESSAGE);
-
   const bannerElement = showBanner ? (
     <div className={styles.bannerContainer}>
       <a
         href={process.env.NEXT_PUBLIC_BANNER_LINK}
         target="_blank"
-        className={`flex flex-col gap-[18px] rounded-[10px]  p-[18px] text-black ${theme === "light" ? "bg-white" : "bg-black"}`}
+        className={`flex flex-col gap-[18px] rounded-[10px]  p-[18px] ${theme === "light" ? "bg-white text-black" : "bg-black text-white"}`}
       >
         <strong
           className={`flex items-center justify-between font-diatype text-[15px] ${theme === "light" ? "text-black" : "text-white"}`}
