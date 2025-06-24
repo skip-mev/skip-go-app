@@ -110,7 +110,7 @@ export function SkipPage() {
             {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
             process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
             process.env.NEXT_PUBLIC_BANNER_TITLE ? (
-              <Banner />
+              <Banner theme={theme} />
             ) : null}
           </div>
         </div>
