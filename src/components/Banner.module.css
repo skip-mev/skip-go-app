@@ -18,6 +18,9 @@
     position: fixed;
     padding: 18px 18px 22px 18px;
   }
+  .bannerContainer > a {
+    max-width: 480px;
+  }
 }
 
 .closeIcon:hover {
