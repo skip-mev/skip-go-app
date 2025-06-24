@@ -3,7 +3,7 @@ import { isCosmosDomain } from "@/pages";
 import ArrowIcon from "./ArrowIcon";
 import styles from "./button.module.css";
 import cosmosStyles from "./cosmos/cosmos.module.css";
-import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
+import { ThinArrowIcon } from "./ThinArrowIcon";
 
 const DiscordButton = () => (
   <a
