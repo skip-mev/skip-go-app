@@ -10,7 +10,7 @@ export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
   const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 830px)");
+    const mediaQuery = window.matchMedia("(min-width: 900px)");
     const update = () => setIsDesktop(mediaQuery.matches);
     update();
 
