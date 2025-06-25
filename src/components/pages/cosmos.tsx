@@ -115,6 +115,11 @@ export function CosmosPage() {
               assetSymbolsSortedToTop={process.env.NEXT_PUBLIC_ASSET_SYMBOLS_SORTED_TO_TOP?.split(",")}
               hideAssetsUnlessWalletTypeConnected={true}
             />
+            {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
+            process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
+            process.env.NEXT_PUBLIC_BANNER_TITLE ? (
+              <Banner theme={theme} />
+            ) : null}
           </div>
         </div>
         <div className="flex w-full items-center justify-center px-10 py-4 lg:bottom-0">
@@ -122,11 +127,6 @@ export function CosmosPage() {
             <u>go.cosmos.network</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
           </p>
         </div>
-        {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
-        process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
-        process.env.NEXT_PUBLIC_BANNER_TITLE ? (
-          <Banner />
-        ) : null}
       </main>
     </div>
   );
