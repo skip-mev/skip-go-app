@@ -1,0 +1,28 @@
+.bannerContainer {
+  right: 0;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.bannerContainer > a {
+  pointer-events: all;
+}
+
+@media screen and (min-width: 900px) {
+  .bannerContainer{
+    position: fixed;
+    padding: 18px 18px 22px 18px;
+  }
+  .bannerContainer > a {
+    max-width: 480px;
+  }
+}
+
+.closeIcon:hover {
+  cursor: pointer;
+}

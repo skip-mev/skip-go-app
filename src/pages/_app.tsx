@@ -6,8 +6,10 @@ import Head from "next/head";
 import React from "react";
 
 import { DefaultSeo } from "@/components/DefaultSeo";
+import { initAmplitude } from "@/utils/initAmplitude";
 
 export default function App({ Component, pageProps }: AppProps) {
+  initAmplitude();
   const [queryClient] = React.useState(() => new QueryClient());
 
   require("../styles/globals.css");

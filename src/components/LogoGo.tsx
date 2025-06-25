@@ -6,7 +6,7 @@ export const LogoGo = ({
   color?: string;
 } = {}) => (
   <svg
-    className={styles.gologo}
+    className={`${styles.gologo} h-[48px]`}
     viewBox="0 0 176 51"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
