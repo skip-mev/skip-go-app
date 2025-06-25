@@ -1,18 +1,15 @@
-import styles from "./LogoGo.module.css";
-
 export const LogoGo = ({
   color = "black",
 }: {
   color?: string;
 } = {}) => (
   <svg
-    className={`${styles.gologo} h-[48px]`}
+    className="h-[48px]"
     viewBox="0 0 176 51"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      className={styles.o}
       d="M161.389 34.7492C163.911 34.7492 165.815 32.8457 165.815 30.3233C165.815 27.8009 163.911 25.8975 161.389 25.8975C158.866 25.8975 156.963 27.8009 156.963 30.3233C156.963 32.8457 158.866 34.7492 161.389 34.7492ZM146.734 30.3233L151.302 16.9034H171.478L176 30.3233L171.478 43.7432H151.302L146.734 30.3233Z"
       fill={color}
     />
