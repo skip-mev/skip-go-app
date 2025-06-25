@@ -1,15 +1,12 @@
 import { track } from "@amplitude/analytics-browser";
 
-import { isCosmosDomain } from "@/pages";
-
 import styles from "./button.module.css";
-import cosmosStyles from "./cosmos/cosmos.module.css";
-import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
+import { ThinArrowIcon } from "./ThinArrowIcon";
 
 const DiscordButton = () => (
   <a
-    className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} font-diatype`}
-    href={isCosmosDomain ? "https://discord.gg/interchain" : "https://skip.build/discord"}
+    className={`${styles.skipbutton} font-diatype`}
+    href={"https://discord.gg/interchain"}
     target="_blank"
     onClick={() => {
       track("go app need help button - clicked");

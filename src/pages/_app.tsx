@@ -8,13 +8,11 @@ import React from "react";
 import { DefaultSeo } from "@/components/DefaultSeo";
 import { initAmplitude } from "@/utils/initAmplitude";
 
-export const isCosmosDomain = process.env.NEXT_PUBLIC_COSMOS_DOMAIN === "true";
-
 export default function App({ Component, pageProps }: AppProps) {
   initAmplitude();
   const [queryClient] = React.useState(() => new QueryClient());
 
-  isCosmosDomain ? require("../styles/cosmosGlobals.css") : require("../styles/globals.css");
+  require("../styles/globals.css");
 
   return (
     <>
@@ -22,30 +20,30 @@ export default function App({ Component, pageProps }: AppProps) {
         <link
           rel="icon"
           type="image/png"
-          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon-96x96.png`}
+          href={`/skip-favicon-96x96.png`}
           sizes="96x96"
         />
         <link
           rel="icon"
           type="image/svg+xml"
-          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon.svg`}
+          href={`/skip-favicon.svg`}
         />
         <link
           rel="shortcut icon"
-          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}favicon.ico`}
+          href={`/skip-favicon.ico`}
         />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}apple-touch-icon.png`}
+          href={`/skip-apple-touch-icon.png`}
         />
         <meta
           name="apple-mobile-web-app-title"
-          content={isCosmosDomain ? "IBC Eureka" : "Skip Go"}
+          content={"Skip Go"}
         />
         <link
           rel="manifest"
-          href={`/${isCosmosDomain ? "cosmos-" : "skip-"}site.webmanifest`}
+          href={`/skip-site.webmanifest`}
         />
       </Head>
       <DefaultSeo />

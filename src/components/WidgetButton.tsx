@@ -1,7 +1,7 @@
 import { track } from "@amplitude/analytics-browser";
 
 import styles from "./button.module.css";
-import { ThinArrowIcon } from "./cosmos/ThinArrowIcon";
+import { ThinArrowIcon } from "./ThinArrowIcon";
 
 const WidgetButton = () => (
   <a
