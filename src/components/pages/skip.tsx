@@ -1,3 +1,4 @@
+import { track } from "@amplitude/analytics-browser";
 import { Widget } from "@skip-go/widget";
 import { useState } from "react";
 
@@ -10,7 +11,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { useURLQueryParams } from "@/hooks/useURLQueryParams";
 import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
-import { track } from "@amplitude/analytics-browser";
 
 import { Banner } from "../Banner";
 import { CosmosIcon } from "../cosmos/CosmosIcon";
@@ -27,7 +27,7 @@ export function SkipPage() {
       navigator.clipboard.writeText(`${window.location.origin}?${queryParamsString}`);
       window.history.replaceState({}, "", `${window.location.pathname}?${queryParamsString}`);
     }
-    track("button clicked: share button", {
+    track("button clicked: share this route button", {
       queryParamsString,
     });
   };
