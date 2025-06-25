@@ -23,7 +23,7 @@ const ShareButton = ({ onClick }: { onClick?: () => void }) => {
       className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} ${styles.widgetButton} font-diatype`}
     >
       {isShowingCopyToClipboardFeedback ? "Link Copied!" : "Share this route"}
-      <ShareIcon color="currentColor" />
+      <ShareIcon />
     </button>
   );
 };

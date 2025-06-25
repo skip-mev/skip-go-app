@@ -1,4 +1,4 @@
-export const ShareIcon = ({ color }: { color: string }) => {
+export const ShareIcon = ({ color = "currentColor" }: { color?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
