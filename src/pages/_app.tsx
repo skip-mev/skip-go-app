@@ -6,10 +6,12 @@ import Head from "next/head";
 import React from "react";
 
 import { DefaultSeo } from "@/components/DefaultSeo";
+import { initAmplitude } from "@/utils/initAmplitude";
 
 export const isCosmosDomain = process.env.NEXT_PUBLIC_COSMOS_DOMAIN === "true";
 
 export default function App({ Component, pageProps }: AppProps) {
+  initAmplitude();
   const [queryClient] = React.useState(() => new QueryClient());
 
   isCosmosDomain ? require("../styles/cosmosGlobals.css") : require("../styles/globals.css");
