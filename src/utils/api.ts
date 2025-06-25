@@ -18,10 +18,13 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       let data = getWhitelabelEndpoint(chainID, type);
 
-      if (!data && fallbackFn) {
+      if (data && data.endpoint && fallbackFn) {
         const { endpoint } = await fallbackFn(chainID);
         if (!endpoint) throw new Error(`No endpoint found for chainID: ${chainID}`);
-        const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+        const workingEndpoint = await findFirstWorkingEndpoint(
+          [data.endpoint, ...endpoint],
+          type === "rpc" ? "rpc" : "rest",
+        );
         if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
         data = { endpoint: workingEndpoint, isPrivate: false };
       }
