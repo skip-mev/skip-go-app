@@ -9,7 +9,7 @@ const WidgetButton = () => (
     href="https://docs.skip.build/go"
     target="_blank"
     onClick={() => {
-      track("button clicked: build with skip go");
+      track("go app build with skip go button - clicked");
     }}
   >
     Build with Skip:Go
