@@ -27,7 +27,7 @@ export function SkipPage() {
       navigator.clipboard.writeText(`${window.location.origin}?${queryParamsString}`);
       window.history.replaceState({}, "", `${window.location.pathname}?${queryParamsString}`);
     }
-    track("button clicked: share this route button", {
+    track("button clicked: share this route", {
       queryParamsString,
     });
   };

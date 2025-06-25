@@ -12,7 +12,7 @@ const DiscordButton = () => (
     href={isCosmosDomain ? "https://discord.gg/interchain" : "https://skip.build/discord"}
     target="_blank"
     onClick={() => {
-      track("button clicked: need help button");
+      track("button clicked: need help");
     }}
   >
     Need Help?
