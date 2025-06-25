@@ -12,6 +12,7 @@ import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
 
 import { Banner } from "../Banner";
+import { CosmosIcon } from "../cosmos/CosmosIcon";
 
 export function SkipPage() {
   const defaultRoute = useURLQueryParams();
@@ -61,7 +62,7 @@ export function SkipPage() {
       )}
     >
       <main className="relative flex min-h-screen flex-col">
-        <div className="flex w-full flex-row justify-between px-6 py-4">
+        <div className="flex w-full flex-row justify-between p-6">
           <LogoGo color={theme === "dark" ? "white" : "black"} />
           <div className="flex flex-col items-end gap-[10px]">
             <ShareButton onClick={onClickedShareButton} />
@@ -113,6 +114,13 @@ export function SkipPage() {
               <Banner theme={theme} />
             ) : null}
           </div>
+        </div>
+
+        <div className="hidden w-full flex-row items-center justify-between px-8 py-6 md:flex">
+          <CosmosIcon color={theme === "dark" ? "white" : "black"} />
+          <p className={`text-center text-[13px] opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
+            <u>go.skip.build</u> {" is powered by Cosmos Hub, IBC Eureka & Skip:Go ❤️"}
+          </p>
         </div>
 
       </main>

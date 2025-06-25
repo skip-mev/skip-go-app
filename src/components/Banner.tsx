@@ -5,9 +5,17 @@ import styles from "./Banner.module.css";
 import { CloseIcon } from "./CloseIcon";
 
 export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
+  const hideBannerTitle = localStorage.getItem("hideBanner");
+  const hideBannerFromLocalStorage = hideBannerTitle === process.env.NEXT_PUBLIC_BANNER_TITLE;
+
   const [isDesktop, setIsDesktop] = useState(false);
   const [bannerRoot, setBannerRoot] = useState<HTMLElement | null>(null);
-  const [showBanner, setShowBanner] = useState(true);
+  const [hideBanner, setHideBanner] = useState(hideBannerFromLocalStorage ?? false);
+
+  const handleHideBanner = () => {
+    setHideBanner(true);
+    localStorage.setItem("hideBanner", process.env.NEXT_PUBLIC_BANNER_TITLE ?? "");
+  };
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 900px)");
@@ -28,19 +36,19 @@ export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
     setBannerRoot(el);
   }, []);
 
-  const bannerElement = showBanner ? (
+  const bannerElement = !hideBanner ? (
     <div className={styles.bannerContainer}>
       <a
         href={process.env.NEXT_PUBLIC_BANNER_LINK}
         target="_blank"
-        className={`flex flex-col gap-[18px] rounded-[10px]  p-[18px] ${theme === "light" ? "bg-white text-black" : "bg-black text-white"}`}
+        className={`flex flex-col gap-[18px] rounded-[10px] p-[18px] ${theme === "light" ? "bg-white text-black" : "bg-black text-white"}`}
       >
         <strong
           className={`flex items-center justify-between font-diatype text-[15px] ${theme === "light" ? "text-black" : "text-white"}`}
         >
           {process.env.NEXT_PUBLIC_BANNER_TITLE}
           <CloseIcon
-            onClick={() => setShowBanner(false)}
+            onClick={handleHideBanner}
             color={theme === "light" ? "#00000073" : "#ffffff80"}
           />
         </strong>
