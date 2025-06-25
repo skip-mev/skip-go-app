@@ -13,7 +13,7 @@ import { apiURL, endpointOptions } from "@/lib/skip-go-widget";
 import { cn } from "@/utils/ui";
 
 import { Banner } from "../Banner";
-import { CosmosIcon } from "../cosmos/CosmosIcon";
+import { CosmosIcon } from "../CosmosIcon";
 
 export function SkipPage() {
   const defaultRoute = useURLQueryParams();

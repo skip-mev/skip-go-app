@@ -1,9 +1,6 @@
 import { useState } from "react";
 
-import { isCosmosDomain } from "@/pages";
-
 import styles from "./button.module.css";
-import cosmosStyles from "./cosmos/cosmos.module.css";
 import { ShareIcon } from "./ShareIcon";
 
 const ShareButton = ({ onClick }: { onClick?: () => void }) => {
@@ -20,7 +17,7 @@ const ShareButton = ({ onClick }: { onClick?: () => void }) => {
   return (
     <button
       onClick={handleOnClick}
-      className={`${isCosmosDomain ? cosmosStyles.cosmosbutton : styles.skipbutton} ${styles.widgetButton} font-diatype`}
+      className={`${styles.skipbutton} ${styles.widgetButton} font-diatype`}
     >
       {isShowingCopyToClipboardFeedback ? "Link Copied!" : "Share this route"}
       <ShareIcon />
