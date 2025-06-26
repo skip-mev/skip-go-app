@@ -18,19 +18,6 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       let data = getWhitelabelEndpoint(chainID, type);
 
-      if (fallbackFn) {
-        const { endpoint } = await fallbackFn(chainID);
-        if (!endpoint) throw new Error(`No endpoint found for chainID: ${chainID}`);
-        const endpoints = data?.endpoint ? [data.endpoint, ...endpoint] : endpoint;
-        const workingEndpoint = await findFirstWorkingEndpoint(endpoints, type === "rpc" ? "rpc" : "rest");
-        if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
-        data = { endpoint: workingEndpoint, isPrivate: false };
-      }
-
-      if (!data) {
-        return new Response(null, { status: 404 }); // Not Found
-      }
-
       if (data && data.isApiKey && data.endpoint) {
         const url = new URL(data.endpoint);
         url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
@@ -38,6 +25,38 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
           body: req.body,
           method: req.method,
         });
+      }
+
+      if (fallbackFn) {
+        const { endpoint } = await fallbackFn(chainID);
+        if (data && data.endpoint && data.isPrivate) {
+          const privateNodeResponse = await fetch(data.endpoint, {
+            headers: {
+              authorization: getPrivateAuthHeader(),
+            },
+          });
+          if (privateNodeResponse.ok) {
+            data = { endpoint: data.endpoint, isPrivate: true };
+          } else {
+            if (!endpoint) {
+              throw new Error(`No endpoint found for chainID: ${chainID}`);
+            }
+            const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+            if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
+            data = { endpoint: workingEndpoint, isPrivate: false };
+          }
+        } else {
+          if (!endpoint) {
+            throw new Error(`No endpoint found for chainID: ${chainID}`);
+          }
+          const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+          if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
+          data = { endpoint: workingEndpoint, isPrivate: false };
+        }
+      }
+
+      if (!data) {
+        return new Response(null, { status: 404 }); // Not Found
       }
 
       const headers = new Headers();
