@@ -18,6 +18,15 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       let data = getWhitelabelEndpoint(chainID, type);
 
+      if (data && data.isApiKey && data.endpoint) {
+        const url = new URL(data.endpoint);
+        url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
+        return fetch(url, {
+          body: req.body,
+          method: req.method,
+        });
+      }
+
       if (fallbackFn) {
         const { endpoint } = await fallbackFn(chainID);
         if (!endpoint) throw new Error(`No endpoint found for chainID: ${chainID}`);
@@ -29,15 +38,6 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       if (!data) {
         return new Response(null, { status: 404 }); // Not Found
-      }
-
-      if (data.isApiKey && data.endpoint) {
-        const url = new URL(data.endpoint);
-        url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
-        return fetch(url, {
-          body: req.body,
-          method: req.method,
-        });
       }
 
       const headers = new Headers();
