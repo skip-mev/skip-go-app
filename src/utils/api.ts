@@ -31,6 +31,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       if (fallbackFn) {
         const { endpoint } = await fallbackFn(chainID);
         if (data && data.endpoint && data.isPrivate) {
+          console.log(`Using private endpoint: ${data.endpoint}`);
           const privateNodeResponse = await fetch(data.endpoint, {
             headers: {
               authorization: getPrivateAuthHeader(),
