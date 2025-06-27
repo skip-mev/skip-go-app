@@ -17,6 +17,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       const [chainID, ...args] = req.url.split(splitter).pop()!.split("/");
 
       let data = getWhitelabelEndpoint(chainID, type);
+      console.log(`createProxyHandler: chainID=${chainID}, type=${type}, data=${JSON.stringify(data)}`);
 
       if (data && data.isApiKey && data.endpoint) {
         const url = new URL(data.endpoint);
@@ -35,6 +36,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
               authorization: getPrivateAuthHeader(),
             },
           });
+          console.log(`privateNodeResponse: ${privateNodeResponse.status} ${privateNodeResponse.statusText}`);
           if (privateNodeResponse.ok) {
             data = { endpoint: data.endpoint, isPrivate: true };
           } else {
@@ -42,6 +44,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
               throw new Error(`No endpoint found for chainID: ${chainID}`);
             }
             const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+            console.log(`workingEndpoint1: ${workingEndpoint}`);
             if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
             data = { endpoint: workingEndpoint, isPrivate: false };
           }
@@ -50,6 +53,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
             throw new Error(`No endpoint found for chainID: ${chainID}`);
           }
           const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
+          console.log(`workingEndpoint2: ${workingEndpoint}`);
           if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
           data = { endpoint: workingEndpoint, isPrivate: false };
         }
@@ -60,6 +64,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       }
 
       const headers = new Headers();
+      console.log(`createProxyHandler: data=${JSON.stringify(data)}`);
       if (data.isPrivate) {
         headers.set("authorization", getPrivateAuthHeader());
       }
@@ -71,6 +76,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
         method: req.method,
       });
     } catch (error) {
+      console.error("handler error:", error instanceof Error ? error.message : String(error));
       const data = JSON.stringify({ error });
       return new Response(data, { status: 500 }); // Internal Server Error
     }
