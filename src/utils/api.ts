@@ -34,8 +34,20 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
           console.log(`Using private endpoint: ${data.endpoint}`);
           const headers = new Headers();
           headers.set("authorization", getPrivateAuthHeader());
+          try {
+            const privateNodeResponse = await fetch(data.endpoint, {
+              headers,
+              method: req.method,
+            });
+            console.log(`privateNodeResponse111: ${privateNodeResponse.status} ${privateNodeResponse.statusText}`);
+          } catch (error) {
+            console.error(
+              `Error fetching from private node: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
           const privateNodeResponse = await fetch(data.endpoint, {
             headers,
+            method: req.method,
           });
           console.log(`privateNodeResponse: ${privateNodeResponse.status} ${privateNodeResponse.statusText}`);
           if (privateNodeResponse.ok) {
