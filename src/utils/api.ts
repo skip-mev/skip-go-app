@@ -30,14 +30,18 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       if (fallbackFn) {
         const { endpoint } = await fallbackFn(chainID);
         if (data && data.endpoint && data.isPrivate) {
-          const privateNodeResponse = await fetch(data.endpoint, {
-            headers: {
-              authorization: getPrivateAuthHeader(),
-            },
-          });
-          if (privateNodeResponse.ok) {
-            data = { endpoint: data.endpoint, isPrivate: true };
-          } else {
+          try {
+            const privateNodeResponse = await fetch(data.endpoint, {
+              headers: {
+                authorization: getPrivateAuthHeader(),
+              },
+            });
+            if (privateNodeResponse.ok) {
+              data = { endpoint: data.endpoint, isPrivate: true };
+            } else {
+              throw new Error(`Private node endpoint failed: ${privateNodeResponse.statusText}`);
+            }
+          } catch (error) {
             if (!endpoint) {
               throw new Error(`No endpoint found for chainID: ${chainID}`);
             }
