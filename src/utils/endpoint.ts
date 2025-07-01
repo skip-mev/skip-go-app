@@ -1,5 +1,13 @@
 export async function findFirstWorkingEndpoint(endpoints: string[], type: "rpc" | "rest"): Promise<string | null> {
-  for (const endpoint of endpoints) {
+  const sortedEndpoints = endpoints.sort((a, b) => {
+    const aPol = a.toLowerCase().includes("polkachu");
+    const bPol = b.toLowerCase().includes("polkachu");
+
+    if (aPol === bPol) return 0;
+    return aPol ? -1 : 1;
+  });
+
+  for (const endpoint of sortedEndpoints) {
     try {
       const url = (() => {
         switch (type) {
