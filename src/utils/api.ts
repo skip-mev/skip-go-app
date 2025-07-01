@@ -31,7 +31,6 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
         const { endpoint } = await fallbackFn(chainID);
         if (data && data.endpoint && data.isPrivate) {
           try {
-            console.log(data);
             const privateNodeResponse = await fetch(data.endpoint, {
               headers: {
                 authorization: getPrivateAuthHeader(),
@@ -46,9 +45,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
             if (!endpoint) {
               throw new Error(`No endpoint found for chainID: ${chainID}`);
             }
-            console.log("using public node");
             const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
-            console.log("working endpoint", workingEndpoint);
             if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
             data = { endpoint: workingEndpoint, isPrivate: false };
           }
