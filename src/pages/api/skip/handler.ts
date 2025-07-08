@@ -24,6 +24,14 @@ export default async function handler(req: NextRequest) {
     const headers = new Headers();
 
     if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Skipping CORS middleware in development mode");
+        return fetch(uri, {
+          body: req.body,
+          method: req.method,
+          headers,
+        });
+      }
       throw new Error("ALLOWED_LIST_EDGE_CONFIG is not set");
     }
 
