@@ -32,8 +32,25 @@ const corsMiddleware = async (request: NextRequest) => {
   const origin = request.headers.get("origin") ?? "";
 
   if (!process.env.ALLOWED_LIST_EDGE_CONFIG) {
-    console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Skipping CORS middleware in development mode");
+      const headers = new Headers(request.headers);
+      headers.set("Access-Control-Allow-Origin", origin);
+      Object.entries(corsOptions).forEach(([key, value]) => {
+        headers.set(key, value);
+      });
+      const isPreflight = request.method === "OPTIONS";
+      if (isPreflight) {
+        return NextResponse.json({}, { headers: headers });
+      }
 
+      const response = NextResponse.next({
+        headers: headers,
+      });
+      return response;
+    }
+
+    console.error("ALLOWED_LIST_EDGE_CONFIG is not set");
     return NextResponse.next();
   }
   const client = createClient(process.env.ALLOWED_LIST_EDGE_CONFIG);
