@@ -20,6 +20,7 @@ const mapTargetUrl = (path: string[]) => {
   return null;
 };
 const getRawBody = (req: NextApiRequest): Promise<Buffer> => {
+  console.log("Amplitude proxy hit:", req.method, req.url);
   return new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     req.on("data", (chunk) => chunks.push(chunk));
