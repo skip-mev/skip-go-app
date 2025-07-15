@@ -6,27 +6,52 @@ export const config = {
   },
 };
 
+const mapTargetUrl = (path: string[]) => {
+  const joined = path.join("/");
+  if (joined.startsWith("2/httpapi")) {
+    return `https://api2.amplitude.com/${joined}`;
+  }
+  if (joined.startsWith("upload")) {
+    return `https://s.ax.amplitude.com/${joined}`;
+  }
+  if (joined.startsWith("config")) {
+    return `https://sr-client-cfg.amplitude.com/${joined}`;
+  }
+  return null;
+};
+const getRawBody = (req: NextApiRequest): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const chunks: Uint8Array[] = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  let rawBody = "";
-  req.on("data", (chunk) => {
-    rawBody += chunk;
+  const path = (req.query.path || []) as string[];
+  const target = mapTargetUrl(path);
+
+  if (!target) {
+    res.status(400).json({ error: "Unsupported Amplitude proxy path" });
+    return;
+  }
+
+  const rawBody = req.method !== "GET" && req.method !== "HEAD" ? await getRawBody(req) : undefined;
+
+  const proxyRes = await fetch(target + (req.url?.includes("?") ? "?" + req.url.split("?")[1] : ""), {
+    method: req.method,
+    headers: Object.fromEntries(
+      Object.entries(req.headers).filter(([key]) => key.toLowerCase() !== "host"),
+    ) as HeadersInit,
+    body: rawBody,
   });
 
-  req.on("end", async () => {
-    try {
-      const amplitudeRes = await fetch("https://api2.amplitude.com/2/httpapi", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: rawBody,
-      });
+  const proxyBuffer = await proxyRes.arrayBuffer();
 
-      const result = await amplitudeRes.text();
-      res.status(amplitudeRes.status).send(result);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Proxy error" });
-    }
+  proxyRes.headers.forEach((value, key) => {
+    res.setHeader(key, value);
   });
+
+  res.status(proxyRes.status).send(Buffer.from(proxyBuffer));
 }
