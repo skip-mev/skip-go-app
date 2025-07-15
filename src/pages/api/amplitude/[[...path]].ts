@@ -6,16 +6,15 @@ export const config = {
   },
 };
 
-const mapTargetUrl = (path: string[]) => {
-  const joined = path.join("/");
-  if (joined.startsWith("2/httpapi")) {
-    return `https://api2.amplitude.com/${joined}`;
+const mapTargetUrl = (path: string) => {
+  if (path.startsWith("httpapi")) {
+    return `https://api2.amplitude.com/${path}`;
   }
-  if (joined.startsWith("upload")) {
-    return `https://s.ax.amplitude.com/${joined}`;
+  if (path.startsWith("upload")) {
+    return `https://s.ax.amplitude.com/${path}`;
   }
-  if (joined.startsWith("config")) {
-    return `https://sr-client-cfg.amplitude.com/${joined}`;
+  if (path.startsWith("config")) {
+    return `https://sr-client-cfg.amplitude.com/${path}`;
   }
   return null;
 };
@@ -30,7 +29,8 @@ const getRawBody = (req: NextApiRequest): Promise<Buffer> => {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const path = (req.query.path || []) as string[];
+  const pathArray = (req.query.path || []) as string[];
+  const path = pathArray.join("/");
   const target = mapTargetUrl(path);
 
   if (!target) {
