@@ -99,8 +99,11 @@ export function SkipPage() {
                 },
                 destination: {
                   1: ["0xFEC6a341F9B7e30E30Ef5B990158FA539B6bb057", "0xbf45a5029d081333407cc52a84be5ed40e181c46"],
-                  "pacific-1": ["ibc/6C00E4AA0CC7618370F81F7378638AE6C48EFF8C9203CE1C2357012B440EBDB7"],
-                  "1329": ["0xB75D0B03c06A926e488e2659DF1A861F860bD3d1"],
+                  "pacific-1": [
+                    "ibc/6C00E4AA0CC7618370F81F7378638AE6C48EFF8C9203CE1C2357012B440EBDB7",
+                    "ibc/CA6FBFAF399474A06263E10D0CE5AEBBE15189D6D4B2DD9ADE61007E68EB9DB0",
+                  ],
+                  "1329": ["0xB75D0B03c06A926e488e2659DF1A861F860bD3d1", "0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1"],
                   "evmos_9001-2": undefined,
                   ...(showLedgerMainnet ? {} : { "ledger-mainnet-1": undefined }),
                 },
