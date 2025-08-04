@@ -1,3 +1,4 @@
+import { ipAddress } from "@vercel/edge";
 import { createClient } from "@vercel/edge-config";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -102,6 +103,8 @@ const corsMiddleware = async (request: NextRequest) => {
 
 export async function middleware(request: NextRequest) {
   geoBlockMiddleware(request);
+  const ip = ipAddress(request) || "unknown";
+  console.log(`Request from IP: ${ip}, URL: ${request.url}`);
   const response = await corsMiddleware(request);
   // response = abTestMiddleware(request, response);
   return response;
