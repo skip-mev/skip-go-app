@@ -1,6 +1,6 @@
 import styles from "./Banner.module.css";
 
-export const CloseIcon = ({ color, onClick }: { color: string; onClick?: () => void; }) => {
+export const CloseIcon = ({ color, onClick }: { color: string; onClick?: () => void }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
