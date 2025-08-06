@@ -54,18 +54,9 @@ const getRawBody = (req: NextApiRequest): Promise<Buffer> => {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log("Amplitude request received:", {
-      method: req.method,
-      url: req.url,
-      path: req.query.path,
-      headers: Object.keys(req.headers),
-    });
-
     const pathArray = (req.query.path || []) as string[];
     const path = pathArray.join("/");
     const target = mapTargetUrl(path);
-
-    console.log("Mapped path:", { path, target });
 
     if (!target) {
       console.error("Unsupported path:", path);
@@ -80,7 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (isPost) {
       try {
         rawBody = await getRawBody(req);
-        console.log("Body read successfully, length:", rawBody?.length);
       } catch (bodyError) {
         console.error("Error reading body:", bodyError);
         res.status(400).json({ error: "Failed to read request body" });
@@ -142,15 +132,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    console.log("Forwarding to:", targetUrl.toString());
-
     const response = await fetch(targetUrl.toString(), {
       method,
       headers,
       body: rawBody,
     });
-
-    console.log("Amplitude response:", { status: response.status, statusText: response.statusText });
 
     const responseBuffer = await response.arrayBuffer();
     response.headers.forEach((value, key) => res.setHeader(key, value));
