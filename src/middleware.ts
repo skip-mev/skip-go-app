@@ -5,7 +5,7 @@ import { cleanOrigin, edgeConfigResponse, isPreview } from "./utils/api";
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, solana-client, sentry-trace, baggage, x-client-url, x-client-version, x-client-name",
 };
 
 // Donetsk and Luhansk Regions of Ukraine, Russia, Crimea, Cuba, Iran, North Korea or Syria
