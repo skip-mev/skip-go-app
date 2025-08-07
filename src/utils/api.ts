@@ -112,13 +112,6 @@ export const cleanOrigin = (str: string) => {
   }
 };
 
-export const isIngress = (str: string) => {
-  if (str.includes("ingress")) {
-    return true;
-  }
-  return false;
-};
-
 export const isVercelPreview = (str: string) => {
   if (str.endsWith("vercel.app")) {
     return true;
@@ -141,7 +134,7 @@ export const isCloudflarePreview = (str: string) => {
 };
 
 export const isPreview = (str: string) => {
-  if (isVercelPreview(str) || isCloudflarePreview(str) || isNetlifyPreview(str) || isIngress(str)) {
+  if (isVercelPreview(str) || isCloudflarePreview(str) || isNetlifyPreview(str)) {
     return true;
   }
   return false;
