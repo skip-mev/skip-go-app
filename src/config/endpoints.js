@@ -124,7 +124,7 @@ exports.WHITELABEL_CHAIN_IDS = {
   "mantle-1": true,
   "mars-1": true,
   "migaloo-1": true,
-  "neutron-1": true,
+  // "neutron-1": true,
   "noble-1": true,
   "nois-1": true,
   "nomic-stakenet-3": true,
