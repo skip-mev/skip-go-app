@@ -112,6 +112,13 @@ export const cleanOrigin = (str: string) => {
   }
 };
 
+export const isWorkersDev = (str: string) => {
+  if (str.endsWith("workers.dev")) {
+    return true;
+  }
+  return false;
+};
+
 export const isIngress = (str: string) => {
   if (str.includes("ingress")) {
     return true;
@@ -120,28 +127,34 @@ export const isIngress = (str: string) => {
 };
 
 export const isVercelPreview = (str: string) => {
-  if (str.endsWith("vercel.app")) {
+  if (str.includes("vercel.app")) {
     return true;
   }
   return false;
 };
 
 export const isNetlifyPreview = (str: string) => {
-  if (str.endsWith("netlify.app")) {
+  if (str.includes("netlify.app")) {
     return true;
   }
   return false;
 };
 
 export const isCloudflarePreview = (str: string) => {
-  if (str.endsWith("pages.dev") || str.endsWith("trycloudflare.com")) {
+  if (str.includes("pages.dev") || str.includes("trycloudflare.com")) {
     return true;
   }
   return false;
 };
 
 export const isPreview = (str: string) => {
-  if (isVercelPreview(str) || isCloudflarePreview(str) || isNetlifyPreview(str) || isIngress(str)) {
+  if (
+    isVercelPreview(str) ||
+    isCloudflarePreview(str) ||
+    isNetlifyPreview(str) ||
+    isIngress(str) ||
+    isWorkersDev(str)
+  ) {
     return true;
   }
   return false;
