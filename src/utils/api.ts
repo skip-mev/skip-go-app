@@ -45,17 +45,13 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
             if (!endpoint) {
               throw new Error(`No endpoint found for chainID: ${chainID}`);
             }
-            const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
-            if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
-            data = { endpoint: workingEndpoint, isPrivate: false };
+            data = { endpoint: endpoint[0], isPrivate: false };
           }
         } else {
           if (!endpoint) {
             throw new Error(`No endpoint found for chainID: ${chainID}`);
           }
-          const workingEndpoint = await findFirstWorkingEndpoint(endpoint, type === "rpc" ? "rpc" : "rest");
-          if (!workingEndpoint) throw new Error(`No working endpoint found for chainID: ${chainID}`);
-          data = { endpoint: workingEndpoint, isPrivate: false };
+          data = { endpoint: endpoint[0], isPrivate: false };
         }
       }
 

@@ -107,7 +107,10 @@ function extractCamelCaseRest(chain) {
 
 async function codegen() {
   console.log("Getting mainnet rpc files...");
-  let mainnetRpc = [];
+  let mainnetRpc = [{
+    chainId: "wf-relayer",
+    rpc: ["http://relayer-api-wf-grpc.dev.skip.build:443"],
+  }];
   let mainnetRest = [];
   for (const registry of registries) {
     const { rpc, rest } = await collectMainnetChains(registry);
