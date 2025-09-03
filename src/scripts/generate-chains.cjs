@@ -109,7 +109,7 @@ async function codegen() {
   console.log("Getting mainnet rpc files...");
   let mainnetRpc = [{
     chainId: "wf-relayer",
-    rpc: ["http://relayer-api-wf-grpc.dev.skip.build:443"],
+    rpc: ["http://relayer-api-wf-grpc.dev.skip.build"],
   }];
   let mainnetRest = [];
   for (const registry of registries) {
