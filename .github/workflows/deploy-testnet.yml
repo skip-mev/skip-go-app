@@ -20,24 +20,19 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: testnet
+          ref: main
+          fetch-depth: 0
 
       - id: configure
-        name: configure
-        run: git config pull.ff true
+        name: Configure git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
-      - id: pull-main
-        name: Pull latest 'main'
-        run: git pull --ff-only origin main
-
-      - id: diff-check
-        name: Check if 'testnet' is behind 'main'
-        run: git diff --exit-code origin/main
-
-      - id: fast-forward
-        name: Fast forward 'main' → 'testnet'
-        run: git merge --ff-only origin/main
-
-      - id: push-testnet
-        name: Push latest 'testnet'
-        run: git push --set-upstream origin testnet
+      - id: sync-testnet
+        name: Sync 'main' → 'testnet'
+        run: |
+          git fetch origin testnet:testnet || git branch testnet
+          git checkout testnet
+          git reset --hard origin/main
+          git push --force origin testnet
