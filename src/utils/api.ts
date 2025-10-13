@@ -147,13 +147,21 @@ export const isCloudflarePreview = (str: string) => {
   return false;
 };
 
+export const isAmplifyPreview = (str: string) => {
+  if (str.includes("amplifyapp.com")) {
+    return true;
+  }
+  return false;
+};
+
 export const isPreview = (str: string) => {
   if (
     isVercelPreview(str) ||
     isCloudflarePreview(str) ||
     isNetlifyPreview(str) ||
     isIngress(str) ||
-    isWorkersDev(str)
+    isWorkersDev(str) ||
+    isAmplifyPreview(str)
   ) {
     return true;
   }
