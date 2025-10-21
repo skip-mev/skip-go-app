@@ -32,7 +32,7 @@
     "@vercel/edge": "^1.2.2",
     "@vercel/edge-config": "^0.4.1",
     "autoprefixer": "^10.4.17",
-    "chain-registry": "^2.0.78",
+    "chain-registry": "^2.0.85",
     "clsx": "^2.1.0",
     "next": "^14.1.0",
     "next-seo": "^6.4.0",
