@@ -1,5 +1,15 @@
 name: Update Dependencies
 
+# Setup Instructions:
+# Option 1 (Recommended): Enable GitHub Actions to create PRs
+#   Go to: Settings → Actions → General → Workflow permissions
+#   Check: "Allow GitHub Actions to create and approve pull requests"
+#
+# Option 2: Use a Personal Access Token
+#   1. Create a PAT with 'repo' scope at https://github.com/settings/tokens
+#   2. Add it as a repository secret named 'PAT_TOKEN'
+#   3. Go to: Settings → Secrets and variables → Actions → New repository secret
+
 on:
   schedule:
     # Run every Monday at 9:00 AM UTC
@@ -18,7 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,7 +45,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           commit-message: 'chore: update chain registries and Skip Go widget'
           title: 'chore: automated dependency updates'
           body: |
