@@ -68,7 +68,3 @@ jobs:
           branch: automated/update-dependencies
           branch-suffix: timestamp
           delete-branch: true
-          labels: |
-            dependencies
-            automated
-          assignees: ${{ github.repository_owner }}
