@@ -129,7 +129,7 @@ async function codegen() {
   await fs.writeFile(restOutputFilePath, JSON.stringify(rest), "utf-8");
   console.log(`Generated rest file at ${restOutputFilePath}`);
 
-  const rpc = mergeArrays(mainnetRpc, testnetRpc);
+  const rpc = addHardcodedRpcs(mergeArrays(mainnetRpc, testnetRpc));
   const rpcOutputFilePath = path.resolve(outPath, "rpc.json");
   await fs.writeFile(rpcOutputFilePath, JSON.stringify(rpc), "utf-8");
   console.log(`Generated rpc file at ${rpcOutputFilePath}`);
@@ -147,5 +147,22 @@ const mergeArrays = (arr1, arr2) => {
 
   return Array.from(map.values());
 };
+
+// Hardcoded RPC endpoints for specific chains
+const hardcodedRpcs = {
+  "bitbadges-1": ["https://rpc.bitbadges.io"],
+};
+
+function addHardcodedRpcs(chains) {
+  return chains.map((chain) => {
+    if (hardcodedRpcs[chain.chainId]) {
+      return {
+        ...chain,
+        rpc: [...hardcodedRpcs[chain.chainId], ...chain.rpc],
+      };
+    }
+    return chain;
+  });
+}
 
 void codegen();
