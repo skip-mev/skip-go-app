@@ -6,6 +6,7 @@ import { CloseIcon } from "./CloseIcon";
 
 export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
   const hideBannerTitle = localStorage.getItem("hideBanner");
+  // Check if banner should be hidden based on localStorage value matching env variable
   const hideBannerFromLocalStorage = hideBannerTitle === process.env.NEXT_PUBLIC_BANNER_TITLE;
 
   const [isDesktop, setIsDesktop] = useState(false);
