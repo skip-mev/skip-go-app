@@ -9,6 +9,7 @@ export default function Document() {
           content="ie=edge"
           httpEquiv="X-UA-Compatible"
         />
+        {/* Setting X-UA-Compatible to IE=edge ensures the latest rendering engine is used */}
       </Head>
       <body>
         <Main />
