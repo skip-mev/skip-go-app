@@ -61,7 +61,6 @@ export default async function handler(req: NextRequest) {
     } else if (process.env.SKIP_API_KEY) {
       headers.set("authorization", process.env.SKIP_API_KEY);
     }
-    headers.set("Keep-Trace", "true");
     return fetch(uri, {
       body: req.body,
       method: req.method,
