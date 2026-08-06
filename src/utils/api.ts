@@ -23,6 +23,9 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
         url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
         return fetch(url, {
           body: req.body,
+          headers: {
+            "Content-Type": "application/json",
+          },
           method: req.method,
         });
       }
@@ -64,6 +67,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       }
 
       const headers = new Headers();
+      headers.set("Content-Type", "application/json");
       if (data.isPrivate) {
         headers.set("authorization", getPrivateAuthHeader());
       }
