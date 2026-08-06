@@ -37,7 +37,6 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
             const privateNodeResponse = await fetch(data.endpoint, {
               headers: {
                 authorization: getPrivateAuthHeader(),
-                "Content-Type": "application/json",
               },
             });
             if (privateNodeResponse.ok) {
