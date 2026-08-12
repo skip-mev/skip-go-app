@@ -82,6 +82,7 @@ export function SkipPage() {
               apiUrl={apiURL}
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
+              skipExplorerUrl="https://dev-skip-explorer.vercel.app"
               enableAmplitudeAnalytics
               disableShadowDom
               onRouteUpdated={onRouteUpdated}
