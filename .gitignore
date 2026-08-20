@@ -24,3 +24,6 @@ tests/downloads/
 !.env.example
 
 certificates
+
+# graphify knowledge-graph output (local only)
+graphify-out/
