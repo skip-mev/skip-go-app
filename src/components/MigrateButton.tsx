@@ -13,8 +13,8 @@ const MigrateButton = () => {
 
   return (
     <>
-      {/* mobile: one-line floating bar */}
-      <div className="fixed bottom-6 left-4 right-4 z-10 flex items-center gap-3 rounded-2xl border-2 border-solid border-red-500 bg-black px-4 py-3 font-diatype text-white sm:hidden">
+      {/* mobile / short viewport: one-line floating bar */}
+      <div className="fixed bottom-6 left-4 right-4 z-10 flex items-center gap-3 rounded-2xl border-2 border-solid border-red-500 bg-black px-4 py-3 font-diatype text-white sm:[@media(min-height:720px)]:hidden">
         <img
           src={NOBLE_USDC_IMG}
           alt="Noble USDC"
@@ -38,8 +38,8 @@ const MigrateButton = () => {
         </a>
       </div>
 
-      {/* desktop: tall card */}
-      <div className="fixed bottom-24 right-8 z-10 hidden w-[400px] flex-col overflow-hidden rounded-3xl border-2 border-solid border-red-500 bg-black font-diatype text-white sm:flex">
+      {/* desktop (wide + tall enough): tall card */}
+      <div className="fixed bottom-24 right-8 z-10 hidden w-[400px] flex-col overflow-hidden rounded-3xl border-2 border-solid border-red-500 bg-black font-diatype text-white sm:[@media(min-height:720px)]:flex">
         <div className="flex items-center gap-3 p-5">
           <img
             src={NOBLE_USDC_IMG}
