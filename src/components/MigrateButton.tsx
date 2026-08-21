@@ -53,9 +53,9 @@ const MigrateButton = () => {
             type="button"
             aria-label="Dismiss"
             onClick={() => setHidden(true)}
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-solid border-red-500 bg-black text-white transition-colors hover:bg-red-500/20"
+            className="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-black text-white/70 transition-colors hover:text-white"
           >
-            <span className="text-[24px] leading-none">×</span>
+            <span className="text-[32px] leading-none">×</span>
           </button>
         </div>
 
