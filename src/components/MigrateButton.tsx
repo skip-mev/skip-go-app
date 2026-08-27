@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { ThinArrowIcon } from "./ThinArrowIcon";
 
-const MIGRATION_DOCS_URL = "https://skip-go-mintae-usdc-migration-guide.mintlify.site/app/usdc-n-manual-migration";
+const MIGRATION_DOCS_URL = "https://docs.skip.build/go/app/usdc-n-manual-migration";
 const NOBLE_USDC_IMG =
   "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.png";
 
