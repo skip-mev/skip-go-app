@@ -83,6 +83,7 @@ export function SkipPage() {
               apiUrl={apiURL}
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
+              skipExplorerUrl={process.env.NEXT_PUBLIC_SKIP_EXPLORER_URL}
               enableAmplitudeAnalytics
               disableShadowDom
               onRouteUpdated={onRouteUpdated}
