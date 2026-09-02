@@ -87,7 +87,7 @@ export function SkipPage() {
               assetAnnotations={{
                 "USDC.n": {
                   variant: "info",
-                  swapPage: { label: "Migration required" },
+                  swapPage: { label: "Migrate USDC.n to USDC.inj" },
                   selector: {
                     description: "Convert to USDC before support ends",
                     pinToTop: true,
