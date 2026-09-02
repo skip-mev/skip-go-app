@@ -84,6 +84,16 @@ export function SkipPage() {
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
               skipExplorerUrl={process.env.NEXT_PUBLIC_SKIP_EXPLORER_URL}
+              assetAnnotations={{
+                "USDC.n": {
+                  variant: "info",
+                  swapPage: { label: "Migration required" },
+                  selector: {
+                    description: "Convert to USDC before support ends",
+                    pinToTop: true,
+                  },
+                },
+              }}
               enableAmplitudeAnalytics
               disableShadowDom
               onRouteUpdated={onRouteUpdated}
