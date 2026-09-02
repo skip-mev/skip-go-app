@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
+import MigrateButton from "@/components/MigrateButton";
 import ShareButton from "@/components/ShareButton";
 import WidgetButton from "@/components/WidgetButton";
 // import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
@@ -82,7 +83,7 @@ export function SkipPage() {
               apiUrl={apiURL}
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
-              skipExplorerUrl="https://dev-skip-explorer.vercel.app"
+              skipExplorerUrl={process.env.NEXT_PUBLIC_SKIP_EXPLORER_URL}
               enableAmplitudeAnalytics
               disableShadowDom
               onRouteUpdated={onRouteUpdated}
@@ -132,6 +133,7 @@ export function SkipPage() {
           </p>
         </div>
       </main>
+      <MigrateButton />
     </div>
   );
 }
