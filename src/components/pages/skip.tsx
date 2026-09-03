@@ -86,11 +86,11 @@ export function SkipPage() {
               skipExplorerUrl={process.env.NEXT_PUBLIC_SKIP_EXPLORER_URL}
               assetAnnotations={{
                 "USDC.n": {
-                  variant: "info",
-                  swapPage: { label: "Migrate USDC.n to USDC.inj" },
+                  variant: "error",
+                  swapPage: { label: "Migration Required" },
                   selector: {
-                    description: "Convert to USDC before support ends",
                     pinToTop: true,
+                    description: "Is Being Deprecated",
                   },
                 },
               }}
