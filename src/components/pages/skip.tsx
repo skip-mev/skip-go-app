@@ -84,6 +84,16 @@ export function SkipPage() {
               defaultRoute={defaultRoute}
               onlyTestnet={process.env.NEXT_PUBLIC_IS_TESTNET}
               skipExplorerUrl={process.env.NEXT_PUBLIC_SKIP_EXPLORER_URL}
+              assetAnnotations={{
+                "USDC.n": {
+                  variant: "error",
+                  swapPage: { label: "Migration Required" },
+                  selector: {
+                    pinToTop: true,
+                    description: "Is Being Deprecated",
+                  },
+                },
+              }}
               enableAmplitudeAnalytics
               disableShadowDom
               onRouteUpdated={onRouteUpdated}
