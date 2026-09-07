@@ -36,7 +36,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
           try {
             const privateNodeResponse = await fetch(data.endpoint, {
               headers: {
-                authorization: getPrivateAuthHeader(),
+                "User-Agent": getWhitelabelUserAgent(),
               },
             });
             if (privateNodeResponse.ok) {
@@ -69,7 +69,7 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       const headers = new Headers();
       headers.set("Content-Type", "application/json");
       if (data.isPrivate) {
-        headers.set("authorization", getPrivateAuthHeader());
+        headers.set("User-Agent", getWhitelabelUserAgent());
       }
 
       const uri = [data.endpoint, ...args].join("/");
@@ -85,12 +85,11 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
   };
 }
 
-export function getPrivateAuthHeader() {
-  if (!(process.env.POLKACHU_USER && process.env.POLKACHU_PASSWORD)) {
-    throw new Error("env POLKACHU_USER or POLKACHU_PASSWORD is not set");
+export function getWhitelabelUserAgent() {
+  if (!process.env.WHITELABEL_KEY) {
+    throw new Error("env WHITELABEL_KEY is not set");
   }
-  const userpass = `${process.env.POLKACHU_USER}:${process.env.POLKACHU_PASSWORD}`;
-  return `Basic ${Buffer.from(userpass).toString("base64")}`;
+  return process.env.WHITELABEL_KEY;
 }
 
 export const edgeConfigResponse = z.record(

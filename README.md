@@ -24,8 +24,7 @@ Make sure to set the following environment variables in `.env` file:S
 
 ```bash
 NEXT_PUBLIC_API_URL="https://api.skip.build"
-POLKACHU_USER=            # required
-POLKACHU_PASSWORD=        # required
+WHITELABEL_KEY=           # required
 NEXT_PUBLIC_EDGE_CONFIG=  # required
 ```
 

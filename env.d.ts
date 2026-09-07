@@ -3,8 +3,7 @@ declare namespace NodeJS {
     readonly APP_URL?: string;
     readonly NEXT_PUBLIC_API_URL?: string;
 
-    readonly POLKACHU_USER?: string;
-    readonly POLKACHU_PASSWORD?: string;
+    readonly WHITELABEL_KEY?: string;
 
     readonly NEXT_PUBLIC_EDGE_CONFIG?: string;
     readonly NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?: string;
