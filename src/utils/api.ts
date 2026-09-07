@@ -79,8 +79,11 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
         method: req.method,
       });
     } catch (error) {
-      const data = JSON.stringify({ error });
-      return new Response(data, { status: 500 }); // Internal Server Error
+      const message = error instanceof Error ? error.message : String(error);
+      return new Response(JSON.stringify({ error: message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   };
 }
