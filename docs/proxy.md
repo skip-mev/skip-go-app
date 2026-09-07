@@ -55,8 +55,8 @@ Proxies Cosmos LCD/REST requests. The first path segment after `/api/rest/` is t
 
 1. **Whitelabel (Solana)** — Helius endpoints with `HELIUS_API_KEY` injected as a query param.
 2. **Custom chain IDs** — hardcoded endpoints in `CUSTOM_API_CHAIN_IDS` (e.g. `secret-4` → Lavender Five).
-3. **Polkachu private nodes** — chains listed in `WHITELABEL_CHAIN_IDS` get a `polkachu.com` endpoint with Basic auth via `POLKACHU_USER`/`POLKACHU_PASSWORD`.
-4. **Public fallback** — uses endpoints from `src/chains/rest.json`, preferring Polkachu nodes, and health-checks until a working one is found.
+3. **Whitelabel private nodes** — chains listed in `WHITELABEL_CHAINS` get a `cosmoslabs.kr` endpoint with the `WHITELABEL_KEY` sent as the `User-Agent` header. If the private node health-check fails, it falls through to the public fallback below.
+4. **Public fallback** — uses endpoints from `src/chains/rest.json`, preferring Polkachu-hosted public nodes (see `findFirstWorkingEndpoint` in `src/utils/endpoint.ts` — unrelated to the whitelabel private nodes above), and health-checks until a working one is found.
 
 ### Cosmos RPC (`/api/rpc/:chainID/*`)
 
@@ -87,13 +87,13 @@ Proxies analytics events to Amplitude. The `api_key` is provided by the client i
 ## API Key Injection Summary
 
 
-| Proxy                           | Env Variable                                                | Injection Method                    |
-| ------------------------------- | ----------------------------------------------------------- | ----------------------------------- |
-| Skip API                        | Per-origin key from Edge Config, or `SKIP_API_KEY` fallback | `authorization` header              |
-| Widget Skip API                 | `WIDGET_SKIP_API_KEY`                                       | `authorization` header              |
-| Cosmos REST/RPC (Polkachu)      | `POLKACHU_USER`, `POLKACHU_PASSWORD`                        | `authorization` header (Basic auth) |
-| Cosmos REST/RPC (Helius/Solana) | `HELIUS_API_KEY`                                            | `api-key` query parameter           |
-| Amplitude                       | None (client-provided)                                      | —                                   |
+| Proxy                            | Env Variable                                                 | Injection Method           |
+| -------------------------------- | -------------------------------------------------------------| --------------------------- |
+| Skip API                         | Per-origin key from Edge Config, or `SKIP_API_KEY` fallback | `authorization` header      |
+| Widget Skip API                  | `WIDGET_SKIP_API_KEY`                                        | `authorization` header      |
+| Cosmos REST/RPC (Whitelabel)     | `WHITELABEL_KEY`                                             | `User-Agent` header         |
+| Cosmos REST/RPC (Helius/Solana)  | `HELIUS_API_KEY`                                             | `api-key` query parameter   |
+| Amplitude                        | None (client-provided)                                       | —                            |
 
 
 ---
@@ -173,31 +173,33 @@ The `apiKey` field is used by the Skip API handler to set the `authorization` he
 
 ## Endpoint Configuration (`src/config/endpoints.js`)
 
-This file controls how the REST and RPC proxies resolve a `chainID` to an upstream endpoint. It exports one function and four lookup tables.
+This file controls how the REST and RPC proxies resolve a `chainID` to an upstream endpoint. It exports one function and three lookup tables.
 
 ### `getWhitelabelEndpoint(chainID, type)`
 
 Called by `createProxyHandler` in `src/utils/api.ts` before falling back to the public chain registry. It checks the following in order:
 
 1. **Solana** — `solana` and `solana-devnet` return Helius RPC endpoints with `isApiKey: true`. The proxy handler appends `HELIUS_API_KEY` as a query parameter.
-2. **Custom chain IDs** — looks up `CUSTOM_API_CHAIN_IDS` (for REST) or `CUSTOM_RPC_CHAIN_IDS` (for RPC). These are chains with hardcoded third-party endpoints that don't follow the Polkachu naming convention.
-3. **Polkachu private nodes** — if the `chainID` exists in `WHITELABEL_CHAIN_IDS`, a Polkachu URL is constructed from the chain ID, type, and an optional numeric suffix. The result is marked `isPrivate: true` so the proxy adds Basic auth headers.
+2. **Custom chain IDs** — looks up `CUSTOM_API_CHAIN_IDS` (for REST) or `CUSTOM_RPC_CHAIN_IDS` (for RPC). These are chains with hardcoded third-party endpoints that don't follow the whitelabel naming convention.
+3. **Whitelabel private nodes** — if the `chainID` exists in `WHITELABEL_CHAINS`, a `cosmoslabs.kr` URL is constructed from the entry's `chainName` and `isTestnet` flag. The result is marked `isPrivate: true` so the proxy adds a `User-Agent` auth header.
 4. **No match** — returns `undefined`, causing the proxy to fall through to the public endpoint lists in `src/chains/rest.json` or `src/chains/rpc.json`.
 
 ### `CUSTOM_API_CHAIN_IDS` / `CUSTOM_RPC_CHAIN_IDS`
 
-Chains that need a specific non-Polkachu endpoint. Currently only `secret-4` pointing to Lavender Five nodes.
+Chains that need a specific non-whitelabel endpoint. Currently only `secret-4` pointing to Lavender Five nodes.
 
-### `WHITELABEL_CHAIN_IDS`
+### `WHITELABEL_CHAINS`
 
-A map of `chainID → true | number`. Chains in this list get routed to a Polkachu private node. The value controls the URL:
+A map of `chainID → { chainName: string; isTestnet?: boolean }`. Chains in this list get routed to a whitelabel private node hosted on `cosmoslabs.kr`. The URL is built as:
 
-- `true` → `https://{chainID}-skip-{type}.polkachu.com` (e.g. `cosmoshub-4-skip-rpc.polkachu.com`)
-- `number` → appends a numeric suffix (e.g. `osmosis-1-skip-rpc-1.polkachu.com`)
+```
+https://{lcd|rpc}-{chainName}.{mainnet|testnet}.cosmoslabs.kr
+```
 
-### `WHITELABEL_CUSTOM_NODE_IDS`
-
-Overrides the `chainID` used in the Polkachu URL when the chain's actual ID doesn't match the Polkachu naming. For example, `shentu-2.2` maps to `shentu-22` because dots aren't valid in Polkachu hostnames.
+- `lcd` is used for REST (`type: "api"`), `rpc` for Tendermint RPC (`type: "rpc"`).
+- The network segment defaults to `mainnet`; set `isTestnet: true` on the entry to use `testnet` instead.
+- `chainName` is **not** always the same as the `chainID` key — it's the short slug cosmoslabs.kr uses for the chain (e.g. `cosmoshub-4` → `cosmos`, `phoenix-1` → `terra`, `pacific-1` → `sei`). Testnet entries reuse the same `chainName` as their mainnet counterpart; the `mainnet`/`testnet` domain segment (driven by `isTestnet`) is what distinguishes them, not a `-testnet` suffix on `chainName`.
+- Entries whose real endpoint isn't hosted on `cosmoslabs.kr` at all (custom third-party RPC providers) don't belong in this map — they'd get a broken `cosmoslabs.kr` URL built for them. Route those through `CUSTOM_API_CHAIN_IDS`/`CUSTOM_RPC_CHAIN_IDS` instead, or leave them out entirely so they fall through to the public endpoint lists.
 
 ---
 
@@ -232,6 +234,5 @@ The middleware also geo-blocks the root path (`/`) for requests from sanctioned 
 | `SKIP_API_KEY`             | Yes (production)                          | Skip API fallback key                 |
 | `WIDGET_SKIP_API_KEY`      | Yes (production)                          | Widget Skip API proxy                 |
 | `ALLOWED_LIST_EDGE_CONFIG` | Yes (production)                          | CORS middleware + Skip API handler    |
-| `POLKACHU_USER`            | Yes (for private nodes)                   | Cosmos REST/RPC proxy                 |
-| `POLKACHU_PASSWORD`        | Yes (for private nodes)                   | Cosmos REST/RPC proxy                 |
+| `WHITELABEL_KEY`           | Yes (for private nodes)                   | Cosmos REST/RPC proxy (whitelabel chains) |
 | `HELIUS_API_KEY`           | Yes (for Solana)                          | Cosmos REST/RPC proxy (Solana chains) |
