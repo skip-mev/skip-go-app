@@ -221,7 +221,7 @@ Next.js rewrites in `next.config.js` route wildcard paths to the correct handler
 
 ## Geo-Blocking
 
-The middleware also geo-blocks the root path (`/`) for requests from sanctioned regions: Russia (RU), Cuba (CU), Iran (IR), North Korea (KP), Syria (SY), and specific Ukrainian regions (Donetsk, Luhansk, Crimea).
+The middleware also geo-blocks the root path (`/`) for requests from sanctioned regions: Russia (RU), Cuba (CU), Iran (IR), North Korea (KP), and specific Ukrainian regions (Donetsk, Luhansk, Crimea).
 
 ---
 
