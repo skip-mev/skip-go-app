@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import DiscordButton from "@/components/DiscordButton";
 import { LogoGo } from "@/components/LogoGo";
-import MigrateButton from "@/components/MigrateButton";
 import ShareButton from "@/components/ShareButton";
 import WidgetButton from "@/components/WidgetButton";
 // import { useFeatureEnabled } from "@/hooks/useFeatureEnabled";
@@ -143,7 +142,6 @@ export function SkipPage() {
           </p>
         </div>
       </main>
-      <MigrateButton />
     </div>
   );
 }
