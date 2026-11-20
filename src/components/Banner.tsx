@@ -1,67 +1,41 @@
-import { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+export const Banner = () => {
+  const link = process.env.NEXT_PUBLIC_BANNER_LINK;
+  const message = process.env.NEXT_PUBLIC_BANNER_MESSAGE;
+  const content = (
+    <>
+      <span className="truncate text-[14px] font-semibold leading-5 tracking-[-0.01em] md:shrink-0 md:overflow-visible md:text-[15px]">
+        {process.env.NEXT_PUBLIC_BANNER_TITLE}
+      </span>
+      {message && (
+        <span className="hidden min-w-0 truncate text-[13px] leading-5 text-white/75 md:block">{message}</span>
+      )}
+    </>
+  );
+  const lineClass = "flex min-w-0 max-w-full items-baseline justify-center gap-3";
 
-import styles from "./Banner.module.css";
-import { CloseIcon } from "./CloseIcon";
-
-export const Banner = ({ theme }: { theme: "dark" | "light" }) => {
-  const hideBannerTitle = localStorage.getItem("hideBanner");
-  const hideBannerFromLocalStorage = hideBannerTitle === process.env.NEXT_PUBLIC_BANNER_TITLE;
-
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [bannerRoot, setBannerRoot] = useState<HTMLElement | null>(null);
-  const [hideBanner, setHideBanner] = useState(hideBannerFromLocalStorage ?? false);
-
-  const handleHideBanner = () => {
-    setHideBanner(true);
-    localStorage.setItem("hideBanner", process.env.NEXT_PUBLIC_BANNER_TITLE ?? "");
-  };
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 900px)");
-    const update = () => setIsDesktop(mediaQuery.matches);
-    update();
-
-    mediaQuery.addEventListener("change", update);
-    return () => mediaQuery.removeEventListener("change", update);
-  }, []);
-
-  useEffect(() => {
-    let el = document.getElementById("banner-root");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "banner-root";
-      document.body.appendChild(el);
-    }
-    setBannerRoot(el);
-  }, []);
-
-  const bannerElement = !hideBanner ? (
-    <div className={styles.bannerContainer}>
-      <a
-        href={process.env.NEXT_PUBLIC_BANNER_LINK}
-        target="_blank"
-        className={`flex flex-col gap-[18px] rounded-[10px] p-[18px] ${theme === "light" ? "bg-white text-black" : "bg-black text-white"}`}
-      >
-        <strong
-          className={`flex items-center justify-between font-diatype text-[15px] ${theme === "light" ? "text-black" : "text-white"}`}
+  return (
+    <div
+      role="status"
+      className="relative flex w-full justify-center bg-black px-4 py-3 font-diatype text-white md:px-6"
+    >
+      {link ? (
+        <a
+          href={link}
+          target="_blank"
+          rel="noreferrer"
+          title={message}
+          className={`${lineClass} text-white underline decoration-white/60 underline-offset-[3px] hover:decoration-white`}
         >
-          {process.env.NEXT_PUBLIC_BANNER_TITLE}
-          <CloseIcon
-            onClick={handleHideBanner}
-            color={theme === "light" ? "#00000073" : "#ffffff80"}
-          />
-        </strong>
-        <div className={`font-diatype text-[13px] ${theme === "light" ? "text-[#00000073]" : "text-[#ffffff80]"}`}>
-          {process.env.NEXT_PUBLIC_BANNER_MESSAGE}
+          {content}
+        </a>
+      ) : (
+        <div
+          title={message}
+          className={lineClass}
+        >
+          {content}
         </div>
-      </a>
+      )}
     </div>
-  ) : null;
-
-  if (isDesktop && bannerRoot) {
-    return ReactDOM.createPortal(bannerElement, bannerRoot);
-  }
-
-  return bannerElement;
+  );
 };
