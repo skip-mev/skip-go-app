@@ -4,6 +4,8 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_API_URL?: string;
 
     readonly WHITELABEL_KEY?: string;
+    readonly HELIUS_API_KEY?: string;
+    readonly ALCHEMY_API_KEY?: string;
 
     readonly NEXT_PUBLIC_EDGE_CONFIG?: string;
     readonly NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?: string;
