@@ -53,9 +53,9 @@ Proxies Cosmos LCD/REST requests. The first path segment after `/api/rest/` is t
 
 **Endpoint resolution order:**
 
-1. **Whitelabel (Solana)** — Helius endpoints with `HELIUS_API_KEY` injected as a query param.
+1. **Solana** — Helius endpoints with `HELIUS_API_KEY` injected as a query param. If Helius returns a non-2xx status (e.g. 429 `max usage reached`) or the request fails, the proxy retries the same body against Alchemy (`{alchemyEndpoint}/{ALCHEMY_API_KEY}`). Each provider is optional and skipped when its key is unset; with neither key set the proxy returns 500.
 2. **Custom chain IDs** — hardcoded endpoints in `CUSTOM_API_CHAIN_IDS` (e.g. `secret-4` → Lavender Five).
-3. **Whitelabel private nodes** — chains listed in `WHITELABEL_CHAINS` get a `cosmoslabs.kr` endpoint with the `WHITELABEL_KEY` sent as the `User-Agent` header. If the private node health-check fails, it falls through to the public fallback below.
+3. **Whitelabel private nodes** — chains listed in `WHITELABEL_CHAINS` get a `cosmoslabs.kr` endpoint with the `WHITELABEL_KEY` sent as the `User-Agent` header. Before each request the proxy health-checks the private node (RPC: `GET /`; REST: `GET /cosmos/base/tendermint/v1beta1/node_info`, since Cosmos SDK LCD answers 501 on `/`). If the health-check fails, it falls through to the public fallback below.
 4. **Public fallback** — uses endpoints from `src/chains/rest.json`, preferring Polkachu-hosted public nodes (see `findFirstWorkingEndpoint` in `src/utils/endpoint.ts` — unrelated to the whitelabel private nodes above), and health-checks until a working one is found.
 
 ### Cosmos RPC (`/api/rpc/:chainID/*`)
@@ -92,7 +92,8 @@ Proxies analytics events to Amplitude. The `api_key` is provided by the client i
 | Skip API                         | Per-origin key from Edge Config, or `SKIP_API_KEY` fallback | `authorization` header      |
 | Widget Skip API                  | `WIDGET_SKIP_API_KEY`                                        | `authorization` header      |
 | Cosmos REST/RPC (Whitelabel)     | `WHITELABEL_KEY`                                             | `User-Agent` header         |
-| Cosmos REST/RPC (Helius/Solana)  | `HELIUS_API_KEY`                                             | `api-key` query parameter   |
+| Solana RPC (Helius, primary)     | `HELIUS_API_KEY`                                             | `api-key` query parameter   |
+| Solana RPC (Alchemy, fallback)   | `ALCHEMY_API_KEY`                                            | URL path (`/v2/{key}`)      |
 | Amplitude                        | None (client-provided)                                       | —                            |
 
 
@@ -179,7 +180,7 @@ This file controls how the REST and RPC proxies resolve a `chainID` to an upstre
 
 Called by `createProxyHandler` in `src/utils/api.ts` before falling back to the public chain registry. It checks the following in order:
 
-1. **Solana** — `solana` and `solana-devnet` return Helius RPC endpoints with `isApiKey: true`. The proxy handler appends `HELIUS_API_KEY` as a query parameter.
+1. **Solana** — `solana` and `solana-devnet` return a Helius `endpoint` plus an Alchemy `fallbackEndpoint` with `isSolana: true`. The proxy handler (`proxySolanaRequest`) calls Helius with `HELIUS_API_KEY` and falls back to Alchemy with `ALCHEMY_API_KEY` on a non-2xx response or network error. Each provider is optional and skipped when its key is unset.
 2. **Custom chain IDs** — looks up `CUSTOM_API_CHAIN_IDS` (for REST) or `CUSTOM_RPC_CHAIN_IDS` (for RPC). These are chains with hardcoded third-party endpoints that don't follow the whitelabel naming convention.
 3. **Whitelabel private nodes** — if the `chainID` exists in `WHITELABEL_CHAINS`, a `cosmoslabs.kr` URL is constructed from the entry's `chainName` and `isTestnet` flag. The result is marked `isPrivate: true` so the proxy adds a `User-Agent` auth header.
 4. **No match** — returns `undefined`, causing the proxy to fall through to the public endpoint lists in `src/chains/rest.json` or `src/chains/rpc.json`.
@@ -235,4 +236,5 @@ The middleware also geo-blocks the root path (`/`) for requests from sanctioned 
 | `WIDGET_SKIP_API_KEY`      | Yes (production)                          | Widget Skip API proxy                 |
 | `ALLOWED_LIST_EDGE_CONFIG` | Yes (production)                          | CORS middleware + Skip API handler    |
 | `WHITELABEL_KEY`           | Yes (for private nodes)                   | Cosmos REST/RPC proxy (whitelabel chains) |
-| `HELIUS_API_KEY`           | Yes (for Solana)                          | Cosmos REST/RPC proxy (Solana chains) |
+| `HELIUS_API_KEY`           | At least one of the two (for Solana)      | Solana RPC proxy (primary)            |
+| `ALCHEMY_API_KEY`          | At least one of the two (for Solana)      | Solana RPC proxy (fallback)           |
