@@ -18,27 +18,24 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
 
       let data = getWhitelabelEndpoint(chainID, type);
 
-      if (data && data.isApiKey && data.endpoint) {
-        const url = new URL(data.endpoint);
-        url.searchParams.set("api-key", process.env.HELIUS_API_KEY!);
-        return fetch(url, {
-          body: req.body,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: req.method,
-        });
+      if (data && data.isSolana && data.endpoint) {
+        return await proxySolanaRequest(req, data.endpoint, data.fallbackEndpoint);
       }
 
       if (fallbackFn) {
         const { endpoint } = await fallbackFn(chainID);
         if (data && data.endpoint && data.isPrivate) {
           try {
-            const privateNodeResponse = await fetch(data.endpoint, {
+            const healthCheckUrl =
+              type === "api"
+                ? new URL("cosmos/base/tendermint/v1beta1/node_info", data.endpoint).toString()
+                : data.endpoint;
+            const privateNodeResponse = await fetch(healthCheckUrl, {
               headers: {
                 "User-Agent": getWhitelabelUserAgent(),
               },
             });
+            await privateNodeResponse.body?.cancel();
             if (privateNodeResponse.ok) {
               data = { endpoint: data.endpoint, isPrivate: true };
             } else {
@@ -86,6 +83,37 @@ export function createProxyHandler(type: "api" | "rpc", fallbackFn?: FallbackEnd
       });
     }
   };
+}
+
+async function proxySolanaRequest(req: NextRequest, heliusEndpoint: string, alchemyEndpoint?: string) {
+  const heliusKey = process.env.HELIUS_API_KEY;
+  const alchemyUrl =
+    alchemyEndpoint && process.env.ALCHEMY_API_KEY ? `${alchemyEndpoint}/${process.env.ALCHEMY_API_KEY}` : undefined;
+  if (!heliusKey && !alchemyUrl) {
+    throw new Error("No Solana RPC API key configured (HELIUS_API_KEY / ALCHEMY_API_KEY)");
+  }
+
+  const requestInit = {
+    body: req.method === "GET" || req.method === "HEAD" ? undefined : await req.text(),
+    headers: { "Content-Type": "application/json" },
+    method: req.method,
+  };
+
+  if (heliusKey) {
+    const heliusUrl = new URL(heliusEndpoint);
+    heliusUrl.searchParams.set("api-key", heliusKey);
+    try {
+      const response = await fetch(heliusUrl, requestInit);
+      if (response.ok || !alchemyUrl) return response;
+      console.warn(`Solana RPC helius responded with ${response.status}, falling back to alchemy`);
+      await response.body?.cancel();
+    } catch (error) {
+      if (!alchemyUrl) throw error;
+      console.warn("Solana RPC helius request failed, falling back to alchemy:", error);
+    }
+  }
+
+  return fetch(alchemyUrl!, requestInit);
 }
 
 export function getWhitelabelUserAgent() {

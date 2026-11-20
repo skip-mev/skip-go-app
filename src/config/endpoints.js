@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @typedef {{ endpoint: string | undefined; isPrivate: boolean; isApiKey?: boolean } | undefined} EndpointConfig
+ * @typedef {{ endpoint: string | undefined; isPrivate: boolean; isSolana?: boolean; fallbackEndpoint?: string } | undefined} EndpointConfig
  */
 
 /**
@@ -24,15 +24,17 @@ exports.getWhitelabelEndpoint = (chainID, type) => {
   if (chainID === "solana-devnet") {
     return {
       endpoint: "https://devnet.helius-rpc.com",
+      fallbackEndpoint: "https://solana-devnet.g.alchemy.com/v2",
       isPrivate: false,
-      isApiKey: true,
+      isSolana: true,
     };
   }
   if (chainID === "solana") {
     return {
       endpoint: "https://mainnet.helius-rpc.com",
+      fallbackEndpoint: "https://solana-mainnet.g.alchemy.com/v2",
       isPrivate: false,
-      isApiKey: true,
+      isSolana: true,
     };
   }
 
