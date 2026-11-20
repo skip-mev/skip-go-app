@@ -65,11 +65,7 @@ export function SkipPage() {
         theme === "dark" ? "before:bg-[url(/dark-bg.svg)]" : theme === "light" ? "before:bg-[url(/light-bg.svg)]" : "",
       )}
     >
-      {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" &&
-      process.env.NEXT_PUBLIC_BANNER_MESSAGE &&
-      process.env.NEXT_PUBLIC_BANNER_TITLE ? (
-        <Banner />
-      ) : null}
+      {process.env.NEXT_PUBLIC_SHOW_BANNER === "true" && process.env.NEXT_PUBLIC_BANNER_TITLE ? <Banner /> : null}
       <main className="relative flex min-h-screen flex-col">
         <div className="flex w-full flex-row justify-between p-6">
           <LogoGo color={theme === "dark" ? "white" : "black"} />

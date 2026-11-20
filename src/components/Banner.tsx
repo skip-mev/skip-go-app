@@ -6,7 +6,9 @@ export const Banner = () => {
       <span className="truncate text-[14px] font-semibold leading-5 tracking-[-0.01em] md:shrink-0 md:overflow-visible md:text-[15px]">
         {process.env.NEXT_PUBLIC_BANNER_TITLE}
       </span>
-      <span className="hidden min-w-0 truncate text-[13px] leading-5 text-white/75 md:block">{message}</span>
+      {message && (
+        <span className="hidden min-w-0 truncate text-[13px] leading-5 text-white/75 md:block">{message}</span>
+      )}
     </>
   );
   const lineClass = "flex min-w-0 max-w-full items-baseline justify-center gap-3";
